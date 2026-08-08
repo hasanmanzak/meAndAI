@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>MeAndAI.Protocol.Conformance.Abstractions</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../MeAndAI.Protocol.Domain/MeAndAI.Protocol.Domain.csproj" />
+  </ItemGroup>
+</Project>

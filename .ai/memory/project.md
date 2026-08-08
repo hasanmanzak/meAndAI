@@ -1,9 +1,152 @@
 # Project Snapshot
 
-Last verified: **2026-07-30**
+Last verified: **2026-08-08**
 
 ## Verified facts
 
+- Historical ContractSlice A strict-redraw and parser-record-slot chain: base
+  [`25e26f908e1f123640c758e42e1db92d5eea6dde`](https://github.com/hasanmanzak/meAndAI/commit/25e26f908e1f123640c758e42e1db92d5eea6dde),
+  git tree identity `9a0dc5bb9b41c9509366ab92bc7de642724938b6`, passed
+  [run 30716919833](https://github.com/hasanmanzak/meAndAI/actions/runs/30716919833).
+  Historical parser-record-slot implementation predecessor
+  [`fca0778663238b83bb2ede7cba5ab52012414689`](https://github.com/hasanmanzak/meAndAI/commit/fca0778663238b83bb2ede7cba5ab52012414689),
+  git tree identity `05c7591565d965966285cd51226446b2f54c81bc`, passed Ubuntu and Windows in
+  [run 30722890590](https://github.com/hasanmanzak/meAndAI/actions/runs/30722890590);
+  publication verification was correctly skipped and the
+  [draft PR #174](https://github.com/hasanmanzak/meAndAI/pull/174) suite reports
+  GitGuardian green.
+  [FIND-0445](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0445)
+  and [FIND-0446](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0446)
+  are resolved. `A-INDEX-SLOT-01` remains `ReviewedLocalGreen`; its canonical R,
+  focused greens, cumulative A `19/19`, `642/690` size, locks/build/format/diff,
+  and three final `0/0/0` reviews remain immutable. Strict D/RT retired
+  never-activated `A-PARSER-INDEX-01` as a non-live, non-reactivatable
+  `RetiredBeforeActivation` tombstone and partitioned it into three ordered
+  packets. `A-PARSER-RECORD-SLOT-01` is exact-head `ReviewedLocalGreen`:
+  canonical R is immutable, final focused green is `1/1`, cumulative A is
+  `20/20`, exact packet size is `666/690`, reviews closed `0/0/0`, and exact-head
+  hosted checks are green. Renewed Writer-first D/RT closed `0/0/0` in three
+  independent current-tree reviews and StructureOnly is green.
+  [FIND-0447](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0447)
+  is resolved by exact correction head
+  [`3fa66695eb978954b321545e2d226c1effa6ead4`](https://github.com/hasanmanzak/meAndAI/commit/3fa66695eb978954b321545e2d226c1effa6ead4),
+  git tree identity: `5ed8c3eef36cfab99490c514b0a23ca99b681ad0`, and green
+  [run 30746985780](https://github.com/hasanmanzak/meAndAI/actions/runs/30746985780).
+  [FIND-0448](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0448)
+  is resolved by exact
+  [`561a760401cf7312a15cadea3e6bf9f56b488d5d`](https://github.com/hasanmanzak/meAndAI/commit/561a760401cf7312a15cadea3e6bf9f56b488d5d),
+  git tree identity: `8f120c396bd531e7b33d9c00a1265e0a7be6d1ba`, and successful
+  [run 30748757145](https://github.com/hasanmanzak/meAndAI/actions/runs/30748757145).
+  `A-GOVERNED-REFERENCE-SLOTS-01` is `ReviewedLocalGreen`. Exact remote-equal
+  [`6b49de76d7420c33a3707c3aeeab78b4362fb602`](https://github.com/hasanmanzak/meAndAI/commit/6b49de76d7420c33a3707c3aeeab78b4362fb602),
+  git tree identity: `15cb1b6d048b40436a676df53472d4ad9dc23441`,
+  passed Ubuntu and Windows in
+  [run 30753246121](https://github.com/hasanmanzak/meAndAI/actions/runs/30753246121).
+  Its exact R/G evidence plus focused `1/1`, cumulative A `21/21`, validation,
+  and reviews are retained in the
+  governed-reference-slots handoff.
+  At the admission checkpoint the live denominator was `18 - 1 + 3 = 20`;
+  twelve packets were `ReviewedLocalGreen` (`60%`). The exact hosted-green
+  admission frozen-design
+  predecessor is
+  [`f298e87f98cb0896904a21078e2e3f391b2b8dcd`](https://github.com/hasanmanzak/meAndAI/commit/f298e87f98cb0896904a21078e2e3f391b2b8dcd),
+  git tree identity `6debfc2f3648ec7972d3e1f21d1f1cc224b35a4a`, with successful
+  [run 30774470978](https://github.com/hasanmanzak/meAndAI/actions/runs/30774470978).
+  The immutable admission implementation delivery is
+  [`c1653d45c99eb01291bc571e93d74db80d94d9e8`](https://github.com/hasanmanzak/meAndAI/commit/c1653d45c99eb01291bc571e93d74db80d94d9e8),
+  git tree identity `7f547daa92ca22d4f4f288e5ac8a97f890185bd7`; Ubuntu passed in
+  `18m12s`, Windows passed in `17m28s`, and publication verification was
+  correctly skipped in [run 30778711538](https://github.com/hasanmanzak/meAndAI/actions/runs/30778711538).
+  The exact hosted-green selector delivery is
+  [`2bbd36f5dd9ee975778063719fe8f879873e00d5`](https://github.com/hasanmanzak/meAndAI/commit/2bbd36f5dd9ee975778063719fe8f879873e00d5),
+  git tree identity `fe543889cc68fad6a61139f0125a41ca4050ce40`, with successful
+  [run 30772197693](https://github.com/hasanmanzak/meAndAI/actions/runs/30772197693);
+  publication verification was correctly skipped. The exact hosted-green
+  finding delivery [`2430a67e...`](https://github.com/hasanmanzak/meAndAI/commit/2430a67e0140a6c8ce0f26eaebae8aed35259134) /
+  [run 30767103072](https://github.com/hasanmanzak/meAndAI/actions/runs/30767103072)
+  remains historical predecessor evidence. Cumulative A is `27/27`.
+  `A-FINDING-01` is packet-local `ReviewedLocalGreen` on its
+  `R=NotApplicable`, `TestOnlyGreen`, production-zero route; synchronized
+  commit, push, and exact-head hosted validation are complete.
+  Exact target-freeze head
+  [`e1dc05637e316cb27d54050b06dfa26683fecb85`](https://github.com/hasanmanzak/meAndAI/commit/e1dc05637e316cb27d54050b06dfa26683fecb85),
+  git tree identity: `4d60d8814d28fe025248540fd3ad0237b22d37e7`, made Windows
+  green while Ubuntu failed only
+  [TEST-0178](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178) in
+  [run 30756586843](https://github.com/hasanmanzak/meAndAI/actions/runs/30756586843).
+  [FIND-0449](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0449)
+  is resolved by exact
+  [`9180b1ff300534ab38d34d2227ab2f79878c9007`](https://github.com/hasanmanzak/meAndAI/commit/9180b1ff300534ab38d34d2227ab2f79878c9007),
+  git tree identity: `1ebabf4091d9ee9d2a77ef9eb22fa7be1bc4c434`, and successful
+  [run 30758284884](https://github.com/hasanmanzak/meAndAI/actions/runs/30758284884).
+  [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
+  remains `Planned`; no final scenario/status/owner/workflow activation is
+  claimed, and [TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
+  plus B/C/D remain held. `A-FINDING-01` is packet-local `ReviewedLocalGreen`;
+  `A-SELECTOR-01` is packet-local `ReviewedLocalGreen` at the
+  selector handoff in the canonical log index,
+  with canonical R, production `12/20`, packet `382/520`, and historical
+  cumulative A `24/24`; synchronized green commit/push/exact-head hosted
+  validation are complete. `A-ADMISSION-01` is packet-local
+  `ReviewedLocalGreen`, with exact LR/R/G/V and hosted predecessor evidence
+  retained unchanged by the bounded records-only correction.
+  `A-PROJECTOR-DAG-01` is packet-local `ReviewedLocalGreen`: predecessor
+  focused/cumulative are exact `1/1` and `25/25`; immutable R is
+  `E8CF388ECF27BC37B79AE51966D3A123CED82CD80432C6F860CB2DA14A03C006`;
+  canonical focused/cumulative green are
+  `8F708B1AEEA6848DCA134CC3C653423F3AABC705708CC07C0E4C6173829A4546`
+  and `74A9A6AD9F152976156D11450F813487FE9E1ECD23F8DE5F6134A2894FBED005`;
+  build/format/StructureOnly and the seven-scenario publication suite are green;
+  final review is `0/0/0`; and the combined packet is accepted at exact
+  `770/770`. The exact implementation identity and hosted evidence are retained
+  in the canonical projector handoff. Exact-head hosted validation passed
+  Windows in `14m58s` and Ubuntu in `19m00s`, with publication verification
+  correctly skipped. Never-activated `A-CONVERGE-01` is retired and excluded
+  from the denominator. Its historical one-for-one replacement
+  `A-FULL-MANIFEST-01` is packet-local `ReviewedLocalGreen`. Canonical R ran
+  once and is immutable at
+  `F586F5BC8FFD5964EB1857512FA089FC8E5E5D3A054E39F28850057BE75DC0DB`;
+  the post-fix sentinel is diagnostic only. Two bounded corrections changed
+  stale applicability sibling negatives and a premature planned-scenario
+  literal without changing production or R. Final FullManifest is `1/1` at
+  `B11EBABED2AE2D938B65F3C8202694B88364DA1AF0E2DDADBCC69754EC450489`,
+  cumulative A is `27/27` at
+  `0392900A44314848BD0EDBC7425A0ABE5767B2E960726AD29DBF5AC78AB77A90`,
+  full Conformance is `27/27`, full Domain is `98/98`, StructureOnly passed with
+  `elapsedMs=484633`, and publication evidence passed `7/7` in `329.3s` without
+  a published-state claim. The first hosted implementation head passed Windows
+  and failed Ubuntu only on the instruction-graph edge budget. The bounded
+  records-only correction is exact-head hosted-green at
+  `canonical owning-finding correction head`, tree
+  `canonical owning-finding correction tree`, and run `30834117740`;
+  Windows passed in `15m53s`, Ubuntu in `17m50s`, publication verification was
+  correctly skipped, and that correction graph is `4094/4096`. This records-only
+  closure adds the two reserved evidence relations; its final delivery graph
+  is `4096/4096` and is closed by the exact evidence in the canonical owning
+  finding; Windows passed in `17m28s`, Ubuntu in `12m28s`, and publication
+  verification was correctly skipped.
+  `A-COMPLETE-PROFILE-01` is now exact-head hosted-green
+  `ReviewedLocalGreen` at the exact implementation commit and replacement
+  hosted run recorded in the canonical feature finding; its git tree identity
+  is recorded there.
+  Windows passed in `44m13s`, Ubuntu passed in `11m50s`, publication
+  verification was correctly skipped, and the implementation tree graph is
+  `4095/4096`. `A-PREDECESSOR-01` is immutable exact hosted-green predecessor
+  history recorded in the canonical owning finding. Its subsequent records
+  synchronization also passed exact-head hosted validation; publication
+  verification was correctly skipped. Canonical R `0014` and `0015` are
+  accepted, immutable, and were not rerun. The lifecycle freeze head passed
+  Ubuntu in `20m44s` and Windows in `46m51s`; publication verification was
+  correctly skipped. The exact lifecycle implementation identity recorded in
+  the canonical handoff passed Ubuntu in `19m36s` and Windows in `36m02s`; publication verification was
+  correctly skipped. ContractSlice A is `19/20` (`95%`) and `32/32`; Domain is `98/98`. `A-RESOURCE-01` is exact-head hosted-green at immutable R=`0024`; `A-CONVERGE-02`: V1 immutable diagnostic/no success, V2 `FrozenDesign`/corrected-design hosted pending. [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) and final activation remain held. Follow the current [canonical log index](log/README.md). The
+  predecessor-manifest exact-head hosted-green handoff indexed there is
+  immutable history; the admission-proof reviewed-local-green handoff,
+  the selector reviewed-local-green handoff in the canonical log index,
+  finding declaration reviewed-local-green handoff,
+  the parser-record-slot handoff in the canonical log index
+  and index-slot handoff in the canonical log index
+  are historical.
 - Repository: [hasanmanzak/meAndAI](https://github.com/hasanmanzak/meAndAI)
 - Visibility: public temporarily for hosted-CI continuity; the maintainer
   intends to return the repository to private after outstanding hosted and
@@ -19,6 +162,108 @@ Last verified: **2026-07-30**
   [FEAT-0059](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md)
   provides the typed C# operational foundation and portable verified package
   prerequisite. Its release grants no successor implementation authority.
+- Historical ContractSlice A cumulative `13/13` content is committed at
+  [`5fa7f7d`](https://github.com/hasanmanzak/meAndAI/commit/5fa7f7d02e64032e867d7c84d42662ba080b3c90)
+  (`[skip ci]`), with BASE records synchronized by
+  [`9107a49`](https://github.com/hasanmanzak/meAndAI/commit/9107a4936449048a057156e4714a99165ba1f24f).
+  Exact pushed
+  [`7f60e0c`](https://github.com/hasanmanzak/meAndAI/commit/7f60e0c66a49056b9e9854ccc353acfe67f65ed5)
+  is a recovery input rather than an accepted green
+  predecessor: it contained 18 static A facts and no valid build or per-packet
+  red/RT/review evidence. Bounded
+  [FIND-0441](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0441)
+  recovery retains four facts; each
+  exact focused filter passes `1/1` and cumulative A passes `17/17` locally.
+  Final local V passes locked restore with unchanged relevant lock fingerprints,
+  zero-warning/error Release build, format, diff/marker checks, and fresh
+  full-diff review `0/0/0`; status is `ReviewedLocalGreen`. Audited
+  git tree: `4ca02623e1f14233e847ebf64bc52d3cfe8869b8` is pushed at exact content
+  checkpoint
+  [`f64860ef456380232c23dfc4729a0d87f257483d`](https://github.com/hasanmanzak/meAndAI/commit/f64860ef456380232c23dfc4729a0d87f257483d)
+  on draft
+  [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174). Hosted
+  [TEST-0074](../../docs/features/FEAT-0012-v082-correction/test-cases.md#test-0074)
+  then exposed [FIND-0442](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0442):
+  the still-`Planned` A-D scenario carried 17 premature final `Scenario` traits.
+  The bounded correction retains every `ContractSlice=A` fact/FQN and defers
+  the [Scenario trait for TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
+  to atomic final activation. Local review, push, and exact-head hosted
+  [run 30659970794](https://github.com/hasanmanzak/meAndAI/actions/runs/30659970794)
+  are green; remote-equal
+  [`c88beefee54f3f0d0e0e623807eb8a4c9bf48032`](https://github.com/hasanmanzak/meAndAI/commit/c88beefee54f3f0d0e0e623807eb8a4c9bf48032)
+  was the frozen predecessor used to activate `A-SCHEMA-SLOT-01`; it is
+  historical now that the schema-slot packet has closed.
+- `A-SCHEMA-SLOT-01` is packet-local `ReviewedLocalGreen` with exact FQN
+  `ContractSliceASchemaSlotManifestTests.Enforces_exact_schema_and_zero_capability_evidence_slot_closure`
+  and marker `TEST-0210-A-BEHAVIOR-RED-0003`. D/RT owns the exact
+  reviewed red-source SHA-256
+  `128C3CAF24BB029CBE3C85ABEB4434B54DC2D90B29EED436B8343990E91E57DB`,
+  repository-tree schema, a producer-free zero-capability slot, schema/slot and
+  component closure, and global equal SlotKey reuse. All three prior 0003
+  attempts remain diagnostic. The first TRX at
+  `D:\Temp\meandai-test-0210-a-cf51d3e38d6a41c1a45c30eb5edf6e94\TEST-0210-A-BEHAVIOR-RED-0003.trx`
+  and the technically conforming rerun at
+  `D:\Temp\meandai-test-0210-a-9a39c31356614537b6a6f0eac0083c56\TEST-0210-A-BEHAVIOR-RED-0003.trx`
+  are exactly the diagnostic recurrence set for
+  [FIND-0443](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0443)
+  and its append-only
+  [evidence clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5150679793)
+  respectively because the lower-level micro oracle contradicted the accepted
+  locked-adapter marker-free assertion StackTrace and because the second run
+  preceded complete repository-record synchronization. The third TRX at
+  `D:\Temp\meandai-test-0210-a-c96f8fa926734506b50d17637e4e2dbe\TEST-0210-A-BEHAVIOR-RED-0003.trx`,
+  SHA-256
+  `F4190734BC91DB6879DCCC92633BBCB6DF4B9400A8CD4D47A7C6DF9030358C3A`,
+  is separately a zero-discovery VSTest infrastructure abort and is neither
+  [FIND-0443](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0443)
+  nor R. Canonical R is accepted at
+  `D:\Temp\meandai-test-0210-a-96ff2a5352c141f78f8bebbfc0f957f0\TEST-0210-A-BEHAVIOR-RED-0003.trx`,
+  SHA-256
+  `4B7B8398362E23B9364BBB7C11C4A538BA984B3474A52F2D95567CB340545FDE`.
+  The frozen red-source hash remained exact; the complete oracle passed in one
+  process-scoped 300-second-child / exact-420-second-outer invocation, and the
+  parent environment remained unset. No further red retry is authorized.
+  Original-oracle green passed `1/1` at
+  `D:\Temp\meandai-test-0210-a-green-d223831945254a88b29b723f0a07f3e3\TEST-0210-A-GREEN-0003.trx`,
+  SHA-256
+  `EF73BE838513986CA8FB9D41D1FC2B34D98CC3E31C650638B15158A7B115BB80`.
+  Final topology-clean focused green passed `1/1` at
+  `D:\Temp\meandai-test-0210-a-green-final-topology-64237a9f1c384c1fb5adef025948cfe0\TEST-0210-A-GREEN-FINAL-0003.trx`,
+  SHA-256
+  `A8552AF906E45AFB22A85BF0F3B61DDFD8AFA813036AA78292180C1BC32A2ACD`;
+  cumulative A passed `18/18` at
+  `D:\Temp\meandai-test-0210-a-cumulative-topology-retry-c93d714f03894591b62e498df55931c3\TEST-0210-A-GREEN-CUMULATIVE-0003.trx`,
+  SHA-256
+  `920BC60B161595E97D12544836D5B6E5B271C60931FFFB0860389F81F77B9DDC`.
+  Final test source is 436 lines, SHA-256
+  `FC43FDDA4B273BFCBED442FB145E28BA207EE433A08A9D3E43BEA88574154480`;
+  production `256` plus test `436` is `692/700`, and estimated `+2` remains
+  inside the hard cap. Release build passed with zero warnings/errors, format
+  passed, and all six locks remained unchanged.
+  [TEST-0074](../../docs/features/FEAT-0012-v082-correction/test-cases.md#test-0074)
+  first exposed a fixture-data
+  [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
+  literal; it is neutral
+  [TEST-0001](../../docs/features/FEAT-0001-common-development-protocol/test-cases.md#test-0001)
+  now, with no Scenario trait. Corrected local StructureOnly was inconclusive
+  at a controlled 300-second active timeout with no orphan; the earlier full
+  suite was inconclusive at 600 seconds, below official 20/35-minute budgets.
+  They are infrastructure observations, not red/green evidence. Fresh full-
+  diff review pass 2, after the pass-1 traceability correction, closed
+  `0 Blocking / 0 Important / 0 Minor`. [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
+  remains `Planned`; the index-slot handoff is historical and current routing
+  is the parser-record-slot handoff above.
+- The schema-slot packet was pushed at
+  [`3b93c9e4...`](https://github.com/hasanmanzak/meAndAI/commit/3b93c9e4b93e19baa150b57d8a2c99c4038689d8)
+  on draft [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174). Both stable
+  jobs in hosted [run 30699069580](https://github.com/hasanmanzak/meAndAI/actions/runs/30699069580)
+  failed only clickable-reference
+  [TEST-0175](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175).
+  [FIND-0444](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0444)
+  is resolved by record-only corrections at remote-equal
+  [`c73977d...`](https://github.com/hasanmanzak/meAndAI/commit/c73977d4af922aa66c464f6caced0d1aae473665)
+  and exact-head hosted [run 30704338972](https://github.com/hasanmanzak/meAndAI/actions/runs/30704338972);
+  the schema-slot C# evidence is unchanged.
 - Previous C# operational-foundation checkpoint:
   [FEAT-0059](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md)
   / [SUBF-0120](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0120)
@@ -123,6 +368,326 @@ documented project decision required when another approach better fits the
 domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 
 ## Active recurrence knowledge
+
+### Record synchronization reintroduces noncanonical cross-record links
+
+- Status: `Active`
+- Observable signature: an exact pushed documentation/memory synchronization
+  head makes hosted
+  [TEST-0175](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175)
+  report a pull-request label targeting `/pull/<number>/checks` as a non-record
+  target, or report a rendered stable identifier as not wholly covered by one
+  canonical link.
+- Applicability: current [SUBF-0143](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)
+  packet/cohort record synchronization and later repository Markdown changes
+  that describe packet, pull-request, scenario, finding, commit, or hosted-run
+  evidence.
+- Affected contract and cause: record synchronization used a GitHub checks UI
+  subroute as the identity of [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174)
+  and left the exact readiness prose "Full
+  [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
+  green is not claimed" outside a canonical link. This was plain readiness
+  prose, not the earlier Scenario-trait defect. The prior bounded
+  [FIND-0444](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0444)
+  correction had no active pre-push recurrence route for the next record cohort.
+- Canonical owner and evidence:
+  [FIND-0445](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0445),
+  [FEAT-0065](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md),
+  existing
+  [TEST-0175](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175),
+  the historical
+  index-slot handoff in the canonical log index,
+  the current
+  parser-record-slot handoff in the canonical log index,
+  failed head
+  [`bfa961d...`](https://github.com/hasanmanzak/meAndAI/commit/bfa961d1f661588dc48f337720cae2ef741887a7),
+  and [run 30712296217](https://github.com/hasanmanzak/meAndAI/actions/runs/30712296217).
+  [DEC-0029](../../docs/decisions/DEC-0029-canonical-recurrence-knowledge-and-test-harness-ownership.md)
+  owns this recurrence-entry schema.
+- Fixed release or evidence: no release. The bounded twelve-record correction
+  is resolved at exact remote-equal
+  [`25e26f908e1f123640c758e42e1db92d5eea6dde`](https://github.com/hasanmanzak/meAndAI/commit/25e26f908e1f123640c758e42e1db92d5eea6dde),
+  git tree identity: `9a0dc5bb9b41c9509366ab92bc7de642724938b6`,
+  with both stable jobs green in
+  [run 30716919833](https://github.com/hasanmanzak/meAndAI/actions/runs/30716919833).
+  The correction and later packet-denominator redraw remain separate commit
+  boundaries.
+- Required safe response: preserve the packet-local C#/test/lock evidence;
+  inventory only the authorized record cohort; target every pull-request label
+  at canonical [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174);
+  wholly link every rendered stable identifier to its canonical record; run the
+  existing [TEST-0175](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175)
+  barrier and fresh record review; then commit, push, and require remote-equal
+  exact-head hosted green before activating a successor.
+- Unsafe retry boundary: do not treat `/checks` as a pull-request identity, do
+  not partially link or code-format a governed stable identifier, do not use an
+  unchanged rerun of [`bfa961d...`](https://github.com/hasanmanzak/meAndAI/commit/bfa961d1f661588dc48f337720cae2ef741887a7)
+  as correction evidence, do not create a derivative test/validator, and do not
+  combine the separate packet-denominator redraw with this hosted correction.
+- Freshness and review condition: confirmed 2026-08-01; review after the
+  [TEST-0175](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175)
+  parsing/exact-target contract or the A-cohort record-synchronization process
+  changes.
+- Superseded by: `None`
+
+### Planned multi-slice scenario is asserted before final activation
+
+- Status: `Active`
+- Observable signature: [TEST-0074](../../docs/features/FEAT-0012-v082-correction/test-cases.md#test-0074)
+  reports `planned scenario is already asserted` while only a partial
+  ContractSlice is implemented and the canonical scenario remains `Planned`.
+- Applicability: a canonical scenario decomposed into partial .NET traits whose
+  scenario-status, scenario-owner, workflow filters, and full executable route activate later.
+- Affected contract and cause: partial [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
+  A facts received the final
+  [Scenario trait for TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
+  even though A-D and the
+  combined route were incomplete.
+- Canonical owner and evidence: [FIND-0442](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0442),
+  the [typed design](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-typed-evaluation-kernel-design.md),
+  the historical trait-correction handoff in the [canonical log index](log/README.md),
+  the historical schema-slot handoff,
+  the historical index-slot handoff,
+  the historical parser-record-slot handoff,
+  the hosted-green governed-reference-slots handoff,
+  the hosted-green target parser/index/slot handoff,
+  the hosted-green finding declaration reviewed-local-green handoff,
+  the hosted-green selector reviewed-local-green handoff,
+  the hosted-green admission-proof reviewed-local-green handoff,
+  and the current full-manifest `ReviewedLocalGreen` state.
+- Fixed release or evidence: no release. Partial facts retain exact FQN and
+  `ContractSlice`; final `Scenario` traits are deferred to the same atomic
+  scenario-status/scenario-owner/workflow-test-step target-and-filter/[TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
+  activation after all A-D focused and combined green.
+  [FIND-0442](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0442)
+  correction is reviewed and pushed at exact
+  [`c88beefee54f3f0d0e0e623807eb8a4c9bf48032`](https://github.com/hasanmanzak/meAndAI/commit/c88beefee54f3f0d0e0e623807eb8a4c9bf48032);
+  hosted [run 30659970794](https://github.com/hasanmanzak/meAndAI/actions/runs/30659970794)
+  is green. During `A-SCHEMA-SLOT-01`,
+  [TEST-0074](../../docs/features/FEAT-0012-v082-correction/test-cases.md#test-0074)
+  then exposed only a fixture-data
+  [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
+  literal; the correction is neutral
+  [TEST-0001](../../docs/features/FEAT-0001-common-development-protocol/test-cases.md#test-0001)
+  and retains no
+  Scenario trait. The corrected 300-second StructureOnly and earlier 600-second
+  full-suite attempts expired below the official 20/35-minute budgets with no
+  orphan; both are infrastructure observations, not scenario red/green evidence.
+- Required safe response: keep `PlannedDocumentation` strict, remove premature
+  final scenario traits, preserve partial-slice filters, and rerun StructureOnly
+  plus the unchanged cumulative ContractSlice filter; require exact-head hosted
+  green before accepting the correction head as a predecessor.
+- Unsafe retry boundary: do not mark a partial scenario `Passing`, weaken
+  [TEST-0074](../../docs/features/FEAT-0012-v082-correction/test-cases.md#test-0074),
+  add a scenario-ID-specific bypass, or activate scenario-owner/workflow scope early.
+- Freshness and review condition: confirmed 2026-07-31; review when partial
+  trait topology or final scenario activation changes.
+- Superseded by: `None`
+
+### Frozen delivery oracle contradicts locked adapter serialization
+
+- Status: `Active`
+- Observable signature: an otherwise exact BehaviorRed TRX includes the locked
+  xUnit/VSTest adapter's marker-free assertion `StackTrace`, while a lower-level
+  packet record prohibits every sibling `ErrorInfo` child.
+- Applicability: expected-red evidence that uses direct `Assert.Fail` with the
+  immutable xUnit package and standard TRX logger.
+- Affected contract and cause: the active micro plan drifted from the accepted
+  typed design and canonical 0001/0002 evidence by calling the standard same-
+  result StackTrace an invalid sibling.
+- Canonical owner and evidence:
+  [FIND-0443](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0443),
+  [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210),
+  the [typed design](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-typed-evaluation-kernel-design.md),
+  the historical schema-slot handoff,
+  the historical index-slot handoff,
+  the historical parser-record-slot handoff in the canonical log index,
+  the hosted-green governed-reference-slots handoff,
+  the hosted-green target parser/index/slot handoff,
+  the hosted-green finding declaration reviewed-local-green handoff,
+  the hosted-green selector reviewed-local-green handoff in the canonical log index,
+  the hosted-green admission-proof reviewed-local-green handoff,
+  and the current full-manifest `ReviewedLocalGreen` state.
+- Fixed release or evidence: no release. The
+  [FIND-0443](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0443)
+  recurrence set is
+  exactly the diagnostic `cf51...` and `9a39...` 0003 TRX observations: the
+  first exposed the oracle contradiction; the second passed the technical
+  shape but preceded complete repository-record sync. The separate `c96...`
+  zero-discovery infrastructure abort is excluded and governed below. The
+  corrected oracle now has accepted canonical R at the exact `96ff...` TRX and
+  SHA-256 recorded in the verified facts above.
+- Required safe response: preserve the corrected lower-level wording and
+  accepted R; permit zero or one nonempty marker-free standard
+  `ErrorInfo/StackTrace` and validate it when present. Stop before green if any
+  record/source or locked-adapter contract diverges; do not rerun accepted R.
+- Unsafe retry boundary: do not suppress/wrap the assertion stack, relabel it as
+  infrastructure failure, retroactively promote the exposing run, or allocate a
+  new marker ordinal.
+- Freshness and review condition: confirmed 2026-08-01; review when the locked
+  adapter, logger, or BehaviorRed evidence contract changes.
+- Superseded by: `None`
+
+### VSTest testhost connection aborts before discovery
+
+- Status: `Active`
+- Observable signature: VSTest aborts its testhost connection at the default
+  90 seconds before discovery; the TRX has no `UnitTestResult`, all 16 counters
+  are zero, and one infrastructure Error RunInfo.
+- Applicability: the current single-test ContractSlice A expected-red
+  invocation when `VSTEST_CONNECTION_TIMEOUT` is unset.
+- Affected contract and cause: the host connection window expired before the
+  test ran, so the invocation is infrastructure evidence rather than R.
+- Canonical owner and evidence: the historical
+  schema-slot handoff in the canonical log index
+  and exact TRX
+  `D:\Temp\meandai-test-0210-a-c96f8fa926734506b50d17637e4e2dbe\TEST-0210-A-BEHAVIOR-RED-0003.trx`,
+  SHA-256
+  `F4190734BC91DB6879DCCC92633BBCB6DF4B9400A8CD4D47A7C6DF9030358C3A`.
+- Fixed release or evidence: no release. Accepted canonical R is
+  `D:\Temp\meandai-test-0210-a-96ff2a5352c141f78f8bebbfc0f957f0\TEST-0210-A-BEHAVIOR-RED-0003.trx`,
+  SHA-256
+  `4B7B8398362E23B9364BBB7C11C4A538BA984B3474A52F2D95567CB340545FDE`.
+  One child-process `VSTEST_CONNECTION_TIMEOUT=300` / exact 420-second outer
+  invocation passed every oracle; its parent environment remained unset, and
+  reviewed red-source SHA-256 remained
+  `128C3CAF24BB029CBE3C85ABEB4434B54DC2D90B29EED436B8343990E91E57DB`.
+- Required safe response: retain the diagnostic `c96...` evidence and accepted
+  `96ff...` R separately. Bounded green is now complete; do not reclassify the
+  later controlled protocol-suite timeouts as red or green evidence.
+- Unsafe retry boundary: do not pre-discover, loop, reuse evidence, persist or
+  raise either timeout, or auto-retry any further failure.
+- Freshness and review condition: confirmed 2026-08-01; review when the locked
+  VSTest/TestHost route or host execution environment changes.
+- Superseded by: `None`
+
+### Small-context packet advancement outruns the canonical ledger
+
+- Status: `Active`
+- Observable signature: an agent reports completion or pushes a successor tree
+  while the micro ledger still shows candidate/no-later-A state, recorded counts
+  lag the static test inventory, or the exact pushed head does not build.
+- Applicability: [SUBF-0143](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)
+  micro-delivery work and later small-context agents
+  operating under a frozen packet brief.
+- Affected contract and cause: multiple semantic packets were combined without
+  retained D/RT/R/V evidence; exact pushed
+  [`7f60e0c`](https://github.com/hasanmanzak/meAndAI/commit/7f60e0c66a49056b9e9854ccc353acfe67f65ed5)
+  contained 18 A facts while
+  canonical records still reported `13/13` and the tree did not build.
+- Canonical owner and evidence: [FIND-0441](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0441),
+  [FIND-0442](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0442),
+  [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210),
+  the [micro plan](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-micro-delivery-plan.md),
+  the historical planned-scenario-trait correction handoff in the canonical log index,
+  the historical schema-slot handoff in the canonical log index,
+  the historical index-slot handoff in the canonical log index,
+  the historical parser-record-slot handoff in the canonical log index,
+  the hosted-green governed-reference-slots handoff,
+  the hosted-green target parser/index/slot handoff,
+  the hosted-green finding declaration reviewed-local-green handoff,
+  the hosted-green selector reviewed-local-green handoff in the canonical log index,
+  the hosted-green admission-proof reviewed-local-green handoff,
+  and the current full-manifest `ReviewedLocalGreen` state.
+- Fixed release or evidence: no release. Four retained exact filters pass `1/1`
+  and cumulative A passes `17/17` locally; final local V and fresh full-diff
+  review `0/0/0` establish `ReviewedLocalGreen`. Audited tree `4ca02623...` is
+  pushed at content checkpoint
+  [`f64860ef...`](https://github.com/hasanmanzak/meAndAI/commit/f64860ef456380232c23dfc4729a0d87f257483d)
+  on draft
+  [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174); the later
+  remote-equal [`c88beef...`](https://github.com/hasanmanzak/meAndAI/commit/c88beefee54f3f0d0e0e623807eb8a4c9bf48032)
+  [FIND-0442](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0442)
+  correction head passed local review, push, and exact-head hosted green in
+  [run 30659970794](https://github.com/hasanmanzak/meAndAI/actions/runs/30659970794),
+  so it was the `A-SCHEMA-SLOT-01` activation predecessor. That packet is now packet-local
+  `ReviewedLocalGreen` with focused `1/1`, cumulative A `18/18`, build/format/
+  lock evidence. Fresh full-diff review pass 2, after the pass-1 traceability
+  correction, closed `0 Blocking / 0 Important / 0 Minor`.
+- Required safe response: the historical pushed head was recovery input and
+  required exact diff/test/review/record reconciliation before any successor
+  activation. That recovery is complete at exact remote-equal
+  [`c73977d...`](https://github.com/hasanmanzak/meAndAI/commit/c73977d4af922aa66c464f6caced0d1aae473665)
+  with hosted [run 30704338972](https://github.com/hasanmanzak/meAndAI/actions/runs/30704338972)
+  green. The oversized next vertical was redrawn without semantic expansion;
+  `A-INDEX-SLOT-01` is now `ReviewedLocalGreen`. A later strict D/RT retired
+  residual `A-PARSER-INDEX-01` before activation and replaced it with three
+  ordered live packets; `A-PARSER-RECORD-SLOT-01` and
+  `A-GOVERNED-REFERENCE-SLOTS-01` are `ReviewedLocalGreen`. The governed packet
+  is exact remote-equal hosted green at
+  [`6b49de76d7420c33a3707c3aeeab78b4362fb602`](https://github.com/hasanmanzak/meAndAI/commit/6b49de76d7420c33a3707c3aeeab78b4362fb602),
+  git tree identity: `15cb1b6d048b40436a676df53472d4ad9dc23441`,
+  and [run 30753246121](https://github.com/hasanmanzak/meAndAI/actions/runs/30753246121);
+  its exact R/G evidence is retained in the governed-reference handoff.
+  [FIND-0447](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0447)
+  is resolved at exact [`3fa66695eb978954b321545e2d226c1effa6ead4`](https://github.com/hasanmanzak/meAndAI/commit/3fa66695eb978954b321545e2d226c1effa6ead4) /
+  [run 30746985780](https://github.com/hasanmanzak/meAndAI/actions/runs/30746985780).
+  [FIND-0448](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0448)
+  is resolved at exact [`561a760401cf7312a15cadea3e6bf9f56b488d5d`](https://github.com/hasanmanzak/meAndAI/commit/561a760401cf7312a15cadea3e6bf9f56b488d5d) /
+  [run 30748757145](https://github.com/hasanmanzak/meAndAI/actions/runs/30748757145).
+  The exact hosted-green admission frozen-design predecessor is
+  [`f298e87f98cb0896904a21078e2e3f391b2b8dcd`](https://github.com/hasanmanzak/meAndAI/commit/f298e87f98cb0896904a21078e2e3f391b2b8dcd) /
+  [run 30774470978](https://github.com/hasanmanzak/meAndAI/actions/runs/30774470978).
+  The immutable admission implementation delivery is
+  [`c1653d45c99eb01291bc571e93d74db80d94d9e8`](https://github.com/hasanmanzak/meAndAI/commit/c1653d45c99eb01291bc571e93d74db80d94d9e8),
+  git tree identity `7f547daa92ca22d4f4f288e5ac8a97f890185bd7`; Ubuntu passed in
+  `18m12s`, Windows passed in `17m28s`, and publication verification was
+  correctly skipped in [run 30778711538](https://github.com/hasanmanzak/meAndAI/actions/runs/30778711538).
+  The exact hosted-green selector delivery is
+  [`2bbd36f5dd9ee975778063719fe8f879873e00d5`](https://github.com/hasanmanzak/meAndAI/commit/2bbd36f5dd9ee975778063719fe8f879873e00d5),
+  git tree identity `fe543889cc68fad6a61139f0125a41ca4050ce40`, with successful
+  [run 30772197693](https://github.com/hasanmanzak/meAndAI/actions/runs/30772197693).
+  The earlier exact hosted-green finding delivery remains
+  [`2430a67e...`](https://github.com/hasanmanzak/meAndAI/commit/2430a67e0140a6c8ce0f26eaebae8aed35259134) /
+  [run 30767103072](https://github.com/hasanmanzak/meAndAI/actions/runs/30767103072).
+  `A-FINDING-01` and `A-SELECTOR-01` are packet-local `ReviewedLocalGreen`; the
+  latter is at the
+  selector handoff in the canonical log index
+  with synchronized delivery and hosted proof complete. `A-ADMISSION-01` is
+  packet-local `ReviewedLocalGreen`; its exact implementation, record delivery,
+  and hosted predecessor evidence remain exact after the bounded records-only
+  correction.
+  `A-PROJECTOR-DAG-01` is packet-local `ReviewedLocalGreen`; its exact
+  implementation identity and hosted evidence are retained in the canonical
+  projector handoff. At that historical projector checkpoint, cumulative A was
+  `27/27`, final review was `0/0/0`,
+  and combined budget is `770/770`; exact-head hosted validation passed Windows
+  in `14m58s` and Ubuntu in `19m00s`, with publication verification correctly
+  skipped. Never-activated `A-CONVERGE-01` is retired and excluded from the
+  denominator. Its historical one-for-one replacement `A-FULL-MANIFEST-01` is
+  `ReviewedLocalGreen`; immutable R, bounded generic green, the sibling-
+  assertion corrections, the fixture-topology correction, exact `27/27`
+  cumulative validation, and final long checks are retained in its canonical
+  handoff. The first hosted implementation head passed Windows and failed Ubuntu
+  only on the instruction-graph edge budget. The bounded records-only correction
+  is exact-head hosted-green at `canonical owning-finding correction head`,
+  tree `canonical owning-finding correction tree`, and run `30834117740`,
+  with graph `4094/4096`. This records-only closure adds the two reserved
+  evidence relations; its final delivery graph is `4096/4096` and is closed
+  by the exact evidence in the canonical owning finding; Windows passed in
+  `17m28s`, Ubuntu in `12m28s`, and publication verification was correctly
+  skipped. `A-COMPLETE-PROFILE-01` is exact-head hosted-green
+  `ReviewedLocalGreen` at the exact implementation commit and replacement
+  hosted run recorded in the canonical feature finding; its git tree identity
+  is recorded there.
+  Windows passed in `44m13s`, Ubuntu passed in `11m50s`, publication
+  verification was correctly skipped, and the implementation tree graph is
+  `4095/4096`. `A-PREDECESSOR-01` is immutable exact hosted-green predecessor
+  history recorded in the canonical owning finding. Its subsequent records
+  synchronization also passed exact-head hosted validation; publication
+  verification was correctly skipped. Canonical R `0014` and `0015` are
+  accepted, immutable, and were not rerun. The lifecycle freeze head passed
+  Ubuntu in `20m44s` and Windows in `46m51s`; publication verification was
+  correctly skipped. The exact lifecycle implementation identity recorded in
+  the canonical handoff passed Ubuntu in `19m36s` and Windows in `36m02s`; publication verification was correctly skipped.
+- Unsafe retry boundary: do not trust completion wording or commit messages,
+  reconstruct missing red/review evidence, allocate retrospective markers, or
+  call a broken or unreviewed pushed head the next predecessor.
+- Freshness and review condition: refreshed 2026-08-07 for the exact recovery,
+  strict redraw, exact parser-record and complete-profile hosted-green heads,
+  governed-reference freeze, and umbrella authority; review when the micro
+  state machine, packet brief, or checkpoint authority changes.
+- Superseded by: `None`
 
 ### Completed historical adoption issue is misclassified as malformed
 
@@ -415,7 +980,7 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   encoding can mask the second dependency until a hosted Windows runner sets a
   preamble-bearing value.
 - Canonical owner and evidence: the
-  [v0.13.1 stdin correction](log/2026-07-23-v0131-hosted-windows-stdin-encoding-correction.md)
+  v0.13.1 stdin correction in the canonical log index
   owns batch-reader framing; [SUBF-0106](../../docs/features/FEAT-0055-v0154-utf8-workflow-dispatch/README.md#subf-0106)
   / [TEST-0153](../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0153)
   / [issue #137](https://github.com/hasanmanzak/meAndAI/issues/137) owns lifecycle
@@ -647,8 +1212,9 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 
 - Status: `Active`
 - Observable signature: [TEST-0065](../../docs/features/FEAT-0011-stability-closure/test-cases.md#test-0065)
-  reports an `UnlinkedCommitReference` for a
-  short SHA or for a commit-like hexadecimal object identity in Markdown.
+  or its repository-wide [TEST-0178](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178)
+  owner reports an `UnlinkedCommitReference` for a short SHA or for a
+  commit-like hexadecimal object identity in Markdown.
 - Applicability: tracked Markdown and GitHub-facing evidence that names commits,
   checkpoints, blobs, or other Git objects.
 - Affected contract and cause: a human-facing commit identity is not navigable
@@ -656,18 +1222,59 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   referenced implementation evidence is not itself invalid.
 - Canonical owner and evidence: [FIND-0284](../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md#find-0284)
   / [TEST-0178](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178)
-  owns the exact reference contract.
+  owns the exact reference contract. Historical
+  [FIND-0446](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0446)
+  remains resolved at exact head
+  [`25e26f908e1f123640c758e42e1db92d5eea6dde`](https://github.com/hasanmanzak/meAndAI/commit/25e26f908e1f123640c758e42e1db92d5eea6dde),
+  git tree identity: `9a0dc5bb9b41c9509366ab92bc7de642724938b6`, and
+  [run 30716919833](https://github.com/hasanmanzak/meAndAI/actions/runs/30716919833).
+  The later delivery occurrence was
+  [FIND-0447](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0447):
+  exact activation head
+  [`cf8920e6a42b9118761c30599f8fcb9f87f5335f`](https://github.com/hasanmanzak/meAndAI/commit/cf8920e6a42b9118761c30599f8fcb9f87f5335f),
+  git tree identity: `1c9fc67f666a7e972ed034cdcf5ba21cb98becf5`, and
+  [run 30744358545](https://github.com/hasanmanzak/meAndAI/actions/runs/30744358545),
+  with thirteen ambiguous Git tree labels. It is resolved by exact correction
+  head [`3fa66695eb978954b321545e2d226c1effa6ead4`](https://github.com/hasanmanzak/meAndAI/commit/3fa66695eb978954b321545e2d226c1effa6ead4),
+  git tree identity: `5ed8c3eef36cfab99490c514b0a23ca99b681ad0`, and green
+  [run 30746985780](https://github.com/hasanmanzak/meAndAI/actions/runs/30746985780).
+  The current delivery occurrence is
+  [FIND-0449](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0449):
+  exact target-freeze head
+  [`e1dc05637e316cb27d54050b06dfa26683fecb85`](https://github.com/hasanmanzak/meAndAI/commit/e1dc05637e316cb27d54050b06dfa26683fecb85),
+  git tree identity: `4d60d8814d28fe025248540fd3ad0237b22d37e7`, and
+  [run 30756586843](https://github.com/hasanmanzak/meAndAI/actions/runs/30756586843)
+  exposed one `UnlinkedCommitReference` in the target-freeze handoff. The
+  bounded correction is exact
+  [`9180b1ff300534ab38d34d2227ab2f79878c9007`](https://github.com/hasanmanzak/meAndAI/commit/9180b1ff300534ab38d34d2227ab2f79878c9007),
+  git tree identity: `1ebabf4091d9ee9d2a77ef9eb22fa7be1bc4c434`; successful
+  [run 30758284884](https://github.com/hasanmanzak/meAndAI/actions/runs/30758284884)
+  resolves the occurrence.
 - Fixed release or evidence: repository-only Markdown verification is the
-  focused barrier; target release `0.15.0` carries the corrected evidence.
+  focused barrier; release `0.15.0` carries the historical corrected evidence.
+  The historical twenty-three-occurrence correction remains resolved. The later
+  thirteen-occurrence correction remains resolved by exact
+  [`3fa66695eb978954b321545e2d226c1effa6ead4`](https://github.com/hasanmanzak/meAndAI/commit/3fa66695eb978954b321545e2d226c1effa6ead4) /
+  [run 30746985780](https://github.com/hasanmanzak/meAndAI/actions/runs/30746985780) under
+  [FIND-0447](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0447).
+  The separate Writer-first activation hold is resolved by exact
+  [`561a760401cf7312a15cadea3e6bf9f56b488d5d`](https://github.com/hasanmanzak/meAndAI/commit/561a760401cf7312a15cadea3e6bf9f56b488d5d),
+  git tree identity: `8f120c396bd531e7b33d9c00a1265e0a7be6d1ba`, and successful
+  [run 30748757145](https://github.com/hasanmanzak/meAndAI/actions/runs/30748757145),
+  which resolves [FIND-0448](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0448).
+  The recurrence remains `Active`; delivery evidence does not replace the canonical
+  executable owner.
 - Required safe response: resolve a commit to its exact full SHA and link the
-  label to `https://github.com/<owner>/<repo>/commit/<full-sha>`; describe a
-  non-commit object without presenting its raw identity as a commit reference,
-  or use an exact content permalink when navigation is required.
+  label to `https://github.com/<owner>/<repo>/commit/<full-sha>`; classify a
+  non-commit tree object with the explicit `git tree identity:` prefix without
+  changing its bytes or creating a false commit permalink, or use an exact
+  content permalink when navigation is required.
 - Unsafe retry boundary: do not leave a short SHA in code formatting, do not
   treat an arbitrary 40-hex object as a commit, and do not split one validator
   count into derivative findings.
-- Freshness and review condition: last confirmed 2026-07-25; review after the
-  canonical commit-reference validator contract changes.
+- Freshness and review condition: confirmed 2026-08-02 by the exact current
+  occurrence; review after the canonical commit-reference validator contract
+  or record-authoring process changes.
 - Superseded by: `None`
 
 ### Executable Case rename leaves a retired fixture path in a structural consumer
@@ -979,30 +1586,32 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   [SUBF-0153](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153)
   and
   [TEST-0221](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0221).
-  The local activation candidate is on
-  `codex/subf-0153-evidence-contract-implementation`, from predecessor
+  The historical activation candidate was developed on
+  `codex/subf-0153-evidence-contract-implementation` from predecessor
   [`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7).
 
   The valid red compiled the public-API reflection oracle and failed its one
   selected test solely because the normative 23-type slice inventory was
   absent. Discard the
   separate `NETSDK1064` package-cache attempt; it is not red or regression
-  evidence. Final local evidence is 46 of 46 focused tests and 98 of 98
+  evidence. Historical local evidence was 46 of 46 focused tests and 98 of 98
   combined predecessor/slice tests passing, a Release build with zero warnings
   and zero errors, and clean format verification. Lock-file hashes are
   unchanged, and project/package/solution/lock files are unchanged.
   [TEST-0221](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0221)
   is `Passing` and its current owner is the existing
   `tests/dotnet/MeAndAI.Protocol.Domain.Tests/MeAndAI.Protocol.Domain.Tests.csproj`.
-  The authorized workflow/scenario-owner activation is applied, and the local
+  The authorized workflow/scenario-owner activation is applied, and the
   [TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
   activation implementation is green. Gate 5 removed the private
   `CanonicalEvidencePayload` constructor reflection oracle and strengthened
-  public-observable validation, equality, and defensive-ownership cases. These
-  facts describe only the local working-tree candidate; they do not claim a
-  candidate commit, pull request, hosted run, merge, committed exact tree, or
-  exact-head validation. Follow the
-  [current implementation handoff](log/2026-07-30-feat-0065-subf-0153-evidence-contract-implementation.md).
+  public-observable validation, equality, and defensive-ownership cases. This
+  bounded packet subsequently completed through
+  [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173), exact main
+  [`ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd`](https://github.com/hasanmanzak/meAndAI/commit/ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd),
+  and [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256).
+  The implementation handoff in the canonical log index
+  is retained as historical pre-publication evidence.
 
   The separate [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5128172584)
   produced the Gate 1/2 design and expected-red planning for
@@ -1013,7 +1622,42 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   That Gate 2 packet is accepted, merged, and bounded exact-main validated at
   [`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7).
   [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
-  remains `Planned`, with no executable source or run.
+  remains `Planned`. Its local Gate 3 working tree now has the six-project
+  scaffold, exact SurfaceRed, cumulative-A 48-type surface, and `11/11`
+  structural checkpoint. BehaviorRed observations made before their applicable
+  [message/echo](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139945054)
+  and [RunInfo](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5140224849)
+  clarifications remain diagnostic. The fresh post-synchronization same-FQN run
+  passed the complete corrected oracle as canonical BehaviorRed. The first
+  limited ParseCanonical increment then passed original-oracle and final-source
+  exact-FQN checks `1/1`, cumulative A `12/12`, format verification, a warning/
+  error-free final six-project Release build, and private-byte implementation
+  review. That first-green support review had `0 Blocking`, one unnumbered
+  remaining-A coverage `Important`, and no unresolved `Minor`. The historical
+  canonical-string bounded-green closure handoff in the canonical log index
+  preserves FQN
+  `MeAndAI.Protocol.Conformance.Tests.ContractSliceACanonicalStringTests.Enforces_exact_canonical_manifest_string_encoding`,
+  marker/TRX `TEST-0210-A-BEHAVIOR-RED-0002`, writer-owned internal
+  `CanonicalManifestQuotedUtf8Codec.EncodeQuotedUtf8(string)`, exact
+  legacy/green quoted bytes, the 1,226-byte Unicode fixture and digest, exact
+  composed `C3 A9` versus decomposed `65 CC 81` non-normalization oracle,
+  complete lexical/malformed matrix, and narrow green topology. The reader must
+  canonicalize through that same codec and compare the complete quoted token at
+  `TokenStartIndex..BytesConsumed`; it catches only `GetString()`-originated
+  `InvalidOperationException` at the decode boundary. Direct malformed .NET
+  UTF-16 is codec-argument `ArgumentException`; malformed raw/escaped public
+  documents remain `FormatException`. Seam predecessor and both exact-FQN greens
+  passed `1/1`; the exact red and bounded source review closed `0 Blocking`/
+  `0 Important`/`0 Minor`; cumulative A passed `13/13`. Locked restore,
+  unchanged six lock fingerprints, standard format, clean diff check, and the
+  zero-warning/error six-project Release build passed. The non-gating severity-
+  info scan exposed pre-existing informational backlog/suggestions and is not
+  claimed clean. Canonical-string coverage `Important` is closed at the
+  historical `13/13` checkpoint; current grammar/number/graph/rule routing is
+  the [FIND-0441](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0441)
+  recovery described below, and
+  [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
+  remains `Planned`.
   It separates qualification slices from complete catalogs, uses an acyclic
   artifact/manifest/release graph, and fixes the cumulative public inventories
   at `48/72/95/96`, ending with `72` Abstractions, `23` Conformance, and one
@@ -1069,19 +1713,189 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   network, or I/O surface.
   For
   [SUBF-0143](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143),
-  Gate 2 review, maintainer acceptance, merge, and bounded
-  exact-main validation are complete. Gate 3 still requires both completed
+  Gate 2 review, maintainer acceptance, merge, and bounded exact-main
+  validation are complete. The prerequisite
   [SUBF-0153](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153)
-  merge/exact-main closure and a separate implementation directive; no
-  [SUBF-0143](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)
-  source/test/Gate 3/
-  project/lock/workflow/scenario-owner/
-  [TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
-  change is authorized.
+  completed through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173)
+  at exact main
+  [`ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd`](https://github.com/hasanmanzak/meAndAI/commit/ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd),
+  and [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256)
+  passed. The corrected
+  [ContractSlice A directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139269228)
+  authorizes a ParseCanonical-only A topology correction, bounded correction
+  red-team, exact project/reference/lock and predecessor-ownership transition,
+  exact A expected reds, and cumulative-A C# green. A constructs no executable
+  export, validates no typed registration list, and declares no kernel; first
+  executable activation and registration-mismatch ownership begin in C.
+  The append-only
+  [BehaviorRed evidence clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139945054)
+  makes the exact failed-result message authoritative, permits no marker outside
+  that node except at most one byte-identical run-summary adapter echo, and
+  derives `Xunit.Sdk.FailException` from the reviewed direct `Assert.Fail`
+  source plus immutable xUnit `2.9.3` lock rather than TRX.
+  The later [RunInfo clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5140224849)
+  permits at most one exact-shape marker-free same-FQN `[FAIL]` bookkeeping node
+  only with the sole Failed result, exact message, all 16 counters including
+  `error=0`, and no other diagnostic.
+  [FIND-0439](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0439)
+  fixes the remaining parser boundary: exact byte/depth/token ceilings,
+  exhaustive document-local `FormatException`, post-parse-only
+  `CatalogIncomplete`, role-reachable components with four exact runtime-anchor
+  exemptions, and trusted-envelope ownership of real commit/blob/content proof.
+  [FIND-0440](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0440)
+  records the RunInfo evidence-contract correction; its mandatory fresh rerun
+  is now satisfied by the accepted canonical A BehaviorRed.
   [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
-  remains `Planned` until that separate Gate 3 authority exists.
-  Future first BehaviorRed states use only the exact warning-free `null!`
-  activation/export sentinel defined by the design. D first proves the real
+  remains `Planned`. Correction red-team closed with no Blocking, Important,
+  or Minor finding and canonical StructureOnly passed. Project/lock ownership,
+  exact SurfaceRed, the 48-type structural surface, and focused `11/11` are
+  locally complete. Renewed architecture review of the topology/parser
+  corrections and
+  [FIND-0440](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0440)
+  passed with `0 Blocking`, `0 Important`, and
+  `0 Minor`. Pre-applicable-clarification BehaviorRed
+  observations remain diagnostic only. The fresh post-synchronization exact-FQN
+  invocation produced one reviewed canonical TRX with the sole Failed result,
+  exact marker message, one permitted `StdOut` echo, exact marker-free RunInfo,
+  Failed summary, and complete 16-counter inventory including `error=0`. The
+  first limited ParseCanonical implementation replaced the sentinel, passed the
+  original-oracle and final-source exact-FQN checks `1/1`, cumulative A `12/12`,
+  format verification, and the warning/error-free final six-project Release
+  build, and satisfied private-copy/canonical-reserialization/no-retained-raw-
+  byte source review. Equality now precedes digest/object construction. The
+  private input and writer-returned arrays are zeroed in `finally`; the
+  unretained `ArrayBufferWriter` internal buffer becomes unreachable but is not
+  explicitly zeroed. That first-green support review had `0 Blocking`, one
+  unnumbered remaining-A coverage `Important`, and no unresolved `Minor`. The
+  second A canonical-string exact-red packet and bounded-green closure are in the historical
+  handoff in the canonical log index:
+  exact `0002` FQN/marker, behavior-preserving writer-owned codec extraction,
+  exact legacy/green bytes, raw Unicode, exact composed `C3 A9` versus decomposed
+  `65 CC 81` non-normalization, lowercase C0/DEL/C1, positive 1,226-byte fixture/
+  digest, and malformed raw/escaped input taxonomy. The reader reuses the same
+  codec for complete quoted-token comparison and narrowly maps only decode-boundary
+  `GetString()` `InvalidOperationException`. Internal malformed .NET UTF-16 remains
+  `ArgumentException`; public malformed documents are `FormatException`. Seam
+  predecessor and original-oracle/final-source greens passed `1/1`; exact red
+  and bounded source review closed `0 Blocking`/`0 Important`/`0 Minor`;
+  cumulative A passed `13/13`. Locked restore, unchanged lock fingerprints,
+  standard format, clean diff check, and the zero-warning/error six-project
+  Release build passed; the non-gating severity-info scan is not claimed clean.
+  Canonical-string coverage `Important` is closed at the historical `13/13`
+  checkpoint. Later pushed input
+  [`7f60e0c`](https://github.com/hasanmanzak/meAndAI/commit/7f60e0c66a49056b9e9854ccc353acfe67f65ed5)
+  is under
+  [FIND-0441](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0441)
+  recovery: four retained focused filters pass `1/1`, cumulative A passes
+  `17/17`, and final local V plus fresh full-diff review `0/0/0` establish
+  `ReviewedLocalGreen`. Audited tree `4ca02623...` is pushed at exact content
+  checkpoint
+  [`f64860ef...`](https://github.com/hasanmanzak/meAndAI/commit/f64860ef456380232c23dfc4729a0d87f257483d)
+  on draft
+  [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174); the
+  [FIND-0442](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0442)
+  correction is reviewed, pushed, and exact-head hosted green. Remote-equal
+  [`c88beefee54f3f0d0e0e623807eb8a4c9bf48032`](https://github.com/hasanmanzak/meAndAI/commit/c88beefee54f3f0d0e0e623807eb8a4c9bf48032)
+  is the frozen predecessor for packet-local `ReviewedLocalGreen`
+  `A-SCHEMA-SLOT-01`. Its
+  [FIND-0443](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0443)
+  recurrence is exactly the diagnostic `cf51...` and `9a39...` runs. The third
+  `c96...` observation is a separate zero-discovery VSTest infrastructure
+  abort. Canonical 0003 BehaviorRed is accepted at the exact `96ff...` TRX:
+  one process-scoped 300-second-child / exact-420-second-outer invocation passed
+  the complete oracle, the parent environment remained unset, and no retry is
+  authorized. Original-oracle and topology-clean focused greens passed `1/1`,
+  cumulative A passed `18/18`, final source is 436 lines at SHA-256
+  `FC43FDDA4B273BFCBED442FB145E28BA207EE433A08A9D3E43BEA88574154480`,
+  code/test is `692/700`, build is zero-warning/error, format passed, and locks
+  are unchanged.
+  [TEST-0074](../../docs/features/FEAT-0012-v082-correction/test-cases.md#test-0074)'s
+  fixture-data literal is neutral
+  [TEST-0001](../../docs/features/FEAT-0001-common-development-protocol/test-cases.md#test-0001)
+  with
+  no Scenario trait. The 300-second StructureOnly and earlier 600-second full-
+  suite expirations are infrastructure observations below official budgets,
+  not red/green evidence. Fresh full-diff review pass 2, after the pass-1
+  traceability correction, closed `0 Blocking / 0 Important / 0 Minor`.
+  [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
+  remains `Planned`. The later umbrella checkpoint authorized the strictly
+  redrawn `A-INDEX-SLOT-01`, whose corrected renewed RT closed `0/0/0` and whose
+  current state is `ReviewedLocalGreen`. Subsequent strict D/RT retired
+  never-activated `A-PARSER-INDEX-01`; `A-PARSER-RECORD-SLOT-01` and
+  `A-GOVERNED-REFERENCE-SLOTS-01` are `ReviewedLocalGreen`. The latter is exact
+  remote-equal hosted green at
+  [`6b49de76d7420c33a3707c3aeeab78b4362fb602`](https://github.com/hasanmanzak/meAndAI/commit/6b49de76d7420c33a3707c3aeeab78b4362fb602),
+  git tree identity: `15cb1b6d048b40436a676df53472d4ad9dc23441`,
+  and [run 30753246121](https://github.com/hasanmanzak/meAndAI/actions/runs/30753246121);
+  its exact R/G evidence is retained in the historical governed-reference handoff.
+  [FIND-0447](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0447)
+  is resolved at exact [`3fa66695eb978954b321545e2d226c1effa6ead4`](https://github.com/hasanmanzak/meAndAI/commit/3fa66695eb978954b321545e2d226c1effa6ead4) /
+  [run 30746985780](https://github.com/hasanmanzak/meAndAI/actions/runs/30746985780).
+  [FIND-0448](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0448)
+  is resolved at exact [`561a760401cf7312a15cadea3e6bf9f56b488d5d`](https://github.com/hasanmanzak/meAndAI/commit/561a760401cf7312a15cadea3e6bf9f56b488d5d),
+  git tree identity: `8f120c396bd531e7b33d9c00a1265e0a7be6d1ba`, and successful
+  [run 30748757145](https://github.com/hasanmanzak/meAndAI/actions/runs/30748757145).
+  The exact hosted-green admission frozen-design predecessor is
+  [`f298e87f98cb0896904a21078e2e3f391b2b8dcd`](https://github.com/hasanmanzak/meAndAI/commit/f298e87f98cb0896904a21078e2e3f391b2b8dcd),
+  git tree identity `6debfc2f3648ec7972d3e1f21d1f1cc224b35a4a`, with successful run
+  [30774470978](https://github.com/hasanmanzak/meAndAI/actions/runs/30774470978).
+  The immutable admission implementation delivery is
+  [`c1653d45c99eb01291bc571e93d74db80d94d9e8`](https://github.com/hasanmanzak/meAndAI/commit/c1653d45c99eb01291bc571e93d74db80d94d9e8),
+  git tree identity `7f547daa92ca22d4f4f288e5ac8a97f890185bd7`; Ubuntu passed in
+  `18m12s`, Windows passed in `17m28s`, and publication verification was
+  correctly skipped in [run 30778711538](https://github.com/hasanmanzak/meAndAI/actions/runs/30778711538).
+  The exact hosted-green selector delivery is
+  [`2bbd36f5dd9ee975778063719fe8f879873e00d5`](https://github.com/hasanmanzak/meAndAI/commit/2bbd36f5dd9ee975778063719fe8f879873e00d5),
+  git tree identity `fe543889cc68fad6a61139f0125a41ca4050ce40`, with successful run
+  [30772197693](https://github.com/hasanmanzak/meAndAI/actions/runs/30772197693).
+  The exact hosted-green finding delivery
+  [`2430a67e...`](https://github.com/hasanmanzak/meAndAI/commit/2430a67e0140a6c8ce0f26eaebae8aed35259134) /
+  [run 30767103072](https://github.com/hasanmanzak/meAndAI/actions/runs/30767103072)
+  remains historical predecessor evidence.
+  `A-FINDING-01` is packet-local `ReviewedLocalGreen` at the
+  finding declaration handoff;
+  `A-SELECTOR-01` is packet-local `ReviewedLocalGreen` at the
+  selector handoff in the canonical log index,
+  with synchronized delivery and hosted proof complete. `A-ADMISSION-01` is
+  packet-local `ReviewedLocalGreen`; its exact implementation, record delivery,
+  and hosted predecessor evidence remain exact after the bounded records-only
+  correction.
+  `A-PROJECTOR-DAG-01` is packet-local `ReviewedLocalGreen`; its exact
+  implementation identity and hosted evidence are retained in the canonical
+  projector handoff. Exact-head hosted validation passed Windows in `14m58s`
+  and Ubuntu in `19m00s`, with publication verification correctly skipped.
+  Never-activated `A-CONVERGE-01` is retired and excluded from the denominator.
+  Its historical one-for-one replacement `A-FULL-MANIFEST-01` is exact-head hosted-green
+  `ReviewedLocalGreen`; canonical R remains immutable, final focused is `1/1`,
+  and final cumulative A is `27/27`. The first hosted implementation head passed
+  Windows and failed Ubuntu only on the instruction-graph edge budget. The
+  bounded records-only correction is exact-head hosted-green at
+  `canonical owning-finding correction head`, tree
+  `canonical owning-finding correction tree`, and run `30834117740`,
+  with graph `4094/4096`. This records-only closure adds the two reserved
+  evidence relations; its final delivery graph is `4096/4096` and is closed
+  by the exact evidence in the canonical owning finding; Windows passed in
+  `17m28s`, Ubuntu in `12m28s`, and publication verification was correctly
+  skipped. `A-COMPLETE-PROFILE-01` is exact-head hosted-green
+  `ReviewedLocalGreen` at the exact implementation commit and replacement
+  hosted run recorded in the canonical feature finding; its git tree identity
+  is recorded there.
+  Windows passed in `44m13s`, Ubuntu passed in `11m50s`, publication
+  verification was correctly skipped, and the implementation tree graph is
+  `4095/4096`. `A-PREDECESSOR-01` is immutable exact hosted-green predecessor
+  history recorded in the canonical owning finding. Its subsequent records
+  synchronization also passed exact-head hosted validation; publication
+  verification was correctly skipped. Canonical R `0014` and `0015` are
+  accepted, immutable, and were not rerun.
+  Partial facts retain `ContractSlice` only; their final `Scenario`
+  traits are deferred. B/C/D, workflow/scenario-trait/scenario-owner/
+  [TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
+  activation, WIP extraction, consumer/release/publication/authority-transfer,
+  and PowerShell-retirement changes remain held. A's canonical first BehaviorRed
+  used only the exact warning-free `FinalizedPolicyManifest.ParseCanonical => null!`
+  sentinel and positive minimal-manifest null predicate; the stable green source
+  now contains neither that sentinel nor the marker/null branch. B/C/D retain their
+  activation/export sentinels. C first activates an executable export; D first proves the real
   export graph. RULE-0001 is deliberately later: the real D writer/codec/parser/
   index/projector/kernel vectors must be green before the D session can mint its
   fresh Conformance-registered input from immutable fixture data; no C runtime
@@ -1124,13 +1938,19 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   parent is incomplete, and no successor inherits a passing state. Do not push
   implementation to [draft PR #160](https://github.com/hasanmanzak/meAndAI/pull/160)
   or extract its code. The bounded [TEST-0220](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0220)
-  stable-job route is complete. The current
+  stable-job route is complete. The historical
   [SUBF-0143](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)
   [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5128172584)
-  authorizes no workflow, scenario-owner, project, lock, test, or implementation
-  change. Do not implement, mutate consumers, publish releases, transfer
-  authority, or retire PowerShell without a later dependency-closed Definition
-  of Ready and explicit maintainer directive.
+  authorized no workflow, scenario-owner, project, lock, test, or implementation
+  change. It is superseded for the bounded ContractSlice A operation by the
+  corrected [exact-A directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139269228),
+  which authorized reviewed dependency-closed A increments and only their frozen
+  C# scope. D/RT may prove `R=NotApplicable` / `TestOnlyGreen` with production
+  zero; every other increment retains its frozen red-to-green route. That authority
+  does not extend to B/C/D, workflow/scenario-owner/[TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
+  activation, WIP extraction, consumer mutation, release/publication, authority
+  transfer, or PowerShell retirement; those scopes still require their later
+  dependency-closed Definition of Ready and explicit maintainer directive.
 
 - Immutable [v0.15.5](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.5)
   is published at

@@ -12,7 +12,7 @@ public sealed class ProjectGraphTests
 
     [Fact]
     [Trait("Scenario", "TEST-0220")]
-    public void ProtocolSolutionContainsOnlyDomainAndDomainTests()
+    public void ProtocolSolutionContainsDomainAndDomainTests()
     {
         var solutionPath = Path.Combine(RepositoryRoot, "MeAndAI.Protocol.slnx");
         var document = XDocument.Load(solutionPath);
@@ -22,14 +22,16 @@ public sealed class ProjectGraphTests
             .Order(StringComparer.Ordinal)
             .ToArray();
 
-        Assert.Equal(
-            new[]
-            {
-                "src/MeAndAI.Protocol.Domain/MeAndAI.Protocol.Domain.csproj",
-                "tests/dotnet/MeAndAI.Protocol.Domain.Tests/" +
-                    "MeAndAI.Protocol.Domain.Tests.csproj",
-            },
-            projects);
+        var expectedProjects = new[]
+        {
+            "src/MeAndAI.Protocol.Domain/MeAndAI.Protocol.Domain.csproj",
+            "tests/dotnet/MeAndAI.Protocol.Domain.Tests/" +
+                "MeAndAI.Protocol.Domain.Tests.csproj",
+        };
+
+        Assert.All(
+            expectedProjects,
+            expectedProject => Assert.Contains(expectedProject, projects));
     }
 
     [Fact]

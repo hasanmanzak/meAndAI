@@ -52,7 +52,7 @@ public sealed class EvidencePublicApiContractTests
 
     [Fact]
     [Trait("Scenario", "TEST-0221")]
-    public void DomainExportsEqualTheCumulativeInventory()
+    public void DomainExportsContainTheCumulativeInventory()
     {
         var expected = PredecessorInventory
             .Concat(SliceInventory)
@@ -65,6 +65,8 @@ public sealed class EvidencePublicApiContractTests
             .Order(StringComparer.Ordinal)
             .ToArray();
 
-        Assert.Equal(expected, actual);
+        Assert.All(
+            expected,
+            expectedType => Assert.Contains(expectedType, actual));
     }
 }

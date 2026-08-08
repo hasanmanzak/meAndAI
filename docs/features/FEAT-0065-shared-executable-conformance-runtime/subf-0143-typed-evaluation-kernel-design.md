@@ -3,40 +3,1326 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 design candidate; C# implementation and Gate 3 are not authorized |
+| Status | Gate 2 accepted; A `19/20` (`95%`), `32/32`; [TEST-0210](test-cases.md#test-0210) `Planned`; Resource R=`0024` hosted green; Converge V1 diagnostic/no success, V2 `FrozenDesign`/corrected-design hosted pending after renewed D/RT `0/0/0`. Final activation/DoD held. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Test | [TEST-0210](test-cases.md#test-0210) |
-| Exact-main input baseline | [`cae8854f8afee4c31e362a02637b27b488aab90f`](https://github.com/hasanmanzak/meAndAI/commit/cae8854f8afee4c31e362a02637b27b488aab90f) |
-| Design authority | [SUBF-0143](README.md#subf-0143) / [TEST-0210](test-cases.md#test-0210) [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5128172584) |
-| Accepted predecessor | [SUBF-0153](README.md#subf-0153) [evidence-acquisition design](subf-0153-evidence-contract-design.md), merged through [PR #171](https://github.com/hasanmanzak/meAndAI/pull/171) |
+| Gate 3 micro-delivery routing | Maintainer-approved [SUBF-0143](README.md#subf-0143) [micro-delivery control plan](subf-0143-micro-delivery-plan.md); the projector/DAG freeze-gate handoff remains the immutable design predecessor, while current packet-local `ReviewedLocalGreen` retains exact packet-local implementation/evidence; admission and earlier handoffs remain exact deliveries or historical checkpoints, and operational labels remain non-normative and activate no unstated work |
+| Exact-main implementation baseline | [`ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd`](https://github.com/hasanmanzak/meAndAI/commit/ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd) |
+| Design and Gate 3 authority | Historical [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5128172584); corrected ContractSlice A [implementation directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139269228); current umbrella authority on draft [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174) for ordered A-only delivery through `A-CONVERGE-02`; append-only [BehaviorRed message/echo clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139945054); append-only [BehaviorRed RunInfo clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5140224849); append-only [assertion-stack clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5150679793). B/C/D, merge, release, and publication remain outside that authority. |
+| Completed predecessor | [SUBF-0153](README.md#subf-0153) / [TEST-0221](test-cases.md#test-0221), merged through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173) and exact-main validated by [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) |
 
 ## Directive and hard boundary
 
-The maintainer authorized Gate 1 and Gate 2 architecture design plus
+The historical directive authorized Gate 1 and Gate 2 architecture design plus
 expected-red planning for [SUBF-0143](README.md#subf-0143) and
-[TEST-0210](test-cases.md#test-0210) only. This packet closes the catalog,
+[TEST-0210](test-cases.md#test-0210). The later corrected
+[ContractSlice A directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139269228)
+authorizes only the reviewed A topology correction, project/lock transition,
+exact A expected reds, and bounded cumulative-A C# implementation after this
+correction has no unresolved Blocking or Important architecture finding. This packet closes the catalog,
 release binding, provider-neutral typed model, admission, cache, applicability,
 evaluator, finding, evaluation, and aggregation handoff required by the
 accepted [SUBF-0153](README.md#subf-0153) design.
 
-It does **not** authorize:
+The append-only
+[BehaviorRed evidence clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139945054)
+changes only the standard-TRX evidence oracle: the failed-result message is the
+exact proof node, one run-summary adapter echo is tolerated, and assertion type
+comes from reviewed source plus the immutable xUnit lock. It changes no test,
+marker, product topology, or implementation authority. Every observation made
+before its applicable clarification remains diagnostic. The fresh post-
+synchronization same-FQN run recorded below is the canonical first A
+BehaviorRed.
 
-- C# source or executable-test implementation;
-- Gate 3 expected-red execution;
-- project, package, lock-file, solution, workflow, scenario-owner, or
+The later append-only
+[RunInfo clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5140224849)
+likewise changes evidence wording only. It distinguishes at most one locked-
+adapter, marker-free same-FQN `[FAIL]` bookkeeping node from an independent or
+contradictory diagnostic. The run observed before that distinction remains
+diagnostic and cannot be promoted retroactively.
+
+The 2026-08-01 append-only
+[FIND-0443](README.md#find-0443) [assertion-stack clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5150679793)
+also changes evidence wording only. It aligns the packet-level oracle with this
+design's accepted same-result, marker-free standard assertion `StackTrace` and
+requires a fresh post-synchronization 0003 invocation. The exposing run and the
+later `9a39...` run remain diagnostic: the latter satisfied the technical TRX
+shape but preceded complete repository index synchronization. A renewed full-
+record/source review and another fresh same-marker/FQN/ordinal invocation were
+required before bounded green authority.
+
+The third 0003 observation at
+`D:\Temp\meandai-test-0210-a-c96f8fa926734506b50d17637e4e2dbe\TEST-0210-A-BEHAVIOR-RED-0003.trx`,
+SHA-256 `F4190734BC91DB6879DCCC92633BBCB6DF4B9400A8CD4D47A7C6DF9030358C3A`,
+used a previously nonexistent directory that was empty immediately before its
+single invocation. With `VSTEST_CONNECTION_TIMEOUT` unset, the default
+90-second testhost connection timeout aborted before discovery. The TRX has no
+`UnitTestResult`, all 16 counters are zero, and one infrastructure
+`RunInfo outcome="Error"` names PID `211000`; it is invalid red and remains a
+third diagnostic observation under the existing environment-failure clause.
+
+This observation changes no design semantic and does not broaden the
+BehaviorRed result oracle. It amended only the packet-specific execution
+envelope after renewed record/source review: one new nonexistent-and-empty GUID
+directory, one otherwise identical exact-FQN-filtered `dotnet test` invocation,
+one TRX logger, `--no-restore`, `--no-build`, child-process
+`VSTEST_CONNECTION_TIMEOUT=300`, and an exact 420-second outer timeout. Neither
+timeout could be raised automatically and no automatic retry was permitted. A
+second infrastructure failure would have blocked the packet rather than
+changing the oracle or source.
+
+That one bounded replacement invocation produced canonical 0003 R at
+`D:\Temp\meandai-test-0210-a-96ff2a5352c141f78f8bebbfc0f957f0\TEST-0210-A-BEHAVIOR-RED-0003.trx`,
+SHA-256 `4B7B8398362E23B9364BBB7C11C4A538BA984B3474A52F2D95567CB340545FDE`.
+Its sole exact-FQN result is Failed with the exact marker message, one permitted
+nonempty marker-free standard assertion stack, one permitted byte-identical
+echo, and one exact marker-free same-FQN `[FAIL]` RunInfo. The Failed summary
+has all 16 exact counters: `total=1`, `executed=1`, and `failed=1`, with every
+other counter zero. No attachment or independent diagnostic exists. The parent
+`VSTEST_CONNECTION_TIMEOUT` remained unset after the child completed. This R
+changes neither the reviewed source nor the existing BehaviorRed oracle; all
+three earlier observations remain diagnostic. The bounded green below now
+establishes packet-local `ReviewedLocalGreen`.
+
+### `A-SCHEMA-SLOT-01` bounded-green evidence
+
+The final retained
+`ContractSliceASchemaSlotManifestTests.cs` source is exactly `436` lines with
+SHA-256
+`FC43FDDA4B273BFCBED442FB145E28BA207EE433A08A9D3E43BEA88574154480`.
+The temporary marker and legacy branch are absent. The fixture-only scenario
+literal exposed by [TEST-0074](../FEAT-0012-v082-correction/test-cases.md#test-0074)
+was changed to neutral
+[TEST-0001](../FEAT-0001-common-development-protocol/test-cases.md#test-0001);
+no active [TEST-0210](test-cases.md#test-0210) source literal
+remains. The measured implementation is `256` production plus `436` test lines,
+or `692/700`: two lines above the `600-690` planning estimate, but below the
+only hard stop of more than `700` changed code/test lines.
+
+The original-oracle green, with the temporary branch still present, passed
+`1/1` at
+`D:\Temp\meandai-test-0210-a-green-d223831945254a88b29b723f0a07f3e3\TEST-0210-A-GREEN-0003.trx`,
+SHA-256 `EF73BE838513986CA8FB9D41D1FC2B34D98CC3E31C650638B15158A7B115BB80`.
+After topology cleanup, the final focused run passed `1/1` at
+`D:\Temp\meandai-test-0210-a-green-final-topology-64237a9f1c384c1fb5adef025948cfe0\TEST-0210-A-GREEN-FINAL-0003.trx`,
+SHA-256 `A8552AF906E45AFB22A85BF0F3B61DDFD8AFA813036AA78292180C1BC32A2ACD`,
+and cumulative `ContractSlice=A` passed `18/18` at
+`D:\Temp\meandai-test-0210-a-cumulative-topology-retry-c93d714f03894591b62e498df55931c3\TEST-0210-A-GREEN-CUMULATIVE-0003.trx`,
+SHA-256 `920BC60B161595E97D12544836D5B6E5B271C60931FFFB0860389F81F77B9DDC`.
+
+The Release build completed with zero warnings and zero errors, standard format
+verification passed, and all six lock fingerprints remained unchanged. The
+earlier full protocol-suite run reached its controlled `600`-second outer
+timeout, and the later post-correction `-StructureOnly` run reached its
+controlled `300`-second timeout with no orphan process. Both are inconclusive,
+remain below the repository's reviewed `20`/`35`-minute full-validation
+budgets, and are neither pass nor fail evidence. Fresh full-diff review pass 2
+closed `0 Blocking / 0 Important / 0 Minor` after the pass-1 traceability
+correction. Exact-head hosted [run 30704338972](https://github.com/hasanmanzak/meAndAI/actions/runs/30704338972)
+closes [FIND-0444](README.md#find-0444) at remote-equal
+[`c73977d...`](https://github.com/hasanmanzak/meAndAI/commit/c73977d4af922aa66c464f6caced0d1aae473665).
+`A-INDEX-SLOT-01` remains packet-local `ReviewedLocalGreen`; its canonical R,
+focused/cumulative green, hashes, line budget, locks, and review evidence are
+unchanged. Pushed head
+[`bfa961d...`](https://github.com/hasanmanzak/meAndAI/commit/bfa961d1f661588dc48f337720cae2ef741887a7),
+git tree identity: `07ceea87ae934c53e64eb2bd9e3ecf2904fa3943`, failed only repository-record
+[TEST-0175](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175)
+in [run 30712296217](https://github.com/hasanmanzak/meAndAI/actions/runs/30712296217).
+[FIND-0445](README.md#find-0445) owns that historical authoring failure. Exact
+correction head
+[`43c1800...`](https://github.com/hasanmanzak/meAndAI/commit/43c1800b551c0f7d337a20dd290390094d72311c),
+git tree identity: `2d550a6a894f6dcaa43b73bf156cb72d7c13e9e3`, made Windows
+green while Ubuntu failed only
+[TEST-0178](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178)
+with twenty-three ambiguous Git tree identities in
+[run 30714966450](https://github.com/hasanmanzak/meAndAI/actions/runs/30714966450).
+[FIND-0446](README.md#find-0446) owns their object-identity classification
+correction. Both findings are resolved by exact remote-equal
+[`25e26f9...`](https://github.com/hasanmanzak/meAndAI/commit/25e26f908e1f123640c758e42e1db92d5eea6dde),
+git tree identity: `9a0dc5bb9b41c9509366ab92bc7de642724938b6`, and hosted-green
+[run 30716919833](https://github.com/hasanmanzak/meAndAI/actions/runs/30716919833).
+At that historical strict-redraw checkpoint, never-activated
+`A-PARSER-INDEX-01` was retired and fourteen of twenty live packets were
+`ReviewedLocalGreen` (`70%`). `A-PARSER-RECORD-SLOT-01` was exact-
+head `ReviewedLocalGreen` at [`fca0778...`](https://github.com/hasanmanzak/meAndAI/commit/fca0778663238b83bb2ede7cba5ab52012414689)
+/ [run 30722890590](https://github.com/hasanmanzak/meAndAI/actions/runs/30722890590).
+`A-GOVERNED-REFERENCE-SLOTS-01`, `A-TARGET-PARSER-INDEX-SLOT-01`,
+`A-FINDING-01`, `A-SELECTOR-01`, `A-ADMISSION-01`, and `A-PROJECTOR-DAG-01`
+are `ReviewedLocalGreen`; cumulative A is `26/26`. The exact admission FrozenDesign
+predecessor is [`f298e87f98cb0896904a21078e2e3f391b2b8dcd`](https://github.com/hasanmanzak/meAndAI/commit/f298e87f98cb0896904a21078e2e3f391b2b8dcd),
+git tree identity `6debfc2f3648ec7972d3e1f21d1f1cc224b35a4a`, with Ubuntu and Windows green in
+[run 30774470978](https://github.com/hasanmanzak/meAndAI/actions/runs/30774470978).
+The exact admission record-evidence delivery is
+[`b735853a2153338fd97c366bcd8c212f78bc1bce`](https://github.com/hasanmanzak/meAndAI/commit/b735853a2153338fd97c366bcd8c212f78bc1bce),
+git tree identity `fc5ae301331f55f1435b4262c300489e3cbcff2f`, with Windows green in
+`17m10s`, Ubuntu green in `19m02s`, and publication verification correctly
+skipped in [run 30781516326](https://github.com/hasanmanzak/meAndAI/actions/runs/30781516326).
+`A-PROJECTOR-DAG-01` and `A-FULL-MANIFEST-01` are packet-local
+`ReviewedLocalGreen`. The projector hosted run `30798854880` passed Windows in
+`14m58s` and Ubuntu in `19m00s`; publication verification was correctly skipped.
+Never-activated `A-CONVERGE-01` is retired; `A-COMPLETE-PROFILE-01` is
+exact-head hosted-green `ReviewedLocalGreen` at commit
+`canonical owning-finding correction head`, tree
+`canonical owning-finding correction git tree identity`, and run `canonical owning-finding replacement run`.
+
+### Reviewed-local-green `A-INDEX-SLOT-01` delivery freeze
+
+The accepted design is unchanged. The delivery plan's hard line-budget gate
+redraws the next implementation into a first closed repository-tree path:
+schema/model -> exact `protocol.index.repository-tree` / `1`, `PerContext`, one
+`protocol.model.repository-tree` / `1` input at `(1,1)` -> exact
+`protocol.capability.repository-tree` / `1` -> the existing repository-tree
+slot. The exact indexer is component `protocol.index.repository-tree` / `1`,
+assembly `MeAndAI.Protocol.Policy`, type
+`MeAndAI.Protocol.Policy.Indexes.RepositoryTreeIndex`; the output capability's
+interface component is `protocol.type.capability.repository-tree` / `1`,
+assembly `MeAndAI.Protocol.Conformance.Abstractions`, type
+`MeAndAI.Protocol.Conformance.Abstractions.IRepositoryTree`. Its exact budget is
+`(16777216, 64, 200000, 2000000)`, and canonical failure-code order is
+`protocol.budget.exhausted`, then
+`protocol.index.repository-tree-unavailable`. Shared `(0,0)` rejection through
+both public input factories is included. Parser rows and every other index row
+remain absent and fail closed.
+
+The exact partial Fact is
+`ContractSliceAIndexSlotManifestTests.Enforces_exact_repository_tree_index_and_slot_capability_closure`
+with only `ContractSlice=A`; its marker/TRX stem is
+`TEST-0210-A-BEHAVIOR-RED-0004`. Transient source must construct the otherwise
+valid graph and invoke the writer before direct factory/matrix assertions; only
+the exact current writer exception type/message may emit marker 0004. Positive
+coverage freezes byte/digest round trip, projection, `TryGetIndex`, nested field
+order, and slot/producer equality. Negatives freeze nested spelling/null/
+duplicate/order, collection order, scope/input/model/cardinality, output/
+interface, producer reachability/uniqueness, budget/failure codes, component/
+artifact references, plus explicit rejection of parser and other index rows.
+First-pass D/RT was `0 Blocking / 1 Important / 0 Minor`; the freeze was
+corrected and renewed RT closed `0 Blocking / 0 Important / 0 Minor`. Estimate
+is `540-660`, packet ceiling `690`; `700+` forces another redraw.
+At this freeze boundary `A-PARSER-INDEX-01` remained Candidate/inactive and
+received no marker or implementation authority; the later strict redraw above
+retires that never-activated label and activates only its first replacement.
+
+LR completed once with all six lock fingerprints unchanged. P is
+`NotApplicable`; unchanged-source predecessor proof passed schema-slot focused
+`1/1` in
+`D:\Temp\meandai-test-0210-a-index-slot-p-schema-ae918b5eb8a74a6e9126831803ab815d\TEST-0210-A-PREDECESSOR-SCHEMA-SLOT-0004.trx`
+(`4FBD396466F80A5373A33B8E3C8E0C4CA55995699B7B761AF997644057F3BE60`),
+and cumulative A passed `18/18` in
+`D:\Temp\meandai-test-0210-a-index-slot-p-cumulative-bd86c6e63c7d4c1593a9ead3903ef8b6\TEST-0210-A-PREDECESSOR-CUMULATIVE-0004.trx`
+(`8D8F84F25712CDE59845E99C88C3A34AAAA5C9E5AD5383449CB828EB23508B5E`).
+Both were fresh one-invocation `--no-restore` proofs; neither is R.
+
+The transient source is `388` lines at SHA-256
+`996CDD4A7244A39E702530DF4E45152CAE3EBBE6B430CA3E79FA63FF3756EBF0`.
+After a `0/2/0` source finding pass was corrected, two fresh reviews closed
+`0/0/0` independently and the Release `--no-restore` build was warning/error
+free. The single canonical R is
+`D:\Temp\meandai-test-0210-a-index-slot-red-a4e9fd0d6c8e44cd9e0e20c65eea37fd\TEST-0210-A-BEHAVIOR-RED-0004.trx`,
+SHA-256 `72788214F782CE347C68E646D0B3AB82E58B92F7C18EA4B2B07ED60DDC7053A4`.
+Its exact Failed result, marker Message, permitted marker-free stack, one marker
+echo, permitted same-FQN RunInfo, exact sixteen counters, no attachments, unset
+parent timeout, and no orphan testhost pass the complete BehaviorRed oracle.
+No red retry is authorized.
+
+Bounded implementation changed only the frozen four production files and one
+test. Original-oracle focused green passed `1/1` at
+`D:\Temp\meandai-test-0210-a-index-slot-green-original-5f90b4d8a1724f5da17984eeb4221ae6\TEST-0210-A-GREEN-ORIGINAL-0004.trx`,
+SHA-256 `66F8DC42BD29C603E8004EDAB5EF634F69659854F64618FE34889B2A8640CB4F`.
+After marker/catch removal and final LF normalization, focused green passed
+`1/1` at
+`D:\Temp\meandai-test-0210-a-index-slot-green-lf-final-5793a27fa8f445cbb07582683c308256\TEST-0210-A-GREEN-LF-FINAL-0004.trx`,
+SHA-256 `B755D5DD4A7ED5E269410A72CB422AF0995B80362712EDDFE4FC9DE4BAFB91EE`.
+Final LF-normalized cumulative A passed `19/19` at
+`D:\Temp\meandai-test-0210-a-index-slot-green-lf-cumulative-f13b37ea9fec4fb8b973697898eaac3c\TEST-0210-A-GREEN-LF-CUMULATIVE-0004.trx`,
+SHA-256 `5BAAFF3717BFA1E5FBEC755F187766D627EBFB52A360749A2F5C06D9AFAF06E6`.
+The final source is `377` lines / SHA-256
+LF-normalized SHA-256 `F94B6138B87EBABBE8D0E4033B94CD41F6B44BF9FA37B58948513D3DA52D280B`;
+production delta is `265`, total packet size is `642/690`, Release build has
+zero warnings/errors, full format and diff checks are clean, six locks are
+unchanged, and three final live reviews each closed `0/0/0`.
+
+### Reviewed-local-green `A-PARSER-RECORD-SLOT-01` strict redraw freeze
+
+Strict-redraw base
+[`25e26f908e1f123640c758e42e1db92d5eea6dde`](https://github.com/hasanmanzak/meAndAI/commit/25e26f908e1f123640c758e42e1db92d5eea6dde),
+git tree identity: `9a0dc5bb9b41c9509366ab92bc7de642724938b6`, passed both stable jobs in
+[run 30716919833](https://github.com/hasanmanzak/meAndAI/actions/runs/30716919833).
+Exact activation predecessor
+[`42ce5e550867a1b74be9072fd78b52787d41df5c`](https://github.com/hasanmanzak/meAndAI/commit/42ce5e550867a1b74be9072fd78b52787d41df5c),
+git tree identity: `dc53b2f61f1468089724fd6eb798cb9d7d248570`, passed both stable jobs in
+[run 30719208988](https://github.com/hasanmanzak/meAndAI/actions/runs/30719208988).
+Exact reviewed-local-green head
+[`fca0778663238b83bb2ede7cba5ab52012414689`](https://github.com/hasanmanzak/meAndAI/commit/fca0778663238b83bb2ede7cba5ab52012414689),
+git tree identity: `05c7591565d965966285cd51226446b2f54c81bc`, passed both stable jobs in
+[run 30722890590](https://github.com/hasanmanzak/meAndAI/actions/runs/30722890590).
+The accepted D/RT verdict is `0 Blocking / 0 Important / 0 Minor`. The prior
+combined `A-PARSER-INDEX-01` was never activated and is
+`RetiredBeforeActivation`; it has no FQN, marker, R, G, or V and is excluded
+from the live denominator. The three ordered replacements are
+`A-PARSER-RECORD-SLOT-01`,
+`A-GOVERNED-REFERENCE-SLOTS-01`, and
+`A-TARGET-PARSER-INDEX-SLOT-01`. At that redraw checkpoint, the first was
+exact-head `ReviewedLocalGreen`; the second was `ReviewedLocalGreen` without a
+current exact-head hosted claim, and target/later identities remained `None`.
+Current governed-reference and target-freeze evidence is recorded in the
+[micro-delivery ledger](subf-0143-micro-delivery-plan.md#packet-evidence-ledger).
+
+The first replacement retains one Fact with only `ContractSlice=A`:
+`MeAndAI.Protocol.Conformance.Tests.ContractSliceAParserRecordSlotManifestTests.Enforces_exact_markdown_parser_protocol_record_index_and_slot_capability_closure`.
+Its exact marker/TRX is `TEST-0210-A-BEHAVIOR-RED-0005`; only the exact current
+writer `InvalidOperationException` and exact message `This writer increment
+supports only the minimal qualification slice.` may emit the marker. The
+writer-first branch precedes every direct factory or matrix assertion.
+
+The cumulative registry is exactly two schemas in governed-text/repository-tree
+order, one Markdown parser, two indexes in protocol-record/repository-tree
+order, and two slots in repository-governed-text/repository-tree order. The
+governed schema closes governed-text codec, source-text model, retention
+`(200000,67108864)`, budget `(4194304,256,500000,5000000)`, and its exact five
+failures. Markdown consumes source-text `(1,1)`, produces markdown-document,
+uses the same budget, and orders `protocol.budget.exhausted` before
+`protocol.model.invalid-markdown`. Protocol-record is `PerContext`, consumes
+markdown `(0,null)`, omits `maximumCount` on wire while rejecting explicit
+null, produces protocol-record-index, uses budget
+`(67108864,256,1000000,10000000)`, and orders budget exhaustion before record
+unavailable.
+
+The only new slot in this test-owned partial qualification-slice fixture is
+`protocol.slot.repository-governed-text`, on Repository requirement scope with
+Repository+Provider profile surfaces, exact governed body evidence/
+completeness/schema/consistency/material/target values, and only the
+protocol-record-index capability. This does not redefine the final governed-
+text slot closure; the next packet owns the provider slot and final governed-
+reference relationship. Exact cumulative cache is
+`(512,67108864,128,2000000,8,4,retain-lowest-canonical-keys)`. Provider-governed
+slot/reference, target parser/index/slot, projector graph, admission, executable
+export, and every later slice remain rejected. The exact identities, values,
+negative matrix, line budgets, source allowlist, TRX oracle, and holds are
+normatively frozen in the [micro-delivery plan](subf-0143-micro-delivery-plan.md#a-parser-record-slot-01-drt-observation).
+
+The frozen contract is now proven locally. Canonical R source was `377` lines
+at SHA-256 `DE9E8FD9A2816E6FF0351659D35340D4AD5BCA88059A7811C4E70E88C1DD2028`;
+its sole exact-FQN failed TRX is SHA-256
+`75B557B03901C7279B77745178CECE96D11E1245817CCFA3D603F971AC9F79A9`
+and was never rerun. Final focused green is `1/1` at SHA-256
+`51EBD24767650CD6C89F29647BE72247DAD01CAFE4E3EFD88767381901A09295`;
+final cumulative A is `20/20` at SHA-256
+`751671ED7354EA75E7FEBF2F2FB3FAF7144E28DAE1FE8AA319EE7F303E512B11`.
+Retained test source is `366` lines at SHA-256
+`990920A61CE9BA53444BFA0F87E67301594D0B2A9E1338B06B5CE84D980C5FAE`;
+production is `300` gross changed lines and packet total is `666/690`.
+Release build, format, locks, diff, allowlist, traits, and retained-marker checks
+passed; three independent post-green reviews each closed `0/0/0`.
+
+### Reviewed-local-green `A-GOVERNED-REFERENCE-SLOTS-01` closure
+
+The next frozen Fact is
+`MeAndAI.Protocol.Conformance.Tests.ContractSliceAGovernedReferenceSlotsManifestTests.Enforces_exact_governed_reference_index_and_dual_governed_text_slot_capability_closure`,
+with marker `TEST-0210-A-BEHAVIOR-RED-0006` and only `ContractSlice=A`. Exact
+predecessor is [`fca0778...`](https://github.com/hasanmanzak/meAndAI/commit/fca0778663238b83bb2ede7cba5ab52012414689),
+git tree identity: `05c7591565d965966285cd51226446b2f54c81bc`, hosted-green in
+[run 30722890590](https://github.com/hasanmanzak/meAndAI/actions/runs/30722890590).
+
+The exact cumulative shape is `2` schemas, `1` Markdown parser, `3` indexes in
+governed-reference/protocol-record/repository-tree order, and `3` slots in
+provider-governed/repository-governed/repository-tree order. Governed-reference
+is `protocol.index.governed-reference/1`, component
+`protocol.index.governed-reference/1`, assembly `MeAndAI.Protocol.Policy`, type
+`MeAndAI.Protocol.Policy.Indexes.GovernedReferenceIndex`, `PerPlan`; it consumes
+`protocol.model.markdown-document/1` through component
+`protocol.type.model.markdown-document/1`, assembly `MeAndAI.Protocol.Policy`,
+type `MeAndAI.Protocol.Policy.Models.MarkdownDocumentModel`, at `(0,null)`, then
+`protocol.capability.protocol-record-index/1` through component
+`protocol.type.capability.protocol-record-index/1`, assembly
+`MeAndAI.Protocol.Conformance.Abstractions`, type
+`MeAndAI.Protocol.Conformance.Abstractions.IProtocolRecordIndex`, at `(1,null)`, produces
+`protocol.capability.governed-reference-index/1` through component
+`protocol.type.capability.governed-reference-index/1`, assembly
+`MeAndAI.Protocol.Conformance.Abstractions`, type
+`MeAndAI.Protocol.Conformance.Abstractions.IGovernedReferenceIndex`, uses budget
+`(67108864,256,1000000,10000000)`, and
+orders `protocol.budget.exhausted` before
+`protocol.index.reference-unavailable`. Both governed slots canonicalize
+governed-reference before protocol-record capability while retaining their
+exact slot/requirement keys, requirement surfaces, kind
+`protocol.evidence.governed-text-set`, completeness
+`protocol.completeness.all-governed-bodies`, schema `protocol.governed-text/1`,
+ExactSnapshot/ObjectVersionBound/BoundedNonAtomicObservation consistency order,
+Provider versus `[Repository, Provider]` profile sets, material
+`protocol.material.governed-text`, and exact provider/repository governed-body-
+set targets. Each provider field and every shared-field preservation has a
+negative drift. Components become
+`14`; artifacts stay `3`; cache stays
+`(512,67108864,128,2000000,8,4,retain-lowest-canonical-keys)`.
+
+Natural R prebuilds the graph, remaining Catalog arguments, the successful
+`CatalogSliceDeclaration.Create` result, the validation-free
+`ParsedCanonicalManifest`, and the runtime-created expected exception outside
+the exact catch. The internal production `CanonicalManifestWriter.Write(parsed)`
+boundary is the first and only guarded expected-red observation, the first
+cross-graph validation, and the first serialization call. Only its exact runtime
+`ArgumentException`, `ParamName=rules`, with Message equal to the runtime-created
+expected exception for `The parser and protocol-record graph is not exact.` may
+emit the marker; the filter also requires exact runtime type equality because
+`ArgumentNullException` derives from `ArgumentException`. Every setup, Catalog,
+writer-guard, filter-mismatch, or other exception remains marker-free. Direct
+invocation of the internal closure validator is forbidden. On green, the same
+writer result feeds all subsequent assertions. Reader/writer may generalize only index
+inputs to model/capability; parser remains exact-one model. Catalog preserves
+predecessor `2/2`, accepts only successor `3/3`, and rejects mixed counts.
+Production is limited to Reader/Writer/Catalog and one new test; hard caps are
+`145/55/110`, production `310`, test `370`, total `680`. Pipeline review
+corrected `0/3/0` to provisional `0/0/0`; fresh and renewed post-hosted reviews
+then corrected cross-record, identity, matrix, ordering, and literal-assembly
+findings, but blocking [FIND-0448](README.md#find-0448) later proved their
+Catalog-first natural-red call unreachable. The Writer-first correction above
+closed through three independent current-tree `0/0/0` reviews and StructureOnly.
+Exact activation baseline
+[`561a760401cf7312a15cadea3e6bf9f56b488d5d`](https://github.com/hasanmanzak/meAndAI/commit/561a760401cf7312a15cadea3e6bf9f56b488d5d),
+git tree identity: `8f120c396bd531e7b33d9c00a1265e0a7be6d1ba`, passed Ubuntu and Windows in
+[run 30748757145](https://github.com/hasanmanzak/meAndAI/actions/runs/30748757145)
+and resolved the activation hold. The packet is now `ReviewedLocalGreen`.
+Exact remote-equal
+[`6b49de76d7420c33a3707c3aeeab78b4362fb602`](https://github.com/hasanmanzak/meAndAI/commit/6b49de76d7420c33a3707c3aeeab78b4362fb602),
+git tree identity: `15cb1b6d048b40436a676df53472d4ad9dc23441`,
+passed Ubuntu and Windows in
+[run 30753246121](https://github.com/hasanmanzak/meAndAI/actions/runs/30753246121);
+publication verification was correctly skipped. Prior `0/0/0`
+reviews remain historical rather than current authority. The complete matrix
+and holds are in the
+[handoff](../../../.ai/memory/log/2026-08-02-feat-0065-subf-0143-contractslice-a-governed-reference-slots.md).
+
+P is `NotApplicable`. Unchanged-source predecessor focused `1/1` is
+`D:\Temp\meandai-test-0210-a-predecessor-focused-0006-561a760-clean\TEST-0210-A-PREDECESSOR-FOCUSED-0006.trx`,
+SHA-256 `8C03E5859A46F29B6BB56BA96DCBF81A210AD5B13198C82FE8A1DF62FA6BC422`;
+predecessor cumulative A `20/20` is
+`D:\Temp\meandai-test-0210-a-predecessor-cumulative-0006-561a760-r2\TEST-0210-A-PREDECESSOR-CUMULATIVE-0006-R2.trx`,
+SHA-256 `298BA6226AA5BCC5EE4731575F086224C465AC6F22055BD44FD9207BDDA9ADB3`.
+The first Socket 10055 attempt is diagnostic only, neither P nor R. Transient
+source froze at `370` lines / SHA-256
+`9CFB0ACD9081072B9187FFB9E75704DBBB4FA3094881F643A766E9C872E84075`.
+Canonical R completed the exact oracle and was not rerun:
+`D:\Temp\meandai-test-0210-a-6f79b6c0330541d49d851464e1a8349e\TEST-0210-A-BEHAVIOR-RED-0006.trx`,
+SHA-256 `938DDA74559F955F28A4470EE953DB9575A46DC9453CA27C9EE664FB90E635E2`.
+
+Original-oracle focused green `1/1` is
+`D:\Temp\meandai-test-0210-a-green-original-8bc26cee2b884f80b06ba76c4eef9834\TEST-0210-A-GREEN-ORIGINAL-0006.trx`,
+SHA-256 `06633DAF09D312609E5DF6CA1018F5209A3BB8F88437C1F4E43FCD20A79E140F`.
+Final focused green `1/1` is
+`D:\Temp\meandai-test-0210-a-green-final-ed5ec8da05d44ddba9e00a6f0a196efa\TEST-0210-A-GREEN-FINAL-0006.trx`,
+SHA-256 `CCDA68221C94F051414BE38E2099D447C1EDA5835F9E5C74E30B62C351B0DF77`;
+the parser-record predecessor regression `1/1` is
+`D:\Temp\meandai-test-0210-a-green-predecessor-9c2babadda3f4070aaf749071e62f7cb\TEST-0210-A-GREEN-PREDECESSOR-0006.trx`,
+SHA-256 `08CD02F6EFE613B4E4F8F7754E574B18C84B77F83926FDACB3982B5555F47AA5`;
+and cumulative A `21/21` is
+`D:\Temp\meandai-test-0210-a-green-cumulative-163c8a4efe0d42d89cac064a8ebd3b9a\TEST-0210-A-GREEN-CUMULATIVE-0006.trx`,
+SHA-256 `59917686763074521CB0FABD9A2AC7A8F2C4636C87B545994FF93958190587B9`.
+Retained test source is `358` lines at SHA-256
+`BBE93D8E43632363E63E5D29C4F709353B04F6BD389276126C3409DE8A10A0D1`;
+Reader/Writer/Catalog gross changed lines are `135/21/57`, production `213`,
+combined `571/680`. Locked Release build, format, diff, allowlist, locks, trait,
+and marker checks passed; full Domain is `98/98`, full Conformance is `21/21`,
+and three independent post-green reviews each closed `0/0/0`.
+
+### Reviewed-local-green `A-TARGET-PARSER-INDEX-SLOT-01`
+
+The accepted architecture's target parser/index/slot vertical necessarily owns
+the third repository-target schema/model row. Exact cumulative topology is
+`3/2/4/4`, with zero projector/admission rows, exact `20` components, exact `3`
+artifacts, and unchanged cache. The reserved marker is
+`TEST-0210-A-BEHAVIOR-RED-0007`; the reserved Fact is
+`ContractSliceATargetParserIndexSlotManifestTests.Enforces_exact_repository_target_schema_parser_index_and_slot_capability_closure`,
+with only `ContractSlice=A`. Existing canonicalization fixes target-index input
+order as target-Markdown-set model, target-resolution model, then
+governed-reference capability. The exact identities, Writer-first oracle,
+negative matrix, Catalog-only production allowlist, `180/500/680` hard caps,
+and all held boundaries are frozen in the
+[micro-delivery D/RT observation](subf-0143-micro-delivery-plan.md#a-target-parser-index-slot-01-drt-observation)
+and [target packet handoff](../../../.ai/memory/log/2026-08-02-feat-0065-subf-0143-contractslice-a-target-parser-index-slot-freeze.md).
+The canonical expected red ran exactly once and remains immutable. Retained
+focused green is `1/1`, cumulative A is `22/22`, full Domain is `98/98`, full
+Conformance is `22/22`, retained source is `401` lines, and production/test
+size is `497/680`. Release build, format, locks, diff, marker/trait checks,
+StructureOnly, and three independent post-green reviews are green. Exact
+[`bdd252bb74a2d8ee87664cb0d34b5c893d34a7b9`](https://github.com/hasanmanzak/meAndAI/commit/bdd252bb74a2d8ee87664cb0d34b5c893d34a7b9),
+git tree identity `b95ac0da13e26c168d03525a0d2f7c63127e9885`, passed Ubuntu and Windows in
+[run 30762028026](https://github.com/hasanmanzak/meAndAI/actions/runs/30762028026)
+and is the exact `A-FINDING-01` predecessor.
+
+### Reviewed-local-green `A-FINDING-01` evidence
+
+The frozen `R=NotApplicable` / `TestOnlyGreen` route produced no marker/TRX and
+no production delta. The retained FQN is
+`ContractSliceAFindingManifestTests.Enforces_finding_declarations_with_exact_reference_roles`;
+its one synthetic-fixture test file is `420` lines at SHA-256
+`19DDFFA7131306C8BEF70D7E5B83E88B7ED564FE657045C5ACAF6CFAE49A1CAF`.
+Focused green is `1/1` at `D7C069CC...25D`, cumulative A is `23/23` at
+`8B7046AA...CD3`, full Domain is `98/98` at `8B59FC...3CDB`, and full
+Conformance is `23/23` at `B714DD...56804F`. Release build is
+`0 warnings / 0 errors`; default-severity format, diff, six locks,
+StructureOnly, publication-evidence checks, independent code red-team, and
+evidence audit are green. Exact hosted-green delivery
+[`2430a67e0140a6c8ce0f26eaebae8aed35259134`](https://github.com/hasanmanzak/meAndAI/commit/2430a67e0140a6c8ce0f26eaebae8aed35259134),
+git tree identity `893e6f6dc1a6f0a246dc209be650f906e5f5c702`, passed Ubuntu and Windows in
+[run 30767103072](https://github.com/hasanmanzak/meAndAI/actions/runs/30767103072)
+and is the exact selector design predecessor.
+
+### Reviewed-local-green `A-SELECTOR-01` contract and evidence
+
+Schema 1 already states that `ExpectedSelectorDeclaration.AllowedParentKinds`
+may contain only `ContextProof`, `Root`, and `Derived`; selector-on-selector
+nesting is invalid. At the exact frozen predecessor,
+`ExpectedSelectorDeclaration.Create` instead accepted `ExpectedSelector`.
+D/RT closed `0 Blocking / 0 Important / 0 Minor` on a
+single-production-file correction: canonicalize `allowedParentKinds` once in
+that factory, then reject any `ExpectedSelector` with `ArgumentException`,
+parameter `allowedParentKinds`, and base literal
+`Expected selector parent kinds must be ContextProof, Root, or Derived.` Exact
+observable `Message` equals
+`new ArgumentException(FrozenMessage, nameof(allowedParentKinds)).Message`, so
+framework-appended parameter text is compared portably. The
+shared canonicalizer and kind-rank helper remain unchanged because finding
+declarations legitimately use `ExpectedSelector` reference roles.
+
+The retained one-Fact FQN is
+`MeAndAI.Protocol.Conformance.Tests.ContractSliceASelectorManifestTests.Enforces_expected_selectors_with_exact_slot_schema_resolver_and_finding_closure`;
+its only trait is `ContractSlice=A`, and its canonical-R marker/TRX stem was
+`TEST-0210-A-BEHAVIOR-RED-0008`. Before any sibling assertion or writer call,
+the canonical-R first action was:
+
+```csharp
+_ = ExpectedSelectorDeclaration.Create(
+    "protocol.test.selector.alpha",
+    "protocol.slot.repository-tree",
+    "protocol.test.selector-schema.alpha",
+    Resolve("protocol.selector.test-alpha"),
+    [QualifiedEvidenceReferenceKind.ExpectedSelector],
+    [FindingCode.Parse("protocol.test.finding.alpha")]);
+
+Assert.Fail("TEST-0210-A-BEHAVIOR-RED-0008");
+```
+
+No catch surrounded the call; unexpected exceptions would have been
+marker-free. Retained green replaces only the marker branch with exact
+`ParamName` and runtime-created
+expected-`ArgumentException` `Message` equality.
+
+Production allowlist is only
+`src/MeAndAI.Protocol.Conformance.Abstractions/Rules/ExpectedSelectorDeclaration.cs`
+with target `8-18` and hard cap `20`. Test allowlist is only new
+`tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ContractSliceASelectorManifestTests.cs`
+with target `340-430` and hard cap `500`; combined hard cap is `520`.
+The exact reversed-input fixture contains alpha
+`protocol.test.selector.alpha` / `protocol.slot.repository-tree` /
+`protocol.test.selector-schema.alpha` / `protocol.selector.test-alpha/1` with
+all three allowed parents and findings `protocol.test.finding.alpha` /
+`protocol.test.finding.zeta`; and zeta
+`protocol.test.selector.zeta` / `protocol.slot.repository-governed-text` /
+`protocol.test.selector-schema.zeta` / `protocol.selector.test-zeta/1` with
+`Derived` and finding `protocol.test.finding.zeta`. Both resolver component rows use assembly
+`MeAndAI.Protocol.Conformance.Tests`, artifact `ContractSliceA.Proof.dll`, and
+types `MeAndAI.Protocol.Conformance.Tests.ContractSliceATestAlphaSelectorResolver`
+and `MeAndAI.Protocol.Conformance.Tests.ContractSliceATestZetaSelectorResolver`.
+
+The retained matrix owns input snapshot/canonical order, null/empty/null-element/
+duplicate boundaries, the three allowed and one forbidden parent kinds,
+selector ordering, declared-slot/finding and resolver-component closure, exact
+six-field wire order, and byte/digest roundtrip. Removing the entire
+`expectedSelectors` collection and both resolver rows reproduces the predecessor
+graph; selectors or either resolver left orphaned fail. Malformed-wire ownership
+is limited to the six outer fields/order, both lists, and selector-array
+ordering/null/duplicate boundaries. Nested resolver grammar receives positive
+`componentKey`/`componentVersion` order and orphan negatives only; existing
+component-reference tests retain exhaustive nested grammar. `selectorSchemaKey`
+is preserved exactly but gains no registry or whitelist here. Real five-rule
+selector inventory, schema/resolver mapping, and runtime resolution remain
+`A-FULL-MANIFEST-01` or later-packet scope. The exact selector freeze
+[`c97c317fb0d5e734597f43f605fe4f1718aa6d1c`](https://github.com/hasanmanzak/meAndAI/commit/c97c317fb0d5e734597f43f605fe4f1718aa6d1c),
+git tree identity `7fa1748c59902f027f1bd8ca4cdd66b72194f98e`, passed Ubuntu in `17m33s` and
+Windows in `15m23s` in
+[run 30769530904](https://github.com/hasanmanzak/meAndAI/actions/runs/30769530904).
+
+Canonical R used transient test source `367` lines at SHA-256
+`FC04D1916D14D5A750FC8A884E353E2A2B3662D052F2EAF9A39E0549E64B8F55`, with
+production unchanged at
+`5CFA7E3C37F730FA0ED3259A1688BF03C95D8E4B8D6061D9A21737656ABC1146`.
+The single exact-FQN invocation failed exactly once with the frozen marker; TRX
+SHA-256 is `7A85D0CC4B1AAF45038E818B3687C10D5F3339EC2ECC53D9D5646C97D5F6D30A`.
+The sixteen counters, permitted same-result diagnostics, source custody, and
+zero-attachment oracle passed; R is immutable and was not rerun.
+
+The retained test is `370` lines at
+`56B9B30AE4432D06644F58331569148EF7729DBE282FB8119634B11397862B69`.
+The one production file is
+`F4AA63038FCCA7B6DFBCF087E0F97CDC851C980B099840871C66722FADC4AAAF`,
+with gross `12/20`; combined packet size is `382/520`. Focused green is `1/1`
+at `98B2EADB4E111FEFCAB18C46FD3293FD88E88C028E562DE6CEC9B0C7DE33DDB2`;
+cumulative A is `24/24` at
+`527DCB9E2799AAEDAA1D6A1083014F005705E66C6E620F174A736926D1418D35`;
+full Conformance is `24/24` at
+`7356CC3AD6BD329D84B7694DB5919E7D751C00712216840FE0F562A3F5555532`;
+and full Domain is `98/98` at
+`8DEBDBBE253F5DB7D2A72C0AD80690123AA6E904AAA50C8DAA8B123E35E7F478`.
+Release build is `0 warnings / 0 errors`; format, diff, six locked fingerprints,
+StructureOnly (`elapsedMs=376188`), and the bounded seven-test
+publication-evidence suite are green. Independent code and evidence/scope
+reviews each closed `0 Blocking / 0 Important / 0 Minor`. The packet is
+`ReviewedLocalGreen`. Its exact delivery is
+[`2bbd36f5dd9ee975778063719fe8f879873e00d5`](https://github.com/hasanmanzak/meAndAI/commit/2bbd36f5dd9ee975778063719fe8f879873e00d5),
+git tree identity `fe543889cc68fad6a61139f0125a41ca4050ce40`; Ubuntu passed in
+`17m11s`, Windows passed in `14m43s`, and publication verification was correctly
+skipped in [run 30772197693](https://github.com/hasanmanzak/meAndAI/actions/runs/30772197693).
+
+### Reviewed-local-green `A-ADMISSION-01` contract and evidence
+
+The exact FrozenDesign predecessor is
+[`f298e87f98cb0896904a21078e2e3f391b2b8dcd`](https://github.com/hasanmanzak/meAndAI/commit/f298e87f98cb0896904a21078e2e3f391b2b8dcd),
+git tree identity `6debfc2f3648ec7972d3e1f21d1f1cc224b35a4a`, which passed Ubuntu in
+`17m46s` and Windows in `12m15s` in
+[run 30774470978](https://github.com/hasanmanzak/meAndAI/actions/runs/30774470978);
+publication verification was correctly skipped. This is the hosted design
+predecessor, not the admission implementation delivery. R is
+`Applicable / BehaviorRed`, P is `NotApplicable`, marker/TRX stem is
+`TEST-0210-A-BEHAVIOR-RED-0009`, and the one-Fact FQN is
+`MeAndAI.Protocol.Conformance.Tests.ContractSliceAAdmissionProofManifestTests.Enforces_admission_proof_declarations_with_exact_kind_component_and_artifact_closure`.
+Its only trait is `ContractSlice=A`. Fixture construction precedes the oracle;
+only Writer's exact current `InvalidOperationException` type and exact
+`This writer increment supports only the minimal qualification slice.` message
+may call the marker. Every mismatch or other exception remains marker-free.
+
+The synthetic fixture preserves the exact selector topology and adds three
+admission rows sharing `protocol.test.admission-proof/1`. Reversed typed input
+NoInput/Failed/Observed canonicalizes by composite key/version/kind rank to
+Observed/Failed/NoInput. Three distinct Tests-owned proof components map to the
+existing `ContractSliceA.Proof.dll`; every row has the exact Repository+Provider
+surface union and the complete canonical slot-role union. The graph changes
+from twenty-two to twenty-five components while retaining three artifacts.
+Removing all three rows and components reproduces the selector predecessor;
+partial, split-key/version, orphaned, shared, activation/functional-overlapping,
+or unmapped topology fails closed.
+
+Only `CanonicalManifestReader.cs`, `CanonicalManifestWriter.cs`,
+`CatalogSliceDeclaration.cs`, and one new admission test are allowed. Reader,
+Writer, Catalog, production, test, and combined hard caps are respectively
+`145`, `55`, `110`, `310`, `370`, and `680`. The retained matrix owns exact
+rank/lookup/snapshotting, surfaces/material roles, component/artifact and
+partition closure, six-field wire order, Writer/Reader byte and digest
+roundtrip, forty-two outer-wire mutations, orphan negatives, and predecessor
+reproduction. Real Application proof rows and the six-artifact/thirty-five-row
+inventory remain `A-FULL-MANIFEST-01`; runtime admission and all later behavior stay
+held. Reconciled D/RT closed `0 Blocking / 0 Important / 0 Minor`.
+
+Locked restore ran once and all six lock fingerprints remained unchanged;
+`P` remained `NotApplicable`, while predecessor revalidation passed selector
+focused `1/1` at SHA-256 `CEF622D01BD7AFC6DDF057CAF872F7922BCCAAAA3556AFFF658095B7D5B437B4`
+and cumulative A `24/24` at
+`DE9231E844691362042F8EBDDFC6833CE2BB99D219864404D08189CD62683BB8`.
+Canonical R ran exactly once at the reserved FQN and failed only with the exact
+marker. Its external TRX SHA-256 is
+`2D7B35424911010D120424E6BFDBDBB07C8A265444D8CFE8FF5007FD941EEE76`;
+the transient source is
+`7898CFADE43DD8176DFCB2F8C5C864D00EBCEB066C260C8FC9AE8C2C9C3B3CAC`.
+Reader/Writer/Catalog prehashes are respectively
+`5E1C3CCCD3AF91E6E9CC952057FCB3ADD999C717169624B75D74CD4A3E70B550`,
+`409B40B6AE4121714607707724546AD20EF284CE2510F4F8D488F1B9D9D56DA1`,
+and `2F370175B36BACCC0D3F328F2E23991BC15D1E2A8F6F681C37A28189F93D397B`.
+The TRX has `total/executed/failed=1/1/1`, every other one of the sixteen
+counters zero, no attachment, and no independent diagnostic.
+
+The original oracle passed `1/1` at SHA-256
+`39A9F362E5FEF02A39B283F8879F75A8E0BD87C616DFD9C9EF9CBB9C2F825AFF`.
+Retained focused green is `1/1` at SHA-256
+`3250DA7332E81D3A732AD4E6E3266126EDFA53D9282AC2293944C42E143FD4CA`;
+cumulative A is `25/25` at
+`F5163E4F1D190519D534FCFF1DC5010E0DBA4EFD9DF788302EEDFB31DA53AAB5`;
+full Domain is `98/98` at
+`5DE82E15A344C3A87133878892B2B4DDE7B3860B5E77E5697734629879EFD0E3`;
+and full Conformance is `25/25` at
+`12CACAF9D5BD9BE9240E75ECA29E329243543851E132B05C8BFCAED984B1E9A1`.
+The retained test is `339/370` lines at SHA-256
+`AEFF47E643F97AB31DB69CDB24810F766B078A989D05E5D56E52015B924A9F97`.
+Reader, Writer, and Catalog gross sizes/hashes are `85/145` at
+`25512694EA4B8D1E81265A23493307F76E7CDA5E887E2F0CE9E89C542F702949`,
+`35/55` at `94C659B148C40334628AE90D67213143E1417E6DD9487C74E539139C88DC20AD`,
+and `66/110` at
+`10C1D55F28120DD1D4CE816CFED35A7BF9BB686B37E0232196DA84C0CB05B238`.
+Production/test/combined totals are `186/310`, `339/370`, and `525/680`.
+Release build is `0 warnings / 0 errors`;
+format, diff, marker scan, scope, and locks are green. Full `StructureOnly`
+passed with `elapsedMs=370203`; the seven-test publication-evidence suite passed
+in `242.5` seconds without claiming published-state evidence. Independent final
+code/test and evidence/hash/counter/scope reviews each closed
+`0 Blocking / 0 Important / 0 Minor`. Exact evidence is retained in the
+[admission-proof reviewed-local-green handoff](../../../.ai/memory/log/2026-08-03-feat-0065-subf-0143-contractslice-a-admission-freeze.md).
+Exact hosted-green admission record-evidence delivery
+[`b735853a2153338fd97c366bcd8c212f78bc1bce`](https://github.com/hasanmanzak/meAndAI/commit/b735853a2153338fd97c366bcd8c212f78bc1bce),
+git tree identity `fc5ae301331f55f1435b4262c300489e3cbcff2f`, passed Windows in
+`17m10s` and Ubuntu in `19m02s` in
+[run 30781516326](https://github.com/hasanmanzak/meAndAI/actions/runs/30781516326);
+publication verification was correctly skipped. `A-ADMISSION-01` remains
+packet-local `ReviewedLocalGreen`.
+
+### Frozen-design `A-PROJECTOR-DAG-01` boundary
+
+The next packet adds the single declaration
+`protocol.projector.repository-target-resolution-demand/1` with component
+`MeAndAI.Protocol.Policy.Demands.RepositoryTargetResolutionDemandProjector` in
+the existing Policy artifact. It consumes
+`protocol.capability.governed-reference-index/1` from the provider- and
+repository-governed-text input slots, projects the evaluation-only
+repository-target-resolution output slot, and names opaque demand-frame token
+`protocol.repository-target-resolution-demand/1`. That token is neither a
+payload-schema declaration nor a producer-graph node. Its exact budget is
+`(33554432,64,100000,5000000)` and its sole failure is
+`protocol.budget.exhausted`.
+
+The exact one-Fact FQN is
+`MeAndAI.Protocol.Conformance.Tests.ContractSliceAProjectorDagManifestTests.Enforces_exact_projector_bindings_and_global_producer_graph`;
+its only trait is `ContractSlice=A`, no Scenario is active, and its immutable
+BehaviorRed marker/TRX stem is `TEST-0210-A-BEHAVIOR-RED-0010`. P is
+`NotApplicable`. Fully valid successor creation and all count preconditions are
+outside the catch; only the existing Writer's exact `InvalidOperationException`
+and exact legacy message may emit the marker. Reader is excluded and canonical
+R is never rerun.
+
+The matrix has exactly `103` unique one-at-a-time canonical-byte negatives.
+Validation precedence is array envelope; projector-row wire grammar; raw
+component/artifact resolution and role ownership; locate the one required exact
+projector key/version and validate that row's values; raw projector-slot
+preflight before typed rule factories; generic producer DAG over every producer,
+including extra projector rows; remaining projector cardinality/extra-row
+rejection; then historical exact selector/admission/parser topology. Each
+fixture must reach its owned layer, and every retained negative asserts its
+mapped stable diagnostic rather than accepting an arbitrary `FormatException`.
+
+The `50` projector-row wire negatives are the ten fields, each independently
+missing, duplicated, `null`, or Boolean-wrong-type (`40`), one extra field, and
+each of nine adjacent field swaps. The four array-envelope negatives are a null
+array, object instead of array, one null element, and two byte-identical exact
+projector rows. An empty array is not negative: removing both declaration and
+component must byte-reproduce the valid `25`-component predecessor.
+
+The exact `27` value/local negatives are:
+
+1. alternate `projectorKey`;
+2. projector version `2`;
+3. alternate projector component key with its binding atomically renamed and
+   the old binding removed;
+4. projector component version `2` with its binding atomically versioned;
+5. protocol-record capability key with the governed interface retained;
+6. input capability version `2`;
+7. protocol-record interface component with the governed capability retained;
+8. a fully mapped version-2 governed interface component with a distinct
+   physical test type;
+9. existing repository-tree evaluation slot as output;
+10. alternate demand-schema key;
+11. demand-schema version `2`;
+12. empty `inputSlotKeys`;
+13. one null input-slot element;
+14. duplicate provider input slot;
+15. exact input-slot reversal;
+16. provider input replaced by well-formed unknown `protocol.slot.unknown`;
+17. output slot appended to inputs;
+18. provider governed-text rule slot removed while its projector key remains;
+19. repository governed-text rule slot removed while its projector key remains;
+20. empty failure-code array;
+21. one null failure-code element;
+22. duplicate `protocol.budget.exhausted`;
+23. canonical superset adding `protocol.projector.unexpected-failure`;
+24. `maxBytes` changed to generically valid value `1`;
+25. `maxDepth` changed to generically valid value `1`;
+26. `maxNodes` changed to generically valid value `1`; and
+27. `maxComplexity` changed to generically valid value `1`.
+
+The exact `22` component/DAG negatives are:
+
+1. remove only the projector component binding;
+2. duplicate that component binding;
+3. add one fully mapped declaration-free projector component;
+4. map the projector component to undeclared `Missing.Projector.dll`;
+5. remove only the projector declaration while retaining its binding;
+6. through 12. reuse respectively the activation proof, observed admission
+   proof, governed-text codec, source model, Markdown parser,
+   governed-reference index, and governed-reference capability component as
+   projector, removing the original projector binding in every case;
+13. and 14. remove governed-reference capability from respectively provider
+   and repository governed-text input slot;
+15. remove the governed-reference index declaration and its implementation
+   binding while retaining its capability-type binding and consumers;
+16. add a fully mapped second index with the same output capability;
+17. add a fully mapped second projector with the same output slot;
+18. move the projected output slot to applicability;
+19. add target-resolution capability input to governed-reference index, forming
+   the frozen five-producer/five-edge cycle;
+20. add a fully mapped unused parser that consumes a reachable model and
+   produces an otherwise unconsumed distinct model;
+21. reuse a selector-resolver component as projector and remove the original
+   projector binding; and
+22. reuse the evaluator component as projector and remove the original
+   projector binding.
+
+Component ownership is a role-aware `(key,version) -> role` table over activation
+proof, admission proof, codec, model, parser, index, capability, projector,
+selector, and evaluator. Repetition inside one role is legal; use by a second
+role emits `protocol.manifest.functional-role-collision`. The four envelope and
+50 wire cases emit `protocol.manifest.projector-array-envelope` and
+`protocol.manifest.projector-row-wire`. Component/DAG rows 1-3 and 5 emit
+`protocol.manifest.component-closure`; row 4 emits
+`protocol.manifest.artifact-owner`; rows 6-12 and 21-22 emit the role-collision
+token. Value rows 1-17 and 20-27 emit `protocol.manifest.projector-value`, while
+value rows 18-19 and topology rows 13-14 and 18 emit
+`protocol.manifest.projector-slot`. Topology rows 15-17 emit
+`protocol.manifest.producer-owner`, row 19 emits
+`protocol.manifest.producer-cycle`, and row 20 emits
+`protocol.manifest.producer-unreachable`.
+
+Reader performs the raw component/artifact/role, required-projector value, and
+projector-slot preflight after parsing raw registry/rule records but before
+`CreateRules`, so factory exceptions cannot mask projector diagnostics. Catalog's
+generic producer-DAG validation then runs over every producer before remaining
+extra-projector/cardinality and legacy exact-topology guards. A friend-test-only
+internal result exposes the production-computed root identities, never execution
+order; C still owns first runtime ordering.
+
+Production may change only Reader, Writer, and Catalog. Revised readable-code
+hard caps are `175`, `70`, and `170`, aggregate production `380`; the one test
+hard cap is `410`, and combined green acceptance cap is `770`. A measured
+`771-799` stops green acceptance for readability-preserving refactor back to
+`770` or lower; `800+` forces design redraw. Assertions, diagnostics, or semantic
+vectors may not be compressed away to fit. Fully green successor tuple is
+`(3,2,4,1,4,2,2,3,26,3)` and cumulative A becomes `26/26`.
+That frozen contract has exact packet-local implementation/evidence, and the
+packet is
+`ReviewedLocalGreen`. P is `NotApplicable`; unchanged-source predecessor focused
+`1/1` has TRX SHA-256
+`5144216718A515CDF7B96B47C1F99E93CC2E4E28AC9407D9F9D8BF6B211D5EDC`, and
+predecessor cumulative A `25/25` has TRX SHA-256
+`3A4AAD033A9F0F8E7E1F4365866867B56143CFECC950C028C75D2C0C5C32EF8A`.
+Immutable R source SHA-256 is
+`8CA46746908FF177E0041B37BACFC344B555784C9E793F2B272C020F288C7E2A`; its sole
+canonical failed `1/1` TRX SHA-256 is
+`E8CF388ECF27BC37B79AE51966D3A123CED82CD80432C6F860CB2DA14A03C006`, and R was
+never rerun. Final production source SHA-256 values are Reader
+`6700C1E03629E576155F6AA55BB87AAC2DEBD800BAE8B3ABDB9FA99AB792E04E`, Writer
+`69242E672FEC8606E82CEC9DAFB1C0F8318D33F69B38C582B0BC4714F7EE0D41`, and
+Catalog `8428DAA4E2A4C5C4193C0A271B802DED3F15AC4AA199D644A9D787B45B4B7FDA`.
+Canonical retained test source is `408` lines at SHA-256
+`8E919A438CD9D6B13021AAFB50481E3567E3B40A95F45B059E71E00C71843010`;
+focused `1/1` passed in `472ms` at TRX SHA-256
+`8F708B1AEEA6848DCA134CC3C653423F3AABC705708CC07C0E4C6173829A4546`,
+and cumulative A `26/26` passed with projector duration `518ms` at TRX SHA-256
+`74A9A6AD9F152976156D11450F813487FE9E1ECD23F8DE5F6134A2894FBED005`.
+Release build passed with `0 warnings / 0 errors` in `6.63s`; format is green;
+`StructureOnly` passed with `elapsedMs=394809`; publication-evidence passed
+`7/7` in `256.7s` without claiming published-state evidence; independent review
+closed `0 Blocking / 0 Important / 0 Minor`. Realized Reader `175`, Writer `32`,
+Catalog `155`, aggregate production `362`, test `408`, and combined `770`
+satisfy the frozen caps. Hosted run `30798854880` passed Windows in `14m58s` and
+Ubuntu in `19m00s`; publication verification was correctly skipped.
+
+### Reviewed-local-green `A-FULL-MANIFEST-01` correction
+
+The inactive `A-CONVERGE-01` routing label is retired before activation. Its
+reserved fresh full-manifest Fact was incompatible with a no-new-Fact
+convergence classification. `A-FULL-MANIFEST-01` replaces it one-for-one in the
+twenty-packet live denominator. `A-CONVERGE-02` remains the final A audit and
+adds no Fact.
+
+The replacement was not `TestOnlyGreen`. The pre-green
+`CatalogSliceDeclaration` closure rejected the accepted initial manifest before
+Writer/Reader because it assumed exactly one rule, four evaluation-slot
+occurrences, two selectors, two findings, and one shared admission contract
+identity. The accepted declaration has five rules, twelve slot occurrences
+over four structurally equal reusable SlotKeys, three selectors, sixteen
+findings, and three distinct admission contract identities. That current
+restriction was the sole expected-red seam.
+
+Green generalized the already-accepted declaration mechanics without embedding
+initial-release counts in reusable production code:
+
+- `CanonicalRules` continues to reject two declarations of one SlotKey unless
+  they are structurally equal.
+- schema, producer, parser, index, projector, and admission closure use exact
+  SlotKey lookup over structurally unique slots rather than flattened cross-rule
+  occurrence positions; applicability and evaluation distinct sets remain
+  separate, while occurrence counts remain visible to the exact snapshot test.
+- admission closure requires exactly the Observed, Failed, and NoInput kinds,
+  three distinct proof-component identities, and surfaces/material roles equal
+  to the complete canonical slot union. All contracts share one contract
+  version, but independently canonical contract keys have no cardinality rule.
+  It imposes no zero-applicability rule and no selector/finding count.
+- five rules, twelve occurrences, three selectors, sixteen findings,
+  twenty-seven logical Policy rows, thirty-five component rows, and six
+  artifacts remain exact initial-catalog assertions in the retained Fact; they
+  are not generic parser constants.
+
+The proof identities absent from the earlier snapshot text are now exact. The
+activation contract is `protocol.activation.release-envelope` / `1`, with proof
+component `protocol.activation-proof.release-envelope` / `1`, type
+`MeAndAI.Protocol.Application.PolicyActivationProof`. Admission contracts and
+components, all version `1`, are:
+
+| Kind | Contract key | Proof component key | Exact Application type |
+| --- | --- | --- | --- |
+| Observed | `protocol.admission.observed` | `protocol.admission-proof.observed` | `MeAndAI.Protocol.Application.Qualification.ObservedQualificationProof` |
+| Failed | `protocol.admission.failed` | `protocol.admission-proof.failed` | `MeAndAI.Protocol.Application.Qualification.FailedAttemptProof` |
+| NoInput | `protocol.admission.no-input` | `protocol.admission-proof.no-input` | `MeAndAI.Protocol.Application.Qualification.NoInputRoutingProof` |
+
+The exact R marker and TRX stem are
+`TEST-0210-A-BEHAVIOR-RED-0011`. The exact Fact/FQN is
+`MeAndAI.Protocol.Conformance.Tests.ContractSliceAFullManifestGraphTests.Full_declaration_graph_equals_the_exact_five_rule_six_artifact_thirty_five_component_snapshot`.
+It has only `ContractSlice=A`, no Scenario, and expected-red ordinal `0011`.
+After registry, five rules, artifacts, components, the successful
+`CatalogSliceDeclaration.Create` result, and validation-free
+`ParsedCanonicalManifest` are constructed outside the guard, R invokes only
+`CanonicalManifestWriter.Write(parsed)`. Only exact runtime type
+`ArgumentException`, parameter `rules`, and message equal to
+`new ArgumentException("Admission-proof contracts require the exact selector topology.", "rules").Message`
+may execute the sole direct `Assert.Fail(exactMarker)`. Type/message mismatch,
+setup, Reader, and every other failure remain marker-free. R runs once. Its TRX
+contains the marker only in the sole failed result ErrorInfo/Message plus at
+most one byte-identical summary echo; permitted stack and RunInfo are marker-
+free, and no other result, diagnostic, or attachment contains it.
+
+Green proves canonical Writer -> Reader -> Writer bytes/digest and exact ordered
+projections for five rules, ten normative fragments, registry `3/2/4/1`, zero
+applicability occurrences, four distinct slots/twelve occurrences distributed
+`2/4/3/3`, three selectors, sixteen findings distributed `2/2/4/4/4`, three
+admission proofs, exact caches/budgets/failures, the twenty-seven logical Policy
+partition, four runtime anchors, one activation proof, three admission proofs,
+thirty-five components, and six artifact basenames. The four partitions are
+disjoint; exact component-key-to-artifact bindings and the named distribution
+Policy `23`, Conformance.Abstractions `5`, Application `4`, Domain `1`,
+Conformance `1`, and Markdig `1` are asserted; every artifact is used; the exact
+producer roots and reverse slot reachability remain green. The same Fact proves
+equal repeated SlotKeys accepted; divergent repeated SlotKey, missing proof
+kind, reused proof component, and derived surface/material-role mismatch
+rejected; and shared admission contract keys across kinds accepted.
+
+Artifact byte lengths/digests in this A fixture are deterministic test sentinels
+that bind declaration rows only. The Fact performs no filesystem, reflection,
+assembly-load, or artifact hashing; it does not claim the future Application or
+Policy implementation types exist, register, execute, or match physical files.
+Actual artifact/type/registration proof remains with activation and later
+slices.
+
+The production allowlist is only `CatalogSliceDeclaration.cs`, target/hard
+gross delta `40-60/80`. Test scope is the new
+`ContractSliceAFullManifestGraphTests.cs`, target `450-550` and retained-source
+hard cap `608`, plus the existing
+`ContractSliceAAdmissionProofManifestTests.cs` changed-key assertion correction,
+gross-delta hard cap `12`. The stale-sibling finding added only the two owning
+assertions in `ContractSliceAGovernedReferenceSlotsManifestTests.cs` and
+`ContractSliceATargetParserIndexSlotManifestTests.cs`, gross `3+2=5`; it added
+no production behavior. The aggregate test hard cap remains `620`; combined
+hard cap remains `700`. The admission sibling stayed unchanged through P/R and
+green converted only its changed-Observed-key rejection into a positive
+parse/write byte round-trip; its mixed-version rejection remains. Project,
+solution, package, lock, workflow, public/friend API, every other sibling test,
+and held downstream scope remain unchanged. P was `NotApplicable`; unchanged
+projector focused `1/1` and cumulative A `26/26` preceded the one canonical R.
+
+Canonical R is immutable at TRX SHA-256
+`F586F5BC8FFD5964EB1857512FA089FC8E5E5D3A054E39F28850057BE75DC0DB`.
+The terminal-sentinel finding records why unchanged-source original green is not claimed: after
+the production correction, the unchanged transient source failed marker-free
+only at its terminal missing-behavior sentinel, TRX SHA-256
+`AA5F050091E0DAD737B7639C2CFF42E36854C97A924DD61E14D7D34C9CE20010`.
+Removing only that terminal line changed source and passed `1/1` at TRX SHA-256
+`264F9BEA27ED1B458C8E74AF0448D710356B95218E385F8DF7EFCB2E06128986`;
+it is a corrected-original checkpoint only. Final retained green removes the
+marker, catch, and sentinel entirely.
+
+The stale-sibling finding first exposed cumulative `25/27` at TRX SHA-256
+`700CB92C90BB7C8FF031767D2A6B7C9E25C2A416828CD1D1720AF5695658BF97`.
+The two corrected sibling proofs are SHA-256
+`8FFB1E412D0311510E0ADB0A94AA6D0FEC1518D94683CE7790FDA44DBCD955F9`
+and `884B7478FC4C0DCE166D1FB72E84F9305D072631E3063DFEC42479F24B964EEF`.
+The qualification-lifecycle finding then removed five premature planned scenario semantic-evidence
+entries. Current per-rule qualification counts are `[1,1,3,1,1]`, total `7`;
+the deferred final atomic activation adds that scenario to every rule and changes
+them to `[2,2,4,2,2]`, total `12`.
+
+Final A-FULL source is `353` lines at SHA-256
+`863BDCDBED53BF3D08C1009CE86842DF8D8B058D49D9BFF5D72B3D5C1A67D4CA`;
+Catalog is SHA-256
+`456EFCCC3E34A84473CB265B5E3494690D72867C329E3FFE33E2151F70027EF5`.
+Focused, cumulative A, full Conformance, and full Domain passed `1/1`, `27/27`,
+`27/27`, and `98/98`, at respective TRX SHA-256
+`B11EBABED2AE2D938B65F3C8202694B88364DA1AF0E2DDADBCC69754EC450489`,
+`0392900A44314848BD0EDBC7425A0ABE5767B2E960726AD29DBF5AC78AB77A90`,
+`97C0B960F3EC0CABB32803D4394D3D23685B57D2E0B046DA99929EEBF69E13E2`,
+and `0095818A237CB1E84FBDC1F4C4B6279CC5422FC1DDBB9C0CBAA496B00FA5016D`.
+StructureOnly passed in `484633ms`; publication-evidence passed `7/7` in
+`329.3s` without a published-state claim. Realized production/test/combined
+gross deltas are `77/80`, `364/620`, and `441/700`. The packet is exact-head
+hosted-green `ReviewedLocalGreen` at correction head
+`canonical owning-finding correction head`, tree
+`canonical owning-finding correction tree`, and run `30834117740`.
+Windows passed in `15m53s`, Ubuntu in `17m50s`, publication verification was
+correctly skipped, and that correction head's graph is `4094/4096`. This
+records-only closure adds only the reserved two evidence relations, producing a
+final delivery graph of `4096/4096` that is closed by the exact evidence in the canonical owning finding; Windows passed in `17m28s`, Ubuntu in `12m28s`, and publication verification was correctly skipped.
+Cumulative A is now `32/32`; `A-COMPLETE-PROFILE-01` is exact-head hosted-green
+`ReviewedLocalGreen` at the implementation identity recorded in the canonical
+owning finding.
+
+### Exact-head hosted-green `A-PREDECESSOR-01` canonical boundary
+
+The direct parent FrozenDesign delivery hosted check is green. Its immutable
+attached check on the existing draft PR satisfied the activation predecessor
+gate. The packet is now exact-head hosted-green `ReviewedLocalGreen` at the
+bounded instruction-graph correction identity recorded in the canonical owning
+finding. Its exact FQN is
+`MeAndAI.Protocol.Conformance.Tests.ContractSliceAPredecessorManifestTests.Enforces_existing_predecessor_version_and_exact_digests`;
+P is `NotApplicable`; canonical R `0014` is accepted and immutable; G/V are
+packet-local green under exact marker/TRX stem
+`TEST-0210-A-BEHAVIOR-RED-0014`.
+
+An Existing predecessor serializes exactly `kind`, `catalogVersion`,
+`manifestDigest`, and `completeInventoryDigest` in that order. Its version is
+strictly lower than the enclosing complete catalog: `2/1` and non-adjacent
+`3/1` are positive; equal and higher predecessor versions fail closed. The
+current five-rule revision-1 inventory is `104` bytes with digest
+`c013e4b9937f225163f58e41b893600b87d88faf6340678a79242041443f8af3`;
+the four-rule revision-1 predecessor inventory is `91` bytes with digest
+`52cf1f9c6ecc7e8b652d047f595bb4c66fac53735f9637cb3edbd0c54c8e8554`.
+The `44`-byte UTF-8/no-BOM, one-terminal-LF seed
+`meandai.test-0210.a.predecessor-manifest.v1\n` hashes to
+`6fb963fcdf35683f2172ea62e383401f36f5c41660c59e0c594852ccb64108df`.
+It is an opaque field-separation/round-trip vector, never parsed as a canonical
+predecessor manifest and never treated as authenticity evidence.
+
+The current catalog is rebuilt from the A-FULL rules property by property via
+`RuleDeclaration.Create`, changing only `CatalogVersion`. The four-rule
+predecessor frame remains an external canonical digest fixture; no predecessor
+catalog is activated. `CompleteCatalogDeclaration` owns only strict-lower
+validation. Existing transition carriers stay constructible, but this increment
+keeps Reader and Writer restricted to Added/current-rule transitions and rejects
+non-Added/deferred transition shapes so the later transition packet retains a
+natural boundary.
+
+The frozen clone is exactly the current 20-argument API; `currentCatalogVersion`
+is v2 or v3 and no other argument changes:
+
+```csharp
+RuleDeclaration.Create(
+    rule.RuleId,
+    rule.RuleRevision,
+    currentCatalogVersion,
+    rule.NormativeDigest,
+    rule.NormativeFragments,
+    rule.QualificationScenarios,
+    rule.Evaluator,
+    rule.ApplicabilitySlots,
+    rule.EvaluationSlots,
+    rule.ExpectedSelectors,
+    rule.SubjectRoles,
+    rule.Surfaces,
+    rule.SnapshotKinds,
+    rule.Operations,
+    rule.Findings,
+    rule.EvaluationFailureCodes,
+    rule.IntroducedIn,
+    rule.DeprecatedIn,
+    rule.RetiredIn,
+    rule.CompatibilityAliases)
+```
+
+The accepted immutable R was Writer-only: all construction preceded one guarded
+`CanonicalManifestWriter.Write(parsedExisting)` call, which failed with the
+exact `InvalidOperationException` message `This writer increment supports only
+the minimal qualification slice.` It emitted only the atomically allocated
+`TEST-0210-A-BEHAVIOR-RED-0014`; Reader failures could not emit it, and R was
+not rerun.
+The green contract adds the exact `32`-negative matrix frozen in the test
+contract. Production ownership is limited to `CanonicalManifestReader.cs`,
+`CanonicalManifestWriter.cs`, and `CompleteCatalogDeclaration.cs`; test
+ownership is limited to `ContractSliceAPredecessorManifestTests.cs` and the
+obsolete six-line equal-version Writer cleanup in
+`ContractSliceACompleteCatalogProfileTests.cs`. Gross production/test/combined
+caps are `160/440/600`; `601+` returns to D/RT and `700+` requires redesign.
+The `600` D/RT exception is indivisible: separating Reader wire parsing, Writer
+canonical emission, Catalog strict ordering, or the exact boundary matrix would
+create a temporarily accepted or emitted noncanonical Existing manifest. The
+per-file caps and cleanup allocation are mapped by basename in the control plan.
+Transition semantics, authenticity/coherence, lifecycle truth, public API,
+project/friend/lock/workflow changes, and kernel activation remain held.
+
+The bounded implementation keeps those ownership seams exact. Canonical R used
+transient source `423` lines at SHA-256
+`3535913224F9413B1201A910BDB5139A34EFB6ABB8148C37591244C0E2DFB002`;
+its sole TRX SHA-256 is
+`DCC53EBC3B095C88E4CDE18AEABFD450286238B9273BC855F7370E01060F5567`,
+with the complete oracle green. Final source is `410` lines at SHA-256
+`3501D655D2B27CBA82008B761D3C674EBE0890E817710C5EB1617BFEE1C9429D`.
+Focused, retained A-COMPLETE, cumulative A, full Conformance, and Domain are
+`1/1`, `1/1`, `29/29`, `29/29`, and `98/98`. Reader/Writer/Catalog gross
+changes are `70/36/14`; production/test/combined are `120/416/536`. Release
+build, format, diff, all six lock fingerprints, and StructureOnly
+(`elapsedMs=419847`) are green; three independent final reviews each closed
+`0/0/0`. The exact correction head passed Ubuntu in `19m00s` and Windows in
+`35m20s`; publication verification was correctly skipped and its instruction
+graph is `351 nodes / 4096 edges`. This records-only synchronization does not claim hosted
+proof for its own delivery head. That distinct freeze-delivery gate later
+closed before transition implementation began.
+
+### ReviewedLocalGreen `A-TRANSITION-01` boundary and evidence <a name="a-transition-01-freeze"></a>
+
+The A-PREDECESSOR records synchronization is exact-head hosted-green at the
+identity recorded in the canonical owning finding, and the separate
+freeze-delivery head passed hosted validation. `A-TRANSITION-01` implementation
+and synchronized records delivery are exact-hosted-green; it is immutable
+predecessor history. Its exact FQN is
+`MeAndAI.Protocol.Conformance.Tests.ContractSliceATransitionManifestTests.Enforces_exact_unchanged_added_revised_and_retired_transition_shapes`;
+ordinal `0015`; marker/TRX stem
+`TEST-0210-A-BEHAVIOR-RED-0015`; one Fact; only `ContractSlice=A`; no Scenario.
+Design, independent red-team, final code/test, and evidence/scope reviews each
+closed `0/0/0`. P is `NotApplicable`; both implementation and synchronized
+records heads are exact-hosted-green.
+
+The exact positive Existing carrier is protocol `0.18.0`, current catalog
+version `2`, predecessor catalog version `1`, and current rules `RULE-0001`,
+`RULE-0002`, `RULE-0003`, and `RULE-0005`. `RULE-0002` is revision `2`; the
+other current rules are revision `1`. Sorted transitions are:
+
+| Rule | Kind | Previous | Current | Reviewed authority |
+| --- | --- | ---: | ---: | --- |
+| `RULE-0001` | Unchanged | `1` | `1` | absent; wire field omitted |
+| `RULE-0002` | Revised | `1` | `2` | present |
+| `RULE-0003` | Unchanged | `1` | `1` | present |
+| `RULE-0004` | Retired | `1` | absent; wire field omitted | present |
+| `RULE-0005` | Added | absent; wire field omitted | `1` | present |
+
+`RULE-0004` is absent from current rules, the current profile, and the current
+inventory. `RULE-0005` is absent from the predecessor side. The current profile
+contains exactly `RULE-0003` and `RULE-0005`. No predecessor authenticity or
+historical-coherence claim is made.
+
+Reader owns strict variant grammar and typed projection; Writer owns canonical
+variant serialization; `CompleteCatalogDeclaration` owns RuleId-based current/
+absent membership and current-revision mapping. Positional zipping is forbidden.
+The typed transition declaration and its public API remain unchanged. Production
+is limited to `CanonicalManifestReader.cs`, `CanonicalManifestWriter.cs`, and
+`CompleteCatalogDeclaration.cs`; tests are limited to new
+`ContractSliceATransitionManifestTests.cs` and deletion-only predecessor cleanup.
+
+Canonical R constructs the whole valid carrier outside the guard. Only the
+assignment from `CanonicalManifestWriter.Write(parsedExisting)` is inside it.
+Only exact `InvalidOperationException` with exact message `This writer increment
+supports only the minimal qualification slice.` may emit the marker. Type or
+message mismatch, Reader failure, setup failure, and every other exception are
+marker-free. The exact-FQN run must select, discover, execute, and fail exactly
+one result, with zero passed/skipped, and satisfy all sixteen established TRX
+oracle requirements. Accepted canonical R is SHA-256
+`8E08CAF887D69FF38B247960501AF470DB0DC840154586DF2D4A78CD77D8780E`
+with transient source `353` lines / SHA-256
+`5593A547D7347224081A28755D6F09B70D8CC5C7C5269B5DDBD1D756DEEBC428`.
+The complete oracle passed; R ran once and was never rerun.
+
+The retained Reader matrix has exactly `91` syntactically valid single-object
+mutations:
+
+- `001..016`: Unchanged required fields `ruleId`, `kind`, `previousRevision`,
+  `currentRevision`, each missing, duplicate, wire-null, and wrong-typed;
+- `017..019`: present optional `reviewedAuthority` duplicate, wire-null, and
+  numeric wrong-type;
+- `020..035`: Added required-field four-by-four matrix;
+- `036..055`: Revised required-field five-by-four matrix;
+- `056..071`: Retired required-field four-by-four matrix;
+- `072..079`: unknown kind, illegal Added previous, illegal Retired current,
+  Unchanged unequal revisions, Revised non-increasing revision, and the first
+  three Unchanged adjacent swaps;
+- `080..090`: final Unchanged swap plus all Added, Revised, and Retired adjacent
+  swaps; and
+- `091`: representative unexpected property after Revised authority.
+
+Every raw mutation changes one unique transition object, passes a `JsonDocument`
+syntax preflight, and reaches the outer `FormatException` boundary. The direct
+Catalog matrix is exactly `092..098`: missing `RULE-0005` mapping, duplicate
+`RULE-0003`, absent-current non-Retired `RULE-9998`, current `RULE-0003` mapped
+Retired, plus Unchanged/Added/Revised current-revision mismatches. Each is exact
+`ArgumentException` with `ParamName=transitions`. No other synthetic rule ID is
+a positive carrier.
+
+The new transition test owns internal future seam
+`CreateMixedTransitionManifest()` and all clone/catalog/profile/mutation helpers;
+`A-LIFECYCLE-01` may consume that seam unchanged. The predecessor test receives
+exactly `73` physical deletions and no new seam: legacy message constant `1`,
+call `1`, transition-boundary helper `22`, transition cases `20`, legacy
+rejection helper `6`, transition array `2`, transition JSON `21`.
+
+Gross production additions are capped at Reader `125`, Writer `45`, Catalog
+`70`, and `240` total. The retained new test is capped at `377` lines; gross
+test additions at `450`; combined additions at `690`. The `73` predecessor
+deletions are audited separately and never netted. Production above `240`
+reopens D/RT; `700+` requires redesign. The achieved implementation order after
+the freeze-delivery hosted gate was canonical R, RuleId catalog partition, atomic
+Writer guard/serializer, atomic Reader raw/parser/projection/validator, exact
+`91+7` green matrix, then predecessor cleanup and cumulative validation.
+
+The first post-production exact-FQN validation failed marker-free and
+console-only with `protocol.manifest.component-closure`; no TRX existed.
+[FIND-0461](README.md#find-0461) owns the test-fixture correction that removed only inherited
+`protocol.evaluator.rule-0004` while retaining the shared Policy artifact.
+Corrected original-oracle source `364` /
+`17FD5051B63EB14D44BDF501E108FC15D3FC10E1D666C853C52BC5FC630C5B09`
+passed `1/1` console-only. Final marker-free source is `351` /
+`44A7F1B6A016105D088005DFECC6AE8B516890295890B7AA5FF10C13F5A1E4C6`.
+Focused and retained predecessor runs are `1/1`; cumulative A and full
+Conformance are `30/30`; Domain is `98/98`. Reader/Writer/Catalog additions are
+`98/12/55`; production/test/combined additions are `165/351/516`; predecessor
+cleanup is exact `+0/-73` separately. Release build, format, diff, `15` locks,
+pass TRX oracles, and final reviews are green.
+
+The implementation and synchronized records delivery are exact-hosted-green;
+the lifecycle records-only freeze delivery also passed Ubuntu in `20m44s` and
+Windows in `46m51s`.
+
+### `A-LIFECYCLE-01` operational boundary and local-green closure <a name="a-lifecycle-01-freeze"></a>
+
+The synchronized A-TRANSITION records delivery is the immutable exact
+hosted-green activation predecessor recorded in the canonical lifecycle
+handoff. The lifecycle packet owns one test Fact at exact FQN
+`MeAndAI.Protocol.Conformance.Tests.ContractSliceALifecycleManifestTests.Enforces_rule_lifecycle_against_transitions_and_active_profiles`,
+only `ContractSlice=A`, and no Scenario. R is `NotApplicable`, no ordinal,
+marker, or red TRX is allocated, G is `TestOnlyGreen`, and production delta is
+exactly `0`.
+
+The test consumes the internal mixed transition carrier unchanged. Introduced
+and non-null Deprecated values are bounded above by the enclosing protocol
+version, not required to equal it. Added does not imply introduced-at-current.
+A deprecated but non-retired compatible rule remains active and remains in the
+exact named/baseline profile. A current rule has no RetiredIn; retirement is
+represented only by an absent-current Retired transition. Predecessor lifecycle,
+compatibility-alias deltas, authenticity, and deprecation-implies-Revised remain
+outside this packet.
+
+The exact matrix contains four positives and six negatives. Positives retain
+the earlier-introduced Added carrier, accept current-version introduction, and
+accept earlier/current deprecation while keeping the rule in-profile. Negatives
+cover future introduction/deprecation, current RetiredIn, deprecated-active
+profile omission, retired/absent profile insertion, and one canonical
+deprecatedIn mutation preserving the exact outer FormatException and inner
+ArgumentException category/message.
+
+Only new `ContractSliceALifecycleManifestTests.cs` may change. Production and
+all existing tests/helpers plus public/friend/project/package/lock/workflow
+surfaces are locked. Target test size is `320`, hard test/combined cap is `420`,
+and production cap is `0`. The unchanged-production original oracle passed
+`1/1`. After one review-owned N4 specificity correction, retained source is
+`266` lines / `704F...EDCF`, focused is `1/1`, cumulative A and full
+Conformance are `32/32`, Domain is `98/98`, production remains `0`, and fresh
+code/test plus evidence/scope reviews each closed `0/0/0`. Progress is `19/20`
+(`95%`); any future production need still reopens D/RT.
+
+### Exact-head hosted-green `A-COMPLETE-PROFILE-01` closure
+
+The A-COMPLETE design-only predecessor builds on the recorded A-FULL delivery
+and is exact hosted-green through run `30844428072`. Gate 3 is
+active. Its corrected exact Fact/FQN is
+`MeAndAI.Protocol.Conformance.Tests.ContractSliceACompleteCatalogProfileTests.Enforces_exact_provider_profile_genesis_catalog_inventory_digest_and_added_transitions`,
+with expected-red marker/TRX stem `TEST-0210-A-BEHAVIOR-RED-0013`, one Fact,
+only `ContractSlice=A`, and no Scenario.
+
+The discovered marker `0012` / exact FQN
+`MeAndAI.Protocol.Conformance.Tests.ContractSliceACompleteCatalogProfileTests.Enforces_exact_genesis_catalog_inventory_digest_profile_and_added_transitions`
+used `Repository + Provider` profile surfaces.
+That contradicts the frozen Provider-only axis because surface intersection
+would resolve all five rules while the fixture lists only `RULE-0003` through
+`RULE-0005`. Its TRX SHA-256
+`950F15AA946EF42E1549EF7C356E6EDF7E5F1227285FA0A39511C51E43B4CB62`
+and source SHA-256
+`2129E819F0313FE4C9AF09613B16C2F7772EACB60DEBCA21C6DDE550CFA00701`
+are retained only as an invalid diagnostic attempt. The identity is never
+retried or promoted. Green stopped, its partial mutation was removed, and the
+packet returned to D/RT. The corrected source uses only `Provider`. Renewed
+D/RT and source review closed `0/0/0`; Release build passed with zero
+warnings/errors. Its single accepted canonical R is
+`D:\Temp\meandai-test-0210-a-3f6e8a12c4b7490db2561e978a34f0cd\TEST-0210-A-BEHAVIOR-RED-0013.trx`,
+SHA-256 `34CD24791964B8602240E3B1CA31CC570E18ABA911A5E9343C4018402C724C7C`,
+with source SHA-256
+`7239A20F27B488B750E0AE29CF2B50DAA162EF283F8CFBF05736C19DEF474644`.
+The independent oracle audit closed `0/0/0`; R is never rerun. Bounded
+implementation subsequently became packet-local `ReviewedLocalGreen` without
+rerunning R.
+
+P changes only internal compile seams. `ParsedCanonicalManifest` carries
+nullable `Slice` plus optional trailing nullable `CompleteCatalog`; the parsed
+Writer guard checks `slice is null || manifest.CompleteCatalog is not null`
+before any dereference and retains the current exact qualification-only
+`InvalidOperationException` message. The A-FULL fixture factory becomes
+internal. Public API, friend grants, complete serialization, parsing, and
+runtime behavior remain unchanged in P.
+
+Canonical R builds every factory value outside the guard, derives its graph from
+the A-FULL fixture, and replaces only the authority/union with exact
+`CompleteProtocolSnapshot`, `Slice=null`, and a valid genesis
+`CompleteCatalog`. It then invokes only the parsed Writer. Reader and Finalized
+projection do not enter R; only the frozen exception type/message may emit the
+single marker.
+
+Green adds the complete branch without weakening the exact-one union. The root
+encodes exactly one of `slice` or `completeCatalog`; shared rules still feed the
+existing schema/slot/component closure. The complete body has ordered
+`predecessor`, `completeInventoryDigest`, `baselineProfileName`, `rules`,
+`transitions`, and `namedProfiles`. The Reader reconstructs the same declaration,
+compares the serialized inventory digest to the independently derived digest,
+and `FinalizedPolicyManifest` retains the selected union arm. Writer -> Reader
+-> Writer bytes and manifest digest must be identical.
+
+This packet admits only Genesis catalog version `1` at protocol `0.17.0`, the
+five current revision-1 rules, and one Added transition per rule with the exact
+ContractSlice A Gate 3 directive authority already frozen earlier in this
+record.
+The inventory frame is exactly `104` bytes and hashes to
+`c013e4b9937f225163f58e41b893600b87d88faf6340678a79242041443f8af3`.
+The sole baseline/named profile
+`protocol.profile.consumer-provider-exact-commit-conformance-audit` has axes
+Consumer, Conformance, ExactCommit, Provider, and Audit; exact compatibility is
+role/operation/snapshot equality plus surface intersection, ignores enforcement
+phase, and resolves only `RULE-0003`, `RULE-0004`, and `RULE-0005`.
+
+The retained negative boundary is both/neither union arms, inventory digest
+inequality, compatible profile omission/addition, and missing/extra/non-Added
+transition rows. Existing predecessor wire serialization/parsing and its
+version/digest semantics, other transition kinds,
+cross-version lifecycle, exhaustive malformed-wire coverage, resource bounds,
+kernel/export/registration, final activation, and B/C/D remain later. Source is
+limited to Reader, Writer, Finalized manifest, `CompleteCatalogDeclaration`, the
+new test, and the A-FULL helper visibility seam. Hard caps are `430` production,
+`240` test, and `680` combined, with mandatory redesign at `700`. Expected green
+is focused `1/1`, cumulative/Conformance `28/28`, and Domain `98/98`. Release
+build is `0/0`, format/diff are green, production is `+283/-37`, test is
+`+162/-1`, and combined additions are `445`. The initial code review's
+Existing-predecessor finding was corrected without adding Existing semantics;
+renewed code and evidence reviews closed `0/0/0`. Progress remains `15/20`
+(`75%`). Exact-head hosted validation is green at the implementation identity
+recorded in the canonical owning finding; Windows
+passed in `44m13s`, Ubuntu in `11m50s`, and publication verification was
+correctly skipped. This closes only A-COMPLETE packet evidence; no full-A
+completion, final activation, B/C/D, or DoD is claimed.
+
+That corrected directive still does **not** authorize:
+
+- ContractSlice B, C, or D source/test implementation;
+- executable policy-export construction, `CatalogSliceKernel`, typed
+  registration activation, or registration-mismatch behavior in A;
+- workflow, scenario-trait, scenario-owner, or
   [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
-  mutation;
+  mutation before all four ContractSlice groups and the combined local route
+  are green and separately authorized;
 - extraction or cherry-picking from [draft PR #160](https://github.com/hasanmanzak/meAndAI/pull/160);
 - provider, consumer, adoption, update, release, publication, or authority
   mutation; or
 - PowerShell compatibility or retirement work.
 
-Every future executable contract described here is implemented in C#.
+Every executable contract described here is implemented in C#.
 Markdown is its reviewed architecture and contract specification, not a second
-runtime or rule engine. Publication of this design, a draft pull request, local
-validation, or the word “continue” does not grant Gate 3 authority.
+runtime or rule engine. The A directive grants no later-slice authority by
+implication.
 
 ## Gate 2 outcome
 
@@ -137,8 +1423,9 @@ compile artifacts containing logical keys only
 
 No compiled artifact embeds its own final digest. No manifest includes its own
 digest in the bytes that are hashed. `FinalizedPolicyManifest.ManifestDigest`
-is computed over and carried beside the private canonical manifest bytes; it
-is not a serialized manifest field. The release envelope owned by
+is computed over a private entry copy of the canonical manifest bytes and is
+carried by the sealed typed projection; the raw bytes are not retained by
+`FinalizedPolicyManifest` and the digest is not a serialized manifest field. The release envelope owned by
 [FEAT-0068](../FEAT-0068-protocol-release-finalizer-authority-transfer/README.md)
 binds that digest and every exact artifact digest.
 
@@ -152,13 +1439,15 @@ from the exact artifact bytes named by the manifest. A caller-authored proof,
 an assembly-name assertion, an MVID assertion, or an export self-asserted
 digest is insufficient.
 
-[TEST-0210](test-cases.md#test-0210) has three ordered, friend-only proof paths and no generic test
+[TEST-0210](test-cases.md#test-0210) has four ordered, friend-only proof paths and no generic test
 origin. ContractSlice B admits only its codec-registration subset through
 `IContractSliceBActivationProofState`; it does not construct either public
-export. ContractSlice C activates a Tests-owned synthetic complete graph whose
-six registration families and all executable component types live in the Tests
-artifact; it does not reuse a real Policy registration or claim a production
-release. ContractSlice D alone may mint the non-authoritative qualification
+export. ContractSlice C owns a Tests-owned synthetic qualification export and
+a distinct synthetic complete graph; both reuse the same
+Tests-owned six registration families and executable component objects and
+artifact graph, but only the complete variant has complete-snapshot authority.
+Neither reuses a real Policy registration or claims a production release.
+ContractSlice D alone may mint the non-authoritative qualification
 mirror whose catalog, component list, codec/parser/index/projector
 declarations, budgets, and all six internal registration lists are exact-equal
 to `InitialRuleQualificationPolicy.Export`; only the activation and three
@@ -171,17 +1460,278 @@ confer release/consumer authority.
 
 The manifest schema key is `protocol.policy-manifest.v1`. Its canonical bytes
 are strict UTF-8 without BOM and contain one JSON object followed by exactly one
-LF. Canonicalization is owned by [SUBF-0143](README.md#subf-0143), independently
+LF. Schema 1 permits at most `16,777,216` input bytes, reachable JSON container
+depth `9`, and `1,000,000` JSON tokens including property names and scalar/
+container tokens. The root object has depth `1`; only an object or array start
+increments depth. `ParseCanonical` checks the byte ceiling before allocating
+its private copy, then enforces the depth and token ceilings while reading;
+equality is allowed. Byte and token one-over values retain their exact resource
+`FormatException` boundaries: byte one-over owns exact message `The canonical
+policy manifest exceeds the byte ceiling.` and token one-over owns exact message
+`The policy manifest exceeds the JSON token ceiling.`; both have null inner
+exception. A tenth container is not a grammar-valid schema-1 manifest; it is
+rejected first through outer `FormatException` message `The policy manifest is
+not canonical JSON.` with a `JsonException` inner exception.
+It adds no ambient, machine-dependent, declaration-count, or collection-count
+limit. Canonicalization is
+owned by [SUBF-0143](README.md#subf-0143), independently
 of the later report serializer owned by
 [SUBF-0154](README.md#subf-0154).
 
-Canonical bytes are private implementation state. `FinalizedPolicyManifest`
-publishes their digest and safe typed projections, not raw JSON or a byte
-buffer. The `MeAndAI.Protocol.Application` internal factory used by [FEAT-0068](../FEAT-0068-protocol-release-finalizer-authority-transfer/README.md)
-and the `MeAndAI.Protocol.Conformance.Tests` [TEST-0210](test-cases.md#test-0210) friend factory each copy
-the input bytes, parse them with the exact schema below, reserialize the typed
-projection, require byte equality, and then compute `ManifestDigest`. There is
-no public manifest constructor or factory.
+Canonical input bytes are private parsing state. After the non-reading length
+ceiling check, `ParseCanonical` copies the complete `ReadOnlyMemory<byte>` at
+method entry, parses only that copy with the
+exact schema below, reserializes the typed projection, requires byte equality,
+computes `ManifestDigest`, seals immutable projections, and then discards the
+raw copy. `FinalizedPolicyManifest` publishes the digest and safe typed
+projections, not raw JSON, a byte buffer, or a retained `ReadOnlyMemory<byte>`.
+The `MeAndAI.Protocol.Application` internal factory used by [FEAT-0068](../FEAT-0068-protocol-release-finalizer-authority-transfer/README.md)
+and the `MeAndAI.Protocol.Conformance.Tests` [TEST-0210](test-cases.md#test-0210) friend call this one parser; neither implements another copy/parser path.
+There is no public manifest constructor or factory.
+
+`A-RESOURCE-01` freezes independent sequential byte/token/depth carriers:
+qualification aliases, sorted unique fixed-width aliases, and the full depth-9
+graph with deepest `componentKey` scalar replaced by a tenth container. Legacy
+R owns exact `Expected JSON token 'String'.` with no inner exception; G changes
+only `CanonicalManifestReader.MaximumDepth` from `64` to `9`. Production is
+`+1/-1`; test/combined additions are capped at `650/651`. A fresh parent samples
+the exact focused process tree every `100ms` from root launch through root exit;
+observable descendants, at most `90s`, and at most `1,610,612,736` bytes
+(`1.5 GiB`) are mandatory. Carriers are in-memory and sequential, use pre-sized
+and released buffers plus streaming token counts, and use no disk fixture,
+`JsonDocument`, naive repeated concatenation, ambient value, or parallel
+million-token construction. Any variance reopens D/RT.
+
+`0016`-`0023` remain immutable diagnostic attempts. The sole accepted canonical
+R is `0024`; bounded `MaximumDepth 64 -> 9` G, focused/cumulative/full/Domain
+green, Release build/format, and renewed reviews are complete locally. Exact
+artifact paths, metrics, SHA-256 identities, diagnostic causes, and green
+evidence are canonical only in
+`.ai/memory/log/2026-08-07-feat-0065-subf-0143-contractslice-a-resource-freeze.md`.
+Exact [`885ad0ba01f99ed44e325fa974a6cb62e89b4986`](https://github.com/hasanmanzak/meAndAI/commit/885ad0ba01f99ed44e325fa974a6cb62e89b4986) passed Ubuntu `18m51s` and
+Windows `43m06s` in run `31264791256`,
+with publication verification skipped. R was not rerun.
+
+### `A-CONVERGE-02` corrected V2 frozen audit contract <a name="a-converge-02-freeze"></a>
+
+Resource head
+[`885ad0ba01f99ed44e325fa974a6cb62e89b4986`](https://github.com/hasanmanzak/meAndAI/commit/885ad0ba01f99ed44e325fa974a6cb62e89b4986)
+is hosted-green `ReviewedLocalGreen`. V1 D/RT closed `0/0/0`; its sole run later
+failed closed on standard TRX `completed=0`, so it is immutable diagnostic/no
+success. Corrected V2 D/RT closed `0/0/0`; V2 remains frozen until this exact
+corrected-design/live-route head is hosted green.
+
+This pure audit packet has P/R/G `NotApplicable`, not `TestOnlyGreen`, and an
+empty executable allowlist. It adds no Fact/FQN/marker/ordinal/TRX or code,
+test, project, package, lock, workflow, scenario/status/owner mutation. V1's
+failure requires the exact twelve-path corrected-design cohort below; it
+records V1, freezes V2, retains `19/20`, and changes no history. Only fully
+green V2 produces `CompletionRecommended`; no intermediate record claims
+`20/20`.
+
+One atomic code-free `COHORT-SYNC-A-FINAL` commit then owns the only global
+transition to `20/20`. Its exact allowlist is:
+
+```text
+.ai/memory/README.md
+.ai/memory/log/README.md
+.ai/memory/project.md
+.ai/memory/log/2026-08-08-feat-0065-subf-0143-contractslice-a-converge.md
+docs/architecture/protocol-governance-and-execution/README.md
+docs/architecture/protocol-governance-and-execution/successor-delivery-plan.md
+docs/architecture/protocol-governance-and-execution/transition-register.md
+docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md
+docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-micro-delivery-plan.md
+docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-typed-evaluation-kernel-design.md
+docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md
+docs/features/README.md
+```
+
+The handoff is at most `80` lines and `4` Markdown links, with at most `2`
+repository-relative outgoing links; no other new node or link relation is
+allowed. The sync changes each live current tuple exactly once to A audit
+complete/recommended, `20/20`, cumulative `32/32`, [TEST-0210](test-cases.md#test-0210)
+`Planned`, and all activation/B/C/D holds retained; it rewrites no historical
+evidence. `git diff --check`, StructureOnly, graph limits `4096` edges and
+`4,194,304` parsed bytes, and two final reviews `0/0/0` must close on the exact
+atomic tree before commit. Until that commit is exact-head hosted green, the
+authoritative state remains local completion recommended / hosted pending.
+
+Discovery is frozen to Release `--no-restore --no-build --list-tests --filter
+"ContractSlice=A"`. Sorting the exact FQNs ordinally, joining with LF, and
+adding one final LF yields `32` names and SHA-256
+`C42DF0B847DF11078C904346CA5D033084797B5386450527E3F8D99612F08B92`.
+Each exact FQN is prefix `MeAndAI.Protocol.Conformance.Tests.` plus one
+suffix below; the reconstructed full names, not the suffixes alone, own the digest:
+
+```text
+ContractSliceAAdmissionProofManifestTests.Enforces_admission_proof_declarations_with_exact_kind_component_and_artifact_closure
+ContractSliceAArtifactComponentGraphTests.Enforces_exact_binding_runtime_anchor_and_reachability_graph
+ContractSliceACanonicalJsonGrammarTests.Enforces_exact_document_and_slice_structural_grammar
+ContractSliceACanonicalNumberTests.Enforces_exact_integer_grammar_and_range
+ContractSliceACanonicalStringTests.Enforces_exact_canonical_manifest_string_encoding
+ContractSliceACompleteCatalogProfileTests.Enforces_exact_provider_profile_genesis_catalog_inventory_digest_and_added_transitions
+ContractSliceAFindingManifestTests.Enforces_finding_declarations_with_exact_reference_roles
+ContractSliceAFullManifestGraphTests.Full_declaration_graph_equals_the_exact_five_rule_six_artifact_thirty_five_component_snapshot
+ContractSliceAGovernedReferenceSlotsManifestTests.Enforces_exact_governed_reference_index_and_dual_governed_text_slot_capability_closure
+ContractSliceAIndexSlotManifestTests.Enforces_exact_repository_tree_index_and_slot_capability_closure
+ContractSliceALifecycleManifestTests.Enforces_rule_lifecycle_against_transitions_and_active_profiles
+ContractSliceAManifestTests.Parses_minimal_canonical_qualification_manifest
+ContractSliceAOwnershipTests.DomainExportsEqualTheOrdinalUnionOfPredecessorInventories
+ContractSliceAOwnershipTests.EffectiveRestoreGraphsEqualTheContractSliceATotalGraph
+ContractSliceAOwnershipTests.FriendAssembliesEqualTheCurrentContractSliceAMatrix
+ContractSliceAOwnershipTests.LocksEqualTheContractSliceATotalGraph
+ContractSliceAOwnershipTests.PackageReferencesEqualTheContractSliceAGraph
+ContractSliceAOwnershipTests.SolutionAndProjectReferencesEqualTheContractSliceAGraph
+ContractSliceAParserRecordSlotManifestTests.Enforces_exact_markdown_parser_protocol_record_index_and_slot_capability_closure
+ContractSliceAPredecessorManifestTests.Enforces_existing_predecessor_version_and_exact_digests
+ContractSliceAProjectorDagManifestTests.Enforces_exact_projector_bindings_and_global_producer_graph
+ContractSliceAPublicApiTests.DeclaredPublicSurfaceEqualsTheContractSliceASnapshot
+ContractSliceAPublicApiTests.ExportedTypesEqualTheContractSliceAInventories
+ContractSliceAPublicApiTests.FriendAssembliesEqualTheCurrentContractSliceAAllowlist
+ContractSliceAPublicApiTests.PublicTypesHaveNoConstructionOrSerializationLeak
+ContractSliceAPublicApiTests.StagedExportsExposeOnlyTheContractSliceASeam
+ContractSliceAResourceManifestTests.Enforces_exact_manifest_byte_reachable_depth_and_token_ceilings
+ContractSliceARuleDeclarationTests.Enforces_canonical_multi_fragment_rule_provenance
+ContractSliceASchemaSlotManifestTests.Enforces_exact_schema_and_zero_capability_evidence_slot_closure
+ContractSliceASelectorManifestTests.Enforces_expected_selectors_with_exact_slot_schema_resolver_and_finding_closure
+ContractSliceATargetParserIndexSlotManifestTests.Enforces_exact_repository_target_schema_parser_index_and_slot_capability_closure
+ContractSliceATransitionManifestTests.Enforces_exact_unchanged_added_revised_and_retired_transition_shapes
+```
+
+The focused predecessor FQN is the resource test above and must pass `1/1`.
+The main `ContractSlice=A` run and unfiltered full Conformance run must each
+pass `32/32`; full Domain must pass `98/98`. The API/friend/hold subset is
+exactly the five `ContractSliceAPublicApiTests` plus six
+`ContractSliceAOwnershipTests` FQNs above; the same LF framing yields SHA-256
+`F58C362D6CA12A4C67AFCD1C75573063A89F2909088BA11DFA9BAF247E68B0C6`,
+and the class-union filter must select and pass `11/11`.
+
+Materialize the exact fenced bytes below in one fresh external `.ps1`, record
+its SHA-256 in the handoff, and invoke that file once and uninterrupted from
+repository root with `pwsh -NoProfile -File`; piecemeal execution or rerun is
+not evidence. The exact corrected V2 PowerShell 7 script is:
+
+```powershell
+$ErrorActionPreference = 'Stop'
+if ($PSVersionTable.PSVersion -lt [Version]'7.4') { throw 'A-CONVERGE V2 requires PowerShell 7.4 or later.' }
+$PSNativeCommandUseErrorActionPreference = $true
+$c = 'tests/dotnet/MeAndAI.Protocol.Conformance.Tests/MeAndAI.Protocol.Conformance.Tests.csproj'
+$d = 'tests/dotnet/MeAndAI.Protocol.Domain.Tests/MeAndAI.Protocol.Domain.Tests.csproj'
+& dotnet build MeAndAI.Protocol.slnx -c Release --no-restore --nologo
+function Get-Digest([string[]] $v) { [Array]::Sort($v, [StringComparer]::Ordinal); $b = [Text.Encoding]::UTF8.GetBytes(($v -join "`n") + "`n"); [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($b)) }
+function Get-Discovery([string] $p, [string] $f = '') { $a = @('test', $p, '-c', 'Release', '--no-restore', '--no-build', '--list-tests', '--nologo'); if ($f) { $a += @('--filter', $f) }; $o = & dotnet @a 2>&1; [string[]] @($o | ForEach-Object { $_.ToString().Trim() } | Where-Object { $_ -like 'MeAndAI.Protocol.*.Tests.*' }) }
+function Assert-Set([string[]] $v, [int] $n, [string] $h, [string] $name) { if ($v.Count -ne $n -or (Get-Digest $v) -cne $h) { throw "$name discovery mismatch." } }
+$a = @(Get-Discovery $c 'ContractSlice=A')
+$u = @($a | Where-Object { $_ -like '*.ContractSliceAPublicApiTests.*' -or $_ -like '*.ContractSliceAOwnershipTests.*' })
+$domain = @(Get-Discovery $d)
+Assert-Set $a 32 'C42DF0B847DF11078C904346CA5D033084797B5386450527E3F8D99612F08B92' 'A'
+Assert-Set $u 11 'F58C362D6CA12A4C67AFCD1C75573063A89F2909088BA11DFA9BAF247E68B0C6' 'API/ownership'
+Assert-Set $domain 98 'FABE8953F91FC735BCB4A74DF1AD00A01F3B37DE4DAC21841F381BC9845A132B' 'Domain'
+$resource = @('MeAndAI.Protocol.Conformance.Tests.ContractSliceAResourceManifestTests.Enforces_exact_manifest_byte_reachable_depth_and_token_ceilings')
+$root = Join-Path ([IO.Path]::GetTempPath()) ('meandai-test-0210-a-converge-' + [Guid]::NewGuid().ToString('N'))
+if (Test-Path -LiteralPath $root) { throw 'Fresh evidence root already exists.' }; [void][IO.Directory]::CreateDirectory($root)
+function Invoke-Run([string] $p, [string] $file, [string] $f = '') { $x = @('test', $p, '-c', 'Release', '--no-restore', '--no-build', '--nologo'); if ($f) { $x += @('--filter', $f) }; $x += @('--logger', "trx;LogFileName=$file", '--results-directory', $root); & dotnet @x }
+Invoke-Run $c 'resource.trx' 'FullyQualifiedName=MeAndAI.Protocol.Conformance.Tests.ContractSliceAResourceManifestTests.Enforces_exact_manifest_byte_reachable_depth_and_token_ceilings'
+Invoke-Run $c 'a.trx' 'ContractSlice=A'
+Invoke-Run $c 'api-ownership.trx' 'FullyQualifiedName~ContractSliceAPublicApiTests|FullyQualifiedName~ContractSliceAOwnershipTests'
+Invoke-Run $c 'conformance.trx'
+Invoke-Run $d 'domain.trx'
+function Assert-Trx([string] $file, [string[]] $expected) {
+  [xml] $trx = Get-Content -LiteralPath (Join-Path $root $file) -Raw
+  $r = @($trx.SelectNodes('//*[local-name()="UnitTestResult"]')); $d = @($trx.SelectNodes('//*[local-name()="UnitTest"]')); $e = @($trx.SelectNodes('//*[local-name()="TestEntry"]'))
+  [string[]] $rn = @($r | ForEach-Object { [string]$_.testName }); [string[]] $dn = @($d | ForEach-Object { [string]$_.name }); $h = Get-Digest $expected
+  if ($r.Count -ne $expected.Count -or $d.Count -ne $expected.Count -or $e.Count -ne $expected.Count -or (Get-Digest $rn) -cne $h -or (Get-Digest $dn) -cne $h) { throw "$file FQN-set mismatch." }
+  if (@($r | ForEach-Object { [string]$_.executionId } | Sort-Object -Unique).Count -ne $expected.Count) { throw "$file result executionId uniqueness mismatch." }
+  foreach ($result in $r) {
+    $definition = @($d | Where-Object { [string]$_.id -ceq [string]$result.testId -and [string]$_.name -ceq [string]$result.testName })
+    $entry = @($e | Where-Object { [string]$_.testId -ceq [string]$result.testId -and [string]$_.executionId -ceq [string]$result.executionId })
+    if ($definition.Count -ne 1 -or $entry.Count -ne 1) { throw "$file definition/entry/result identity mismatch." }
+  }
+  if (@($r | Where-Object { [string]$_.outcome -cne 'Passed' }).Count) { throw "$file has a non-passing result." }
+  $k = $trx.SelectSingleNode('//*[local-name()="Counters"]'); foreach ($n in @('total','executed','passed')) { if ([int]$k.$n -ne $expected.Count) { throw "$file/$n mismatch." } }
+  foreach ($n in @('failed','error','timeout','aborted','inconclusive','passedButRunAborted','notRunnable','notExecuted','disconnected','warning','completed','inProgress','pending')) { if ([int]$k.$n) { throw "$file/$n is nonzero." } }
+  if (@($trx.SelectNodes('//*[local-name()="ResultFiles"]/* | //*[local-name()="CollectorDataEntries"]/* | //*[local-name()="RunInfo"]')).Count) { throw "$file has a diagnostic or attachment." }
+}
+Assert-Trx 'resource.trx' $resource; Assert-Trx 'a.trx' $a; Assert-Trx 'api-ownership.trx' $u; Assert-Trx 'conformance.trx' $a; Assert-Trx 'domain.trx' $domain
+& dotnet format MeAndAI.Protocol.slnx --verify-no-changes --no-restore
+& pwsh -NoProfile -File tests/protocol.tests.ps1 -StructureOnly
+& pwsh -NoProfile -File tests/capabilities/publication-evidence/post-publication-evidence.tests.ps1
+$locks = [ordered]@{
+  'src/MeAndAI.Protocol.Domain/packages.lock.json' = '03EEADC5EF377C17F787AB65F41FB4C8A9C936BB7F7F4171111FDEEC8A81CB46'; 'src/MeAndAI.Protocol.Conformance.Abstractions/packages.lock.json' = 'D79FF11818ABFE0B6CA9CAEC111778169AA36A04709BCA3E0EC0AB84325BF799'; 'src/MeAndAI.Protocol.Conformance/packages.lock.json' = '20E6BA80BFB6EDE58228D28560A03B6143F3D163AC5E06720491458FEA9570E7'; 'src/MeAndAI.Protocol.Policy/packages.lock.json' = 'C57F6AFAEBA953E49D3B6D2CB85E82C00E6A40631507426B1616E57B94724309'; 'tests/dotnet/MeAndAI.Protocol.Domain.Tests/packages.lock.json' = 'D2065F11ED7030EE7DFA7A757FBA2A0D420DAC2F32D0105DFA93D3F78F9B00BC'; 'tests/dotnet/MeAndAI.Protocol.Conformance.Tests/packages.lock.json' = 'BA8D8C653CF0CFD2398F9E43F7AB87ED268A9B77EC5FC2E0F81D2BD7849016C0'
+}
+foreach ($x in $locks.GetEnumerator()) { if ((Get-FileHash -LiteralPath $x.Key -Algorithm SHA256).Hash -cne $x.Value) { throw "Lock mismatch: $($x.Key)" } }
+& git diff --check
+```
+
+V2 owns build, format, diff, StructureOnly, publication, and six lock oracles;
+every exit must be zero. Final production/test/docs/memory and evidence/scope
+reviews must each close `0/0/0` after the final record edit.
+
+V1 is immutable and never rerun. Exact head
+[`7c698d78374678a9f3d2264edc8d451effeaffe0`](https://github.com/hasanmanzak/meAndAI/commit/7c698d78374678a9f3d2264edc8d451effeaffe0)
+passed Ubuntu `20m00s`, Windows `47m15s`; [run 31269244100](https://github.com/hasanmanzak/meAndAI/actions/runs/31269244100)
+skipped publication. Its retained script ran once, exited `1` after five passes
+on `resource.trx/completed mismatch.`, and stopped before later gates. All V1
+paths, hashes, counters, and custody live only in the owning convergence ledger;
+V1 contributes no success. V2 expects `total/executed/passed=N` and all thirteen
+other counters zero; it requires its frozen SHA, fresh path/root, hosted gate,
+and one invocation.
+
+A fully green corrected V2 audit produces `CompletionRecommended`; only the atomic sync above
+advances the routing denominator to `20/20`, while cumulative A remains
+`32/32`. This recommends ContractSlice A completion only; [TEST-0210](test-cases.md#test-0210)
+stays `Planned`. Scenario/status/owner, both combined workflow filters,
+[TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
+B/C/D, merge, release, and publication remain held.
+
+`FinalizedPolicyManifest.ParseCanonical` is the Abstractions-owned byte
+boundary. It throws `FormatException` for empty input, BOM, invalid UTF-8,
+invalid JSON, trailing or missing LF, alternate field order or spelling,
+unknown/duplicate/null fields, numeric or grammar failure, invalid closed
+union/cardinality, noncanonical collection order, or typed-reserialization byte
+inequality, including declaration/reference/artifact-component mapping closure
+failure observable from the document alone. It does not reference or throw the
+downstream Conformance-owned `CatalogIntegrityException`. A successfully parsed
+manifest that later conflicts with the predecessor-trusted sealed-manifest or
+release-envelope identity uses `CatalogIntegrityCode.ManifestInvalid`; a valid
+parsed artifact projection that differs from the actual loaded artifact set or
+bytes uses `CatalogIntegrityCode.ArtifactMismatch`. Raw byte rejection never
+enters a kernel or masquerades as activation evidence.
+
+The [FIND-0439](README.md#find-0439) correction makes this exception boundary
+exhaustive. `ParseCanonical` resolves every
+document-local rule/slot/requirement/profile/transition/schema/producer/
+projector/component/artifact reference, uniqueness constraint, reachability
+constraint, and DAG edge and reports any failure as `FormatException`.
+`CatalogIncomplete` begins only after successful parsing when validation needs
+predecessor-trusted snapshot state or the loaded executable export/registration
+partition; it never reclassifies a defect knowable from manifest bytes alone.
+Factory `ArgumentException` instances caused by parsed document values are
+wrapped as `FormatException`; cancellation, out-of-memory, and unexpected
+runtime failures are not caught or relabeled.
+
+A qualification slice may contain zero rules. Its payload-schema, parser,
+index, demand-projector, and admission-proof arrays may each be empty when the
+resulting declaration/reference graph is closed and no rule or declaration
+requires a missing row. The activation-proof contract, its component identity,
+one mapped positive-length artifact, and the positive cache-budget shape remain
+mandatory. Such an empty qualification slice is structural only: it is not a
+complete catalog, executable export, production-policy claim, or verdict
+authority. This is the exact minimal positive manifest fixture for the first
+ContractSlice A behavior increment.
+
+Every component row must be referenced by the activation-proof,
+admission-proof, codec, parser, index, demand-projector, selector, evaluator,
+model-implementation, or capability-interface declaration graph, except the
+four exact schema-1 runtime anchors `protocol.runtime.domain`,
+`protocol.runtime.conformance-abstractions`, `protocol.runtime.conformance`, and
+`protocol.runtime.markdig` with the exact identities declared below. A
+qualification manifest may omit any runtime anchor that its closed declaration
+graph does not require, including all four in the minimal fixture. An arbitrary
+unreferenced component, an alternate runtime-anchor identity, a component
+without exactly one artifact mapping, an artifact used by no component, or a
+reference to an undeclared component is document-local `FormatException`.
 
 The exact byte rules are:
 
@@ -189,8 +1739,9 @@ The exact byte rules are:
   floating-point numbers, unknown properties, or alternate spellings;
 - field names are ASCII and appear in the schema order below;
 - strings use JSON escaping with `\"`, `\\`, `\b`, `\f`, `\n`, `\r`, and
-  `\t` where applicable, otherwise lowercase `\u00xx` only for remaining
-  controls; printable Unicode is preserved without normalization;
+  `\t` where applicable; `/` remains raw; remaining C0, `DEL`, and C1 controls
+  use lowercase `\u00xx`; every other valid Unicode scalar is emitted as its
+  raw UTF-8 bytes without normalization;
 - integers are base-10, non-negative, and have no leading zero except `0`;
 - booleans are lowercase `true` or `false`;
 - object collections are arrays in the exact canonical ordinal order below;
@@ -216,8 +1767,12 @@ components
 Exactly one of `slice` or `completeCatalog` is present. The absent variant is
 omitted, never serialized as `null`. `manifestDigest`, canonical bytes, loaded
 instances, cache state, and a release-envelope digest are never serialized.
-`sourceCommit` is the exact lowercase 40-hex commit whose path/blob projections
-must match every normative fragment.
+`sourceCommit` is an exact lowercase 40-hex commit identity. `ParseCanonical`
+validates that identity and the internal normative-fragment path/blob/selector/
+digest grammar and closure only. Proof that the commit and containing blobs
+actually exist and contain the declared fragment bytes requires trusted source/
+blob evidence and remains in the predecessor-trusted qualification or release
+envelope; it is not inferred by this byte parser.
 
 The nested object field order is normative:
 
@@ -497,10 +2052,10 @@ stops at the first applicable row in this order:
 
 | Code | Exact category |
 | --- | --- |
-| `ManifestInvalid` | Non-canonical bytes; schema/field/order/grammar/union failure; duplicate manifest declaration/reference row; self-digest or unknown manifest value |
-| `ArtifactMismatch` | Missing/extra/duplicate artifact file or component mapping; filename/length/digest/loaded-artifact mismatch |
+| `ManifestInvalid` | A successfully parsed sealed-manifest identity/digest/projection conflicts with the predecessor-trusted release or qualification envelope, including an envelope-supplied self-digest or unknown manifest identity. Raw schema/field/order/grammar/union/duplicate/declaration/reference/mapping rejection is the Abstractions-owned `ParseCanonical` `FormatException` contract above. |
+| `ArtifactMismatch` | A valid parsed artifact/component projection differs from the actual loaded artifact set, filename, length, digest, assembly/type binding, or loaded-artifact mapping. Document-local missing/extra/duplicate mapping is rejected earlier by `ParseCanonical`. |
 | `ActivationProofInvalid` | Wrong activation contract/type/artifact/envelope/manifest; incomplete verified-artifact set; failed export/loaded-Assembly proof |
-| `CatalogIncomplete` | Missing/extra/duplicate/retired rule; incomplete predecessor/transition/profile/baseline/rule-to-schema logical closure; cyclic/unreachable/ambiguous declared producer DAG |
+| `CatalogIncomplete` | After a successful document-local parse only: the parsed manifest conflicts with predecessor-trusted snapshot state, or the loaded executable export/registration partition is incomplete despite a document-internally closed declaration graph. Missing/extra/duplicate/retired rules, incomplete transition/profile/baseline/rule-to-schema closure, and cyclic/unreachable/ambiguous declared producer DAGs knowable from manifest bytes are earlier `ParseCanonical` `FormatException`. |
 | `RegistrationMismatch` | Export family/projection or internal registration/type-token set differs from the accepted manifest partition; logical key maps to a wrong CLR generic type/instance |
 | `PlanStateInvalid` | Invalid named/caller profile selection, target-selector cardinality, target/slot/instruction set, kernel/session stamp, phase transition, reuse, staleness, or cross-plan input |
 | `AdmissionProofInvalid` | Missing/extra/duplicate/overlapping/foreign proof or instruction identity; SlotKey multiplicity outside the exact owner-sharded instruction bijection; wrong proof kind/type/artifact/receipt/request/resolved target/route; failed proof attestation |
@@ -521,7 +2076,7 @@ assembly inventory is the ordinal union of its own delta and every earlier
 delta. A public type enters once with its complete member/nullability/factory
 surface; no later slice adds a public member to an earlier type.
 
-### ContractSlice A - catalog, provenance, and activation
+### ContractSlice A - catalog, provenance, and manifest preflight
 
 `MeAndAI.Protocol.Conformance.Abstractions` delta:
 
@@ -581,9 +2136,14 @@ CompleteCatalogSnapshot
 NamedExecutionProfile
 ```
 
-ContractSlice A validates activation through the reviewed internal friend
-surface. Public kernels are not exported until their complete two-phase API is
-usable in ContractSlice C.
+ContractSlice A validates canonical manifest bytes, digest and typed
+projection, declaration/reference closure, artifact/component mapping,
+catalog/provenance, predecessor/transition shape, and the negative public/friend
+surface. It constructs no executable policy export, calls no
+`IPolicyActivationProof.Proves(...)` overload, validates no internal export
+registration list, and declares or exports no kernel. First executable export
+activation and the complete `CatalogSliceKernel` public API begin together in
+ContractSlice C.
 
 ### ContractSlice B - admission and sealed capabilities
 
@@ -1262,9 +2822,20 @@ public static class InitialRuleQualificationPolicy
 }
 ```
 
+Every `ReleaseSchemaRegistry.TryGet*` validates its required key/version
+arguments with the corresponding declaration grammar. `null` throws
+`ArgumentNullException`; empty, whitespace-padded, malformed, wrong-case, or
+otherwise noncanonical text throws `ArgumentException`; over-maximum-length
+text throws `ArgumentOutOfRangeException`. A well-formed but absent identity
+returns `false` with `declaration = null`; an exact present identity returns
+`true` with a non-null declaration. These methods never trim, normalize, or
+case-fold.
+
 The activation-proof overload semantics are closed; returning `true` means all
 conditions in the matching row hold and returning `true` for only a subset is
-`ActivationProofInvalid`:
+`ActivationProofInvalid`, except for the explicitly narrower C synthetic-
+qualification negative-fixture branch defined below, which is rejected outside
+that exact friend envelope:
 
 | Overload | Exact attestation bound by the proof's private verified envelope |
 | --- | --- |
@@ -1279,9 +2850,35 @@ provider object immutability was not verified, or any byte/projection mismatch.
 The kernel independently recomputes all structural, predecessor, transition,
 registration, and receipt predicates; `true` cannot waive a failed predicate.
 
-[TEST-0210](test-cases.md#test-0210) has exactly two non-production public-export activation variants in
+ContractSlice A does not invoke any `Proves` overload. Its
+`ParseCanonical`-only behavior validates the canonical manifest projection and
+declaration/artifact graph without constructing or attesting an executable
+export. ContractSlice C is the first slice that can invoke complete-export
+attestation against the final six-list registration shape; ContractSlice D is
+the first slice that can invoke qualification-export attestation against the
+real Policy artifact. B's private codec-mirror proof remains a distinct
+non-export harness contract.
+
+[TEST-0210](test-cases.md#test-0210) has exactly three non-production public-export activation variants in
 addition to B's private codec-only proof:
 
+- ContractSlice C's synthetic-qualification manifest has `QualificationSlice`
+  authority and reuses the object-identical Tests-owned six-family registration
+  objects, logical declarations, component identities, schema graph, budgets,
+  artifacts, and immutable fixture source used by C's synthetic-complete
+  variant. Its `PolicyQualificationSliceExport` contains no real Policy type or
+  artifact and cannot produce a complete evaluation or verdict. A private
+  friend-only branch of `Proves(PolicyQualificationSliceExport)` attests the
+  exact candidate object, Tests assembly/artifact origin, fixture stamp, and
+  presented registration objects independently of their equality to the
+  manifest. That deliberately narrow test branch lets `CatalogSliceKernel`
+  classify missing/extra/duplicate/foreign/wrong-generic registration and
+  public-projection drift as `RegistrationMismatch`; the kernel, not the proof,
+  performs that comparison. It is rejected for every production envelope and
+  cannot satisfy D's real-Policy qualification-mirror semantics. The final
+  internal export factory preserves the presented six-list order and
+  multiplicity for this friend fixture; only the kernel owns manifest
+  bijection validation and `RegistrationMismatch` classification.
 - ContractSlice C's synthetic-complete manifest has
   `CompleteProtocolSnapshot` authority. Its 27 registration/type-contract rows
   preserve the production logical keys, versions, declarations, DAG, budgets,
@@ -1311,16 +2908,17 @@ addition to B's private codec-only proof:
   supplied the mirror/proofs. It cannot satisfy complete-export proof
   semantics.
 
-Both branches require the exact friend assembly identity and private fixture
+All three branches require the exact friend assembly identity and private fixture
 stamp and are rejected under a production envelope. No public origin flag,
 factory, registration seam, or authority token is added.
 
 The two nullable manifest properties are an exclusive closed union: exactly one
 is non-null and must match `AuthorityKind`. Internal
 `MeAndAI.Protocol.Application` ([FEAT-0068](../FEAT-0068-protocol-release-finalizer-authority-transfer/README.md)) and
-`MeAndAI.Protocol.Conformance.Tests` ([TEST-0210](test-cases.md#test-0210)) friend factories recompute and
-compare canonical bytes, manifest digest, declarations, and artifact order;
-they do not trust caller projections.
+`MeAndAI.Protocol.Conformance.Tests` ([TEST-0210](test-cases.md#test-0210)) friend factories obtain manifests only through
+`ParseCanonical` and compare its sealed digest/projections, declarations, and
+artifact order with their private envelope state; they do not trust caller
+projections and cannot access or revalidate discarded raw bytes.
 
 The two policy exports expose only safe logical identity publicly. Their exact
 codec/model/parser/index/evaluator/selector-resolver
@@ -1361,6 +2959,44 @@ shown `Create` factories and equality members; `ReviewedAuthorityPermalink`
 exposes only its shown `Create` factory and equality members. None inherits the
 token-family parse surface.
 
+Shared validation and value semantics are exact. All textual validation,
+equality, hash input, and textual ordering are ordinal and ASCII-exact. Inputs
+are never trimmed, case-folded, Unicode-normalized, or accepted through aliases.
+A required reference or enumerable that is `null` throws
+`ArgumentNullException`. In caller-creatable `Create` and variant factories, an
+empty or whitespace-only required string, a grammar-invalid/noncanonical
+string, a null enumerable element, a duplicate semantic key/value, an invalid
+union variant, or a cross-field/foreign-membership conflict throws
+`ArgumentException`; an empty enumerable throws `ArgumentException` only where
+that type's exact contract requires one or more elements. A non-positive value
+where positivity is required, a negative count, an invalid numeric or temporal
+range, or an over-maximum-length value throws `ArgumentOutOfRangeException`.
+Checked arithmetic overflow remains `OverflowException`. Optional nullable
+members accept `null` only where their exact signature and variant contract
+permit it. Exception category is observable; message, `ParamName`, and
+validation implementation/order are not oracles unless a type-specific rule
+explicitly says otherwise.
+
+Every declared `Parse(string value)` throws `ArgumentNullException` for `null`
+and `FormatException` for empty, whitespace-padded, malformed, unknown-closed,
+wrong-case, over-length, or otherwise noncanonical text. Its paired `TryParse`
+never throws for caller text, returns `false` with `result = null` for every
+such invalid input, and returns `true` with a non-null value exactly when
+`Parse` succeeds. `CatalogVersion.Create(0)` and negative values throw
+`ArgumentOutOfRangeException`.
+
+Every `IEquatable<T>` implementation uses all and only the type's public
+semantic state: ordinal strings, exact bytes/digests, numeric values,
+nullable-state presence, nested semantic equality, and collection elements in
+their exposed canonical order. `Equals(null)` and equality with another union
+leaf/runtime type are false. `GetHashCode()` uses the same state and ordinal
+comparers; its integer result is not stable evidence. A text value's
+`ToString()` returns exact `Value`. Only types explicitly declaring
+`IComparable<T>` expose public comparison: textual values use ordinal
+comparison, `CatalogVersion` uses numeric `Value` comparison, and
+`CompareTo(null)` returns `1`. `CatalogVersion.ToString()` returns invariant
+ASCII base-10 `Value` with no sign or leading zero.
+
 Artifact files are unique and ordered by `FileName`; component bindings are
 unique and ordered by component key/version, and physical assembly/type
 identity is also unique. FileName is a basename with no separator and
@@ -1383,7 +3019,7 @@ named profile, however, `RuleIds` must equal exactly the full subset of that
 inventory satisfying the same static planning predicate: the rule declares the
 profile's SubjectRole, Operation, and SnapshotKind, and the profile Surfaces
 intersect the rule Surfaces. Missing a compatible rule or adding an
-incompatible one is `CatalogIncomplete`; no named profile that can mint a
+incompatible one is document-local `ParseCanonical` `FormatException`; no named profile that can mint a
 `CompleteCatalogEvaluation`/verdict may narrow this closure. The designated
 baseline is one default named profile and obeys the same exact compatible-set
 rule; it is not falsely required to contain rules for incompatible Adoption,
@@ -2591,8 +4227,9 @@ scans, or performs service lookup.
 The internal export members/factories shown above are the final ContractSlice C
 source shape, not an instruction to reference later-slice types early.
 ContractSlice A introduces the public export projections with explicit
-non-public constructors and validates canonical manifest/artifact/proof
-preconditions without constructing an executable export. ContractSlice B
+non-public constructors and validates canonical manifest plus declaration/
+artifact/component preconditions without constructing an executable export or
+calling an activation-proof overload. ContractSlice B
 introduces only the final internal model-token plus codec-registration/visitor
 subset needed by its test mirror; it does not yet add an export registration
 list or six-list export factory. Its complete Tests-only causal surface is:
@@ -3943,18 +5580,43 @@ The production activation contract is
 component in its own exact fixture envelope; it never changes a production
 manifest or export.
 
-Activation derives unique producer tables for every model and capability.
-Schema nodes are roots; parser/index edges come from every declared input.
-Unresolved inputs, duplicate producers, self-edges, input/output identity
-collisions, and cycles fail. Kahn ordering uses component key/version then
-declaration key/version ordinal as its ready-node tie-breaker. Every rule-slot
-capability must resolve to one producer, and every declaration/output must be
-reachable from at least one slot; unreachable or extra registrations fail.
+The document-local producer graph derives unique producer tables for every model
+and capability, but its node universe is exactly the payload-schema, semantic-
+model-parser, context-index, and acquisition-demand-projector declarations.
+Model and capability identities, slots, selectors, evaluators, proof contracts,
+components, artifacts, and demand-frame schema tokens are not graph nodes.
+Edges are prerequisite to dependent: model/capability producers point to every
+consuming parser or index; the governed-reference capability producer points to
+the repository-target projector; and that projector points to the output slot
+requirement's repository-target-resolution schema producer. The exact graph has
+ten nodes: three schema, two parser, four index, and one projector.
+
+Roots are computed as producer nodes with indegree zero. The exact positive
+ten-node successor roots are governed-text and repository-tree schemas; the
+repository-target-resolution schema is projected and therefore is not a
+successor root. Jointly removing the projector declaration and its component
+removes that inbound edge, so the valid nine-node predecessor has governed-text,
+repository-target-resolution, and repository-tree schema roots. For the
+structurally unique union of every rule's applicability and evaluation slots,
+validation seeds each slot's schema and capability producers, walks prerequisite
+edges in reverse, and requires the union of all slot closures to equal all
+producer nodes. Unresolved inputs, duplicate producer owners,
+duplicate output-slot projector owners, ambiguous component-to-artifact owners,
+self-edges, input/output identity collisions, cycles, or unreachable producers
+fail. Kahn ordering uses component key/version, declaration key/version, then
+family rank `Schema < Parser < Index < Projector` as its total ready-node
+comparator. Every rule-slot capability must resolve to one producer.
 The resulting codec/parser/index/demand-projector/selector/evaluator plus
-model/capability type closure is the 27-row Policy registration/type-contract partition and must
-biject with the export's internal typed registrations/type tokens and public
-`Components` list. Of those rows, 23 implementations/types are in Policy and
-four capability-interface identities are in Abstractions. The runtime
+model/capability type closure is the 27-row Policy logical producer/type-
+contract manifest partition. ContractSlice A owns its exact declaration rows,
+component identities, ordinal order, artifact mappings, DAG, reachability, and
+the 35-row manifest union below; it makes no executable-registration claim.
+ContractSlice C first requires that same 27-row partition to biject with the
+export's six internal typed registration lists, model/capability type tokens,
+and public `Components` projection. Missing, extra, duplicate, foreign, or
+wrong-generic registration/type-token rows are `RegistrationMismatch`. Of
+those rows, 23 implementations/types are in Policy and four capability-
+interface identities are in Abstractions. The runtime
 artifact-anchor partition is the exact four-row table above and must biject
 with the loaded Domain, Abstractions, Conformance, and Markdig artifacts. The
 activation-proof partition is the one exact
@@ -3962,7 +5624,10 @@ activation-proof partition is the one exact
 activation-proof type/artifact. The admission-proof partition is the exact
 `AdmissionProofContractDeclaration` component set and must biject with the
 activated observed/failed/no-input proof types/artifacts. The four partitions
-are component-key/type disjoint; their ordinal union must equal the manifest
+are component-key/type disjoint; one functional component identity cannot serve
+two declaration roles across activation proof, admission proof, payload codec,
+model type, parser, index, capability type, projector, selector resolver, or
+evaluator. Their ordinal union must equal the manifest
 `components` and component/artifact mappings exactly. No partition may absorb,
 omit, or duplicate another. The initial production union is therefore exactly
 35 component rows: 27 Policy registration/type-contract rows, four runtime
@@ -4196,14 +5861,18 @@ SlotKey, target structural order, demand kind, owning repository identity, then
 first ItemId; duplicate owner shards, item overlap/gap, or any other repeated
 SlotKey is `PlanStateInvalid`.
 
-Projection runs only after all active input slots and their declared
+At runtime, projection runs only after all active input slots and their declared
 capability are terminal and qualified. One output slot has at most one
-projector. Projected slots are evaluation-only. The activation DAG contains
-edges from the input capability producer to the projector and from the
-projector to the output slot's acquisition/schema producer. Unknown
-input/output slots or capabilities, duplicate output ownership, a projected
-applicability slot, self-dependency, cycle, unreachable output, or a rule path
-that demands the output before its inputs is `CatalogIncomplete`.
+projector, and projected slots are evaluation-only. The manifest dependency
+edges are the same document-local governed-reference-producer to projector and
+projector to repository-target-resolution-schema-producer edges frozen above.
+Unknown input/output slots or capabilities, duplicate output ownership, a
+projected applicability slot, self-dependency, cycle, unreachable output, or a
+rule path that demands the output before its inputs is document-local
+`ParseCanonical` `FormatException`. ContractSlice A proves only the canonical
+manifest bytes, typed projection, bindings, ownership, DAG, reachability, and
+order; ContractSlice C first activates registrations and observes runtime
+execution order.
 
 A zero-candidate product emits no repository-target instruction, proof request,
 external call, payload, codec invocation, or historical parser invocation. The
@@ -5098,9 +6767,9 @@ to `CloseApplicability`, `PlanEvaluation`, `AdvanceEvaluation`, and `Evaluate`.
 
 ### Exact closure and projected-slot aggregation
 
-Manifest activation requires one global structural declaration per SlotKey and
-one global SlotKey owner per RequirementKey. Reusing a RequirementKey under a
-different SlotKey is `CatalogIncomplete`. This makes the public acquisition
+`ParseCanonical` requires one global structural declaration per SlotKey and one
+global SlotKey owner per RequirementKey. Reusing a RequirementKey under a
+different SlotKey is document-local `FormatException`. This makes the public acquisition
 projection reversible without adding another wrapper type.
 
 A `SealedAcquisitionAttempt` is minted for every issued instruction and keeps
@@ -5710,11 +7379,11 @@ The exact per-rule declaration projection is:
 
 | Rule | Surfaces / snapshot kinds | Evaluation slots | Expected selectors | Qualification scenarios |
 | --- | --- | --- | --- | --- |
-| RULE-0001 rev 1 | Repository / ExactCommit, Candidate, ProviderFullInventory, CapturedEvidence | repository-tree | `protocol.selector.feature-readme`, SlotKey `protocol.slot.repository-tree`, schema `protocol.selector.relative-child.v1`, feature-readme resolver, parent Derived, finding `protocol.feature.readme-missing`; `protocol.selector.feature-test-cases`, the same SlotKey/schema, feature-test-cases resolver, parent Derived, finding `protocol.feature.test-cases-missing` | [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004), [TEST-0210](test-cases.md#test-0210) |
-| RULE-0002 rev 1 | Repository / ExactCommit, Candidate, ProviderFullInventory, CapturedEvidence | repository-tree; repository-governed-text | `protocol.selector.decision-record`, SlotKey `protocol.slot.repository-governed-text`, schema `protocol.selector.decision-record-by-id.v1`, decision-record resolver, parent Derived, finding `protocol.decision.record-missing` | [TEST-0005](../FEAT-0001-common-development-protocol/test-cases.md#test-0005), [TEST-0210](test-cases.md#test-0210) |
-| RULE-0003 rev 1 | Repository + Provider / ExactCommit, Candidate, ProviderEvent, ProviderFullInventory, CapturedEvidence | repository-governed-text; provider-governed-text; repository-target-resolution | none | [TEST-0175](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175), [TEST-0176](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0176), [TEST-0177](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0177), [TEST-0210](test-cases.md#test-0210) |
-| RULE-0004 rev 1 | Repository + Provider / ExactCommit, Candidate, ProviderEvent, ProviderFullInventory, CapturedEvidence | repository-governed-text; provider-governed-text; repository-target-resolution | none | [TEST-0177](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0177), [TEST-0210](test-cases.md#test-0210) |
-| RULE-0005 rev 1 | Repository + Provider / ExactCommit, Candidate, ProviderEvent, ProviderFullInventory, CapturedEvidence | repository-governed-text; provider-governed-text; repository-target-resolution | none | [TEST-0178](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178), [TEST-0210](test-cases.md#test-0210) |
+| RULE-0001 rev 1 | Repository / ExactCommit, Candidate, ProviderFullInventory, CapturedEvidence | repository-tree | `protocol.selector.feature-readme`, SlotKey `protocol.slot.repository-tree`, schema `protocol.selector.relative-child.v1`, feature-readme resolver, parent Derived, finding `protocol.feature.readme-missing`; `protocol.selector.feature-test-cases`, the same SlotKey/schema, feature-test-cases resolver, parent Derived, finding `protocol.feature.test-cases-missing` | [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004) |
+| RULE-0002 rev 1 | Repository / ExactCommit, Candidate, ProviderFullInventory, CapturedEvidence | repository-tree; repository-governed-text | `protocol.selector.decision-record`, SlotKey `protocol.slot.repository-governed-text`, schema `protocol.selector.decision-record-by-id.v1`, decision-record resolver, parent Derived, finding `protocol.decision.record-missing` | [TEST-0005](../FEAT-0001-common-development-protocol/test-cases.md#test-0005) |
+| RULE-0003 rev 1 | Repository + Provider / ExactCommit, Candidate, ProviderEvent, ProviderFullInventory, CapturedEvidence | repository-governed-text; provider-governed-text; repository-target-resolution | none | [TEST-0175](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175), [TEST-0176](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0176), [TEST-0177](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0177) |
+| RULE-0004 rev 1 | Repository + Provider / ExactCommit, Candidate, ProviderEvent, ProviderFullInventory, CapturedEvidence | repository-governed-text; provider-governed-text; repository-target-resolution | none | [TEST-0177](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0177) |
+| RULE-0005 rev 1 | Repository + Provider / ExactCommit, Candidate, ProviderEvent, ProviderFullInventory, CapturedEvidence | repository-governed-text; provider-governed-text; repository-target-resolution | none | [TEST-0178](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178) |
 
 The evaluator component is the matching `protocol.evaluator.rule-NNNN` entry;
 CatalogVersion is 1; normative fragments/digests are the exact earlier table;
@@ -5725,7 +7394,7 @@ failure, never evaluator-authored text.
 
 The exact qualification links are:
 
-| Rule | Canonical existing siblings | Fresh typed qualification |
+| Rule | Canonical existing siblings | Deferred final activation |
 | --- | --- | --- |
 | [RULE-0001](../../architecture/protocol-governance-and-execution/successor-delivery-plan.md#rule-0001) | [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004) | [TEST-0210](test-cases.md#test-0210) |
 | [RULE-0002](../../architecture/protocol-governance-and-execution/successor-delivery-plan.md#rule-0002) | [TEST-0005](../FEAT-0001-common-development-protocol/test-cases.md#test-0005) | [TEST-0210](test-cases.md#test-0210) |
@@ -5733,8 +7402,12 @@ The exact qualification links are:
 | [RULE-0004](../../architecture/protocol-governance-and-execution/successor-delivery-plan.md#rule-0004) | [TEST-0177](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0177) | [TEST-0210](test-cases.md#test-0210) |
 | [RULE-0005](../../architecture/protocol-governance-and-execution/successor-delivery-plan.md#rule-0005) | [TEST-0178](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178) | [TEST-0210](test-cases.md#test-0210) |
 
-The older scenarios remain their own canonical semantic owners. [TEST-0210](test-cases.md#test-0210)
-directly executes fresh C# fixtures; it never consumes a sibling result.
+The current admitted counts are `[1,1,3,1,1]`, total `7`. The older scenarios
+remain their own canonical semantic owners. While [TEST-0210](test-cases.md#test-0210)
+is `Planned`, its deferred column is not part of `QualificationScenarios`.
+Final atomic activation appends it to all five declarations, yielding
+`[2,2,4,2,2]`, total `12`. The scenario directly executes fresh C# fixtures; it
+never consumes a sibling result.
 [TEST-0176](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0176) retains provider enumeration, pagination, freshness, and I/O
 ownership. [TEST-0210](test-cases.md#test-0210) receives only already sealed provider-neutral material.
 
@@ -5909,15 +7582,25 @@ The full sibling inventory is:
 
 ## [TEST-0210](test-cases.md#test-0210) expected-red contract
 
-[TEST-0210](test-cases.md#test-0210) is project-neutral, table-driven, and fresh. It is one canonical
-composed scenario divided by the additional exact trait `ContractSlice=A`,
-`B`, `C`, or `D`. No new stable test ID is allocated by this design.
+[TEST-0210](test-cases.md#test-0210) is project-neutral, table-driven, and
+fresh. It is one canonical composed scenario divided while `Planned` by the
+sole exact partition trait `ContractSlice=A`, `B`, `C`, or `D`. Before final
+activation, the activation packet freezes the complete retained-fact identity
+inventory and proves that each identity has exactly one A-D `ContractSlice`
+and no `Scenario` trait. One atomic candidate then adds
+the `Scenario` trait for [TEST-0210](test-cases.md#test-0210) to that frozen inventory together with status, automation,
+scenario-owner, both stable workflow test steps' run-block form, solution target, and
+filter, plus
+[TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146).
+Post-mutation validation proves both the ContractSlice and Scenario identity
+sets equal the frozen inventory exactly. No new stable test ID is allocated by
+this design.
 
 | Slice | Direct contract |
 | --- | --- |
-| A | Catalog declarations, normative provenance/digests, canonical manifest, acyclic artifact/component/projector graph, predecessor transitions, exact cumulative-A exports, exact friend matrix, and negative registration surface |
+| A | Catalog declarations, normative provenance/digests, canonical manifest parse/digest/typed projection, acyclic declaration/artifact/component/projector graph, predecessor transitions, exact cumulative-A exports, exact friend matrix, and negative public surface; no executable export, typed registration list, activation, or kernel |
 | B | Cumulative-B 72 export shape; exactly the codec-registration/model-token subset; three protocol-writer-owned persistent payload wires; Tests-only private-stamp writer/qualifier/admission; decode/model cache; codec-local four-counter meter/ledger; ContextProof, Root, and codec-derived reference sealing; collision, ceiling, concurrency, cancellation, and host-failure lifecycle. B does not claim parser/index/projector/selector behavior, provider-neutral capability semantics, index cache, shared-root ledgers, or zero-candidate planning. |
-| C | Cumulative-C 95 exports; a Tests-owned synthetic-complete graph with all six registration families and synthetic parser/index/projector/selector/evaluator implementations; provider-neutral capability semantics; both Markdown parsers; repository-tree, record, governed-reference, and repository-target indexes; staged Plan/Advance/Closure API; zero-to-N rounds and owner-sharded projected-slot aggregation; index cache/shared-root ledger; retained outcomes; applicability; kernel outputs/order/flags; transition/verdict truth tables. C consumes no real Policy registration or result. |
+| C | Cumulative-C 95 exports; first executable export activation and `CatalogSliceKernel`; a Tests-owned synthetic-complete graph with all six registration families plus exact registration/type-token/public-projection bijection and mismatch negatives; synthetic parser/index/projector/selector/evaluator implementations; provider-neutral capability semantics; both Markdown parsers; repository-tree, record, governed-reference, and repository-target indexes; staged Plan/Advance/Closure API; zero-to-N rounds and owner-sharded projected-slot aggregation; index cache/shared-root ledger; retained outcomes; applicability; kernel outputs/order/flags; transition/verdict truth tables. C consumes no real Policy registration or result. |
 | D | Final cumulative 96 exports including the real qualification-only Policy entrypoint; direct real-Policy repetition of every B codec and C registration/parser/index/projector/selector/evaluator vector; fresh positive/negative/boundary/malformed RULE-0001..0005 repository/provider fixtures; exact code/provenance; overlap/co-report; sibling-equivalent outcomes. |
 
 Each slice follows its own red/review/green gate after a later implementation
@@ -5994,12 +7677,14 @@ The future executable scenario directly covers:
 The slice-specific matrix is also mandatory and may not be deferred to a later
 scenario:
 
-- A proves exact cumulative count 48, the 27-row Policy registration/type-
+- A proves exact cumulative count 48, the 27-row manifest logical producer/type-
   contract partition and 35-row full component union, the demand-projector
-  registry/manifest field order, missing/extra/duplicate projector
-  registration, input/output slot/capability closure, projected-applicability
-  rejection, producer/projector cycle and unreachable output, and the exact
-  no-extra-friend matrix.
+  declaration/manifest field order, missing/extra/duplicate projector
+  declaration or component mapping, input/output slot/capability closure,
+  projected-applicability rejection, the exact numbered twenty-two topology
+  mutations in the current frozen contract, computed successor/predecessor
+  roots, canonical byte/digest/typed-projection behavior, and the exact
+  no-extra-friend matrix. It proves no executable registration or activation.
 - B proves cumulative count 72 and the non-authoritative Tests-owned codec
   mirror through private-stamp `Activate ->
   WriteCanonicalPayload -> Qualify -> Admit` mirror; golden writer byte vectors,
@@ -6019,7 +7704,12 @@ scenario:
   ContextProof/Root/codec-derived reference sealing; and no admission writer/
   codec rerun. It claims no parser/index/projector/selector, provider-capability,
   index-cache, shared-root-ledger, zero-candidate, or public-plan behavior.
-- C proves cumulative count 95, all six final registration lists,
+- C proves cumulative count 95, first executable export activation, all six
+  final registration lists and their exact count/order/bijection with the
+  27-row manifest partition, model/capability type tokens, and public
+  `Components` projection. Missing/extra/duplicate codec/parser/index/projector/
+  selector/evaluator registration, a foreign or wrong generic CLR type/instance,
+  and public projection drift are `RegistrationMismatch`. C also proves
   Tests-owned synthetic implementations for both Markdown parsers and every
   index/projector/selector/evaluator family, and
   `PlanApplicability -> CloseApplicability -> PlanEvaluation ->
@@ -6100,24 +7790,73 @@ predecessor/environment error is invalid red.
 
 After reviewed SurfaceRed, implement only that slice's complete structural
 delta until the anchor and exact API tests compile. Then add only the reviewed
-executable test for the slice's first semantic increment. It has
-`[Trait("Scenario", "`[TEST-0210](test-cases.md#test-0210)`")]` and exactly one matching
-`[Trait("ContractSlice", "<A|B|C|D>")]`.
+partial test belonging to [TEST-0210](test-cases.md#test-0210) for the slice's
+first semantic increment. While the canonical scenario remains `Planned`, the
+test has exactly one matching `[Trait("ContractSlice", "<A|B|C|D>")]` and no
+`Scenario` trait; its exact FQN and packet record preserve the parent-scenario
+link. The final activation uses this closed order:
+
+1. In the exact pre-activation parent, freeze one ordinal table `E` from every
+   retained test-method FQN to its A-D slice, its derived per-slice counts, the
+   table digest, and the parent SHA. `E` includes the exact C# verifier FQN
+   `MeAndAI.Protocol.Conformance.Tests.ContractSliceActivationTopologyTests.Matches_exact_contract_slice_scenario_inventory`.
+   Run `ContractSlice=A|ContractSlice=B|ContractSlice=C|ContractSlice=D` and
+   require selected = discovered = executed = passed = `|E|`, failed = skipped
+   = zero, and the executed FQN set = `E.Keys`.
+2. The verifier reflects over direct, non-skipped `[Fact]` methods in its
+   executing assembly. For `E`, `[Theory]`, inherited/generic/overloaded facts,
+   class-level partition/scenario traits, duplicate FQNs, and a second
+   handwritten count are forbidden. It requires the reflected A-D
+   ContractSlice identities to equal `E.Keys`, exactly one direct
+   ContractSlice per identity equal to `E[FQN]`, pairwise-disjoint slices, no
+   foreign A-D fact, and the cardinality equality
+   `|E| = |A| + |B| + |C| + |D|`. Its own direct Scenario-trait cardinality is
+   the phase selector: zero requires zero target Scenario traits on all `E`
+   facts; exactly one target trait requires the target Scenario identity set to
+   equal `E.Keys` with exactly one target Scenario trait per fact; any other
+   self state or any other Scenario value on an `E` fact fails. Before
+   activation, it constructs the target ID from split fragments so a planned
+   source does not assert the scenario.
+3. In one reviewed candidate with no published intermediate, add exactly one
+   literal `Scenario` trait for [TEST-0210](test-cases.md#test-0210) to every `E` fact and change status,
+   automation, scenario-owner, both stable workflow test steps' run-block form,
+   solution target, and filter, plus
+   [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
+   together. No FQN, method, `E` row, slice, production, project, package, or
+   lock mutation is permitted in this activation commit. A partial mutation is
+   invalid and cannot be committed.
+4. At the candidate head, rerun the A-D ContractSlice union, then the focused
+   `Scenario` filter for [TEST-0210](test-cases.md#test-0210), then the final solution-level combined route.
+   Each applicable run must have zero failed/skipped tests and exact
+   selected/discovered/executed/passed cardinality. Both focused identity sets
+   must equal the same `E.Keys`; the always-selected verifier must prove the
+   post-activation mapping above.
+
+This C# fact is introduced as the last retained D fact before activation with
+only `ContractSlice=D`; its method body, FQN, and `E` table remain
+byte-identical in the activation commit, while only its direct trait metadata
+gains the Scenario trait that selects the final phase. It is executable
+ownership of the bijection and remains part of
+[TEST-0210](test-cases.md#test-0210); it allocates no additional stable scenario ID. [TEST-0074](../FEAT-0012-v082-correction/test-cases.md#test-0074) retains
+the distinct lifecycle/authority check, and
+[TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
+retains workflow-invocation ownership.
 
 The structural-delta checkpoint has one reproducible, compile-green temporary
 red state and no discretionary stub behavior. In the uncommitted red worktree,
-the one activation/export member used by the first increment returns `null!`
-from its declared non-null reference return/property and performs no other
-work: A uses `CatalogSliceKernel.Activate`, B uses
+the one parse/activation/export member used by the first increment returns
+`null!` from its declared non-null reference return/property and performs no
+other work: A uses `FinalizedPolicyManifest.ParseCanonical`, B uses
 `ContractSliceBAdmissionHarness.Activate`, C uses `ConformanceKernel.Activate`,
 and D uses `InitialRuleQualificationPolicy.Export`. Nullable analysis therefore
-emits no warning. The exact absent-behavior predicate is: A returned normally
-instead of throwing the declared missing-registration integrity exception; or
-B/C/D returned null instead of their exact activated harness/kernel/export.
-Only that predicate calls `Assert.Fail(exactMarker)`. A wrong exception/code or
-a non-null but structurally wrong graph uses marker-free exact assertions and
-cannot masquerade as the planned red. No throwing placeholder, `default`
-factory graph, permissive activation, clock/random input, or already-green
+emits no warning. The exact absent-behavior predicate is that A returned null
+instead of the parsed non-null manifest, or B/C/D returned null instead of
+their exact activated harness/kernel/export. Only that predicate calls
+`Assert.Fail(exactMarker)`. An exception from A's positive canonical fixture, a
+non-null but structurally wrong projection/digest, a wrong B/C/D exception/code,
+or a structurally wrong non-null graph uses marker-free exact assertions or
+propagates and cannot masquerade as the planned red. No throwing placeholder,
+`default` factory graph, permissive parse/activation, clock/random input, or already-green
 implementation is an admissible first-red predecessor. The temporary `null!`
 body and red test are removed/replaced within that slice's reviewed red-to-green
 operation and are never committed or pushed as an active red state.
@@ -6129,27 +7868,50 @@ before creation and is empty immediately before the command. Record its
 resolved path and run exactly one test CLI invocation. Do not run a discovery
 pre-pass, `--list-tests`, retry, or second logger:
 
-In the command, `$scenarioId` denotes [TEST-0210](test-cases.md#test-0210) and
-is constructed from split fragments so the executable example does not hide a
-cross-record reference in code formatting:
-
 ```text
-$scenarioId = 'TEST-' + '0210'
-dotnet test tests/dotnet/MeAndAI.Protocol.Conformance.Tests/MeAndAI.Protocol.Conformance.Tests.csproj --configuration Release --no-restore --nologo --verbosity minimal --results-directory "<fresh-absolute-temp-directory>" --logger "trx;LogFileName=<exact-marker>.trx" --filter "Scenario=$scenarioId&ContractSlice=<slice>&FullyQualifiedName=<exact-test-fqn>"
+dotnet test tests/dotnet/MeAndAI.Protocol.Conformance.Tests/MeAndAI.Protocol.Conformance.Tests.csproj --configuration Release --no-restore --nologo --verbosity minimal --results-directory "<fresh-absolute-temp-directory>" --logger "trx;LogFileName=<exact-marker>.trx" --filter "ContractSlice=<slice>&FullyQualifiedName=<exact-test-fqn>"
 ```
+
+That planned-phase filter deliberately uses only `ContractSlice` plus exact
+FQN. A `Scenario` filter for [TEST-0210](test-cases.md#test-0210) is valid only after the final atomic
+activation above.
 
 The first required `BehaviorRed` identities are:
 
 | Slice | Exact test FQN | Exact marker and TRX filename |
 | --- | --- | --- |
-| A | `MeAndAI.Protocol.Conformance.Tests.ContractSliceAActivationTests.Rejects_manifest_with_missing_registration` | `TEST-0210-A-BEHAVIOR-RED-0001` / `TEST-0210-A-BEHAVIOR-RED-0001.trx` |
+| A | `MeAndAI.Protocol.Conformance.Tests.ContractSliceAManifestTests.Parses_minimal_canonical_qualification_manifest` | `TEST-0210-A-BEHAVIOR-RED-0001` / `TEST-0210-A-BEHAVIOR-RED-0001.trx` |
 | B | `MeAndAI.Protocol.Conformance.Tests.ContractSliceBActivationTests.Activates_exact_codec_mirror` | `TEST-0210-B-BEHAVIOR-RED-0001` / `TEST-0210-B-BEHAVIOR-RED-0001.trx` |
 | C | `MeAndAI.Protocol.Conformance.Tests.ContractSliceCActivationTests.Activates_exact_synthetic_registration_graph` | `TEST-0210-C-BEHAVIOR-RED-0001` / `TEST-0210-C-BEHAVIOR-RED-0001.trx` |
 | D | `MeAndAI.Protocol.Conformance.Tests.ContractSliceDPolicyExportTests.Exports_exact_real_registration_graph` | `TEST-0210-D-BEHAVIOR-RED-0001` / `TEST-0210-D-BEHAVIOR-RED-0001.trx` |
 
-These are deliberately the first topological behavior of each slice. B proves
-only codec-mirror activation before admission cases. C proves the Tests-owned
-synthetic complete registration graph before any plan/evaluator behavior. D
+The exact A fixture is the strict UTF-8 encoding of the following one-line JSON
+followed by exactly one LF and no BOM:
+
+```json
+{"schema":"protocol.policy-manifest.v1","authorityKind":"qualification-slice","sourceCommit":"0000000000000000000000000000000000000001","protocolVersion":"0.0.0","catalogVersion":1,"slice":{"sliceKey":"protocol.catalog-slice.test-empty","sliceVersion":"1","rules":[]},"schemaRegistry":{"payloadSchemas":[],"parsers":[],"indexes":[],"demandProjectors":[],"admissionProofContracts":[],"cacheBudget":{"maxDecodeEntries":1,"maxDecodeCanonicalBytes":1,"maxIndexEntries":1,"maxIndexNodes":1,"maxConcurrentDecodeAttempts":1,"maxConcurrentIndexAttempts":1,"retentionPolicy":"retain-lowest-canonical-keys"}},"activationProofContract":{"contractKey":"protocol.activation-proof.test","contractVersion":"1","proofComponent":{"componentKey":"protocol.activation-proof.test","componentVersion":"1"}},"artifactFiles":[{"fileName":"ContractSliceA.Proof.dll","byteLength":1,"artifactDigest":"6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d"}],"components":[{"component":{"componentKey":"protocol.activation-proof.test","componentVersion":"1","assemblyName":"MeAndAI.Protocol.Conformance.Tests","typeName":"MeAndAI.Protocol.Conformance.Tests.ContractSliceAActivationProof"},"artifactFileName":"ContractSliceA.Proof.dll"}]}
+```
+
+A green first increment returns a non-null manifest whose authority, commit,
+protocol/catalog/slice identity, empty rule/registry arrays, positive cache
+budget, activation-proof component, artifact/component mapping and order equal
+that fixture; `CompleteCatalog` is null; `ManifestDigest` is SHA-256 of those
+exact 1,222 bytes including the LF,
+`59ef47142c3c0d1e39825bd0e2e11d8f28093bed1ad93c12e251bb95cf5a4d64`.
+Mutating the caller-owned source array after the call changes neither the
+digest nor any projection. Source review, not that black-box assertion alone,
+proves the required copy-at-entry and no-retained-raw-bytes implementation.
+
+These are deliberately the first topological behavior of each slice. A parses
+the exact minimal positive qualification manifest above, proves its SHA-256
+digest, full typed projection, and mutation-independent public result; source
+review proves copy-at-entry and discarded raw bytes. It
+constructs no export and activates no kernel. B proves only codec-mirror
+activation before admission cases. C proves the Tests-owned synthetic complete
+registration graph before any plan/evaluator behavior and is the first
+executable export/kernel activation. The old A missing-registration oracle is a
+later C registration-mismatch increment and may not reuse A's marker; its exact
+transient predecessor and C marker require review immediately before that red. D
 loads the real `InitialRuleQualificationPolicy.Export` and proves only its exact
 public/internal registration graph. The planned later FQN
 `MeAndAI.Protocol.Conformance.Tests.ContractSliceDPolicyEvaluatorTests.Evaluates_rule_0001_against_fresh_qualified_fixture`
@@ -6166,22 +7928,44 @@ Forged-admission, false-applicability, and other end-to-end cases follow the
 same dependency-closed increment rule.
 
 The reviewed test calls `Assert.Fail(exactMarker)` only on the one exact absent-
-behavior predicate named by that increment. With the locked xUnit `2.9.3`
-contract this is `Xunit.Sdk.FailException`; the normalized TRX
-`Output/ErrorInfo/Message` equals the marker byte-for-byte. The marker occurs
-exactly once in the TRX and only in that failed result's message: never an
-attachment, another result, or an unrelated exception. The standard console
-logger may echo the same marker byte-for-byte to stdout/stderr; that incidental
-echo is recorded but is neither counted as a second result nor accepted as
-proof. Unexpected production exceptions propagate and are not caught or
-relabeled; every other incorrect non-exception outcome uses a marker-free
-assertion. Source review proves those branches before the run.
+behavior predicate named by that increment. Source review plus the immutable
+locked xUnit `2.9.3` contract proves that direct call throws
+`Xunit.Sdk.FailException`; the standard TRX schema/adapter does not serialize
+the runtime exception type and the TRX must not claim that it does. The sole
+mapped failed `UnitTestResult` has exactly one `Output/ErrorInfo/Message` node
+whose normalized text equals the marker byte-for-byte. The same `ErrorInfo` may
+also contain zero or one nonempty, marker-free sibling `StackTrace` containing
+the locked adapter's standard failed-result assertion stack. Its absolute paths,
+framework frames, indentation, and source line numbers are recorded non-oracles;
+it is same-result serialization rather than an independent diagnostic. No other
+`ErrorInfo` child or content is allowed. Except for the one permitted run-summary
+echo described next, no other test-result message, stack, attachment, warning,
+error, attribute, or node contains the marker. Across
+`ResultSummary/Output/StdOut` and `StdErr`, the adapter may
+record zero or one additional byte-identical marker echo. That bounded echo is
+neither a second result nor assertion-type proof. Unexpected production
+exceptions propagate and are not caught or relabeled; every other incorrect
+non-exception outcome uses a marker-free assertion. Source review proves those
+branches before the run.
+
+`ResultSummary/RunInfos` is absent or has exactly one `RunInfo`. If present,
+that node has exactly the `computerName`, `outcome`, and `timestamp` attributes,
+`outcome="Error"`, exactly one `Text` child, and no other content. The marker is
+absent and raw `Text` matches only
+`^\[xUnit\.net [0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{2}\][ ]+<exact-test-fqn>[ ]\[FAIL\]$`.
+Machine, timestamp, adapter elapsed time, and indentation are recorded but not
+equality oracles. This locked-adapter same-FQN notification is bookkeeping for
+the sole failed result, not a second result, assertion-type proof, independent
+diagnostic, or infrastructure failure. It is accepted only with the sole mapped
+Failed `UnitTestResult`, Failed summary, exact failed-result message, all 16
+counters including `error=0`, and no attachment or other diagnostic.
 
 A valid first-increment BehaviorRed has nonzero process exit and exactly one
 TRX at `<fresh-directory>/<exact-marker>.trx`. `ResultSummary/@outcome` is
 `Failed`; exactly one `UnitTestResult` maps through `testId` to one
 `UnitTest/TestMethod` composing the exact FQN above; and that result is Failed
-with the exact message/type contract above. Its counters are exactly
+with the exact node-scoped message contract above. The assertion-type contract
+is the separate reviewed-source plus immutable-lock proof above. Its counters are exactly
 `total=1`, `executed=1`, `passed=0`, `failed=1`, `error=0`, `timeout=0`,
 `aborted=0`, `inconclusive=0`, `passedButRunAborted=0`, `notRunnable=0`,
 `notExecuted=0`, `disconnected=0`, `warning=0`, `completed=0`,
@@ -6192,11 +7976,85 @@ are not equality oracles.
 The red is invalid if restore/lock bytes changed; compilation did not succeed;
 the TRX is absent, duplicated, malformed, stale, extra, or outside the fresh
 directory; the full FQN/traits/filter did not select exactly one test; any
-counter differs; the marker is absent, duplicated, misplaced within TRX, or
-attached to another exception; the assertion type differs; an unexpected exception was
-relabeled; or any NU/MSB/compiler/analyzer/project/reference/predecessor/
+counter differs; the exact failed-result message node is absent, duplicated,
+or unequal; the marker occurs anywhere outside that node and the one allowed
+run-summary echo; more than one run-summary echo exists; reviewed source no
+longer has one direct null-branch `Assert.Fail(exactMarker)` call; the immutable
+xUnit contract differs; more than one `RunInfo` exists; its attribute/child/
+outcome/text/FQN/marker contract differs; any other RunInfo, attachment,
+independent warning/error/diagnostic, any `StackTrace` outside the permitted
+marker-free `ErrorInfo/StackTrace`, exception, or infrastructure text exists; an
+unexpected exception was relabeled; or any
+NU/MSB/compiler/analyzer/project/reference/predecessor/
 environment/infrastructure failure occurred. Console text never overrides
 incomplete or contradictory TRX evidence.
+
+Every run observed before its applicable append-only evidence clarification
+remains diagnostic and noncanonical even when its raw output happens to satisfy
+the corrected oracle. Only a fresh post-packet-synchronization invocation may
+become the canonical first A BehaviorRed.
+
+The fresh post-packet-synchronization A invocation used a newly created,
+initially empty external directory, the exact filter, and one TRX logger,
+exited nonzero, and left exactly one TRX at
+`D:\Temp\meandai-test-0210-a-canonical-54b33df16d7446be918f0a3cb75d3c28\TEST-0210-A-BEHAVIOR-RED-0001.trx`.
+That TRX contains exactly one mapped Failed result for
+`MeAndAI.Protocol.Conformance.Tests.ContractSliceAManifestTests.Parses_minimal_canonical_qualification_manifest`,
+one normalized failed-result `ErrorInfo/Message` equal to
+`TEST-0210-A-BEHAVIOR-RED-0001`, one permitted byte-identical `StdOut` echo, and
+one exact-shape marker-free same-FQN `[FAIL]` `RunInfo` with
+`outcome="Error"`. Its `ResultSummary` is Failed and its counters are exactly
+`total=1`, `executed=1`, `passed=0`, `failed=1`, `error=0`, `timeout=0`,
+`aborted=0`, `inconclusive=0`, `passedButRunAborted=0`, `notRunnable=0`,
+`notExecuted=0`, `disconnected=0`, `warning=0`, `completed=0`, `inProgress=0`,
+and `pending=0`. The sole result's standard assertion stack is marker-free;
+there is no independent diagnostic or attachment. IDs, machine, timestamps,
+durations, indentation, absolute paths, and stack line numbers are recorded
+non-oracles. This run is the canonical first A BehaviorRed; every earlier run
+remains diagnostic. It is retained as the predecessor evidence for the first
+limited green below.
+
+The first limited ParseCanonical implementation replaced the reviewed `null!`
+sentinel. Its Release `--no-restore` production build completed with zero
+warnings and zero errors. With the original red oracle still unchanged, the
+exact same FQN passed `1/1` at
+`D:\Temp\meandai-test-0210-a-green-91b9a19a6db741c6af2e5bac3a1a22b0\TEST-0210-A-GREEN-0001.trx`.
+The transient marker constant and null-only `Assert.Fail` branch were then
+removed, and canonical equality was moved before digest/object construction.
+Format verification and the final six-project Release build passed with zero
+warnings and zero errors. The final-source exact FQN passed `1/1` at
+`D:\Temp\meandai-test-0210-a-green-final-62a34655387e4306b0bc26c9203fb97d\TEST-0210-A-GREEN-FINAL-0001.trx`,
+and the cumulative `ContractSlice=A` checkpoint passed `12/12`.
+
+That first green validates the exact 1,222-byte fixture, manifest and artifact
+digests, complete typed projection and order, null `CompleteCatalog`, and
+caller-buffer mutation independence specified above. Source review confirms the
+16 MiB length check precedes copying; parsing and hashing use only a private
+`ToArray` copy; canonical typed reserialization must equal those private input
+bytes; and no raw byte field is retained. The private input copy and writer-
+returned reserialization byte array are zeroed in `finally`; the
+`ArrayBufferWriter` internal buffer becomes unreachable and is not retained by
+the manifest but is not explicitly zeroed. The proven contract is copy-at-entry
+and no retained raw bytes, not universal buffer zeroization. This is only the
+first limited ContractSlice A behavior increment. It does not
+complete [TEST-0210](test-cases.md#test-0210), authorize a later slice, or
+satisfy any remaining A increment.
+
+The first-green support review classified the canonical-string boundary as an
+unnumbered remaining-A coverage `Important`, not a defect in that accepted first
+green. The then-current `CanonicalManifestWriter` used
+`UnsafeRelaxedJsonEscaping`; that was exact for the reviewed ASCII 1,222-byte
+fixture but was not proof of the complete string contract above. The reviewed
+second A increment below froze the exact FQN, marker, writer-owned codec
+topology, fixture matrix, and absent-behavior predicate needed to obtain that
+proof. Its bounded green evidence now closes that `Important`; ContractSlice A
+itself remains incomplete.
+
+Final support review closed with `0 Blocking`, that one unnumbered remaining-A
+coverage `Important`, and no unresolved `Minor`. The ordering Minor is closed by
+the equality-before-digest/object refactor, and the zeroization wording is
+corrected by the exact buffer-lifetime statement above. Neither observation
+downgraded the accepted first fixture green.
 
 Every later semantic increment receives a separately reviewed exact FQN,
 marker, absent-behavior predicate, single-invocation filter, and exact TRX
@@ -6204,10 +8062,166 @@ counter/result inventory before implementation. Markers are transient evidence
 labels, not stable scenario IDs. Only then may bounded production semantics
 turn the increment green.
 
+### Second A increment - canonical quoted UTF-8 strings
+
+This reviewed increment remains inside [TEST-0210](test-cases.md#test-0210)
+with `[Trait("ContractSlice", "A")]` and no `Scenario` trait while the parent
+scenario is `Planned`. The exact FQN and this record preserve the parent link;
+the trait is deferred to final A-D activation. The increment allocates no new
+stable scenario or public API. The exact test identity is:
+
+```text
+MeAndAI.Protocol.Conformance.Tests.ContractSliceACanonicalStringTests.Enforces_exact_canonical_manifest_string_encoding
+```
+
+Its exact marker and TRX filename are
+`TEST-0210-A-BEHAVIOR-RED-0002`. The test is one `[Fact]`, so the exact filtered
+red still selects, executes, and fails one result only. It uses the same fresh
+external-directory, one-invocation, one-logger, failed-result message,
+optional byte-identical summary echo, optional exact marker-free same-FQN
+RunInfo, and complete 16-counter oracle as the accepted first A BehaviorRed.
+No runner observation may broaden that oracle retroactively.
+
+`CanonicalManifestWriter` remains the single serializer owner. Its internal
+`CanonicalManifestQuotedUtf8Codec.EncodeQuotedUtf8(string)` returns exactly one
+validated quoted UTF-8 JSON string token. The pre-red structural extraction is
+behavior-preserving: it moves the existing `UnsafeRelaxedJsonEscaping` string
+result behind that codec, while the writer feeds the returned token through
+`Utf8JsonWriter.WriteRawValue` with input validation enabled. The original
+1,222-byte fixture and digest must remain byte-identical. This extraction adds
+no public export or friend and is not itself the semantic green.
+
+The red's exact probe is the following UTF-16 code-unit sequence:
+
+```text
+0051 0022 005C 0008 000C 000A 000D 0009 001F 007F 0085 009F 3000 D842 DF9F
+```
+
+The behavior-preserving extraction produces this exact legacy quoted-byte hex:
+
+```text
+22515C225C5C5C625C665C6E5C725C745C75303031465C75303037465C75303038355C75303039465C75333030305C75443834325C754446394622
+```
+
+Only that complete legacy result invokes `Assert.Fail` with
+`TEST-0210-A-BEHAVIOR-RED-0002`. A null result, exception, partial change,
+different byte sequence, wrong positive fixture, wrong exception category, or
+unrelated failure is marker-free and invalid red. The bounded green changes the
+same codec to this exact quoted-byte hex:
+
+```text
+22515C225C5C5C625C665C6E5C725C745C75303031665C75303037665C75303038355C7530303966E38080F0A0AE9F22
+```
+
+This means quote and backslash use their exact short escapes, slash stays raw,
+the five named C0 characters use `\b`, `\f`, `\n`, `\r`, and `\t`, the
+remaining C0 value uses lowercase `\u001f`, `DEL` and the two C1 values use
+lowercase `\u007f`, `\u0085`, and `\u009f`, and `U+3000` plus supplementary
+scalar `U+20B9F` are raw UTF-8. The codec never normalizes, replaces, or combines
+valid scalars. The non-normalization oracle also passes contextual values `é`
+(`U+00E9`) and `é` (`U+0065 U+0301`) separately: their raw strict-UTF-8 value
+bytes are respectively `C3 A9` and `65 CC 81`, remain ordinally distinct, and
+neither input may be converted to the other.
+
+The positive integration fixture changes only the original minimal fixture's
+`assemblyName` from `MeAndAI.Protocol.Conformance.Tests` to
+`MeAndAI.Protocol.　Unicode.𠮟.Tests`. Its strict UTF-8 document is exactly
+1,226 bytes including the final LF and has SHA-256
+`5195e1a4b36b8b57a96fbd774fb78c5d46878948f91ee597e66ef6f44821a928`.
+The raw byte sequences `E3 80 80` and `F0 A0 AE 9F` each occur exactly once.
+The parsed `AssemblyName` preserves the exact scalar sequence and the manifest
+digest equals that exact document. The original ASCII fixture remains an
+independent unchanged regression.
+
+The one test owns this complete labeled matrix:
+
+| Group | Exact vectors and result |
+| --- | --- |
+| Quoting | Quote and backslash use `\"` and `\\`; slash is raw. |
+| Named C0 | Backspace, form feed, LF, CR, and tab use only `\b`, `\f`, `\n`, `\r`, and `\t`. |
+| Remaining controls | Remaining C0, `DEL`, and C1 use lowercase `\u00xx`; uppercase hex, long-form alternatives for named controls, and raw C1 are lexically rejected before typed factories. |
+| Printable scalars | `U+3000` and `U+20B9F` are raw UTF-8. Contextual `é` (`U+00E9`) emits raw value bytes `C3 A9`, while `é` (`U+0065 U+0301`) emits raw value bytes `65 CC 81`; the two outputs are ordinally distinct and neither is normalized. |
+| Positive manifest | The exact 1,226-byte assembly-name fixture parses, preserves the typed value, and yields the exact digest above. |
+| Escaped printable alternatives | Escaped `U+3000` and both lowercase and uppercase valid surrogate-pair spellings for `U+20B9F` are noncanonical `FormatException`. |
+| Canonical control lexemes in an opaque field | Lowercase canonical control spellings pass lexical validation, then the typed opaque-identity factory rejects the decoded control; that document-caused `ArgumentException` is wrapped as public `FormatException`. |
+| Malformed raw UTF-8 | Isolated continuation, overlong form, UTF-8 surrogate, truncated sequence, and value above `U+10FFFF` are `FormatException`. |
+| Malformed escaped Unicode | Lone high surrogate, lone low surrogate, reversed pair, and high-surrogate-plus-ASCII are `FormatException`. |
+| Internal argument boundary | Direct `CanonicalManifestQuotedUtf8Codec.EncodeQuotedUtf8(string)` input containing malformed .NET UTF-16 throws `ArgumentException`; it is not a document parse and is not relabeled. |
+
+The reader therefore distinguishes two owners. `BoundedJsonReader.ReadString`
+captures the current token's complete quoted bytes from the original private
+input using the exact half-open range `TokenStartIndex..BytesConsumed`. It calls
+`Utf8JsonReader.GetString()` and catches only an `InvalidOperationException`
+thrown by that call, translating it to `FormatException`. It then re-encodes
+the decoded value through the same
+`CanonicalManifestQuotedUtf8Codec.EncodeQuotedUtf8(string)` used by the writer
+and requires ordinal byte equality with that complete original quoted token.
+Any mismatch is `FormatException` before a typed factory. This is the sole
+lexical-canonicality oracle: no second string grammar, parser, escape scanner,
+or independently maintained allowlist exists.
+
+Public `ParseCanonical` malformed raw or escaped document bytes always fail
+with `FormatException`. When this document-owned re-encode calls the codec, only
+an `ArgumentException` caused by the decoded document value is translated to
+`FormatException`. A direct internal codec caller that supplies malformed .NET
+UTF-16 has violated an argument boundary and receives `ArgumentException`.
+Typed-factory argument failures caused by already decoded document values keep
+the existing separately owned `FormatException` wrapping rule. No test depends
+on exception-message text, and no per-negative fixture digest is required
+because the transformations and exception categories above are the exact
+oracle.
+
+Green is deliberately narrow: replace the no-op legacy codec behavior with the
+exact encoding contract, retain validated `WriteRawValue`, extend only the
+reader lexical checks needed by this matrix, and preserve every manifest
+schema/order/resource/copy/digest boundary already green. It adds no second
+serializer, public surface, project/reference/package/lock/friend change,
+normalization, executable export, registration, activation, kernel, or later-A
+behavior. Exact-FQN green, cumulative `ContractSlice=A`, zero-warning/error
+Release build, format, byte-identical locks, and fresh-diff review are required
+before this increment can close.
+
 Transient red is never pushed or published and never receives root,
 StructureOnly, combined, or hosted validation. Red source is not registered in
 scenario ownership. Production implementation may begin only after the exact
 red is reviewed and no unrelated failure exists.
+
+### Bounded green evidence
+
+The behavior-preserving seam predecessor retained the exact old FQN and passed
+`1/1` at
+`D:\Temp\meandai-test-0210-a-seam-1d7c48a903be4f31a6e2c59b708d4fa1\TEST-0210-A-SEAM-NOOP-0002.trx`.
+The valid canonical BehaviorRed then passed review with `0 Blocking`,
+`0 Important`, and `0 Minor` at
+`D:\Temp\meandai-test-0210-a-8b7f24d6c19a4e03b5f1728a90c4d6e1\TEST-0210-A-BEHAVIOR-RED-0002.trx`.
+The bounded production-source review also closed `0 Blocking`, `0 Important`,
+and `0 Minor`.
+
+With the marker and exact legacy branch still present, the original-oracle
+green passed `1/1` at
+`D:\Temp\meandai-test-0210-a-green-3c6d91a5e8f247b0a1c4d7e9f2b5a630\TEST-0210-A-GREEN-0002.trx`.
+The marker and legacy branch were then removed and source search confirmed both
+absent. The final-source exact FQN passed `1/1` at
+`D:\Temp\meandai-test-0210-a-green-final-5e2a7c91d4f84360b8e1a3c6f9072d54\TEST-0210-A-GREEN-FINAL-0002.trx`,
+and cumulative `ContractSlice=A` passed `13/13` at
+`D:\Temp\meandai-test-0210-a-cumulative-7a3e6d20f9514bc8a2d5e7f039c6b184\TEST-0210-A-GREEN-CUMULATIVE-0002.trx`.
+
+Locked restore succeeded. The six lock SHA-256 fingerprints remain Domain
+`03EEADC5...CB46`, Abstractions `D79FF118...F799`, Conformance
+`20E6BA80...70E7`, Policy `C57F6AFA...4309`, Domain.Tests
+`D2065F11...00BC`, and Conformance.Tests `BA8D8C65...16C0`. The standard
+`dotnet format --verify-no-changes --no-restore` check and `git diff --check`
+passed, and the six-project Release build completed with zero warnings and zero
+errors. A separate non-gating severity-info full scan exposed pre-existing flat-
+namespace/informational backlog and suggestions; this record does not claim
+that scan clean.
+
+This evidence closes only the canonical-string coverage `Important` and this
+second A increment. [TEST-0210](test-cases.md#test-0210) remains `Planned` and
+remaining A is pending. ContractSlice B/C/D, workflow/scenario-trait/scenario-owner/
+[TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146), root,
+combined, hosted, WIP extraction, consumer, release, and publication scope
+remain held.
 
 ## Public API and project-graph ownership transition
 
@@ -6263,23 +8277,51 @@ same exact Application assembly.
 
 ## Future combined and hosted route
 
-Only after all four focused groups and the combined local run are green may one
-authorized atomic change update [TEST-0210](test-cases.md#test-0210) Status/Automation, scenario owner,
-both stable filters, and
-[TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146).
+Only after all four focused groups and the combined local run are green may a
+separately authorized packet execute the four-step activation order in the
+[expected-red contract](#test-0210-expected-red-contract): freeze and prove
+`E` in the exact parent; make one atomic candidate that adds the `Scenario`
+trait for [TEST-0210](test-cases.md#test-0210) to every `E` fact and updates [TEST-0210](test-cases.md#test-0210)
+Status/Automation, scenario-owner, both stable workflow test steps' run-block
+form, solution target, and filter, plus
+[TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146);
+then prove both focused identity sets and the final combined route at the exact
+candidate head. No subset of that mutation is a valid activation.
 
 Each existing stable job retains exactly one protocol locked-restore
-invocation and one protocol test invocation. The test invocation becomes:
+invocation and one protocol test invocation. The Ubuntu step retains
+`shell: bash`, the Windows step retains `shell: pwsh`, and neither shell is
+switched. In both steps, the atomic activation changes the run scalar from
+folded `run: >-` to literal `run: |`, changes the test target from the
+Domain.Tests project to `MeAndAI.Protocol.slnx`, and installs the applicable
+exact script below. This run-block/target/filter transition is part of the
+activation and [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
+contract, not an implied implementation choice.
 
 The split-fragment variables below denote [TEST-0220](test-cases.md#test-0220),
 [TEST-0221](test-cases.md#test-0221), and
-[TEST-0210](test-cases.md#test-0210), respectively:
+[TEST-0210](test-cases.md#test-0210), respectively. The exact Ubuntu Bash
+`run: |` body is:
+
+```text
+test_prefix='TEST-'
+domain_scenario="${test_prefix}0220"
+evidence_scenario="${test_prefix}0221"
+kernel_scenario="${test_prefix}0210"
+activation_verifier='MeAndAI.Protocol.Conformance.Tests.ContractSliceActivationTopologyTests.Matches_exact_contract_slice_scenario_inventory'
+dotnet test MeAndAI.Protocol.slnx --configuration Release --no-restore --nologo --verbosity minimal --filter "Scenario=${domain_scenario}|Scenario=${evidence_scenario}|Scenario=${kernel_scenario}|ContractSlice=A|ContractSlice=B|ContractSlice=C|ContractSlice=D|FullyQualifiedName=${activation_verifier}"
+```
+
+The first Bash assignment is exactly `test_prefix='TEST-'` without a leading
+`$`; the rendering above intentionally distinguishes assignment from
+expansion. The exact Windows PowerShell `run: |` body is:
 
 ```text
 $domainScenario = 'TEST-' + '0220'
 $evidenceScenario = 'TEST-' + '0221'
 $kernelScenario = 'TEST-' + '0210'
-dotnet test MeAndAI.Protocol.slnx --configuration Release --no-restore --nologo --verbosity minimal --filter "Scenario=$domainScenario|Scenario=$evidenceScenario|Scenario=$kernelScenario"
+$activationVerifier = 'MeAndAI.Protocol.Conformance.Tests.ContractSliceActivationTopologyTests.Matches_exact_contract_slice_scenario_inventory'
+dotnet test MeAndAI.Protocol.slnx --configuration Release --no-restore --nologo --verbosity minimal --filter "Scenario=$domainScenario|Scenario=$evidenceScenario|Scenario=$kernelScenario|ContractSlice=A|ContractSlice=B|ContractSlice=C|ContractSlice=D|FullyQualifiedName=$activationVerifier"
 ```
 
 One solution-level invocation may deliberately create a Domain.Tests testhost
@@ -6287,32 +8329,56 @@ and one new bounded Conformance.Tests testhost. This is not described as one OS
 process. It adds no workflow job, step, restore invocation, test invocation,
 trigger, path filter, wrapper, retry, `continue-on-error`, or timeout.
 
+The ContractSlice union and exact verifier FQN are deliberate permanent
+reachability barriers, not extra semantic inventory. The OR filter still runs
+each discovered fact once. They keep the activation-integrity fact executable
+when its own Scenario trait or another fact's Scenario trait is missing; a
+scenario-only filter cannot prove the frozen bijection.
+
 [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) must construct every scenario ID from split fragments, count every
 protocol restore/test invocation before positive matching, require exactly one
-full non-continued invocation per existing stable job, and reject alternate,
-wrapped, or extra commands. Hosted evidence must reconcile selected,
+full non-continued invocation per existing stable job, require the exact
+Bash/pwsh shell, literal run-block form, solution target, assignments, and
+filter terms above, and reject alternate, wrapped, or extra commands. Hosted evidence must reconcile selected,
 discovered, executed, passed, failed, and skipped counts per test project, not
 only static command text.
 
-The Windows job retains its unchanged 35-minute timeout and existing coverage.
-If the exact hosted head does not fit, stop for design review; do not raise the
-timeout, split or remove coverage, add another invocation, or weaken
+The Windows job retained its 35-minute timeout until the first exact hosted head
+did not fit and required design review. The first reviewed ceiling was 45
+minutes. The exact record-delivery closure later reached that ceiling after all
+emitted suites passed and triggered a second design review. The reviewed
+single-job ceiling is now 55 minutes with coverage, topology, and invocation
+count unchanged. If a later exact hosted head still does not fit, stop for
+design review again; do not
+automatically raise the timeout, split or remove coverage, add another
+invocation, or weaken
 [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146).
 
 ## Internal implementation slices
 
-The current directive allocates no new stable IDs. A later implementation
-directive must still deliver these four independently reviewable internal
-slices in order:
+ContractSlice A has a proposed, non-normative
+[micro-delivery control plan](subf-0143-micro-delivery-plan.md). If separately
+accepted, its closed semantic packages and small-context startup capsules refine
+delivery granularity without changing the accepted A-D architecture or authority.
 
-1. **A - Catalog activation:** exact declarations, canonical manifest,
-   normative fragments, artifact proof, slice/complete separation, exports,
-   and evolution.
+The corrected A directive may deliver only separately reviewed A packets. B/C/D
+still require separate future activation, and no packet is active merely from
+this list. No directive here allocates new stable IDs; the four independently
+reviewable internal slices remain ordered:
+
+1. **A - Catalog and manifest preflight:** exact declarations, canonical
+   manifest parse/digest/typed projection, normative fragments, declaration/
+   artifact/component closure, slice/complete separation, public export
+   projections without executable construction, predecessor/evolution, and
+   negative public/friend surface. A declares no kernel and performs no export
+   activation or typed-registration validation.
 2. **B - Codec admission and typed roots:** codec-registration/model-token
    subset, persistent writer/qualifier pairs, private ticket/proof admission,
    decode/model cache, codec-local ledgers, and ContextProof/Root/codec-derived
    reference sealing.
-3. **C - Synthetic complete evaluation kernel:** Tests-owned complete six-family
+3. **C - First executable export activation and synthetic complete evaluation
+   kernel:** final six-list factory and registration/type-token/public-
+   projection bijection plus mismatch negatives; Tests-owned complete six-family
    registration graph, provider-neutral models/capabilities, both parsers,
    indexes/projector/selectors, index cache/shared ledgers, two-phase plans,
    applicability/intents, finding/evaluation minting, status, ordering, and
@@ -6346,9 +8412,10 @@ composed canonical scenario.
 These follow-ups block their respective implementation/authority claims. They
 do not create a competing schema, admission, evaluator, or verdict path.
 
-## Gate 2 completion and approval gate
+## Gate 2 completion and ContractSlice A correction gate
 
-Before this design may be accepted as Gate 2:
+The historical Gate 2 packet is accepted, merged, and exact-main validated.
+Before the corrected ContractSlice A topology may enter C# mutation:
 
 - [x] [PR #171](https://github.com/hasanmanzak/meAndAI/pull/171) and the [SUBF-0153](README.md#subf-0153) Gate 2 design are accepted, merged, and
   exact-main validated at the declared input baseline.
@@ -6361,17 +8428,91 @@ Before this design may be accepted as Gate 2:
   WIP disposition, and negative surface are exact.
 - [x] [TEST-0210](test-cases.md#test-0210) siblings, four internal slices, expected-red purity, project/
   lock/workflow transition, and unchanged Windows budget are exact.
-- [ ] Independent bounded red-team finds no unresolved `Blocking` or
-  `Important` issue in the complete packet.
-- [ ] The maintainer accepts or revises this exact design.
-- [ ] The accepted packet merges and its exact-main commit passes bounded
-  structural/document validation.
-- [ ] A separate maintainer directive explicitly authorizes the first
-  [TEST-0210](test-cases.md#test-0210) ContractSlice source, expected-red execution, project/lock changes,
-  and only the production implementation needed to turn that reviewed red
-  green.
+- [x] The historical packet's independent bounded red-team found no unresolved
+  `Blocking` or `Important` issue, the maintainer accepted it, and it merged at
+  exact main [`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7).
+- [x] [SUBF-0153](README.md#subf-0153) completed through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173), and exact-main [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) passed at the A implementation baseline.
+- [x] The maintainer approved the ParseCanonical-only A / first-activation-in-C
+  topology correction and instructed bounded red-team followed directly by A
+  Gate 3 expected-red/green.
+- [x] Independent bounded correction red-team finds no unresolved `Blocking`
+  or `Important` issue in the corrected A/C ownership and first-red contract.
+- [x] Renewed fresh-diff architecture review of [FIND-0438](README.md#find-0438) and
+  [FIND-0439](README.md#find-0439) closed with `0 Blocking`, `0 Important`, and
+  `0 Minor`; packet-consistency closure remains separate from that verdict.
+- [x] Renewed review of the append-only RunInfo evidence correction and
+  [FIND-0440](README.md#find-0440) has no unresolved `Blocking` or `Important`
+  finding.
+- [x] The fresh post-packet-synchronization exact-FQN invocation produced and
+  passed review as the canonical first A BehaviorRed under the complete
+  message/echo/RunInfo/counter oracle; earlier observations remain diagnostic.
+- [x] The reviewed first limited ParseCanonical increment replaced the sentinel,
+  passed the original-oracle and final-source exact-FQN checkpoints `1/1`,
+  passed cumulative `ContractSlice=A` `12/12`, passed final format/six-project
+  Release build checks, and satisfied source review for the private-byte/
+  canonical-reserialization/no-retained-raw-byte contract.
+- [x] Final first-green support review closed with `0 Blocking`, one unnumbered
+  remaining-A coverage `Important`, and no unresolved `Minor`; the ordering
+  observation is closed and no numbered finding is opened prematurely.
+- [x] The second A canonical-string packet freezes exact FQN/marker/TRX,
+  behavior-preserving writer-owned codec extraction, legacy/green quoted bytes,
+  the 1,226-byte Unicode fixture/digest, the complete lexical/malformed matrix,
+  the internal `ArgumentException` versus public `FormatException` boundary,
+  narrow green topology, and all held scopes.
+- [x] The second A seam predecessor passed `1/1`; its valid BehaviorRed and
+  bounded source reviews closed `0 Blocking`/`0 Important`/`0 Minor`; original-
+  oracle and final-source greens passed `1/1`; cumulative A passed `13/13`;
+  locked restore, standard format, clean diff check, unchanged six lock
+  fingerprints, and zero-warning/error six-project Release build passed. The
+  canonical-string coverage `Important` is closed; the non-gating severity-info
+  scan is not claimed clean.
+- [x] `A-SCHEMA-SLOT-01` preserves the accepted corrected canonical 0003 R and
+  is packet-local `ReviewedLocalGreen`: final retained source is `436` lines at
+  SHA-256 `FC43FDDA4B273BFCBED442FB145E28BA207EE433A08A9D3E43BEA88574154480`,
+  original-oracle and topology-clean final focused runs passed `1/1`, cumulative
+  A passed `18/18`, code/test measured `692/700`, Release build and format
+  passed, and all six lock fingerprints remained unchanged. Fresh full-diff
+  review pass 2 closed `0 Blocking / 0 Important / 0 Minor` after the pass-1
+  traceability correction.
+- [x] The corrected [maintainer directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139269228), append-only [BehaviorRed message/echo clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139945054), and append-only [RunInfo clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5140224849) authorize each separately reviewed
+  [TEST-0210](test-cases.md#test-0210) ContractSlice A increment in the exact
+  order source/preparation -> exact red -> review -> smallest bounded green,
+  one increment at a time. That authority does not accumulate or activate
+  ContractSlice B/C/D.
 
-Until every applicable unchecked item is satisfied, C# implementation, test
-execution, project/lock/workflow/scenario-owner mutation, WIP extraction,
-consumer mutation, release, publication, authority transfer, and PowerShell
-retirement remain prohibited.
+The correction red-team gate, canonical first A BehaviorRed, first limited
+ParseCanonical green, second ContractSlice A canonical-string bounded green,
+and packet-local `A-SCHEMA-SLOT-01` green are satisfied. The canonical-string
+coverage `Important` is closed; fresh full-diff review pass 2 closed
+`0 Blocking / 0 Important / 0 Minor` after the pass-1 traceability correction.
+At the historical A-FULL checkpoint, never-activated `A-PARSER-INDEX-01` was retired;
+`A-PARSER-RECORD-SLOT-01`, `A-GOVERNED-REFERENCE-SLOTS-01`, and
+`A-TARGET-PARSER-INDEX-SLOT-01`, `A-FINDING-01`, `A-SELECTOR-01`,
+`A-ADMISSION-01`, `A-PROJECTOR-DAG-01`, and `A-FULL-MANIFEST-01` were
+`ReviewedLocalGreen`; fourteen of twenty live packets were green (`70%`) with
+cumulative A `27/27`.
+`A-FINDING-01` retained its `R=NotApplicable` / `TestOnlyGreen` /
+production-zero route and is exact-head hosted green at
+[`2430a67e0140a6c8ce0f26eaebae8aed35259134`](https://github.com/hasanmanzak/meAndAI/commit/2430a67e0140a6c8ce0f26eaebae8aed35259134),
+git tree identity `893e6f6dc1a6f0a246dc209be650f906e5f5c702`, and
+[run 30767103072](https://github.com/hasanmanzak/meAndAI/actions/runs/30767103072).
+The admission FrozenDesign delivery
+[`f298e87f98cb0896904a21078e2e3f391b2b8dcd`](https://github.com/hasanmanzak/meAndAI/commit/f298e87f98cb0896904a21078e2e3f391b2b8dcd),
+git tree identity `6debfc2f3648ec7972d3e1f21d1f1cc224b35a4a`, and
+[run 30774470978](https://github.com/hasanmanzak/meAndAI/actions/runs/30774470978).
+It remains the design predecessor, not the admission implementation delivery.
+At that historical checkpoint, the exact hosted boundary was admission record-evidence delivery
+[`b735853a2153338fd97c366bcd8c212f78bc1bce`](https://github.com/hasanmanzak/meAndAI/commit/b735853a2153338fd97c366bcd8c212f78bc1bce),
+git tree identity `fc5ae301331f55f1435b4262c300489e3cbcff2f`, and
+[run 30781516326](https://github.com/hasanmanzak/meAndAI/actions/runs/30781516326),
+with Windows green in `17m10s`, Ubuntu green in `19m02s`, and publication
+verification correctly skipped. `A-ADMISSION-01` remains packet-local
+`ReviewedLocalGreen`. `A-PROJECTOR-DAG-01` is packet-local
+`ReviewedLocalGreen` with exact packet-local implementation/evidence; hosted
+run `30798854880` passed
+Windows in `14m58s` and Ubuntu in `19m00s`, with publication verification
+correctly skipped. Never-activated `A-CONVERGE-01` is retired. Current A state
+is routed by the header and owning freeze ledger. [TEST-0210](test-cases.md#test-0210)
+remains `Planned`; Converge V1 is immutable diagnostic/no success and V2 is
+FrozenDesign/corrected-design hosted pending. Workflow, final activation, later slices, release and
+publication remain prohibited throughout ContractSlice A.

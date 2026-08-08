@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / second dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 3 activated; local implementation candidate green and [TEST-0221](test-cases.md#test-0221) Passing; candidate commit, exact-commit/hosted/PR/merge/exact-main closure pending |
+| Status | Complete; [TEST-0221](test-cases.md#test-0221) Passing through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173), exact main [`ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd`](https://github.com/hasanmanzak/meAndAI/commit/ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd), and [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
@@ -13,7 +13,7 @@
 | Acceptance | [PR #171](https://github.com/hasanmanzak/meAndAI/pull/171) at exact main [`cae8854f8afee4c31e362a02637b27b488aab90f`](https://github.com/hasanmanzak/meAndAI/commit/cae8854f8afee4c31e362a02637b27b488aab90f) with [closure evidence](https://github.com/hasanmanzak/meAndAI/pull/171#issuecomment-5128021520) |
 | Typed-handoff predecessor | [SUBF-0143](README.md#subf-0143) Gate 2 accepted/merged/bounded exact-main at [`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7) |
 | Gate 3 authority | Scoped [activation directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5135051435) |
-| Local candidate | Valid expected red `1/1`; focused [TEST-0221](test-cases.md#test-0221) `46/46`; combined [TEST-0220](test-cases.md#test-0220)/[TEST-0221](test-cases.md#test-0221) `98/98`; Gate 5 public-observable coverage strengthened and final private-reflection oracle removed; local [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) green; Release `0` warnings/`0` errors; severity-`info` format clean; scoped lock fingerprints unchanged; no graph expansion |
+| Implementation closure | Historical valid expected red `1/1`; focused [TEST-0221](test-cases.md#test-0221) `46/46`; combined [TEST-0220](test-cases.md#test-0220)/[TEST-0221](test-cases.md#test-0221) `98/98`; Gate 5 public-observable coverage strengthened and final private-reflection oracle removed; local [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) green; Release `0` warnings/`0` errors; severity-`info` format clean; scoped lock fingerprints unchanged; no graph expansion; completed through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173), exact main [`ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd`](https://github.com/hasanmanzak/meAndAI/commit/ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd), and [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) |
 
 ## Directive and hard boundary
 
@@ -60,9 +60,11 @@ the existing stable-job combined filter, and the narrow
 transition. It grants no WIP extraction, provider/consumer mutation,
 [SUBF-0143](README.md#subf-0143) Gate 3, release/publication/authority transfer,
 PowerShell retirement, or project/package/dependency/lock graph expansion.
-Local green evidence is candidate evidence only; commit, exact-commit
-StructureOnly, PR, hosted exact-head, merge, and exact-main closure remain
-separate pending gates.
+The bounded implementation subsequently completed those publication and
+closure gates through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173),
+exact main
+[`ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd`](https://github.com/hasanmanzak/meAndAI/commit/ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd),
+and [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256).
 
 [SUBF-0152](README.md#subf-0152) is the completed predecessor. Its existing
 RuleId, RuleRevision, ExactSha256Digest, SurfaceKind, SnapshotKind,
@@ -1134,7 +1136,7 @@ The focused red must fail solely because a SliceInventory contract/member is
 absent. A compile, restore, environment, workflow-discovery, or predecessor
 failure is invalid red.
 
-The local candidate satisfied this oracle: the reflection inventory test
+The historical local candidate satisfied this oracle: the reflection inventory test
 selected/executed exactly `1/1` and failed solely because all `23`
 SliceInventory public types were absent. No other failure was present.
 
@@ -1162,7 +1164,7 @@ runs both scenarios.
 Neither scenario invokes the other or consumes the other’s result. A later
 Domain export needs another explicit cumulative-owner transition.
 
-## Canonical execution route and local candidate state
+## Canonical execution route and closure
 
 Acceptance/merge/exact-main validation of this design is complete through
 [PR #171](https://github.com/hasanmanzak/meAndAI/pull/171). The separately
@@ -1171,10 +1173,11 @@ maintainer-accepted/merged/bounded exact-main-validated
 [`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7),
 and the scoped
 [activation directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5135051435)
-opened this route. Steps 1 through 8 are complete in the local candidate. Steps
-9 through 11 remain pending; no candidate implementation commit,
-exact-commit StructureOnly result, PR, hosted exact-head run, merge, or
-exact-main closure is inferred.
+opened this route. All 11 steps are complete through
+[PR #173](https://github.com/hasanmanzak/meAndAI/pull/173), exact main
+[`ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd`](https://github.com/hasanmanzak/meAndAI/commit/ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd),
+and [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256).
+The imperative route below is retained as the historical execution recipe.
 
 1. Start from the accepted exact-main predecessor with clean scoped project
    and lock files.
@@ -1199,7 +1202,7 @@ exact-main closure is inferred.
    existing Domain test project, retain project-owned Scenario traits, move
    authority from PlannedDocumentation to that DotNetTestProject owner, update
    both existing stable jobs to the one combined filter, and update [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146).
-   This transition is complete in the local candidate.
+   This transition completed before publication.
 9. Commit the complete graph-reachable implementation/test/docs/owner/workflow
    packet. Dirty/untracked validation is diagnostic only.
 10. Run StructureOnly on that exact commit under PowerShell 7 and Windows
@@ -1242,7 +1245,7 @@ Capture each SHA-256 before restore and require exact equality afterward. A
 zero exit without byte-identical locks is not valid evidence. No solution,
 project, central-package, NuGet configuration, or lock file may change.
 
-The local candidate recorded unchanged scoped fingerprints:
+The historical local candidate recorded unchanged scoped fingerprints:
 
 - `src/MeAndAI.Protocol.Domain/packages.lock.json`: `03EE...CB46`;
 - `tests/dotnet/MeAndAI.Protocol.Domain.Tests/packages.lock.json`:
@@ -1281,7 +1284,7 @@ $protocolFilter = @(
 
 Only workflow YAML contains the exact literal combined filter.
 
-The local candidate satisfied the bounded route without topology expansion:
+The historical local candidate satisfied the bounded route without topology expansion:
 focused [TEST-0221](test-cases.md#test-0221) passed `46/46`, the combined
 [TEST-0220](test-cases.md#test-0220)/[TEST-0221](test-cases.md#test-0221) route
 passed `98/98` in the existing Domain.Tests testhost, local
@@ -1290,8 +1293,10 @@ green, Release build completed
 with `0` warnings and `0` errors, and `dotnet format` verification at severity
 `info` was clean. No solution/project/package/reference/dependency/effective-
 restore/lock graph edge, job, restore invocation, or testhost was added. This
-is local candidate evidence; the required exact-commit and hosted closure gates
-remain pending.
+local evidence was then closed by [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173),
+exact main
+[`ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd`](https://github.com/hasanmanzak/meAndAI/commit/ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd),
+and [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256).
 
 Gate 5 strengthened the retained green suite around public-observable behavior
 and removed its private-reflection oracle. That final-suite correction does not
@@ -1332,7 +1337,7 @@ If the combined route cannot fit, implementation stops for design review.
 | [FIND-0380](README.md#find-0380) | WIP records are dispositioned by exact successor owner; no code/status carry-forward. |
 | [FIND-0381](README.md#find-0381) | [SUBF-0152](README.md#subf-0152) exact-main baseline remains explicit. |
 | [FIND-0382](README.md#find-0382) | Single-invocation [SUBF-0153](README.md#subf-0153) route, existing Domain.Tests testhost, exact job evidence, and fail-closed budget remain. |
-| [FIND-0383](README.md#find-0383) | [TEST-0220](test-cases.md#test-0220) stayed Passing and [TEST-0221](test-cases.md#test-0221) stayed Planned until atomic activation; [TEST-0221](test-cases.md#test-0221) is now Passing in the local candidate under the scoped directive. |
+| [FIND-0383](README.md#find-0383) | [TEST-0220](test-cases.md#test-0220) stayed Passing and [TEST-0221](test-cases.md#test-0221) stayed Planned until atomic activation; [TEST-0221](test-cases.md#test-0221) is now Passing through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173). |
 | [FIND-0384](README.md#find-0384) | Schema-identified content plus mandatory qualification and a release-bound typed context replace metadata-only evidence. |
 | [FIND-0385](README.md#find-0385) | Target/boundary/scope and location membership close subject/source/snapshot authority. |
 | [FIND-0386](README.md#find-0386) | Context-minted root references seal the asserted tuple; [FEAT-0067](../FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md) qualification verifies payload/location coherence and [SUBF-0143](README.md#subf-0143) owns parser-derived references. |
@@ -1376,8 +1381,10 @@ Gate 3 entry required:
   SliceInventory implementation, [TEST-0220](test-cases.md#test-0220) inventory transition, scenario
   activation, combined workflow filter, and narrow [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) change.
 
-All entry conditions are satisfied and the local Gate 3 candidate is green.
+All entry conditions were satisfied and Gate 3 is complete through
+[PR #173](https://github.com/hasanmanzak/meAndAI/pull/173), exact main
+[`ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd`](https://github.com/hasanmanzak/meAndAI/commit/ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd),
+and [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256).
 The directive grants no WIP extraction, consumer mutation, [SUBF-0143](README.md#subf-0143)
 Gate 3, release, publication, authority transfer, PowerShell retirement, or
-graph expansion. Candidate commit, exact-commit StructureOnly, PR, hosted
-exact-head, merge, and exact-main closure remain pending.
+graph expansion beyond the completed bounded packet.

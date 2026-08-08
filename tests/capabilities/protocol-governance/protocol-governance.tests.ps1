@@ -1061,18 +1061,18 @@ else {
     }
     if (-not [regex]::IsMatch(
         $windowsJobSource,
-        '(?m)^ {4}timeout-minutes: 35\r?$'
+        '(?m)^ {4}timeout-minutes: 55\r?$'
     )) {
         Add-Failure 'TEST-0124 Windows full validation timeout does not cover the measured serial-suite budget.'
     }
     if (-not [regex]::IsMatch(
         $linuxJobSource,
-        '(?m)^ {4}timeout-minutes: 20\r?$'
+        '(?m)^ {4}timeout-minutes: 25\r?$'
     ) -or -not [regex]::IsMatch(
         $postPublicationJobSource,
         '(?m)^ {4}timeout-minutes: 5\r?$'
     )) {
-        Add-Failure 'TEST-0124 unchanged Linux and post-publication timeout bounds are not exact.'
+        Add-Failure 'TEST-0124 Linux and post-publication timeout bounds are not exact.'
     }
 }
 foreach ($requiredProfileText in @(
