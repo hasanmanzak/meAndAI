@@ -139,7 +139,7 @@ Last verified: **2026-08-08**
   Ubuntu in `20m44s` and Windows in `46m51s`; publication verification was
   correctly skipped. The exact lifecycle implementation identity recorded in
   the canonical handoff passed Ubuntu in `19m36s` and Windows in `36m02s`; publication verification was
-  correctly skipped. A is `19/20` (`95%`), `32/32`; Domain `98/98`; Resource R=`0024` hosted green. V1/V2/V3 are diagnostics; V4 is `FrozenDesign`/inactive with D/RT `0/0/0`, pending its exact-head hosted design gate. Parent scenario/final activation remain held. Follow the current [canonical log index](log/README.md). The
+  correctly skipped. A audit is `20/20` (`100%`), cumulative A `32/32`, Domain `98/98`; Resource R=`0024` hosted green; V1/V2/V3 are diagnostics; V4 is fully green and `CompletionRecommended` is local, with the final-sync head hosted pending. Parent scenario/final activation remain held. Follow the current [canonical log index](log/README.md). The
   predecessor-manifest exact-head hosted-green handoff indexed there is
   immutable history; the admission-proof reviewed-local-green handoff,
   the selector reviewed-local-green handoff in the canonical log index,

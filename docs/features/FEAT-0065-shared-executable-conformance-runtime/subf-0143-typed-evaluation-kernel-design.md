@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted; A `19/20` (`95%`), `32/32`; [TEST-0210](test-cases.md#test-0210) `Planned`; Resource hosted green; V1/V2/V3 diagnostic; V4 `FrozenDesign`/inactive, D/RT `0/0/0`, exact-head hosted design gate pending. Final activation/DoD held. |
+| Status | Gate 2 accepted; A audit `20/20` (`100%`), cumulative A `32/32`; [TEST-0210](test-cases.md#test-0210) `Planned`; Resource hosted green; V1/V2/V3 diagnostic; V4 fully green; `CompletionRecommended` local, final-sync head hosted pending. Final activation/DoD held. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
@@ -1215,8 +1215,8 @@ and production cap is `0`. The unchanged-production original oracle passed
 `1/1`. After one review-owned N4 specificity correction, retained source is
 `266` lines / `704F...EDCF`, focused is `1/1`, cumulative A and full
 Conformance are `32/32`, Domain is `98/98`, production remains `0`, and fresh
-code/test plus evidence/scope reviews each closed `0/0/0`. Progress is `19/20`
-(`95%`); any future production need still reopens D/RT.
+code/test plus evidence/scope reviews each closed `0/0/0`. At that packet
+checkpoint, progress was `19/20` (`95%`); any future production need still reopens D/RT.
 
 ### Exact-head hosted-green `A-COMPLETE-PROFILE-01` closure
 
@@ -1506,8 +1506,7 @@ million-token construction. Any variance reopens D/RT.
 R is `0024`; bounded `MaximumDepth 64 -> 9` G, focused/cumulative/full/Domain
 green, Release build/format, and renewed reviews are complete locally. Exact
 artifact paths, metrics, SHA-256 identities, diagnostic causes, and green
-evidence are canonical only in
-`.ai/memory/log/2026-08-07-feat-0065-subf-0143-contractslice-a-resource-freeze.md`.
+evidence remain owned by their historical ledger.
 Exact [`885ad0ba01f99ed44e325fa974a6cb62e89b4986`](https://github.com/hasanmanzak/meAndAI/commit/885ad0ba01f99ed44e325fa974a6cb62e89b4986) passed Ubuntu `18m51s` and
 Windows `43m06s` in run `31264791256`,
 with publication verification skipped. R was not rerun.
@@ -1531,11 +1530,11 @@ default `ConvertFrom-Json` coerced exact ISO strings to culture-formatted
 This pure audit packet has P/R/G `NotApplicable`, not `TestOnlyGreen`, and an
 empty executable allowlist. It adds no Fact/FQN/marker/ordinal/TRX or code,
 test, project, package, lock, workflow, scenario/status/owner mutation. The
-exact twelve-path cohort records V1/V2/V3 and freezes V4 while retaining
-`19/20`. Only fully green V4 produces `CompletionRecommended`; no intermediate record claims
-`20/20`.
+exact predecessor twelve-path cohort recorded V1/V2/V3 and froze V4 while
+retaining `19/20`; only a fully green V4 could produce `CompletionRecommended`,
+and no intermediate record claimed `20/20`.
 
-One atomic code-free `COHORT-SYNC-A-FINAL` commit then owns the only global
+One atomic code-free `COHORT-SYNC-A-FINAL` commit owns the only global
 transition to `20/20`. Its exact allowlist is:
 
 ```text
@@ -1744,9 +1743,9 @@ are immutable diagnostic/no success. V2 and V3 are likewise immutable
 diagnostics; their detailed custody is owned by the convergence ledger. V4
 preserves every audit oracle and changes only culture-safe timestamp sealing.
 
-A fully green V4 audit produces `CompletionRecommended`; only the atomic sync above
-advances the routing denominator to `20/20`, while cumulative A remains
-`32/32`. This recommends ContractSlice A completion only; [TEST-0210](test-cases.md#test-0210)
+The exact V4 audit is `FullyGreen` and produced `CompletionRecommended`; the
+atomic sync above now records routing `20/20` locally, with its exact-head hosted
+gate pending, while cumulative A remains `32/32`. [TEST-0210](test-cases.md#test-0210)
 stays `Planned`. Scenario/status/owner, both combined workflow filters,
 [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
 B/C/D, merge, release, and publication remain held.
@@ -8485,24 +8484,12 @@ Before the corrected ContractSlice A topology may enter C# mutation:
 
 - [x] [PR #171](https://github.com/hasanmanzak/meAndAI/pull/171) and the [SUBF-0153](README.md#subf-0153) Gate 2 design are accepted, merged, and
   exact-main validated at the declared input baseline.
-- [x] Catalog-slice versus complete-snapshot authority and the acyclic
-  artifact/manifest/release graph are exact.
-- [x] Normative selectors, canonicalization, fragment digests, rule digests,
-  first-rule codes, capabilities, and overlap semantics are exact.
-- [x] Project ownership, supported exports, admission proofs, caches, reference
-  variants, two-phase state API, evaluator intents, final outputs, aggregation,
-  WIP disposition, and negative surface are exact.
 - [x] [TEST-0210](test-cases.md#test-0210) siblings, four internal slices, expected-red purity, project/
   lock/workflow transition, and unchanged Windows budget are exact.
 - [x] The historical packet's independent bounded red-team found no unresolved
   `Blocking` or `Important` issue, the maintainer accepted it, and it merged at
   exact main [`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7).
 - [x] [SUBF-0153](README.md#subf-0153) completed through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173), and exact-main [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) passed at the A implementation baseline.
-- [x] The maintainer approved the ParseCanonical-only A / first-activation-in-C
-  topology correction and instructed bounded red-team followed directly by A
-  Gate 3 expected-red/green.
-- [x] Independent bounded correction red-team finds no unresolved `Blocking`
-  or `Important` issue in the corrected A/C ownership and first-red contract.
 - [x] Renewed fresh-diff architecture review of [FIND-0438](README.md#find-0438) and
   [FIND-0439](README.md#find-0439) closed with `0 Blocking`, `0 Important`, and
   `0 Minor`; packet-consistency closure remains separate from that verdict.
@@ -8518,8 +8505,6 @@ Before the corrected ContractSlice A topology may enter C# mutation:
   one increment at a time. That authority does not accumulate or activate
   ContractSlice B/C/D.
 
-Historical Gate-2 through A-FULL packet status and review evidence is owned by
-the micro-delivery ledger.
 `A-FINDING-01` retained its `R=NotApplicable` / `TestOnlyGreen` /
 production-zero route and is exact-head hosted green at
 [`2430a67e0140a6c8ce0f26eaebae8aed35259134`](https://github.com/hasanmanzak/meAndAI/commit/2430a67e0140a6c8ce0f26eaebae8aed35259134),
