@@ -10,8 +10,7 @@ The bounded-capacity delivery is complete through
 the prospective `v0.17.0` schema-2 profile selects `8192` edges, `1048576`
 bytes per parsed blob, and `8388608` aggregate parsed bytes while every target
 through `v0.16.0` remains immutable. The bounded per-blob amendment is
-`ReviewedLocalGreen` and awaits its final exact-tree, commit/push, and hosted
-gates.
+exact-head hosted green; release and publication remain separate.
 Focused graph, quick-adoption profile, StructureOnly, and publication-evidence
 gates plus merged exact-main Ubuntu/Windows validation are green; canonical
 details remain in the
@@ -317,7 +316,7 @@ The lifecycle records-only freeze head is exact-hosted-green: Ubuntu passed in
 `20m44s`, Windows in `46m51s`, and publication verification was correctly
 skipped. The exact lifecycle implementation identity recorded in the canonical
 handoff passed Ubuntu in `19m36s` and Windows in `36m02s`; publication verification was
-correctly skipped. ContractSlice A is merged/exact-main green. `B-SURFACE-01` and `B-CODEC-ACTIVATION-01` are exact-head hosted green; `B-WIRE-REPOSITORY-TREE-01` is `ReviewedLocalGreen` with its exact implementation head hosted gate pending. B is `4/11` and cumulative A+B is `36/43`; the parent scenario, later B packets, C/D, and final activation remain held.
+correctly skipped. ContractSlice A is merged/exact-main green. `B-SURFACE-01`, `B-CODEC-ACTIVATION-01`, and `B-WIRE-REPOSITORY-TREE-01` are exact-head hosted green; `B-WIRE-GOVERNED-TEXT-01` is `FrozenDesign`/inactive pending its synchronized design head's hosted gate. B is `4/11` and cumulative A+B is `36/43`; the parent scenario, later B packets, C/D, and final activation remain held.
 The exact record-delivery closure reached the full `4096/4096` instruction-graph
 budget. Ubuntu passed in `19m52s`; Windows reached its exact 45-minute job
 ceiling after every emitted suite result was successful. The bounded correction

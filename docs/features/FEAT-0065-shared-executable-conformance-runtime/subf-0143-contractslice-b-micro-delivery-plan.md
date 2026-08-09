@@ -3,14 +3,14 @@
 | Field | Value |
 | --- | --- |
 | Classification | Gate 2 micro-delivery plan and design freeze |
-| State | `B-SURFACE-01` and `B-CODEC-ACTIVATION-01` exact-head hosted green; `B-WIRE-REPOSITORY-TREE-01` `ReviewedLocalGreen`/exact implementation head hosted pending; B `4/11`, cumulative A+B `36/43`; later packets inactive |
+| State | `B-SURFACE-01`, `B-CODEC-ACTIVATION-01`, and `B-WIRE-REPOSITORY-TREE-01` exact-head hosted green; `B-WIRE-GOVERNED-TEXT-01` `FrozenDesign`/inactive pending this synchronized design head's hosted gate; B `4/11`, cumulative A+B `36/43`; later packets inactive |
 | Parent | Owning feature and current subfeature |
 | Scenario | [TEST-0210](test-cases.md#test-0210), still `Planned` |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Ordered-B authority | [Maintainer directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5230762350) |
 | Accepted predecessor | Accepted A merge commit [`51623f4d404a95e0f706d72805cf7ddbbbd293b8`](https://github.com/hasanmanzak/meAndAI/commit/51623f4d404a95e0f706d72805cf7ddbbbd293b8); exact-main [run 31304787603](https://github.com/hasanmanzak/meAndAI/actions/runs/31304787603) passed Ubuntu `6m11s`, Windows `11m21s`, publication verification skipped |
 | Normative owner | [Typed evaluation kernel design](subf-0143-typed-evaluation-kernel-design.md) |
-| Implementation language | C# only; the frozen repository-tree packet changes only its two test-owned files |
+| Implementation language | C# only; the frozen governed-text packet changes only its two test-owned files |
 
 ## Authority and non-goals
 
@@ -104,7 +104,7 @@ semantic packages own one Fact and one immutable BehaviorRed ordinal each.
 | `B-CODEC-DERIVATION-01` | Codec-derived reference frame, manifest component/artifact/model identity, same-or-narrower location, structural comparator, collision and foreign-session rejection; no parser/index derivation | `TEST-0210-B-BEHAVIOR-RED-0009`; `ContractSliceBQualifiedReferenceTests.Seals_exact_codec_derived_reference_and_location_narrowing` | Focused `1/1`; B `11/11`; A+B `43/43` |
 | `B-CONVERGE-01` | Pure cumulative audit of exact source/test/export/friend/trait/lock/project state; P/R/G `NotApplicable` | None; every canonical red remains immutable and is never rerun | B `11/11`; A+B/full Conformance `43/43`; Domain `98/98`; Release build/format/locks/diff/StructureOnly/publication evidence/reviews green |
 
-### Implemented `B-WIRE-REPOSITORY-TREE-01` local-green boundary
+### Immutable `B-WIRE-REPOSITORY-TREE-01` hosted-green boundary
 
 The hosted-green activation packet retains the constrained memberless
 `ICanonicalPayloadCodec<TModel>` identity and the object-identical Tests-owned
@@ -117,7 +117,8 @@ resource carriers exist. The typed design owns the exact golden/empty bytes,
 callable staging declarations, error precedence, wire-local ceilings,
 two-test-file allowlist, and `1,200`-line redraw threshold. The current
 codec/wire memory handoff retains routing and immutable evidence only; it adds
-no executable authority. The one-shot red custody defined below remains held.
+no executable authority. Repository-tree canonical R is immutable, its bounded
+green is exact-head hosted green, and it is never rerun.
 
 The exact design cohort is the following twelve existing Markdown paths; no
 new tracked node may be added:
@@ -142,6 +143,29 @@ the sole detailed ledger, stays at exactly four Markdown links, and replaces
 rather than accumulates predecessor commit/run relations. The schema-2 graph
 ceilings remain `8,192` relations and `8,388,608` parsed bytes; an exact-tree
 projection and fresh wire-specific reviews are mandatory before commit.
+
+### Frozen `B-WIRE-GOVERNED-TEXT-01` staging boundary
+
+The next wire packet extends only the retained same-object Tests-owned
+`GovernedTextCodecMirror` and `GovernedTextModelMirror` identities as partial
+types. It modifies only `ContractSliceBActivationTests.cs` for those two
+partial declarations and adds only
+`ContractSliceBGovernedTextCodecTests.cs`; the memberless generic codec
+interface and every production/project/package/lock/workflow surface remain
+unchanged. The typed design normatively owns the internal callable/result
+declarations, Repository/Provider/empty Base64 vectors and SHA-256 identities,
+strict UTF-8/BOM grammar, exact failure precedence, body/payload equality and
+first-one-over semantics, defensive copying, `1,200`-line redraw threshold,
+and the specialized `0003` one-shot runner command.
+
+The exact design cohort remains the same twelve existing Markdown paths named
+above. The current memory handoff stays the single detailed B wire ledger and
+replaces its predecessor commit/run pair rather than adding relations. No
+source/test implementation or canonical red is authorized until this exact
+synchronized design head is committed, pushed, and hosted green. Governed-text
+green is focused `1/1`, B `5/5`, A+B/full Conformance `37/37`, and Domain
+`98/98`; all later packet, Scenario/filter, runtime-efficiency, C/D, merge,
+release, and publication holds remain.
 
 ## SurfaceRed and BehaviorRed contract
 
@@ -306,10 +330,10 @@ project, package, lock, workflow, release, or consumer file. The user-owned
 
 ## Exit condition
 
-This plan was the accepted `FrozenDesign` predecessor. The surface and codec
-activation packets are immutable exact-head hosted-green history. The repository-
-tree wire now retains one immutable canonical red plus bounded local green at B
-`4/11` and A+B `36/43`; its exact implementation head remains hosted pending,
-and every successor stays inactive until that gate closes. C/D, final
+This plan was the accepted `FrozenDesign` predecessor. The surface, codec
+activation, and repository-tree wire packets are immutable exact-head hosted-
+green history. Governed-text is `FrozenDesign`/inactive at B `4/11` and A+B
+`36/43`; its exact synchronized design head must become hosted green before
+canonical red, and every successor stays inactive until that gate closes. C/D, final
 activation, feature DoD, release, publication, consumer mutation, authority
 transfer, and PowerShell retirement remain held.

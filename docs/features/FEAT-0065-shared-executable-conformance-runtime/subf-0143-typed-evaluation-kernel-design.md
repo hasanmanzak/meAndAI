@@ -3,14 +3,14 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted; ContractSlice A merged/exact-main green. B surface and codec activation are exact-head hosted green; `B-WIRE-REPOSITORY-TREE-01` is `ReviewedLocalGreen`/exact implementation head hosted pending; B `4/11`, cumulative A+B `36/43`. [TEST-0210](test-cases.md#test-0210) remains `Planned`; later B packets, C/D, final activation, and DoD remain held. |
+| Status | Gate 2 accepted; ContractSlice A merged/exact-main green. B surface, codec activation, and repository-tree wire are exact-head hosted green; `B-WIRE-GOVERNED-TEXT-01` is `FrozenDesign`/inactive pending this synchronized design head's hosted gate. B is `4/11`, cumulative A+B is `36/43`. [TEST-0210](test-cases.md#test-0210) remains `Planned`; later B packets, C/D, final activation, and DoD remain held. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Test | [TEST-0210](test-cases.md#test-0210) |
 | Gate 3 micro-delivery routing | Historical A delivery remains owned by the [A micro-delivery control plan](subf-0143-micro-delivery-plan.md). Current B design routing is the [ContractSlice B micro-delivery plan](subf-0143-contractslice-b-micro-delivery-plan.md); packet labels refine delivery but activate no executable work. |
 | Exact-main design baseline | Accepted A merge commit [`51623f4d404a95e0f706d72805cf7ddbbbd293b8`](https://github.com/hasanmanzak/meAndAI/commit/51623f4d404a95e0f706d72805cf7ddbbbd293b8), validated by exact-main [run 31304787603](https://github.com/hasanmanzak/meAndAI/actions/runs/31304787603) |
-| Design and Gate 3 authority | Historical A directives and clarifications remain immutable evidence. Surface and codec activation are immutable hosted-green predecessors. Repository-tree retains one immutable canonical red and bounded local green; its implementation-head hosted gate remains open. Later B packets remain predecessor-gated; C/D, final activation, merge, release, and publication remain outside that authority. |
+| Design and Gate 3 authority | Historical A directives and clarifications remain immutable evidence. Surface, codec activation, and repository-tree wire are immutable hosted-green predecessors. Governed-text is frozen below but remains inactive until the exact commit containing this synchronized design is hosted green. Later B packets remain predecessor-gated; C/D, final activation, merge, release, and publication remain outside that authority. |
 | Completed predecessor | [SUBF-0153](README.md#subf-0153) / [TEST-0221](test-cases.md#test-0221), merged through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173) and exact-main validated by [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) |
 
 ## Directive and hard boundary
@@ -4479,6 +4479,201 @@ enclosing identity equality. Schema metadata mismatch, an unknown surface/rank,
 or any construction failure in the decoded scope is invalid-repository-tree;
 known-but-disallowed surface/rank is payload-location-mismatch. Only a fully
 parsed valid embedded identity can reach embedded-identity-mismatch.
+
+### Frozen `B-WIRE-GOVERNED-TEXT-01` staging contract
+
+The repository-tree implementation is immutable exact-head hosted-green
+predecessor evidence. Governed text reuses the same Tests-owned same-object
+mirror topology: only `GovernedTextModelMirror` and `GovernedTextCodecMirror`
+become `partial`, and the new governed-text test file adds the following
+packet-local core. The memberless generic codec interface remains unchanged;
+there is no production codec, adapter, second encoder, resource meter, cache,
+admission path, project, package, lock, workflow, friend, or public API delta.
+
+```csharp
+internal sealed partial class GovernedTextModelMirror
+{
+    internal EvidenceScope Scope { get; }
+    internal EvidenceLocation Location { get; }
+    internal ReadOnlyMemory<byte> Body { get; }
+    internal static GovernedTextModelMirror Create(
+        EvidenceScope scope,
+        EvidenceLocation location,
+        ReadOnlyMemory<byte> body);
+}
+
+internal abstract class GovernedTextWriteMirrorResult
+{
+    private GovernedTextWriteMirrorResult();
+    internal static GovernedTextWriteMirrorResult Written(
+        CanonicalEvidencePayload payload);
+    internal static GovernedTextWriteMirrorResult Rejected(
+        string failureCode);
+    internal abstract TResult Accept<TResult>(
+        IGovernedTextWriteMirrorResultVisitor<TResult> visitor);
+}
+
+internal interface IGovernedTextWriteMirrorResultVisitor<TResult>
+{
+    TResult VisitWritten(CanonicalEvidencePayload payload);
+    TResult VisitRejected(string failureCode);
+}
+
+internal abstract class GovernedTextQualificationMirrorResult
+{
+    private GovernedTextQualificationMirrorResult();
+    internal static GovernedTextQualificationMirrorResult Qualified(
+        GovernedTextModelMirror model);
+    internal static GovernedTextQualificationMirrorResult Rejected(
+        string failureCode);
+    internal abstract TResult Accept<TResult>(
+        IGovernedTextQualificationMirrorResultVisitor<TResult> visitor);
+}
+
+internal interface IGovernedTextQualificationMirrorResultVisitor<TResult>
+{
+    TResult VisitQualified(GovernedTextModelMirror model);
+    TResult VisitRejected(string failureCode);
+}
+
+internal sealed partial class GovernedTextCodecMirror
+{
+    internal GovernedTextWriteMirrorResult WriteGovernedText(
+        EvidenceScope scope,
+        EvidenceLocation location,
+        ReadOnlyMemory<byte> body,
+        CancellationToken cancellationToken);
+    internal GovernedTextQualificationMirrorResult QualifyGovernedText(
+        EvidenceBinding binding,
+        CancellationToken cancellationToken);
+}
+```
+
+Written carries exactly one `CanonicalEvidencePayload`; Qualified carries one
+`GovernedTextModelMirror` retaining the decoded scope, exact Repository or
+Provider location, and one defensive body-byte copy. Rejected carries exactly
+one declared codec failure code. The result types have only private nested
+`WrittenCase`/`RejectedCase` and `QualifiedCase`/`RejectedCase` leaves and are
+observable only through their visitors. Null scope/location/binding arguments
+remain argument failures; cancellation is checked before semantic work and is
+out of band. `ReadOnlyMemory<byte>` is copied once before retention, and later
+source-array mutation cannot alter the payload or qualified model.
+`GovernedTextModelMirror.Create` rejects null scope/location, requires exact
+`scope.Equals(location.Scope)`, copies body bytes once, and is called by the
+qualifier only after every wire oracle passes.
+
+The exact Repository fixture is:
+
+| Field | Exact value |
+| --- | --- |
+| Target subject / source / surface | `repo` / `git` / `repository` |
+| Target snapshot / identity | `exact-commit` / fixture commit: `0123456789abcdef0123456789abcdef01234567` |
+| Boundary snapshot / identity | `exact-commit` / the same 40-hex identity |
+| Started / completed UTC ticks | `0` / `1` |
+| Location | Repository rank `0`; path `docs/body.text`; blob identity the same 40-hex value; line/anchor/property null |
+| Body | exact UTF-8 bytes for `alpha\nβ\n`: `61 6C 70 68 61 0A CE B2 0A` |
+
+Its canonical payload is `278` bytes with SHA-256
+`CCDD5E2CC05B3FB392980166871E9209C4BAD6703E085F480CCCBFF2CC9E8EEC`:
+
+```text
+cHJvdG9jb2wuZ292ZXJuZWQtdGV4dC8xCgAAAARyZXBvAAAAA2dpdAAAAApyZXBvc2l0b3J5AAAADGV4YWN0LWNvbW1pdAAAACgwMTIzNDU2Nzg5YWJjZGVmMDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3AAAADGV4YWN0LWNvbW1pdAAAACgwMTIzNDU2Nzg5YWJjZGVmMDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3AAAAAAAAAAAAAAAAAAAAAQAAAAAOZG9jcy9ib2R5LnRleHQBAAAAKDAxMjM0NTY3ODlhYmNkZWYwMTIzNDU2Nzg5YWJjZGVmMDEyMzQ1NjcAAQAAAAABAAAAAAAAAAlhbHBoYQrOsgo=
+```
+
+The same Repository fixture with an empty body is valid, exactly `269` bytes,
+and has SHA-256
+`77DD9C99FDE106986F8BE991F6C6D681FFB57976C59335EA924DA05300C1E3CA`:
+
+```text
+cHJvdG9jb2wuZ292ZXJuZWQtdGV4dC8xCgAAAARyZXBvAAAAA2dpdAAAAApyZXBvc2l0b3J5AAAADGV4YWN0LWNvbW1pdAAAACgwMTIzNDU2Nzg5YWJjZGVmMDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3AAAADGV4YWN0LWNvbW1pdAAAACgwMTIzNDU2Nzg5YWJjZGVmMDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3AAAAAAAAAAAAAAAAAAAAAQAAAAAOZG9jcy9ib2R5LnRleHQBAAAAKDAxMjM0NTY3ODlhYmNkZWYwMTIzNDU2Nzg5YWJjZGVmMDEyMzQ1NjcAAQAAAAABAAAAAAAAAAA=
+```
+
+The exact Provider fixture is:
+
+| Field | Exact value |
+| --- | --- |
+| Target subject / source / surface | `provider` / `github` / `provider` |
+| Target and boundary snapshot / identity | `provider-event` / `event-42` |
+| Started / completed UTC ticks | `0` / `1` |
+| Location | Provider rank `1`; service `github`; object type `provider.issue`; stable object `object42`; version `version-7`; field `body`; line/fragment null |
+| Body | exact ASCII bytes for `provider body\n` |
+
+Its canonical payload is `222` bytes with SHA-256
+`B6DF065382A0A4AA5EDE18766CFE54C132B7EF5FBFA8AD170BBAE7C619EB0F1F`:
+
+```text
+cHJvdG9jb2wuZ292ZXJuZWQtdGV4dC8xCgAAAAhwcm92aWRlcgAAAAZnaXRodWIAAAAIcHJvdmlkZXIAAAAOcHJvdmlkZXItZXZlbnQAAAAIZXZlbnQtNDIAAAAOcHJvdmlkZXItZXZlbnQAAAAIZXZlbnQtNDIAAAAAAAAAAAAAAAAAAAABAQAAAAZnaXRodWIAAAAOcHJvdmlkZXIuaXNzdWUAAAAIb2JqZWN0NDIAAAAJdmVyc2lvbi03AQAAAARib2R5AAEAAAAAAAAADnByb3ZpZGVyIGJvZHkK
+```
+
+The source-body and complete-payload ceilings are independently
+`4,194,304` bytes. Repository payload equality is reachable with the exact
+`269`-byte empty frame plus `4,194,035` ASCII `x` body bytes and must succeed;
+one more body byte rejects as `protocol.codec.resource-limit-exceeded`.
+Source-body equality at `4,194,304` passes the pre-copy body counter but is
+algebraically dominated by nonzero framing and therefore rejects on complete
+payload size. Body first-one-over rejects before UTF-8 inspection, copying, or
+framing. These are wire-local checks only; multi-binding retention and the
+four-counter ledger remain owned by later packets.
+
+Writer precedence is exact: null arguments, cancellation, source-body first-
+one-over, known Repository/Provider location leaf and tail matrix, supplied
+scope versus `location.Scope` equality, UTF-8/BOM validation, computed payload
+size, one defensive copy, then encoding. Qualifier precedence is null argument,
+cancellation, canonical-payload byte ceiling, exact schema key/version, strict
+header/primitive/optional framing, embedded scope and location construction,
+body UTF-8/BOM validation, trailing-byte closure, known embedded and enclosing
+Repository/Provider matrix, then embedded-versus-enclosing identity equality.
+
+Any malformed UTF-8 sequence in a scope/location text or body is
+`protocol.codec.invalid-utf8`. A leading UTF-8 BOM anywhere, wrong header,
+schema key/version mismatch, premature EOF, declared length mismatch/overflow,
+invalid optional flag, invalid known-leaf field grammar, unknown surface,
+snapshot, or rank, or a trailing byte is
+`protocol.codec.noncanonical-encoding`. A structurally valid Repository leaf
+with non-null line/anchor/property, a structurally valid Provider leaf with
+null field or non-null line/fragment, Workflow surface, or ReleaseAsset/
+Snapshot rank is `protocol.codec.payload-location-mismatch`. Only a fully valid
+allowed Repository or Provider embedded scope/location unequal to the supplied
+writer scope or enclosing binding may return
+`protocol.codec.embedded-identity-mismatch`. These outcomes are mutually
+exclusive; writer and qualifier tests cover both allowed leaves, every tail
+condition, every primitive EOF, BOM and invalid/overlong/surrogate UTF-8,
+optional flags `0/1/2`, schema/header mutation, declared body mismatch,
+trailing bytes, size equality/first-one-over, defensive copying, empty body,
+and byte-exact round trips without newline or Unicode normalization.
+
+The executable allowlist is exactly a partial-identity-only modification to
+`ContractSliceBActivationTests.cs` plus one new
+`ContractSliceBGovernedTextCodecTests.cs`; production, public surface, project,
+package, lock, workflow, Policy, resource, cache, admission, and later-wire
+surfaces are immutable. The normalized two-test-file delta is at most `1,200`;
+`1,201` or more requires renewed design review. The test is one direct,
+non-skipped Fact at
+`MeAndAI.Protocol.Conformance.Tests.ContractSliceBGovernedTextCodecTests.Round_trips_exact_governed_text_wire`,
+with exactly one `ContractSlice=B` trait, no Scenario/Theory/class trait or
+overload, and marker `TEST-0210-B-BEHAVIOR-RED-0003`. Its red temporarily makes
+only the fully prepared valid Repository `WriteGovernedText` semantic return
+`null!`; only that null may call direct `Assert.Fail(marker)`. Every setup,
+exception, wrong non-null result, negative, and qualifier assertion is marker-
+free. Green is focused `1/1`, cumulative B `5/5`, and cumulative A+B/full
+Conformance `37/37`, while Domain remains `98/98`.
+
+Canonical R uses one fresh external CreateNew runner matching
+`D:\Temp\meandai-test-0210-b-governed-text-r0003-runner-<32-lowercase-hex-guid>.ps1`,
+fresh report/log siblings, and a different fresh result root. It inherits the
+repository-tree runner's exact source/Git/lock/build/DLL/PDB/hash, `8,388,608`-
+byte complete-log, `1,048,576`-byte report, process-scoped
+`VSTEST_CONNECTION_TIMEOUT=300`, `420000`-ms monotonic, secure-TRX, atomic
+`InvocationCommitted`, and immutable no-retry contracts, specialized to these
+two source files, the `1,200`-line ceiling, marker/FQN, and this exact command:
+
+```text
+dotnet test tests/dotnet/MeAndAI.Protocol.Conformance.Tests/MeAndAI.Protocol.Conformance.Tests.csproj --configuration Release --no-restore --no-build --nologo --verbosity minimal --results-directory "<fresh-root>" --logger "trx;LogFileName=TEST-0210-B-BEHAVIOR-RED-0003.trx" --filter "ContractSlice=B&FullyQualifiedName=MeAndAI.Protocol.Conformance.Tests.ContractSliceBGovernedTextCodecTests.Round_trips_exact_governed_text_wire"
+```
+
+No runner may be materialized and no canonical red may start until the exact
+commit containing this twelve-record freeze is pushed and exact-head hosted
+green. The accepted repository-tree red is immutable and is never rerun.
 
 The complete Tests-only causal surface is:
 

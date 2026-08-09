@@ -1,12 +1,12 @@
-# ContractSlice B codec-activation and repository-tree wire packet freeze
+# ContractSlice B codec-activation and wire packet freeze
 
 | Field | Value |
 | --- | --- |
-| Packet | `B-CODEC-ACTIVATION-01` / `B-WIRE-REPOSITORY-TREE-01` |
-| State | Codec activation `ReviewedHostedGreen`; repository-tree wire `ReviewedLocalGreen` / exact implementation head hosted gate pending |
+| Packet | `B-CODEC-ACTIVATION-01` / `B-WIRE-REPOSITORY-TREE-01` / `B-WIRE-GOVERNED-TEXT-01` |
+| State | Codec activation and repository-tree wire `ReviewedHostedGreen`; governed-text `FrozenDesign`/inactive pending the synchronized design head's hosted gate |
 | Parent | [ContractSlice B micro-delivery plan](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-contractslice-b-micro-delivery-plan.md) |
 | Scenario | [TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210), retained `Planned` |
-| Exact wire design predecessor | [`e38bedd0fc3d3761f217fccde8271c0caa42af60`](https://github.com/hasanmanzak/meAndAI/commit/e38bedd0fc3d3761f217fccde8271c0caa42af60); exact-head [run 31325450263](https://github.com/hasanmanzak/meAndAI/actions/runs/31325450263) passed Ubuntu `19m35s`, Windows `47m57s`, publication verification skipped |
+| Exact governed-text design predecessor | [`be94ea6da507e654e325b7cfc97074b3b0e5bacd`](https://github.com/hasanmanzak/meAndAI/commit/be94ea6da507e654e325b7cfc97074b3b0e5bacd); exact-head [run 31329704543](https://github.com/hasanmanzak/meAndAI/actions/runs/31329704543) passed Ubuntu `21m01s`, Windows `46m10s`, publication verification skipped |
 | Implementation language | C# only |
 
 ## Immutable codec-activation boundary
@@ -87,7 +87,7 @@ later packet remained inactive. The codec exact head is now hosted green; the
 current packet-specific wire staging below owns the next gate. The accepted
 schema-2 graph ceilings remain `8,192` relations and `8,388,608` parsed bytes.
 
-## Implemented `B-WIRE-REPOSITORY-TREE-01` local-green boundary
+## Immutable `B-WIRE-REPOSITORY-TREE-01` hosted-green boundary
 
 The typed evaluation-kernel design is the normative executable contract. This
 handoff mirrors routing, review, and immutable evidence only and adds no
@@ -295,6 +295,42 @@ once. It is immutable and must never be rerun.
   `4/4`, full Conformance `36/36`, and Domain `98/98` pass. The executable delta
   is `581/1,200` normalized lines; locks, projects, packages, and workflows are
   unchanged. Product/test and evidence/scope reviews are `0/0/0`.
-- B is now `4/11` and cumulative A+B is `36/43`. Exact implementation-head
-  StructureOnly, publication evidence, commit/push, and hosted green remain the
-  delivery gates; all later packets and downstream holds remain inactive.
+- B is `4/11` and cumulative A+B is `36/43`. Exact implementation-head
+  StructureOnly, publication evidence, commit/push, and hosted validation are
+  green at the exact predecessor above; the canonical red is immutable.
+
+## Frozen `B-WIRE-GOVERNED-TEXT-01` routing
+
+- Normative bytes, carrier/result declarations, Repository/Provider/empty
+  vectors, error precedence, body/payload limits, two-test-file allowlist, and
+  the specialized `0003` runner contract are owned only by the typed design.
+- The packet modifies only the retained activation test's two partial identity
+  declarations and adds one governed-text test/core file, with zero production,
+  interface, project, package, lock, workflow, resource, cache, or admission
+  delta and at most `1,200` normalized lines.
+- The sole Fact is the exact governed-text FQN with one `ContractSlice=B` trait,
+  no Scenario, and marker `TEST-0210-B-BEHAVIOR-RED-0003`. No runner or red may
+  start before the commit containing this exact twelve-record freeze is pushed
+  and exact-head hosted green.
+- The frozen green boundary is focused `1/1`, B `5/5`, A+B/full Conformance
+  `37/37`, and Domain `98/98`. B remains `4/11` and A+B `36/43` until then;
+  the parent scenario and every later/downstream hold remain unchanged.
+
+## Frozen governed-text wire design reviews
+
+- Semantic/runner D/RT: `0 Blocking / 0 Important / 0 Minor`; the same-object
+  topology, closed carrier/result declarations, exact Repository/Provider/empty
+  vectors, UTF-8/BOM grammar, failure precedence, equality/first-one-over
+  limits, defensive copying, and one-shot no-retry custody are fully frozen.
+- Route/content/scope review: `0 Blocking / 0 Important / 0 Minor`; the design
+  cohort remains exactly twelve existing Markdown paths, while the later
+  executable allowlist remains two Tests-owned files with zero production or
+  downstream mutation.
+- Capacity review: the typed-design blob is `532510/1048576` normalized bytes.
+  The B-WIRE ceiling is `1200` normalized changed lines and `1201` requires a
+  redraw. Node, relation, aggregate-byte, runner-log, report, timeout, and
+  evidence-root limits remain unchanged; exact-tree StructureOnly and the
+  publication-evidence recurrence must pass before commit.
+- The packet remains `FrozenDesign`/inactive. These reviews authorize only the
+  design delivery; no runner materialization, canonical red, or implementation
+  begins before its exact synchronized design head is hosted green.

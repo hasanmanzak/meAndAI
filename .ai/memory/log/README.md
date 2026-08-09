@@ -6,20 +6,19 @@ and follow its canonical links.
 ## Current continuation
 
 Follow the current
-[ContractSlice B codec-activation and repository-tree wire handoff](2026-08-09-feat-0065-subf-0143-contractslice-b-codec-activation-freeze.md).
+[ContractSlice B codec-activation and wire handoff](2026-08-09-feat-0065-subf-0143-contractslice-b-codec-activation-freeze.md).
 ContractSlice A is merged/exact-main green; `B-SURFACE-01` and
-`B-CODEC-ACTIVATION-01` are exact-head hosted green. `B-WIRE-REPOSITORY-TREE-01`
-is `ReviewedLocalGreen` with its exact implementation head hosted gate pending;
-B is `4/11`, cumulative A+B is `36/43`, later packets are inactive, and the parent
-scenario remains `Planned`.
+`B-CODEC-ACTIVATION-01` plus `B-WIRE-REPOSITORY-TREE-01` are exact-head hosted
+green. `B-WIRE-GOVERNED-TEXT-01` is `FrozenDesign`/inactive pending its
+synchronized design head's hosted gate; B is `4/11`, cumulative A+B is `36/43`,
+later packets are inactive, and the parent scenario remains `Planned`.
 
 Follow the current
 [instruction-graph capacity handoff](2026-08-09-feat-0069-instruction-graph-capacity.md)
 for the prospective `v0.17.0` profile and immutable prior-target boundary.
 The original edge/aggregate delivery has merged exact-main Ubuntu/Windows
-green. Its bounded per-blob/B-WIRE-budget amendment is `ReviewedLocalGreen` and
-awaits final exact-tree, commit/push, and hosted gates; release and publication
-remain separate.
+green. Its bounded per-blob/B-WIRE-budget amendment is exact-head hosted green;
+release and publication remain separate.
 
 Follow the current
 [ContractSlice A V1/V2/V3 diagnostics and fully-green V4 convergence handoff](2026-08-08-feat-0065-subf-0143-contractslice-a-converge.md),
@@ -394,7 +393,7 @@ conversations while disallowing force pushes and deletion.
 
 ## History
 
-- [2026-08-09 - ContractSlice B codec activation and repository-tree wire](2026-08-09-feat-0065-subf-0143-contractslice-b-codec-activation-freeze.md)
+- [2026-08-09 - ContractSlice B codec activation and wire packets](2026-08-09-feat-0065-subf-0143-contractslice-b-codec-activation-freeze.md)
 - [2026-08-09 - ContractSlice B structural surface](2026-08-09-feat-0065-subf-0143-contractslice-b-surface-freeze.md)
 - [2026-08-09 - ContractSlice B design freeze](2026-08-09-feat-0065-subf-0143-contractslice-b-design-freeze.md)
 - [2026-08-07 - ContractSlice A lifecycle ReviewedLocalGreen](2026-08-07-feat-0065-subf-0143-contractslice-a-lifecycle-green.md)

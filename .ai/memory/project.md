@@ -11,11 +11,10 @@ Last verified: **2026-08-09**
   compaction. [DEC-0036](../../docs/decisions/DEC-0036-prospective-instruction-graph-capacity.md)
   therefore freezes the prospective `v0.17.0` profile at `8192` edges,
   `1048576` bytes per parsed blob, and `8388608` aggregate parsed bytes while
-  preserving every earlier target. A bounded pre-failure amendment is local
-  green after the ContractSlice B typed-design blob crossed the former
-  per-blob ceiling and its first complete wire draft crossed a packet-local
-  line threshold; it is `ReviewedLocalGreen`, with final exact-tree,
-  commit/push, and hosted gates pending.
+  preserving every earlier target. A bounded pre-failure amendment is
+  exact-head hosted green after the ContractSlice B typed-design blob crossed
+  the former per-blob ceiling and its first complete wire draft crossed a
+  packet-local line threshold; release and publication remain separate.
   [TEST-0223](../../docs/features/FEAT-0069-instruction-graph-capacity/test-cases.md#test-0223)
   has immutable expected-red plus focused graph, quick-adoption profile,
   StructureOnly, publication-evidence, and exact-main Ubuntu/Windows greens;
@@ -156,7 +155,7 @@ Last verified: **2026-08-09**
   Ubuntu in `20m44s` and Windows in `46m51s`; publication verification was
   correctly skipped. The exact lifecycle implementation identity recorded in
   the canonical handoff passed Ubuntu in `19m36s` and Windows in `36m02s`; publication verification was
-  correctly skipped. ContractSlice A is merged/exact-main green. `B-SURFACE-01` and `B-CODEC-ACTIVATION-01` are exact-head hosted green; `B-WIRE-REPOSITORY-TREE-01` is `ReviewedLocalGreen` with its exact implementation head hosted gate pending. B is `4/11` and cumulative A+B is `36/43`; the parent scenario, later B packets, C/D, and final activation remain held. Follow the current [canonical log index](log/README.md). The
+  correctly skipped. ContractSlice A is merged/exact-main green. `B-SURFACE-01`, `B-CODEC-ACTIVATION-01`, and `B-WIRE-REPOSITORY-TREE-01` are exact-head hosted green; `B-WIRE-GOVERNED-TEXT-01` is `FrozenDesign`/inactive pending its synchronized design head's hosted gate. B is `4/11` and cumulative A+B is `36/43`; the parent scenario, later B packets, C/D, and final activation remain held. Follow the current [canonical log index](log/README.md). The
   predecessor-manifest exact-head hosted-green handoff indexed there is
   immutable history; the admission-proof reviewed-local-green handoff,
   the selector reviewed-local-green handoff in the canonical log index,
