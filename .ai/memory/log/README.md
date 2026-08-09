@@ -6,9 +6,16 @@ and follow its canonical links.
 ## Current continuation
 
 Follow the current
+[ContractSlice B design-freeze handoff](2026-08-09-feat-0065-subf-0143-contractslice-b-design-freeze.md).
+ContractSlice A is merged and exact-main hosted green; B is `FrozenDesign` and
+inactive pending this design delivery's exact-head hosted-green gate and a
+separate implementation directive. The parent scenario remains `Planned`.
+
+Follow the current
 [instruction-graph capacity handoff](2026-08-09-feat-0069-instruction-graph-capacity.md)
 for the prospective `v0.17.0` profile and immutable prior-target boundary.
-Local verification is green; exact-head hosted delivery remains pending.
+Merged exact-main Ubuntu/Windows validation is green; release and publication
+remain separate.
 
 Follow the current
 [ContractSlice A V1/V2/V3 diagnostics and fully-green V4 convergence handoff](2026-08-08-feat-0065-subf-0143-contractslice-a-converge.md),
@@ -294,7 +301,7 @@ correctly skipped. Canonical R `0014` and `0015` are immutable and were not
 rerun. The lifecycle records-only freeze head passed Ubuntu in `20m44s` and
 Windows in `46m51s`. The exact lifecycle implementation identity recorded in the
 canonical handoff passed Ubuntu in `19m36s` and Windows in `36m02s`;
-publication verification was correctly skipped. A audit is `20/20` (`100%`), cumulative A `32/32`, Domain `98/98`; [TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) is `Planned`; Resource R=`0024` hosted green; V1/V2/V3 are diagnostics; V4 is fully green and `CompletionRecommended` is local, with the final-sync head hosted pending; use the handoff above.
+publication verification was correctly skipped. ContractSlice A is merged and exact-main hosted green; the parent scenario remains `Planned`; use the current B design-freeze handoff above.
 Historical governed-reference-slots evidence retains exact implementation
 predecessor
 [`fca0778663238b83bb2ede7cba5ab52012414689`](https://github.com/hasanmanzak/meAndAI/commit/fca0778663238b83bb2ede7cba5ab52012414689),
@@ -383,6 +390,7 @@ conversations while disallowing force pushes and deletion.
 
 ## History
 
+- [2026-08-09 - ContractSlice B design freeze](2026-08-09-feat-0065-subf-0143-contractslice-b-design-freeze.md)
 - [2026-08-07 - ContractSlice A lifecycle ReviewedLocalGreen](2026-08-07-feat-0065-subf-0143-contractslice-a-lifecycle-green.md)
 - [2026-08-07 - ContractSlice A lifecycle FrozenDesign](2026-08-07-feat-0065-subf-0143-contractslice-a-lifecycle-freeze.md)
 - [2026-08-04 - ContractSlice A transition reviewed-local-green](2026-08-04-feat-0065-subf-0143-contractslice-a-transition-freeze.md)

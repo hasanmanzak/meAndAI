@@ -5,7 +5,7 @@ Last verified: **2026-08-09**
 ## Verified facts
 
 - [FEAT-0069](../../docs/features/FEAT-0069-instruction-graph-capacity/README.md)
-  is the active bounded-capacity continuation. Exact baseline
+  is complete through merged exact-main hosted validation. Exact baseline
   [`854bc97056d9e3250ab4c6caa7558825904466e8`](https://github.com/hasanmanzak/meAndAI/commit/854bc97056d9e3250ab4c6caa7558825904466e8)
   reached `4096/4096` edges and `4192113/4194304` parsed bytes after canonical
   compaction. [DEC-0036](../../docs/decisions/DEC-0036-prospective-instruction-graph-capacity.md)
@@ -13,8 +13,8 @@ Last verified: **2026-08-09**
   `8388608` aggregate parsed bytes while preserving every earlier target.
   [TEST-0223](../../docs/features/FEAT-0069-instruction-graph-capacity/test-cases.md#test-0223)
   has immutable expected-red plus focused graph, quick-adoption profile,
-  StructureOnly, and publication-evidence greens; exact-head hosted delivery
-  remains pending.
+  StructureOnly, publication-evidence, and exact-main Ubuntu/Windows greens;
+  release and publication remain separate.
 
 - Historical ContractSlice A strict-redraw and parser-record-slot chain: base
   [`25e26f908e1f123640c758e42e1db92d5eea6dde`](https://github.com/hasanmanzak/meAndAI/commit/25e26f908e1f123640c758e42e1db92d5eea6dde),
@@ -25,7 +25,7 @@ Last verified: **2026-08-09**
   git tree identity `05c7591565d965966285cd51226446b2f54c81bc`, passed Ubuntu and Windows in
   [run 30722890590](https://github.com/hasanmanzak/meAndAI/actions/runs/30722890590);
   publication verification was correctly skipped and the
-  [draft PR #174](https://github.com/hasanmanzak/meAndAI/pull/174) suite reports
+  [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174) suite reports
   GitGuardian green.
   [FIND-0445](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0445)
   and [FIND-0446](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0446)
@@ -151,7 +151,7 @@ Last verified: **2026-08-09**
   Ubuntu in `20m44s` and Windows in `46m51s`; publication verification was
   correctly skipped. The exact lifecycle implementation identity recorded in
   the canonical handoff passed Ubuntu in `19m36s` and Windows in `36m02s`; publication verification was
-  correctly skipped. A audit is `20/20` (`100%`), cumulative A `32/32`, Domain `98/98`; Resource R=`0024` hosted green; V1/V2/V3 are diagnostics; V4 is fully green and `CompletionRecommended` is local, with the final-sync head hosted pending. Parent scenario/final activation remain held. Follow the current [canonical log index](log/README.md). The
+  correctly skipped. ContractSlice A is merged and exact-main hosted green. ContractSlice B is `FrozenDesign`/inactive pending its design delivery's exact-head hosted-green gate and a separate implementation directive; the parent scenario, C/D, and final activation remain held. Follow the current [canonical log index](log/README.md). The
   predecessor-manifest exact-head hosted-green handoff indexed there is
   immutable history; the admission-proof reviewed-local-green handoff,
   the selector reviewed-local-green handoff in the canonical log index,

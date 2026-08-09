@@ -3,14 +3,14 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted; A audit `20/20` (`100%`), cumulative A `32/32`; [TEST-0210](test-cases.md#test-0210) `Planned`; Resource hosted green; V1/V2/V3 diagnostic; V4 fully green; `CompletionRecommended` local, final-sync head hosted pending. Final activation/DoD held. |
+| Status | Gate 2 accepted; ContractSlice A merged and exact-main hosted green. ContractSlice B is `FrozenDesign`/inactive pending this design delivery's exact-head hosted-green gate and a separate implementation directive; [TEST-0210](test-cases.md#test-0210) remains `Planned`; C/D, final activation, and DoD remain held. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Test | [TEST-0210](test-cases.md#test-0210) |
-| Gate 3 micro-delivery routing | Maintainer-approved [SUBF-0143](README.md#subf-0143) [micro-delivery control plan](subf-0143-micro-delivery-plan.md); the projector/DAG freeze-gate handoff remains the immutable design predecessor, while current packet-local `ReviewedLocalGreen` retains exact packet-local implementation/evidence; admission and earlier handoffs remain exact deliveries or historical checkpoints, and operational labels remain non-normative and activate no unstated work |
-| Exact-main implementation baseline | [`ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd`](https://github.com/hasanmanzak/meAndAI/commit/ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd) |
-| Design and Gate 3 authority | Historical [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5128172584); corrected ContractSlice A [implementation directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139269228); current umbrella authority on draft [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174) for ordered A-only delivery through `A-CONVERGE-02`; append-only [BehaviorRed message/echo clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139945054); append-only [BehaviorRed RunInfo clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5140224849); append-only [assertion-stack clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5150679793). B/C/D, merge, release, and publication remain outside that authority. |
+| Gate 3 micro-delivery routing | Historical A delivery remains owned by the [A micro-delivery control plan](subf-0143-micro-delivery-plan.md). Current B design routing is the [ContractSlice B micro-delivery plan](subf-0143-contractslice-b-micro-delivery-plan.md); packet labels refine delivery but activate no executable work. |
+| Exact-main design baseline | Accepted A merge commit [`51623f4d404a95e0f706d72805cf7ddbbbd293b8`](https://github.com/hasanmanzak/meAndAI/commit/51623f4d404a95e0f706d72805cf7ddbbbd293b8), validated by exact-main [run 31304787603](https://github.com/hasanmanzak/meAndAI/actions/runs/31304787603) |
+| Design and Gate 3 authority | Historical A directives and clarifications remain immutable evidence. The current [ContractSlice B design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5230762350) authorizes only the B micro-delivery plan, design freeze, reviews, record synchronization, commit/push, draft PR, and hosted-check correction. It authorizes no B red, test, C# implementation, or executable-surface change; C/D, final activation, merge, release, and publication remain outside that authority. |
 | Completed predecessor | [SUBF-0153](README.md#subf-0153) / [TEST-0221](test-cases.md#test-0221), merged through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173) and exact-main validated by [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) |
 
 ## Directive and hard boundary
@@ -25,6 +25,15 @@ correction has no unresolved Blocking or Important architecture finding. This pa
 release binding, provider-neutral typed model, admission, cache, applicability,
 evaluator, finding, evaluation, and aggregation handoff required by the
 accepted [SUBF-0153](README.md#subf-0153) design.
+
+The current
+[ContractSlice B design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5230762350)
+authorizes only the linked B micro-delivery plan and the normative B freeze in
+this record. It does not authorize SurfaceRed, BehaviorRed, a test/source/
+project/package/lock/workflow change, or any C# implementation. Those actions
+remain inactive until this exact design cohort is committed, pushed, exact-head
+hosted green, accepted through review, and followed by a separate maintainer
+implementation directive naming the first active packet.
 
 The append-only
 [BehaviorRed evidence clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139945054)
@@ -1323,6 +1332,36 @@ Every executable contract described here is implemented in C#.
 Markdown is its reviewed architecture and contract specification, not a second
 runtime or rule engine. The A directive grants no later-slice authority by
 implication.
+
+### ContractSlice B design-freeze boundary <a name="contractslice-b-design-freeze"></a>
+
+The normative delivery decomposition is the
+[ContractSlice B micro-delivery plan](subf-0143-contractslice-b-micro-delivery-plan.md).
+Its accepted predecessor is the A merge commit
+[`51623f4d404a95e0f706d72805cf7ddbbbd293b8`](https://github.com/hasanmanzak/meAndAI/commit/51623f4d404a95e0f706d72805cf7ddbbbd293b8),
+validated by exact-main [run 31304787603](https://github.com/hasanmanzak/meAndAI/actions/runs/31304787603).
+
+The frozen B surface contains exactly `24` Abstractions/Conformance public
+types, produces cumulative public export count `72`, and changes no Domain
+export. The permanent first SurfaceRed is exactly `CS0246` in
+`ContractSliceB.SurfaceRed.cs` at `5:38-5:65` for token
+`IObservedQualificationProof`; it makes no discovery claim. Retained B tests
+will be exactly `11` direct Facts with only `ContractSlice=B`, no `Scenario`,
+and ordinal LF-terminated FQN digest
+`FAA35F542B1C88DFD228920CB437A9F38C220591726F1ACCA3D756603DAD62AB`.
+
+B owns codec activation, the three persistent protocol wires, Tests-only
+private proof admission, the decode/model cache, codec-local four-counter
+resource accounting, sealed ContextProof/Root shapes, and codec-derived
+reference narrowing. It does not own parser/index/projector/selector or
+provider-neutral capability semantics, shared-root ledgers, staged planning,
+kernel evaluation, real Policy export, the initial real-rule set, Scenario
+activation, workflow filters, or runtime-efficiency changes. The design phase
+has P/R/G `NotApplicable`, an
+empty executable allowlist, and no B implementation authority. Global B
+activation remains forbidden until this design delivery is reviewed, committed,
+pushed, exact-head hosted green, accepted, and followed by a separate
+maintainer implementation directive.
 
 ## Gate 2 outcome
 
@@ -8421,15 +8460,15 @@ invocation, or weaken
 
 ## Internal implementation slices
 
-ContractSlice A has a proposed, non-normative
-[micro-delivery control plan](subf-0143-micro-delivery-plan.md). If separately
-accepted, its closed semantic packages and small-context startup capsules refine
-delivery granularity without changing the accepted A-D architecture or authority.
+ContractSlice A's historical delivery is owned by its
+[micro-delivery control plan](subf-0143-micro-delivery-plan.md). ContractSlice
+B is decomposed by the current
+[B micro-delivery plan](subf-0143-contractslice-b-micro-delivery-plan.md), which
+is `FrozenDesign` but activates no test or implementation.
 
-The corrected A directive may deliver only separately reviewed A packets. B/C/D
-still require separate future activation, and no packet is active merely from
-this list. No directive here allocates new stable IDs; the four independently
-reviewable internal slices remain ordered:
+B implementation and C/D still require separate future activation, and no
+packet is active merely from this list. No directive here allocates new stable
+IDs; the four independently reviewable internal slices remain ordered:
 
 1. **A - Catalog and manifest preflight:** exact declarations, canonical
    manifest parse/digest/typed projection, normative fragments, declaration/

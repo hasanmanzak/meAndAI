@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Architecture design |
-| Status | Accepted architecture; [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143) Gate 2 accepted. A audit `20/20`, cumulative A `32/32`; Resource hosted green; V1/V2/V3 diagnostic; V4 fully green; `CompletionRecommended` local, final-sync head hosted pending. Parent scenario `Planned`; no activation/DoD. |
+| Status | Accepted architecture; [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143) Gate 2 accepted. ContractSlice A is merged and exact-main hosted green; ContractSlice B is `FrozenDesign`/inactive pending design delivery and separate implementation authority. Parent scenario `Planned`; no activation/DoD. |
 | Owning epic | [EPIC-0002 / issue #163](https://github.com/hasanmanzak/meAndAI/issues/163) |
 | Owning task | [TASK-0003 / issue #164](https://github.com/hasanmanzak/meAndAI/issues/164) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
@@ -11,10 +11,10 @@
 | Successor allocation | [Successor delivery and qualification plan](successor-delivery-plan.md) |
 | Preserved WIP disposition | [Exact extraction ledger](wip-extraction-ledger.md) |
 | Accepted Gate-2 baseline | Exact-main typed-handoff predecessor [`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7) |
-| Current A implementation boundary | Immutable predecessors; A audit `20/20` (`100%`), cumulative A `32/32`; Resource hosted green; V1/V2/V3 diagnostic; V4 fully green; `CompletionRecommended` local, final-sync head hosted pending. Parent scenario/B/C/D/final activation held. |
+| Current slice boundary | ContractSlice A is immutable merged history. ContractSlice B design is frozen but implementation inactive; C/D and final activation remain held. |
 | Hosted correction chain | Historical `bfa961d...` / run `30712296217` exposed [TEST-0175](../../features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175), then `43c1800...` / run `30714966450` exposed [TEST-0178](../../features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178). Their exact links remain canonical in the owning findings. The bounded documentation/memory correction at exact [`25e26f9...`](https://github.com/hasanmanzak/meAndAI/commit/25e26f908e1f123640c758e42e1db92d5eea6dde) closes both findings; publication verification was correctly skipped. |
 | Preserved implementation input | [`1873c98638ba4960734aadb188eb8c8d70b4bc52`](https://github.com/hasanmanzak/meAndAI/commit/1873c98638ba4960734aadb188eb8c8d70b4bc52) on [draft PR #160](https://github.com/hasanmanzak/meAndAI/pull/160) |
-| Current authority | The maintainer's umbrella directive, persisted on [draft PR #174](https://github.com/hasanmanzak/meAndAI/pull/174), authorizes ordered remaining ContractSlice A delivery through `A-CONVERGE-02`, including strict D/RT redraws, expected-red/green, review, record synchronization, commit/push, PR updates, and hosted-check correction. It does not bypass exact predecessor, D/RT, evidence, or one-mutating-packet gates. B/C/D, final Scenario/status/owner/workflow/[TEST-0146](../../features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146), WIP, consumer, merge, release, publication, authority transfer, and PowerShell retirement remain held. |
+| Current authority | The B design-only directive authorizes micro-planning, design freeze, review, record synchronization, and design delivery only. It grants no SurfaceRed, BehaviorRed, test, C# implementation, or executable mutation. C/D, final Scenario/status/owner/workflow, runtime-efficiency activation, WIP, consumer, merge, release, publication, authority transfer, and PowerShell retirement remain held. |
 
 ## 1. Outcome
 
@@ -86,11 +86,11 @@ passed both stable jobs.
 The corrected historical
 [ContractSlice A directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139269228)
 activated the initial reviewed [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)
-ContractSlice A increments. The current umbrella authority on
-[draft PR #174](https://github.com/hasanmanzak/meAndAI/pull/174) covers the
-ordered remaining A packets through `A-CONVERGE-02`, but every packet still
-requires its own exact predecessor, D/RT, expected-red/green, review, and
-evidence gates. A owns canonical manifest parse/digest/typed projection and
+ContractSlice A increments. The historical umbrella authority on
+[merged PR #174](https://github.com/hasanmanzak/meAndAI/pull/174) covered the
+ordered remaining A packets through `A-CONVERGE-02`; every packet retained its
+own exact predecessor, D/RT, expected-red/green, review, and evidence gates. A
+owns canonical manifest parse/digest/typed projection and
 declaration/artifact/component preflight; it constructs no executable export
 and declares no kernel. First executable activation and six-list registration
 mismatch ownership remain in ContractSlice C. Strict D/RT retires the never-
