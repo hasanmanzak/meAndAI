@@ -821,8 +821,6 @@ public sealed class ContractSliceBOwnershipTests
 
         foreach (var forbidden in new[]
                  {
-                     "ICodecRegistration",
-                     "IContractSliceBActivationProofState",
                      "IPayloadCodec",
                  })
         {
@@ -836,7 +834,6 @@ public sealed class ContractSliceBOwnershipTests
                  {
                      "CatalogSliceKernel",
                      "ConformanceKernel",
-                     "ContractSliceBAdmissionHarness",
                      "DecodeModelCache",
                  })
         {

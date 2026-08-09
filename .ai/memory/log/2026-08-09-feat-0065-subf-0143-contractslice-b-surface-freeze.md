@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Packet | `B-SURFACE-01` |
-| State | `ReviewedLocalGreen`; exact-head hosted pending |
+| State | `ReviewedHostedGreen`; immutable predecessor |
 | Parent | [ContractSlice B micro-delivery plan](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-contractslice-b-micro-delivery-plan.md) |
 | Scenario | [TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210), retained `Planned` |
 | Exact predecessor | Merge commit [`793bb75074ddaa62e62fcb0ee33574b3efda001a`](https://github.com/hasanmanzak/meAndAI/commit/793bb75074ddaa62e62fcb0ee33574b3efda001a); exact-main [run 31310208767](https://github.com/hasanmanzak/meAndAI/actions/runs/31310208767) passed Ubuntu `5m39s`, Windows `11m28s`, publication skipped |
@@ -110,6 +110,11 @@ absence of codec activation or later-slice runtime types.
 - Project/package/lock/workflow/Domain/Policy deltas: zero.
 - Product/test review: `0 Blocking / 0 Important / 0 Minor`.
 - Evidence/scope review: `0 Blocking / 0 Important / 0 Minor`.
+- Exact-head hosted closure: commit
+  [`2d5f5c6ed5c5317b827e7ee6f969d58822c663e9`](https://github.com/hasanmanzak/meAndAI/commit/2d5f5c6ed5c5317b827e7ee6f969d58822c663e9)
+  passed Ubuntu `20m25s` and Windows `16m49s` in
+  [run 31312309195](https://github.com/hasanmanzak/meAndAI/actions/runs/31312309195);
+  publication verification was correctly skipped.
 
 The canonical red is not reused as green evidence. The first A+B topology
 diagnostic remains diagnostic only; all retained green counts above are fresh

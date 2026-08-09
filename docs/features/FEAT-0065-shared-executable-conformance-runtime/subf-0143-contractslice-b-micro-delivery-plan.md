@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Gate 2 micro-delivery plan and design freeze |
-| State | `B-SURFACE-01` `ReviewedLocalGreen`; B `2/11`, cumulative A+B `34/43`, exact-head hosted pending; later packets inactive |
+| State | `B-SURFACE-01` exact-head hosted green; `B-CODEC-ACTIVATION-01` `ReviewedLocalGreen`, exact-head hosted pending; B `3/11`, cumulative A+B `35/43`; later packets inactive |
 | Parent | Owning feature and current subfeature |
 | Scenario | [TEST-0210](test-cases.md#test-0210), still `Planned` |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
@@ -104,6 +104,20 @@ semantic packages own one Fact and one immutable BehaviorRed ordinal each.
 | `B-CODEC-DERIVATION-01` | Codec-derived reference frame, manifest component/artifact/model identity, same-or-narrower location, structural comparator, collision and foreign-session rejection; no parser/index derivation | `TEST-0210-B-BEHAVIOR-RED-0009`; `ContractSliceBQualifiedReferenceTests.Seals_exact_codec_derived_reference_and_location_narrowing` | Focused `1/1`; B `11/11`; A+B `43/43` |
 | `B-CONVERGE-01` | Pure cumulative audit of exact source/test/export/friend/trait/lock/project state; P/R/G `NotApplicable` | None; every canonical red remains immutable and is never rerun | B `11/11`; A+B/full Conformance `43/43`; Domain `98/98`; Release build/format/locks/diff/StructureOnly/publication evidence/reviews green |
 
+### Active `B-CODEC-ACTIVATION-01` staging boundary
+
+This packet introduces the final registration/model-token object graph but only
+the activation-stage identity of `ICanonicalPayloadCodec<TModel>`. That internal
+constrained interface is memberless until successor packets introduce the
+already frozen final writer/qualifier inputs, intents, and resource meter. The
+one retained codec object is nevertheless the sole owner of both directions;
+no alternate writer, qualifier, adapter, public registration, reflection, or
+service lookup is permitted. The retained A PublicApi Fact removes only its
+obsolete `ICodecRegistration`-absence assertion; its FQN, trait, 48-type/member
+snapshot, and containment authority remain unchanged. The exact executable/
+evidence allowlist and one-shot red custody are owned by the current codec-
+activation memory handoff.
+
 ## SurfaceRed and BehaviorRed contract
 
 `B-SURFACE-01` is the accepted one-diagnostic compile-red exception. The exact
@@ -190,8 +204,9 @@ project, package, lock, workflow, release, or consumer file. The user-owned
 ## Exit condition
 
 This plan is the accepted `FrozenDesign` predecessor. The later maintainer
-directive named only `B-SURFACE-01`, whose immutable red and bounded structural
-green are now local. That outcome authorizes no next B test or C# implementation
-by itself. A separate directive must name `B-CODEC-ACTIVATION-01`. C/D, final
+directive closed `B-SURFACE-01` and `B-CODEC-ACTIVATION-01`; their canonical
+reds are immutable and the codec packet is local green. That outcome authorizes
+no next B test or C# implementation by itself. A separate directive must name
+`B-WIRE-REPOSITORY-TREE-01`. C/D, final
 activation, feature DoD, release, publication, consumer mutation, authority
 transfer, and PowerShell retirement remain held.

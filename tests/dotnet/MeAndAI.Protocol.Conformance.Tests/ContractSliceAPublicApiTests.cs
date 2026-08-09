@@ -220,7 +220,6 @@ public sealed class ContractSliceAPublicApiTests
 
         foreach (var forbiddenType in new[]
                  {
-                     "ICodecRegistration",
                      "IDemandProjectorRegistration",
                      "IIndexRegistration",
                      "IParserRegistration",

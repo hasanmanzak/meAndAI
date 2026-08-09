@@ -314,7 +314,7 @@ The lifecycle records-only freeze head is exact-hosted-green: Ubuntu passed in
 `20m44s`, Windows in `46m51s`, and publication verification was correctly
 skipped. The exact lifecycle implementation identity recorded in the canonical
 handoff passed Ubuntu in `19m36s` and Windows in `36m02s`; publication verification was
-correctly skipped. ContractSlice A is merged/exact-main green. `B-SURFACE-01` is `ReviewedLocalGreen` at B `2/11` and cumulative A+B `34/43`, exact-head hosted pending; the parent scenario, later B packets, C/D, and final activation remain held.
+correctly skipped. ContractSlice A is merged/exact-main green. `B-SURFACE-01` is exact-head hosted green and `B-CODEC-ACTIVATION-01` is `ReviewedLocalGreen` at B `3/11` and cumulative A+B `35/43`, exact-head hosted pending; the parent scenario, `B-WIRE-REPOSITORY-TREE-01`, later B packets, C/D, and final activation remain held.
 The exact record-delivery closure reached the full `4096/4096` instruction-graph
 budget. Ubuntu passed in `19m52s`; Windows reached its exact 45-minute job
 ceiling after every emitted suite result was successful. The bounded correction

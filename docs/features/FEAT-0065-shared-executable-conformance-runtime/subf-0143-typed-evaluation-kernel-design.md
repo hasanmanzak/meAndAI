@@ -3,14 +3,14 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted; ContractSlice A merged/exact-main green. `B-SURFACE-01` is `ReviewedLocalGreen`, B `2/11`, cumulative A+B `34/43`, exact-head hosted pending; [TEST-0210](test-cases.md#test-0210) remains `Planned`; later B packets, C/D, final activation, and DoD remain held. |
+| Status | Gate 2 accepted; ContractSlice A merged/exact-main green. `B-SURFACE-01` is exact-head hosted green; `B-CODEC-ACTIVATION-01` is `ReviewedLocalGreen`, exact-head hosted pending; B `3/11`, cumulative A+B `35/43`; [TEST-0210](test-cases.md#test-0210) remains `Planned`; later B packets, C/D, final activation, and DoD remain held. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Test | [TEST-0210](test-cases.md#test-0210) |
 | Gate 3 micro-delivery routing | Historical A delivery remains owned by the [A micro-delivery control plan](subf-0143-micro-delivery-plan.md). Current B design routing is the [ContractSlice B micro-delivery plan](subf-0143-contractslice-b-micro-delivery-plan.md); packet labels refine delivery but activate no executable work. |
 | Exact-main design baseline | Accepted A merge commit [`51623f4d404a95e0f706d72805cf7ddbbbd293b8`](https://github.com/hasanmanzak/meAndAI/commit/51623f4d404a95e0f706d72805cf7ddbbbd293b8), validated by exact-main [run 31304787603](https://github.com/hasanmanzak/meAndAI/actions/runs/31304787603) |
-| Design and Gate 3 authority | Historical A directives and clarifications remain immutable evidence. The accepted B design delivery plus maintainer packet authority permits only `B-SURFACE-01` canonical SurfaceRed, bounded structural C#, tests, synchronization, commit/push, draft PR, and hosted correction. `B-CODEC-ACTIVATION-01`, C/D, final activation, merge, release, and publication remain outside that authority. |
+| Design and Gate 3 authority | Historical A directives and clarifications remain immutable evidence. The accepted B design plus current packet authority has been exercised through `B-CODEC-ACTIVATION-01` local green and permits only its synchronized commit/push, draft-PR update, and hosted correction. `B-WIRE-REPOSITORY-TREE-01`, later B packets, C/D, final activation, merge, release, and publication remain outside that authority. |
 | Completed predecessor | [SUBF-0153](README.md#subf-0153) / [TEST-0221](test-cases.md#test-0221), merged through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173) and exact-main validated by [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) |
 
 ## Directive and hard boundary
@@ -4343,7 +4343,17 @@ artifact/component preconditions without constructing an executable export or
 calling an activation-proof overload. ContractSlice B
 introduces only the final internal model-token plus codec-registration/visitor
 subset needed by its test mirror; it does not yet add an export registration
-list or six-list export factory. Its complete Tests-only causal surface is:
+list or six-list export factory.
+
+`B-CODEC-ACTIVATION-01` stages only the identity-bearing prefix of that final
+subset. `ICanonicalPayloadCodec<TModel>` is initially a constrained, memberless
+internal interface so one object-identical component owns the future paired
+writer and qualifier without introducing their successor-owned inputs, intents,
+or resource meter early. Later packets may only add the exact final `Write`,
+`Qualify`, and meter members already frozen above; they may not replace this
+identity, add a direction-specific registration, or introduce an adapter.
+
+The complete Tests-only causal surface is:
 
 ```csharp
 internal interface IContractSliceBActivationProofState
