@@ -3,10 +3,11 @@
 | Field | Value |
 | --- | --- |
 | Packet | `B-CODEC-ACTIVATION-01` / `B-WIRE-REPOSITORY-TREE-01` / `B-WIRE-GOVERNED-TEXT-01` |
-| State | Codec activation and repository-tree wire `ReviewedHostedGreen`; governed-text `FrozenDesign`/inactive pending the synchronized design head's hosted gate |
-| Parent | [ContractSlice B micro-delivery plan](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-contractslice-b-micro-delivery-plan.md) |
-| Scenario | [TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210), retained `Planned` |
-| Exact governed-text design predecessor | [`be94ea6da507e654e325b7cfc97074b3b0e5bacd`](https://github.com/hasanmanzak/meAndAI/commit/be94ea6da507e654e325b7cfc97074b3b0e5bacd); exact-head [run 31329704543](https://github.com/hasanmanzak/meAndAI/actions/runs/31329704543) passed Ubuntu `21m01s`, Windows `46m10s`, publication verification skipped |
+| State | Codec activation and repository-tree wire `ReviewedHostedGreen`; corrected governed-text `FrozenDesign`/inactive pending the synchronized correction head's hosted gate |
+| Parent | Owning ContractSlice B micro-delivery plan |
+| Scenario | Parent scenario retained `Planned` |
+| Exact repository-tree predecessor | [`be94ea6da507e654e325b7cfc97074b3b0e5bacd`](https://github.com/hasanmanzak/meAndAI/commit/be94ea6da507e654e325b7cfc97074b3b0e5bacd); exact-head [run 31329704543](https://github.com/hasanmanzak/meAndAI/actions/runs/31329704543) passed Ubuntu `21m01s`, Windows `46m10s`, publication verification skipped |
+| Exact first-design diagnostic | [`15032cd84cf1bee66cfe37d528dca4e938f03311`](https://github.com/hasanmanzak/meAndAI/commit/15032cd84cf1bee66cfe37d528dca4e938f03311); exact-head [run 31334875316](https://github.com/hasanmanzak/meAndAI/actions/runs/31334875316) passed Ubuntu `19m47s`, Windows `47m09s`, publication verification skipped; pre-red byte audit then found the optional-null vector defect, with no runner/red/implementation |
 | Implementation language | C# only |
 
 ## Immutable codec-activation boundary
@@ -316,9 +317,17 @@ once. It is immutable and must never be rerun.
   `37/37`, and Domain `98/98`. B remains `4/11` and A+B `36/43` until then;
   the parent scenario and every later/downstream hold remain unchanged.
 
-## Frozen governed-text wire design reviews
+## Corrected governed-text wire design reviews
 
-- Semantic/runner D/RT: `0 Blocking / 0 Important / 0 Minor`; the same-object
+- The first hosted design encoded null Repository anchor/property and null
+  Provider fragment as present empty text, contradicting the canonical
+  `optional T` grammar and Domain leaf invariants. The byte-level review occurred
+  before runner materialization, canonical red, or source/test implementation;
+  that first design is diagnostic-only and grants no executable authority.
+- Corrected Repository, empty, and Provider vectors are respectively
+  `270/93261D43...CDAA`, `261/89DD683B...452F`, and
+  `218/61741F3C...B6EA`; every declared null optional is now one exact zero tag.
+- Renewed semantic/runner D/RT: `0 Blocking / 0 Important / 0 Minor`; the same-object
   topology, closed carrier/result declarations, exact Repository/Provider/empty
   vectors, UTF-8/BOM grammar, failure precedence, equality/first-one-over
   limits, defensive copying, and one-shot no-retry custody are fully frozen.
@@ -326,7 +335,7 @@ once. It is immutable and must never be rerun.
   cohort remains exactly twelve existing Markdown paths, while the later
   executable allowlist remains two Tests-owned files with zero production or
   downstream mutation.
-- Capacity review: the typed-design blob is `532510/1048576` normalized bytes.
+- Capacity review: the typed-design blob is `532482/1048576` normalized bytes.
   The B-WIRE ceiling is `1200` normalized changed lines and `1201` requires a
   redraw. Node, relation, aggregate-byte, runner-log, report, timeout, and
   evidence-root limits remain unchanged; exact-tree StructureOnly and the
