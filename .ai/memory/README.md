@@ -5,12 +5,13 @@ Last reviewed: **2026-08-09**<br>
 Protocol version: **0.16.0**<br>
 Latest immutable release before this unmerged development: **0.16.0**
 
-The current bounded-capacity continuation is
+The bounded-capacity delivery is complete through
 [FEAT-0069](../../docs/features/FEAT-0069-instruction-graph-capacity/README.md):
 the prospective `v0.17.0` schema-2 profile selects `8192` edges and `8388608`
 aggregate parsed bytes while every target through `v0.16.0` remains immutable.
 Focused graph, quick-adoption profile, StructureOnly, and publication-evidence
-gates are green; exact-head hosted delivery remains pending in the
+gates plus merged exact-main Ubuntu/Windows validation are green; canonical
+details remain in the
 [capacity handoff](log/2026-08-09-feat-0069-instruction-graph-capacity.md).
 
 The maintainer accepted
@@ -54,9 +55,9 @@ the related historical correction evidence cataloged by the
 are historical; the hosted-green
 target parser/index/slot reviewed-local-green handoff in the canonical log index
 is also historical. The admission-proof reviewed-local-green handoff is
-historical. Follow the umbrella authority persisted on
-[draft PR #174](https://github.com/hasanmanzak/meAndAI/pull/174),
-and the corrected historical
+historical. ContractSlice A was delivered through
+[merged PR #174](https://github.com/hasanmanzak/meAndAI/pull/174) and its
+historical umbrella authority; follow the corrected historical
 [Gate 3 directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139269228).
 [The append-only BehaviorRed evidence clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139945054)
 governs the exact TRX message/echo/type oracle.
@@ -313,7 +314,7 @@ The lifecycle records-only freeze head is exact-hosted-green: Ubuntu passed in
 `20m44s`, Windows in `46m51s`, and publication verification was correctly
 skipped. The exact lifecycle implementation identity recorded in the canonical
 handoff passed Ubuntu in `19m36s` and Windows in `36m02s`; publication verification was
-correctly skipped. A audit is `20/20` (`100%`), cumulative A `32/32`, Domain `98/98`; Resource R=`0024` hosted green; V1/V2/V3 are diagnostics; V4 is fully green and `CompletionRecommended` is local, with the final-sync head hosted pending. Parent scenario/final activation remain held.
+correctly skipped. ContractSlice A is merged and exact-main hosted green. ContractSlice B is `FrozenDesign`/inactive pending its design delivery's exact-head hosted-green gate and a separate implementation directive; the parent scenario, C/D, and final activation remain held.
 The exact record-delivery closure reached the full `4096/4096` instruction-graph
 budget. Ubuntu passed in `19m52s`; Windows reached its exact 45-minute job
 ceiling after every emitted suite result was successful. The bounded correction

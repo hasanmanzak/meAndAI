@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Feature |
-| Status | Predecessors complete; [SUBF-0143](#subf-0143) Gate 2 accepted. A audit `20/20`, cumulative A `32/32`; [TEST-0210](test-cases.md#test-0210) `Planned`; Resource hosted green; V1/V2/V3 diagnostic; V4 fully green; `CompletionRecommended` local, final-sync head hosted pending. No activation/DoD. |
+| Status | Predecessors complete; [SUBF-0143](#subf-0143) Gate 2 accepted. ContractSlice A is merged and exact-main hosted green; ContractSlice B is `FrozenDesign`/inactive pending its design-delivery hosted gate and separate implementation authority; [TEST-0210](test-cases.md#test-0210) remains `Planned`. No activation/DoD. |
 | Hosted correction | Historical heads and [FIND-0445](#find-0445) through [FIND-0452](#find-0452) retain their exact evidence. The earlier records-only graph-budget and sibling-contract corrections are exact-head hosted-green. A-COMPLETE implementation and its first bounded hosted timeout correction are exact-head hosted-green at the immutable identity recorded in [FIND-0457](#find-0457). The combined bounded graph-headroom and second Windows-timeout correction is exact-head hosted-green and resolves [FIND-0458](#find-0458) and [FIND-0459](#find-0459). A-PREDECESSOR implementation plus its bounded instruction-graph correction and following records synchronization are exact-head hosted-green and recorded in [FIND-0460](#find-0460). A-TRANSITION implementation/synchronized records and A-LIFECYCLE implementation are exact-hosted-green. Publication remains held. |
 | Target version | 0.17.0 |
 | Issue | [#165](https://github.com/hasanmanzak/meAndAI/issues/165) |
@@ -66,16 +66,14 @@ passed both stable jobs.
 
 The corrected historical
 [ContractSlice A implementation directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139269228)
-authorized the initial bounded A topology. The maintainer's current umbrella
-directive, persisted on [draft PR #174](https://github.com/hasanmanzak/meAndAI/pull/174),
-now authorizes the ordered remaining ContractSlice A delivery through
-`A-CONVERGE-02`, including D/RT-required operational redraws that only partition
-accepted A semantics, packet-local expected-red/green/review, record sync,
-commit/push, draft-PR updates, and hosted-check correction. It does not bypass
-predecessor, D/RT, evidence, or one-mutating-packet gates. A constructs no
-executable export and declares no kernel; first executable activation and six-
-list registration mismatch ownership move to ContractSlice C. B/C/D,
-workflow/scenario-owner/[TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
+authorized the initial bounded A topology. Its historical umbrella directive
+delivered the remaining ContractSlice A packets through
+[merged PR #174](https://github.com/hasanmanzak/meAndAI/pull/174), without
+bypassing predecessor, D/RT, evidence, or one-mutating-packet gates. A
+constructs no executable export and declares no kernel; first executable
+activation and six-list registration mismatch ownership remain in ContractSlice
+C. The current B directive authorizes design delivery only; B red/test/C#
+implementation, C/D, workflow/scenario-owner/runtime-efficiency activation,
 merge, provider/consumer mutation, release/publication, authority transfer, and
 PowerShell retirement remain held.
 
@@ -415,7 +413,7 @@ green.
 
 | Test readiness | Current state | Evidence |
 | --- | --- | --- |
-| Scenarios | Predecessors complete; [TEST-0210](test-cases.md#test-0210) `Planned` | A audit `20/20`, cumulative A `32/32`; Resource hosted green; V1/V2/V3 diagnostic; V4 fully green; `CompletionRecommended` local, final-sync head hosted pending. |
+| Scenarios | Predecessors and ContractSlice A complete; [TEST-0210](test-cases.md#test-0210) `Planned` | ContractSlice B `FrozenDesign`/inactive; C/D and final activation held. |
 | Test code | [TEST-0210](test-cases.md#test-0210) remains `Planned`; packet-local cumulative A is `32/32` | A-LIFECYCLE focused, cumulative A, full Conformance, and full Domain are exact `1/1`, `32/32`, `32/32`, and `98/98`. Its source is `266` lines, production delta is `0`, Release build/format/diff/fifteen locks are green, and two independent final reviews are `0/0/0`. Earlier A-TRANSITION implementation evidence and exact cleanup remain immutable. Full [TEST-0210](test-cases.md#test-0210) green and A completion are not claimed. |
 | Current immutable delivery | Exact A-TRANSITION implementation/synchronized records heads plus the lifecycle freeze and implementation heads are hosted green | [FIND-0460](#find-0460) retains immutable predecessor history; [FIND-0461](#find-0461) owns the resolved transition fixture correction. Canonical R `0015` is immutable and was not rerun. A-LIFECYCLE is exact implementation-head hosted-green `ReviewedLocalGreen`; publication and all later scope remain held. |
 
@@ -424,7 +422,7 @@ green.
 | ID | Slice | Tracking | Dependencies | Tests/run | Self-review/findings | Status |
 | --- | --- | --- | --- | --- | --- | --- |
 | `SUBF-0142` <a name="subf-0142"></a> | Original typed rule/evidence/location/outcome/report planning slice | [#165](https://github.com/hasanmanzak/meAndAI/issues/165) | Accepted architecture | [TEST-0209](test-cases.md#test-0209) / not started | Gate 2 found mixed contracts | Superseded before implementation by [SUBF-0152](#subf-0152), [SUBF-0153](#subf-0153), [SUBF-0143](#subf-0143), and [SUBF-0154](#subf-0154); never reuse |
-| `SUBF-0143` <a name="subf-0143"></a> | [Typed evaluation kernel design](subf-0143-typed-evaluation-kernel-design.md) | [#165](https://github.com/hasanmanzak/meAndAI/issues/165) / draft [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174) | Gate 2 accepted | [TEST-0210](test-cases.md#test-0210) `Planned`; A audit `20/20`, cumulative A `32/32`; Resource hosted green | V1/V2/V3 diagnostic; V4 fully green; `CompletionRecommended` local, final-sync head hosted pending; B/C/D/activation held; no DoD. |
+| `SUBF-0143` <a name="subf-0143"></a> | [Typed evaluation kernel design](subf-0143-typed-evaluation-kernel-design.md) | [#165](https://github.com/hasanmanzak/meAndAI/issues/165) / merged [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174) | Gate 2 accepted | [TEST-0210](test-cases.md#test-0210) `Planned`; A merged/exact-main green; B `FrozenDesign`/inactive | B design delivery pending exact-head hosted green and later separate implementation authority; C/D/activation held; no DoD. |
 | `SUBF-0144` <a name="subf-0144"></a> | Extensions, waivers, debt, qualification, and predecessor-trusted self-consumption | [#165](https://github.com/hasanmanzak/meAndAI/issues/165) | [SUBF-0143](#subf-0143) | [TEST-0211](test-cases.md#test-0211) / not started | Pending | Proposed |
 | `SUBF-0152` <a name="subf-0152"></a> | [Closed rule identity, profile-axis, and outcome vocabulary](subf-0152-domain-vocabulary-design.md) in a fresh BCL-only Domain assembly | [#165](https://github.com/hasanmanzak/meAndAI/issues/165) | [FEAT-0059](../FEAT-0059-csharp-operational-foundation/README.md); architecture [PR #169](https://github.com/hasanmanzak/meAndAI/pull/169); implementation [PR #170](https://github.com/hasanmanzak/meAndAI/pull/170) | [TEST-0220](test-cases.md#test-0220) / expected red, 52 of 52 focused Release tests, cross-runtime StructureOnly, and exact-main [run 30511073506](https://github.com/hasanmanzak/meAndAI/actions/runs/30511073506) | Gate 5 reviews and exact-main Ubuntu/Windows validation clean; zero unresolved `Blocking` findings | Complete at [`c31819487e77fc878fc40fae6445bfef582719da`](https://github.com/hasanmanzak/meAndAI/commit/c31819487e77fc878fc40fae6445bfef582719da) |
 | `SUBF-0153` <a name="subf-0153"></a> | [Evidence requirements, target/boundary scope, asserted-canonical payloads, typed locations, contexts, and acquisition-result union](subf-0153-evidence-contract-design.md) | [#165](https://github.com/hasanmanzak/meAndAI/issues/165) / historical [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5126219253) / [PR #171](https://github.com/hasanmanzak/meAndAI/pull/171) / [Gate 3 activation directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5135051435) / [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173) | Completed [SUBF-0152](#subf-0152); accepted/merged/exact-main [SUBF-0143](#subf-0143) typed-handoff predecessor [`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7) | [TEST-0221](test-cases.md#test-0221) Passing in existing Domain.Tests | Valid expected red and focused/combined green; exact-head and exact-main hosted validation passed | Complete at exact main [`ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd`](https://github.com/hasanmanzak/meAndAI/commit/ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd), [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) |
