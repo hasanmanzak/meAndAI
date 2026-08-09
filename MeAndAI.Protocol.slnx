@@ -1,4 +1,8 @@
 <Solution>
   <Project Path="src/MeAndAI.Protocol.Domain/MeAndAI.Protocol.Domain.csproj" />
+  <Project Path="src/MeAndAI.Protocol.Conformance.Abstractions/MeAndAI.Protocol.Conformance.Abstractions.csproj" />
+  <Project Path="src/MeAndAI.Protocol.Conformance/MeAndAI.Protocol.Conformance.csproj" />
+  <Project Path="src/MeAndAI.Protocol.Policy/MeAndAI.Protocol.Policy.csproj" />
   <Project Path="tests/dotnet/MeAndAI.Protocol.Domain.Tests/MeAndAI.Protocol.Domain.Tests.csproj" />
+  <Project Path="tests/dotnet/MeAndAI.Protocol.Conformance.Tests/MeAndAI.Protocol.Conformance.Tests.csproj" />
 </Solution>

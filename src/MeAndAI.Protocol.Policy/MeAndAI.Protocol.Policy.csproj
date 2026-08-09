@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>MeAndAI.Protocol.Policy</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Markdig" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../MeAndAI.Protocol.Domain/MeAndAI.Protocol.Domain.csproj" />
+    <ProjectReference Include="../MeAndAI.Protocol.Conformance.Abstractions/MeAndAI.Protocol.Conformance.Abstractions.csproj" />
+  </ItemGroup>
+</Project>

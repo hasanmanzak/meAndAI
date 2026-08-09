@@ -35,6 +35,7 @@
 | [DEC-0031](DEC-0031-instruction-graph-schema-2-bounded-compatibility.md) | [Evolve the instruction graph to schema 2 for bounded compatibility](DEC-0031-instruction-graph-schema-2-bounded-compatibility.md) | Accepted | 2026-07-26 |
 | [DEC-0032](DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md) | [Use separate C# operational applications with portable JIT distribution](DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md) | Accepted; partially superseded by [DEC-0035](DEC-0035-protocol-owned-governance-and-execution-architecture.md) | 2026-07-27 |
 | [DEC-0035](DEC-0035-protocol-owned-governance-and-execution-architecture.md) | [Make the executable protocol the governance and execution authority](DEC-0035-protocol-owned-governance-and-execution-architecture.md) | Accepted; implementation authority withheld | 2026-07-29 |
+| [DEC-0036](DEC-0036-prospective-instruction-graph-capacity.md) | [Expand instruction-graph capacity prospectively](DEC-0036-prospective-instruction-graph-capacity.md) | Accepted | 2026-08-09 |
 
 The specification-first C# governance draft at
 `docs/decisions/DEC-0033-specification-first-csharp-governance.md` and bounded

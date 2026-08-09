@@ -1,5 +1,9 @@
 # 2026-07-30 - [FEAT-0065](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md) [SUBF-0143](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143) typed-handoff design
 
+> Historical packet. For current ContractSlice A authority and the
+> ParseCanonical-only A / first-activation-in-C correction, follow the
+> [2026-07-31 topology-correction handoff](2026-07-31-feat-0065-subf-0143-contractslice-a-topology-correction.md).
+
 ## Authority and exact predecessor
 
 - Current scope is the

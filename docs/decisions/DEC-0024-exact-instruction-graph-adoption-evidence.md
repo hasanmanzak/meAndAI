@@ -10,6 +10,7 @@
 - Related decisions: [DEC-0013](DEC-0013-trusted-adoption-and-recoverable-evidence.md), [DEC-0021](DEC-0021-explicit-initial-adoption-strategy.md), [DEC-0022](DEC-0022-release-declared-semantic-capabilities.md), and [DEC-0023](DEC-0023-verified-quick-adoption-module-bundle.md)
 - Narrow supersession: supersedes [DEC-0021](DEC-0021-explicit-initial-adoption-strategy.md) only where its fixed known-surface inventory limits instruction-authority discovery; maintainer-owned strategy selection, semantic-mutation boundaries, and compatibility rules remain authoritative
 - Current-schema evolution: [DEC-0031](DEC-0031-instruction-graph-schema-2-bounded-compatibility.md) narrowly supersedes this decision's schema-1 per-blob ceiling and protected-extension vocabulary for current releases; this record remains the immutable schema-1 rationale
+- Prospective capacity revision: [DEC-0036](DEC-0036-prospective-instruction-graph-capacity.md) raises only the `v0.17.0` edge and aggregate parsed-byte ceilings; every earlier target profile remains immutable
 
 ## Context
 

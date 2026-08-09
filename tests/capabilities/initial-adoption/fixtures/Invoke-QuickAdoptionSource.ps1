@@ -225,6 +225,9 @@ try {
                     ImportedTag = [string]$policy.Tag
                     GraphSchema = [int]$policy.GraphSchema
                     MaximumBlobBytes = [int]$policy.Limits.MaximumBlobBytes
+                    MaximumEdges = [int]$policy.Limits.MaximumEdges
+                    MaximumAggregateBlobBytes =
+                        [int]$policy.Limits.MaximumAggregateBlobBytes
                     AssetCalls =
                         [int]$script:QuickAdoptionInitialPolicyAssetCalls
                     ModuleCount = @($policy.Modules).Count

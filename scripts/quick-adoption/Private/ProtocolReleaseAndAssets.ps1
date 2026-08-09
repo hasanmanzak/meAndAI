@@ -542,30 +542,42 @@ function Import-CanonicalInitialAdoptionPolicy {
                 MinimumTag = 'v0.12.6'; MaximumTag = 'v0.14.2'
                 Schema = 1; MaximumBlobBytes = 262144
                 MaximumNodes = 256; MaximumEdges = 2048
+                MaximumAggregateBlobBytes = 4194304
                 MaximumPathUtf8Bytes = 16384
             },
             [pscustomobject]@{
                 MinimumTag = 'v0.14.3'; MaximumTag = 'v0.14.5'
                 Schema = 1; MaximumBlobBytes = 262144
                 MaximumNodes = 256; MaximumEdges = 4096
+                MaximumAggregateBlobBytes = 4194304
                 MaximumPathUtf8Bytes = 16384
             },
             [pscustomobject]@{
                 MinimumTag = 'v0.15.0'; MaximumTag = 'v0.15.1'
                 Schema = 1; MaximumBlobBytes = 262144
                 MaximumNodes = 512; MaximumEdges = 4096
+                MaximumAggregateBlobBytes = 4194304
                 MaximumPathUtf8Bytes = 16384
             },
             [pscustomobject]@{
                 MinimumTag = 'v0.15.2'; MaximumTag = 'v0.15.4'
                 Schema = 1; MaximumBlobBytes = 262144
                 MaximumNodes = 512; MaximumEdges = 4096
+                MaximumAggregateBlobBytes = 4194304
                 MaximumPathUtf8Bytes = 32768
             },
             [pscustomobject]@{
                 MinimumTag = 'v0.15.5'; MaximumTag = 'v0.16.0'
                 Schema = 2; MaximumBlobBytes = 524288
                 MaximumNodes = 512; MaximumEdges = 4096
+                MaximumAggregateBlobBytes = 4194304
+                MaximumPathUtf8Bytes = 32768
+            },
+            [pscustomobject]@{
+                MinimumTag = 'v0.17.0'; MaximumTag = 'v0.17.0'
+                Schema = 2; MaximumBlobBytes = 524288
+                MaximumNodes = 512; MaximumEdges = 8192
+                MaximumAggregateBlobBytes = 8388608
                 MaximumPathUtf8Bytes = 32768
             }
         )
@@ -615,7 +627,8 @@ function Import-CanonicalInitialAdoptionPolicy {
             MaximumNodes = [int]$graphProfile.MaximumNodes
             MaximumEdges = [int]$graphProfile.MaximumEdges
             MaximumDepth = 32
-            MaximumAggregateBlobBytes = 4194304
+            MaximumAggregateBlobBytes =
+                [int]$graphProfile.MaximumAggregateBlobBytes
             MaximumPathUtf8Bytes =
                 [int]$graphProfile.MaximumPathUtf8Bytes
         }

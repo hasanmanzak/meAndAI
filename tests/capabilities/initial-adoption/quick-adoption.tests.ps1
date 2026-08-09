@@ -1502,6 +1502,8 @@ function Initialize-QuickAdoptionImmutableFixture {
         -Repository $protocolRepository -Snapshots $assetSnapshots
 
     Copy-CanonicalProtocolFixture -Destination $protocolRepository -Tag 'v0.16.0'
+    Copy-ImmutableProtocolPolicyFixture -Destination $protocolRepository `
+        -Commit '2329f944694d24523f85b3a60352743918f0e5cd'
     Invoke-TestGit -Repository $protocolRepository -Arguments @(
         'add', '--', '.'
     ) | Out-Null
@@ -1520,7 +1522,7 @@ function Initialize-QuickAdoptionImmutableFixture {
     Invoke-TestGit -Repository $protocolRepository -Arguments @(
         'switch', '--detach'
     ) | Out-Null
-    foreach ($futureTag in @('v0.16.1', 'v1.0.0')) {
+    foreach ($futureTag in @('v0.16.1', 'v0.17.0', 'v1.0.0')) {
         if ($releaseCommits.ContainsKey($futureTag)) {
             throw "Future mock release tag '$futureTag' duplicates an existing fixture release."
         }
@@ -3895,6 +3897,18 @@ try {
             "v0.16.0`ntemplates/project/.github/scripts/MeAndAI.CapabilitiesBootstrap.psm1"
         $runtimePolicySnapshot =
             $global:QuickAdoptionProtocolAssetBytes[$runtimePolicyKey]
+        $runtimeWorkflowKey =
+            "v0.16.0`ntemplates/project/.github/workflows/meandai-protocol-update.yml"
+        $runtimeWorkflowSnapshot =
+            $global:QuickAdoptionProtocolAssetBytes[$runtimeWorkflowKey]
+        $prospectiveWorkflowKey =
+            "v0.17.0`ntemplates/project/.github/workflows/meandai-protocol-update.yml"
+        $prospectiveWorkflowSnapshot =
+            $global:QuickAdoptionProtocolAssetBytes[$prospectiveWorkflowKey]
+        $prospectivePolicyKey =
+            "v0.17.0`ntemplates/project/.github/scripts/MeAndAI.CapabilitiesBootstrap.psm1"
+        $prospectivePolicySnapshot =
+            $global:QuickAdoptionProtocolAssetBytes[$prospectivePolicyKey]
         try {
             $schema1PolicyContract = & $launcherPath `
                 -SupportAction 'InitialPolicyContract' `
@@ -3918,6 +3932,90 @@ try {
                 'TEST-0153 graph-aware immutable v0.15.4 policy import ' +
                 'failed: ' + $_.Exception.Message
             )
+        }
+        foreach ($capacityCase in @(
+            [pscustomobject][ordered]@{
+                Name = 'immutable v0.16.0'
+                Tag = 'v0.16.0'
+                Workflow = $runtimeWorkflowSnapshot
+                Policy = $runtimePolicySnapshot
+                Edges = 4096
+                AggregateBytes = 4194304
+            },
+            [pscustomobject][ordered]@{
+                Name = 'prospective v0.17.0'
+                Tag = 'v0.17.0'
+                Workflow = $prospectiveWorkflowSnapshot
+                Policy = $prospectivePolicySnapshot
+                Edges = 8192
+                AggregateBytes = 8388608
+            }
+        )) {
+            try {
+                $capacityContract = & $launcherPath `
+                    -SupportAction 'InitialPolicyContract' `
+                    -SupportInput @([pscustomobject][ordered]@{
+                        WorkflowBytes =
+                            [byte[]]$capacityCase.Workflow.Bytes
+                        PolicyBytes = [byte[]]$capacityCase.Policy.Bytes
+                        PolicySha = [string]$capacityCase.Policy.Sha
+                        TargetTag = [string]$capacityCase.Tag
+                        RuntimePolicyTag = 'v0.16.0'
+                    })
+                if ([string]$capacityContract.SelectedTag -cne
+                        [string]$capacityCase.Tag -or
+                    [string]$capacityContract.ImportedTag -cne
+                        [string]$capacityCase.Tag -or
+                    [int]$capacityContract.GraphSchema -ne 2 -or
+                    [int]$capacityContract.MaximumBlobBytes -ne 524288 -or
+                    [int]$capacityContract.MaximumEdges -ne
+                        [int]$capacityCase.Edges -or
+                    [int]$capacityContract.MaximumAggregateBlobBytes -ne
+                        [int]$capacityCase.AggregateBytes -or
+                    [int]$capacityContract.AssetCalls -ne 1) {
+                    Add-Failure (
+                        'TEST-0223 ' + [string]$capacityCase.Name +
+                        ' did not retain its exact graph capacity profile.'
+                    )
+                }
+            }
+            catch {
+                Add-Failure (
+                    'TEST-0223 ' + [string]$capacityCase.Name +
+                    ' policy import failed: ' + $_.Exception.Message
+                )
+            }
+        }
+        foreach ($unsupportedCapacityTag in @('v0.16.1', 'v1.0.0')) {
+            $unsupportedWorkflow =
+                $global:QuickAdoptionProtocolAssetBytes[
+                    "$unsupportedCapacityTag`ntemplates/project/.github/workflows/meandai-protocol-update.yml"
+                ]
+            $unsupportedPolicy =
+                $global:QuickAdoptionProtocolAssetBytes[
+                    "$unsupportedCapacityTag`ntemplates/project/.github/scripts/MeAndAI.CapabilitiesBootstrap.psm1"
+                ]
+            $unsupportedCapacityFailure = $null
+            try {
+                [void](& $launcherPath `
+                    -SupportAction 'InitialPolicyContract' `
+                    -SupportInput @([pscustomobject][ordered]@{
+                        WorkflowBytes = [byte[]]$unsupportedWorkflow.Bytes
+                        PolicyBytes = [byte[]]$unsupportedPolicy.Bytes
+                        PolicySha = [string]$unsupportedPolicy.Sha
+                        TargetTag = $unsupportedCapacityTag
+                        RuntimePolicyTag = 'v0.16.0'
+                    }))
+            }
+            catch { $unsupportedCapacityFailure = $_.Exception.Message }
+            if ($unsupportedCapacityFailure -notlike
+                    '*no reviewed instruction-graph profile*') {
+                Add-Failure (
+                    "TEST-0223 unsupported target '$unsupportedCapacityTag' " +
+                    'did not fail closed at exact profile selection: ' +
+                    [string]$unsupportedCapacityFailure
+                )
+            }
         }
         $dynamicPolicyModulesBefore = @(
             Get-Module | Where-Object {
