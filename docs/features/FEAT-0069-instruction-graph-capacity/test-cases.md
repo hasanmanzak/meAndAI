@@ -33,3 +33,8 @@
 - Exact-tree StructureOnly passed in `446.6s` with suite observation `444638ms`.
   Publication evidence passed `7/7` in `277.1s` and explicitly made no
   published-state claim.
+- The first hosted delivery exposed only the sibling
+  [TEST-0159](../FEAT-0039-v0130-test-runtime-efficiency/test-cases.md#test-0159)
+  operation oracle at expected `91` versus actual `93`: the two deliberate
+  profile checks account exactly for the delta. The bounded `93` oracle passed
+  its owner locally in `7.6s`; replacement hosted validation remains pending.

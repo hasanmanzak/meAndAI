@@ -1075,7 +1075,7 @@ $expectedQuickDynamicInvocations = [ordered]@{
     '$identityValidator|global:gh' = 1
     # TEST-0069/TEST-0176 retain bounded real-launcher ownership slices plus
     # pure historical classification, inventory, and snapshot adapters.
-    '$launcherPath|<script>' = 91
+    '$launcherPath|<script>' = 93
     '$historicalMutationCallCount|<script>' = 2
     '$launcherPath|New-MockCompletedAdoptionConsumer' = 1
     '$manifestValidationModule|<script>' = 1
