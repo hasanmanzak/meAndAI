@@ -1,8 +1,20 @@
 # Project Snapshot
 
-Last verified: **2026-08-08**
+Last verified: **2026-08-09**
 
 ## Verified facts
+
+- [FEAT-0069](../../docs/features/FEAT-0069-instruction-graph-capacity/README.md)
+  is the active bounded-capacity continuation. Exact baseline
+  [`854bc97056d9e3250ab4c6caa7558825904466e8`](https://github.com/hasanmanzak/meAndAI/commit/854bc97056d9e3250ab4c6caa7558825904466e8)
+  reached `4096/4096` edges and `4192113/4194304` parsed bytes after canonical
+  compaction. [DEC-0036](../../docs/decisions/DEC-0036-prospective-instruction-graph-capacity.md)
+  therefore freezes the prospective `v0.17.0` profile at `8192` edges and
+  `8388608` aggregate parsed bytes while preserving every earlier target.
+  [TEST-0223](../../docs/features/FEAT-0069-instruction-graph-capacity/test-cases.md#test-0223)
+  has immutable expected-red plus focused graph, quick-adoption profile,
+  StructureOnly, and publication-evidence greens; exact-head hosted delivery
+  remains pending.
 
 - Historical ContractSlice A strict-redraw and parser-record-slot chain: base
   [`25e26f908e1f123640c758e42e1db92d5eea6dde`](https://github.com/hasanmanzak/meAndAI/commit/25e26f908e1f123640c758e42e1db92d5eea6dde),

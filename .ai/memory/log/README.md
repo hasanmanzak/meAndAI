@@ -6,6 +6,11 @@ and follow its canonical links.
 ## Current continuation
 
 Follow the current
+[instruction-graph capacity handoff](2026-08-09-feat-0069-instruction-graph-capacity.md)
+for the prospective `v0.17.0` profile and immutable prior-target boundary.
+Local verification is green; exact-head hosted delivery remains pending.
+
+Follow the current
 [ContractSlice A V1/V2/V3 diagnostics and fully-green V4 convergence handoff](2026-08-08-feat-0065-subf-0143-contractslice-a-converge.md),
 the immutable
 [ContractSlice A resource-boundary handoff](2026-08-07-feat-0065-subf-0143-contractslice-a-resource-freeze.md),

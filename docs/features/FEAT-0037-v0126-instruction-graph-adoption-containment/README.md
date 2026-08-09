@@ -183,6 +183,9 @@ The latest immutable schema-1 policy, v0.15.4, declares the following inclusive
 limits. Reaching a limit is valid; exceeding one blocks before repository,
 secret, branch, issue, pull-request, or semantic-model mutation. Current
 schema-2 evolution is owned by [DEC-0031](../../decisions/DEC-0031-instruction-graph-schema-2-bounded-compatibility.md).
+The prospective `v0.17.0` capacity revision is owned by
+[DEC-0036](../../decisions/DEC-0036-prospective-instruction-graph-capacity.md);
+the table below remains the immutable latest schema-1 profile.
 
 | Dimension | Latest schema-1 inclusive limit |
 | --- | ---: |

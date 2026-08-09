@@ -39,7 +39,7 @@
         @{
             Evidence = 'ExecutableSuite'
             Owner = 'tests/capabilities/instruction-graph-discovery/instruction-graph-discovery.tests.ps1'
-            TestIds = @('TEST-0151', 'TEST-0152', 'TEST-0161')
+            TestIds = @('TEST-0151', 'TEST-0152', 'TEST-0161', 'TEST-0223')
         }
         @{
             Evidence = 'ExecutableSuite'

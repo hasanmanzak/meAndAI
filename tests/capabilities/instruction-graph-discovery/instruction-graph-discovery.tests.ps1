@@ -1222,7 +1222,7 @@ function New-TestActorBatchSessionFixture {
         [System.Collections.IDictionary]$TransportOptions = @{},
         [long[]]$ClockValues = @([long]0),
         [long]$MaximumBlobBytes = 524288,
-        [long]$MaximumAggregateBlobBytes = 4194304,
+        [long]$MaximumAggregateBlobBytes = 8388608,
         [int]$SessionTimeoutMilliseconds = 120000,
         [int]$AbortTimeoutMilliseconds = 5000,
         [int]$MaximumHeaderBytes = 128,
@@ -1268,7 +1268,7 @@ function Test-InstructionGraphBatchActorBehavior {
     $baseFactoryArguments = [ordered]@{
         Repository = 'C:/synthetic/instruction-graph.git'
         MaximumBlobBytes = [long]524288
-        MaximumAggregateBlobBytes = [long]4194304
+        MaximumAggregateBlobBytes = [long]8388608
         SessionTimeoutMilliseconds = [int]120000
         AbortTimeoutMilliseconds = [int]5000
         MaximumHeaderBytes = [int]128
@@ -1683,7 +1683,7 @@ function Test-InstructionGraphBatchActorBehavior {
 
     $productionAggregateParts =
         [Collections.Generic.List[object]]::new()
-    for ($aggregateIndex = 0; $aggregateIndex -lt 8;
+    for ($aggregateIndex = 0; $aggregateIndex -lt 16;
         $aggregateIndex++) {
         $productionAggregateParts.Add($productionBlobResponse)
     }
@@ -1691,12 +1691,12 @@ function Test-InstructionGraphBatchActorBehavior {
         -Arrays @($productionAggregateParts)
     $productionAggregateAtN = New-TestActorBatchSessionFixture `
         -Actor $Actor -HostedModule $HostedModule `
-        -MaximumAggregateBlobBytes 4194304 `
+        -MaximumAggregateBlobBytes 8388608 `
         -TransportOptions @{
             Output = $productionAggregateResponse
             OutputChunkSize = 65536
         }
-    for ($aggregateIndex = 0; $aggregateIndex -lt 8;
+    for ($aggregateIndex = 0; $aggregateIndex -lt 16;
         $aggregateIndex++) {
         [void](& $productionAggregateAtN.Session.ReadBlob (
             New-TestTreeEntry `
@@ -1705,7 +1705,7 @@ function Test-InstructionGraphBatchActorBehavior {
         ))
     }
     & $productionAggregateAtN.Session.Complete (New-TestBatchGraphCounts `
-        -ParsedBlobs 8 -ParsedBlobBytes 4194304)
+        -ParsedBlobs 16 -ParsedBlobBytes 8388608)
 
     [byte[]]$aggregateSentinelPayload = [byte[]]@(1)
     $aggregateSentinelOid = & $getGitBlobSha1Action `
@@ -1721,12 +1721,12 @@ function Test-InstructionGraphBatchActorBehavior {
         -Arrays @($productionAggregateNPlusOneParts)
     $productionAggregateAtNPlusOne = New-TestActorBatchSessionFixture `
         -Actor $Actor -HostedModule $HostedModule `
-        -MaximumAggregateBlobBytes 4194304 `
+        -MaximumAggregateBlobBytes 8388608 `
         -TransportOptions @{
             Output = $productionAggregateResponse
             OutputChunkSize = 65536
         }
-    for ($aggregateIndex = 0; $aggregateIndex -lt 8;
+    for ($aggregateIndex = 0; $aggregateIndex -lt 16;
         $aggregateIndex++) {
         [void](& $productionAggregateAtNPlusOne.Session.ReadBlob (
             New-TestTreeEntry `
@@ -1743,7 +1743,7 @@ function Test-InstructionGraphBatchActorBehavior {
                 -Sha $aggregateSentinelOid
         )
     }.GetNewClosure() -Pattern 'Instruction-graph batch response size exceeds its budget.' `
-        -Message "$label exact 4194304-byte aggregate ceiling was not enforced."
+        -Message "$label exact 8388608-byte aggregate ceiling was not enforced."
     Assert-True -Condition (
         [int]$productionAggregateAtNPlusOne.Transport.State.OutputOffset -eq
             ([int]$productionAggregateAtNPlusOne.Transport.State.Output.Length - 1)
@@ -2370,14 +2370,14 @@ docs/SHOULD_NOT_BE_DISCOVERED.md
         Assert-True -Condition ([string]$graph.digest -ceq [string]$shuffled.digest) `
             -Message 'TEST-0151 shuffled exact-tree input changed the graph digest.'
         Assert-True -Condition ([string]$graph.digest -ceq `
-            '55928fe4ea8b26b3267424ee7d02754edaa82f7efaf33b6ec3719acddad3d69d') `
+            'cf7175dc852404020da91236ce1acaf9827a18c8cc4a7e7ff766ea7edf305845') `
             -Message "TEST-0151 fixed graph digest differs across supported hosts: $([string]$graph.digest)."
         $compactGraphJson = $graph | ConvertTo-Json -Depth 20 -Compress
         $compactGraphJsonSha = & $getSha256Action -Bytes (
             [Text.UTF8Encoding]::new($false).GetBytes($compactGraphJson)
         )
         Assert-True -Condition ($compactGraphJsonSha -ceq `
-            'a09ca107493966b81393a79b0f47ff2ddd52f7f0bdea6e3c693105e4e160c5f0') `
+            '4a3f0faa29c18e01fee674f09bc5da20256899fda9daf222362c1a1756e4d0e8') `
             -Message "TEST-0151 fixed compact graph serialization differs across supported hosts: $compactGraphJsonSha."
         Assert-True -Condition (
             ($graph | ConvertTo-Json -Depth 20 -Compress) -ceq
@@ -4821,7 +4821,7 @@ Required reading: [live](docs/INVALID-INFO-LIVE.md).
             $realBatchArguments = [ordered]@{
                 Repository = $realGitRoot
                 MaximumBlobBytes = [long]524288
-                MaximumAggregateBlobBytes = [long]4194304
+                MaximumAggregateBlobBytes = [long]8388608
                 SessionTimeoutMilliseconds = [int]120000
                 AbortTimeoutMilliseconds = [int]5000
                 MaximumHeaderBytes = [int]128
@@ -5034,12 +5034,30 @@ Required reading: [live](docs/INVALID-INFO-LIVE.md).
             [int]$limits.MaximumTreeEntries -eq 65536 -and
             [int]$limits.MaximumTreePathUtf8Bytes -eq 4194304 -and
             [int]$limits.MaximumNodes -eq 512 -and
-            [int]$limits.MaximumEdges -eq 4096 -and
+            [int]$limits.MaximumEdges -eq 8192 -and
             [int]$limits.MaximumDepth -eq 32 -and
             [int]$limits.MaximumBlobBytes -eq 524288 -and
-            [int]$limits.MaximumAggregateBlobBytes -eq 4194304 -and
+            [int]$limits.MaximumAggregateBlobBytes -eq 8388608 -and
             [int]$limits.MaximumPathUtf8Bytes -eq 32768
-        ) -Message 'TEST-0152 release-owned graph schema or limits differ from DEC-0031.'
+        ) -Message 'TEST-0223 prospective release-owned graph capacity differs from DEC-0036.'
+
+        $edgeLimitDigestGraph = Copy-TestInstructionGraph -Graph $graph
+        $edgeLimitDigestGraph.limits.maximumEdges =
+            [int]$limits.MaximumEdges - 1
+        Set-TestInstructionGraphDigest -Graph $edgeLimitDigestGraph `
+            -PolicyModule $policyModule
+        $aggregateLimitDigestGraph = Copy-TestInstructionGraph -Graph $graph
+        $aggregateLimitDigestGraph.limits.maximumAggregateBlobBytes =
+            [int]$limits.MaximumAggregateBlobBytes - 1
+        Set-TestInstructionGraphDigest -Graph $aggregateLimitDigestGraph `
+            -PolicyModule $policyModule
+        Assert-True -Condition (
+            [string]$edgeLimitDigestGraph.digest -cne [string]$graph.digest -and
+            [string]$aggregateLimitDigestGraph.digest -cne
+                [string]$graph.digest -and
+            [string]$edgeLimitDigestGraph.digest -cne
+                [string]$aggregateLimitDigestGraph.digest
+        ) -Message 'TEST-0223 revised edge or aggregate capacity did not remain an exact canonical digest input.'
 
         [byte[]]$realisticGovernanceRootBytes =
             [Text.Encoding]::UTF8.GetBytes(
@@ -5254,7 +5272,7 @@ Required reading: [live](docs/INVALID-INFO-LIVE.md).
             -TreeEntries $edgeFixture.Entries -ReadBlob $edgeFixture.Reader
         Assert-True -Condition (@($edgeBoundaryGraph.edges).Count -eq
             [int]$limits.MaximumEdges) `
-            -Message 'TEST-0152 exact edge boundary did not pass.'
+            -Message 'TEST-0223 exact 8192-edge boundary did not pass.'
         $edgeLines.Add('Reference [overflow](https://example.com/overflow).')
         $edgeOverflowFixture = New-TestGraphFixture -Files ([ordered]@{
             'AGENTS.md' = @($edgeLines) -join "`n"
@@ -5264,7 +5282,7 @@ Required reading: [live](docs/INVALID-INFO-LIVE.md).
                 -TreeEntries $edgeOverflowFixture.Entries `
                 -ReadBlob $edgeOverflowFixture.Reader
         } -Pattern '*edge budget*' `
-            -Message 'TEST-0152 edge N+1 did not fail closed.'
+            -Message 'TEST-0223 edge 8193 did not fail closed.'
 
         $depthFixture = New-TestDepthFixture `
             -Depth ([int]$limits.MaximumDepth)
@@ -5399,7 +5417,7 @@ Required reading: [live](docs/INVALID-INFO-LIVE.md).
             -ReadBlob $aggregateFixture.Reader
         Assert-True -Condition (@($aggregateBoundaryGraph.nodes).Count -eq
             $aggregateBlobCount) `
-            -Message 'TEST-0152 exact aggregate-blob boundary did not pass.'
+            -Message 'TEST-0223 exact 8388608-byte aggregate boundary did not pass.'
         $aggregateOverflowFiles = [ordered]@{}
         foreach ($path in $aggregateFiles.Keys) {
             $aggregateOverflowFiles[$path] = $aggregateFiles[$path]
@@ -5412,7 +5430,7 @@ Required reading: [live](docs/INVALID-INFO-LIVE.md).
                 -TreeEntries $aggregateOverflowFixture.Entries `
                 -ReadBlob $aggregateOverflowFixture.Reader
         } -Pattern '*aggregate parsed-blob budget*' `
-            -Message 'TEST-0152 aggregate-blob N+1 did not fail closed.'
+            -Message 'TEST-0223 aggregate byte 8388609 did not fail closed.'
 
         $firstPath = 'docs/features/a.md'
         $longPathPrefix = 'docs/features/'
@@ -5528,6 +5546,15 @@ if (@($instructionGraphScenarioFailures | Where-Object {
     }).Count -eq 0) {
     Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
         -TestId 'TEST-0152'
+}
+if (@($instructionGraphScenarioFailures | Where-Object {
+        [regex]::IsMatch(
+            [string]$_,
+            '(?<![A-Za-z0-9-])TEST-0223(?![0-9])'
+        )
+    }).Count -eq 0) {
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+        -TestId 'TEST-0223'
 }
 
 if ($failures.Count -gt 0) {

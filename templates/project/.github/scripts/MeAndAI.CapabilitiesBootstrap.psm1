@@ -74,10 +74,10 @@ $script:MeAndAIInstructionGraphSchema = 2
 $script:MeAndAIInstructionGraphMaximumTreeEntries = 65536
 $script:MeAndAIInstructionGraphMaximumTreePathUtf8Bytes = 4194304
 $script:MeAndAIInstructionGraphMaximumNodes = 512
-$script:MeAndAIInstructionGraphMaximumEdges = 4096
+$script:MeAndAIInstructionGraphMaximumEdges = 8192
 $script:MeAndAIInstructionGraphMaximumDepth = 32
 $script:MeAndAIInstructionGraphMaximumBlobBytes = 524288
-$script:MeAndAIInstructionGraphMaximumAggregateBlobBytes = 4194304
+$script:MeAndAIInstructionGraphMaximumAggregateBlobBytes = 8388608
 $script:MeAndAIInstructionGraphMaximumPathUtf8Bytes = 32768
 $script:MeAndAIInstructionGraphRepeatedHashPathPattern =
     '^(?<path>(?:\./|\.\./)?(?:[^/?#]+/)*[^/?#]*#{2,}' +

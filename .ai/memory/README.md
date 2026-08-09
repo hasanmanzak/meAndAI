@@ -1,9 +1,17 @@
 # Project-local AI Memory
 
 Scope: **this `meAndAI` repository only**<br>
-Last reviewed: **2026-08-08**<br>
+Last reviewed: **2026-08-09**<br>
 Protocol version: **0.16.0**<br>
 Latest immutable release before this unmerged development: **0.16.0**
+
+The current bounded-capacity continuation is
+[FEAT-0069](../../docs/features/FEAT-0069-instruction-graph-capacity/README.md):
+the prospective `v0.17.0` schema-2 profile selects `8192` edges and `8388608`
+aggregate parsed bytes while every target through `v0.16.0` remains immutable.
+Focused graph, quick-adoption profile, StructureOnly, and publication-evidence
+gates are green; exact-head hosted delivery remains pending in the
+[capacity handoff](log/2026-08-09-feat-0069-instruction-graph-capacity.md).
 
 The maintainer accepted
 [DEC-0035](../../docs/decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md)
