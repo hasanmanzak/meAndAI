@@ -6,7 +6,7 @@
 | Parent epic | [EPIC-0002 / issue #163](https://github.com/hasanmanzak/meAndAI/issues/163) |
 | Architecture task | [TASK-0003 / issue #164](https://github.com/hasanmanzak/meAndAI/issues/164) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
-| Current authority | ContractSlice A is merged/exact-main green. `B-SURFACE-01` is exact-head hosted green and `B-CODEC-ACTIVATION-01` is `ReviewedLocalGreen` at B `3/11` and A+B `35/43`, exact-head hosted pending; `B-WIRE-REPOSITORY-TREE-01`, C/D, activation, merge/release/publication remain held. |
+| Current authority | ContractSlice A is merged/exact-main green. `B-SURFACE-01` and `B-CODEC-ACTIVATION-01` are exact-head hosted green at B `3/11` and A+B `35/43`; `B-WIRE-REPOSITORY-TREE-01` is frozen/inactive pending its design-head hosted gate. C/D, activation, merge/release/publication remain held. |
 
 This plan allocates the accepted architecture to stable delivery records. It
 did not itself authorize implementation. The later
@@ -239,7 +239,7 @@ enumeration, pagination, freshness, and acquisition completeness belong to
 | Feature Gate 2 design review | Completed for [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152); accepted/merged/exact-main for [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153); accepted/merged/bounded exact-main for [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143) at [`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7); every later slice remains unsatisfied |
 | Exact accepted-head structural validation | Architecture and predecessor subfeatures are exact-main validated. ContractSlice A was completed through [merged PR #174](https://github.com/hasanmanzak/meAndAI/pull/174); its exact merge/run evidence is owned by the current B plan and canonical handoff. |
 | [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143) typed-handoff Gate 2 | Satisfied at exact-main predecessor [`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7); downstream activation remains gated. |
-| Separate maintainer implementation directive | Satisfied for bounded `B-SURFACE-01` and `B-CODEC-ACTIVATION-01`; both canonical reds are immutable and the codec packet is local green. A new directive must name `B-WIRE-REPOSITORY-TREE-01`; C/D, final Scenario/status/owner/workflow, runtime-efficiency activation, merge, release, and publication remain held. |
+| Separate maintainer implementation directive | Satisfied for the ordered B sequence; surface and codec activation are immutable hosted-green predecessors. Repository-tree execution still requires this packet's exact frozen-design head to pass hosted validation; C/D, final Scenario/status/owner/workflow, runtime-efficiency activation, merge, release, and publication remain held. |
 
 The issued [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153)
 directive names exactly one dependency-closed subfeature and its bounded

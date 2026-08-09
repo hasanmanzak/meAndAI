@@ -3,14 +3,14 @@
 | Field | Value |
 | --- | --- |
 | Classification | Gate 2 micro-delivery plan and design freeze |
-| State | `B-SURFACE-01` exact-head hosted green; `B-CODEC-ACTIVATION-01` `ReviewedLocalGreen`, exact-head hosted pending; B `3/11`, cumulative A+B `35/43`; later packets inactive |
+| State | `B-SURFACE-01` and `B-CODEC-ACTIVATION-01` exact-head hosted green; `B-WIRE-REPOSITORY-TREE-01` `FrozenDesign`/inactive pending its exact design-head hosted gate; B `3/11`, cumulative A+B `35/43`; later packets inactive |
 | Parent | Owning feature and current subfeature |
 | Scenario | [TEST-0210](test-cases.md#test-0210), still `Planned` |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
-| Design-only authority | [Maintainer directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5230762350) |
+| Ordered-B authority | [Maintainer directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5230762350) |
 | Accepted predecessor | Accepted A merge commit [`51623f4d404a95e0f706d72805cf7ddbbbd293b8`](https://github.com/hasanmanzak/meAndAI/commit/51623f4d404a95e0f706d72805cf7ddbbbd293b8); exact-main [run 31304787603](https://github.com/hasanmanzak/meAndAI/actions/runs/31304787603) passed Ubuntu `6m11s`, Windows `11m21s`, publication verification skipped |
 | Normative owner | [Typed evaluation kernel design](subf-0143-typed-evaluation-kernel-design.md) |
-| Implementation language | C# only; the active structural packet changes only its frozen carrier/test surface |
+| Implementation language | C# only; the frozen repository-tree packet changes only its two test-owned files |
 
 ## Authority and non-goals
 
@@ -104,19 +104,44 @@ semantic packages own one Fact and one immutable BehaviorRed ordinal each.
 | `B-CODEC-DERIVATION-01` | Codec-derived reference frame, manifest component/artifact/model identity, same-or-narrower location, structural comparator, collision and foreign-session rejection; no parser/index derivation | `TEST-0210-B-BEHAVIOR-RED-0009`; `ContractSliceBQualifiedReferenceTests.Seals_exact_codec_derived_reference_and_location_narrowing` | Focused `1/1`; B `11/11`; A+B `43/43` |
 | `B-CONVERGE-01` | Pure cumulative audit of exact source/test/export/friend/trait/lock/project state; P/R/G `NotApplicable` | None; every canonical red remains immutable and is never rerun | B `11/11`; A+B/full Conformance `43/43`; Domain `98/98`; Release build/format/locks/diff/StructureOnly/publication evidence/reviews green |
 
-### Active `B-CODEC-ACTIVATION-01` staging boundary
+### Frozen `B-WIRE-REPOSITORY-TREE-01` staging boundary
 
-This packet introduces the final registration/model-token object graph but only
-the activation-stage identity of `ICanonicalPayloadCodec<TModel>`. That internal
-constrained interface is memberless until successor packets introduce the
-already frozen final writer/qualifier inputs, intents, and resource meter. The
-one retained codec object is nevertheless the sole owner of both directions;
-no alternate writer, qualifier, adapter, public registration, reflection, or
-service lookup is permitted. The retained A PublicApi Fact removes only its
-obsolete `ICodecRegistration`-absence assertion; its FQN, trait, 48-type/member
-snapshot, and containment authority remain unchanged. The exact executable/
-evidence allowlist and one-shot red custody are owned by the current codec-
-activation memory handoff.
+The hosted-green activation packet retains the constrained memberless
+`ICanonicalPayloadCodec<TModel>` identity and the object-identical Tests-owned
+repository-tree mirror. The frozen wire packet extends that same codec/model
+identity as a partial Tests-owned writer/qualifier mirror core; it adds no
+production codec, alternate interface, adapter, static encoder, registration,
+resource meter, cache, or admission behavior. The final generic interface
+members remain held until all three wire cores and their dependency-owned
+resource carriers exist. The typed design owns the exact golden/empty bytes,
+callable staging declarations, error precedence, wire-local ceilings,
+two-test-file allowlist, and `700`-line redraw threshold. The current
+codec/wire memory handoff retains routing and immutable evidence only; it adds
+no executable authority. The one-shot red custody defined below remains held.
+
+The exact design cohort is the following twelve existing Markdown paths; no
+new tracked node may be added:
+
+```text
+.ai/memory/README.md
+.ai/memory/log/2026-08-09-feat-0065-subf-0143-contractslice-b-codec-activation-freeze.md
+.ai/memory/log/README.md
+.ai/memory/project.md
+docs/architecture/protocol-governance-and-execution/README.md
+docs/architecture/protocol-governance-and-execution/successor-delivery-plan.md
+docs/architecture/protocol-governance-and-execution/transition-register.md
+docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md
+docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-contractslice-b-micro-delivery-plan.md
+docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-typed-evaluation-kernel-design.md
+docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md
+docs/features/README.md
+```
+
+This cohort must remain edge-neutral: the existing codec/wire handoff remains
+the sole detailed ledger, stays at exactly four Markdown links, and replaces
+rather than accumulates predecessor commit/run relations. The schema-2 graph
+ceilings remain `8,192` relations and `8,388,608` parsed bytes; an exact-tree
+projection and fresh wire-specific reviews are mandatory before commit.
 
 ## SurfaceRed and BehaviorRed contract
 
@@ -146,6 +171,84 @@ Every BehaviorRed uses one fresh external result directory, one exact FQN plus
 result, exact 16-counter closure, the exact marker-only failed message, the
 locked optional assertion stack/summary echo/RunInfo allowances, and no other
 diagnostic or attachment. A canonical red is invoked once and never rerun.
+
+### Repository-tree canonical-red runner custody
+
+The `0002` runner is one fresh external regular, non-reparse, CreateNew file at
+`D:\Temp\meandai-test-0210-b-wire-r0002-runner-<32-lowercase-hex-guid>.ps1`.
+Its canonical LF-plus-terminal-LF byte length, SHA-256, and zero-error
+PowerShell AST are frozen before use. Its sibling report and stdout/stderr logs
+are separate regular, non-reparse, CreateNew files. Each complete accepted log
+is UTF-8, untruncated, at most `8,388,608` bytes, with exact length/SHA custody;
+the append-only UTF-8-LF report journal is at most `1,048,576` bytes. A first
+byte over either ceiling kills any live child tree, records explicit overflow
+when the journal remains writable, and is always `OracleRejected`, never
+accepted or silently truncated. Those siblings plus the different fresh
+`D:\Temp\meandai-test-0210-b-<32-lowercase-hex-guid>` result root must all be
+absent initially. The runner has disjoint `ValidateOnly` and `Execute` modes.
+`ValidateOnly` is read-only and creates no script, report, log, root, build, or
+test artifact; `Execute` repeats every predicate before committing authority.
+
+At runner start, immediately before build, immediately before test, and after
+test immediately before acceptance, the runner rebinds the exact repo root,
+branch, future hosted-green design HEAD equal to upstream, no staged delta, and
+the complete porcelain allowlist containing only the retained activation-test
+modification, the new repository-tree test, and the excluded user-owned NCrunch
+file. At those same four gates it binds exact length/SHA of both sources and the
+runner; one direct Fact/FQN, sole
+`ContractSlice=B`, no Scenario/Theory/class trait, one marker literal, the
+null-only direct `Assert.Fail` branch, the partial-only retained identity edit,
+and normalized two-test-file delta `<=700` are mandatory. The following six
+regular lock files remain exact throughout, in Domain, Abstractions,
+Conformance, Policy, Domain.Tests, Conformance.Tests order:
+
+```text
+03EEADC5EF377C17F787AB65F41FB4C8A9C936BB7F7F4171111FDEEC8A81CB46
+D79FF11818ABFE0B6CA9CAEC111778169AA36A04709BCA3E0EC0AB84325BF799
+20E6BA80BFB6EDE58228D28560A03B6143F3D163AC5E06720491458FEA9570E7
+C57F6AFAEBA953E49D3B6D2CB85E82C00E6A40631507426B1616E57B94724309
+D2065F11ED7030EE7DFA7A757FBA2A0D420DAC2F32D0105DFA93D3F78F9B00BC
+BA8D8C653CF0CFD2398F9E43F7AB87ED268A9B77EC5FC2E0F81D2BD7849016C0
+```
+
+`Execute` sets process-local `DOTNET_CLI_UI_LANGUAGE=en` and performs exactly
+`dotnet build tests/dotnet/MeAndAI.Protocol.Conformance.Tests/MeAndAI.Protocol.Conformance.Tests.csproj --configuration Release --no-restore --no-incremental --nologo --verbosity minimal -warnaserror`.
+It requires exit `0`, zero warnings/errors, then records and seals the freshly
+written test DLL/PDB length/SHA/timestamps and uses those exact bytes through
+the following packet-specific command, which specializes and supersedes the
+generic red template only for this runner:
+
+```text
+dotnet test tests/dotnet/MeAndAI.Protocol.Conformance.Tests/MeAndAI.Protocol.Conformance.Tests.csproj --configuration Release --no-restore --no-build --nologo --verbosity minimal --results-directory "<fresh-root>" --logger "trx;LogFileName=TEST-0210-B-BEHAVIOR-RED-0002.trx" --filter "ContractSlice=B&FullyQualifiedName=MeAndAI.Protocol.Conformance.Tests.ContractSliceBRepositoryTreeCodecTests.Round_trips_exact_repository_tree_wire"
+```
+
+It creates the still-absent result root once and proves it empty. Immediately before direct child creation it atomically
+records `InvocationCommitted`; the parent runner environment must have
+`VSTEST_CONNECTION_TIMEOUT` absent before and after the process-scoped child
+value `300`. An exact `420000`-ms monotonic outer bound, one child, one logger,
+and no discovery/wrapper/retry apply. Timeout kills the whole child tree once.
+The only accepted native child exit is integer `1`; the runner exits `0` only
+after the complete frozen TRX/root/source/binary oracle.
+
+`InvocationCommitted` irrevocably consumes `R=0002`. A process-create failure,
+timeout, runner interruption/crash, unexpected exit, missing/malformed/extra
+TRX, or any oracle rejection after that state is immutable `NoSuccess` and is
+never retryable with a changed or unchanged runner, timeout, path, or wrapper.
+Only `PreflightFailed` or `BuildFailed` before `InvocationCommitted` may be
+corrected and revalidated after renewed review without consuming the invocation.
+
+The TRX reader is fail-closed: DTD processing is prohibited, external entity
+resolution is disabled with a null resolver, and malformed or nonconforming XML
+is `OracleRejected` without any alternate parser or recovery path.
+
+The atomic report schema is
+`protocol.canonical-behavior-red-runner-report/1` and records runner/source/Git/
+status/line-budget/locks/build/DLL/PDB/root/process/environment/timeout/exit/TRX
+custody with start/end UTC and elapsed milliseconds. Terminal states are
+`ValidateOnly`, `PreflightFailed`, `BuildFailed`, `InvocationCommitted`,
+`TimedOut`, `OracleRejected`, or `CanonicalRedAccepted`. A final accepted
+report prints its own path/SHA, TRX path/SHA, native exit `1`, and runner exit
+`0`, mutates no repository record, and grants no green authority.
 
 ## Packet-local activation gate
 
@@ -203,10 +306,10 @@ project, package, lock, workflow, release, or consumer file. The user-owned
 
 ## Exit condition
 
-This plan is the accepted `FrozenDesign` predecessor. The later maintainer
-directive closed `B-SURFACE-01` and `B-CODEC-ACTIVATION-01`; their canonical
-reds are immutable and the codec packet is local green. That outcome authorizes
-no next B test or C# implementation by itself. A separate directive must name
-`B-WIRE-REPOSITORY-TREE-01`. C/D, final
+This plan is the accepted `FrozenDesign` predecessor. The surface and codec
+activation packets are immutable exact-head hosted-green history. The ordered-B
+maintainer directive names `B-WIRE-REPOSITORY-TREE-01`, but canonical red and
+C# mutation remain held until this packet-specific frozen design is reviewed,
+committed, pushed, and exact-head hosted green. C/D, final
 activation, feature DoD, release, publication, consumer mutation, authority
 transfer, and PowerShell retirement remain held.

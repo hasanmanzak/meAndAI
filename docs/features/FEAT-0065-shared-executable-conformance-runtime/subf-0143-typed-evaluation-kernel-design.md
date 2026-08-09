@@ -3,14 +3,14 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted; ContractSlice A merged/exact-main green. `B-SURFACE-01` is exact-head hosted green; `B-CODEC-ACTIVATION-01` is `ReviewedLocalGreen`, exact-head hosted pending; B `3/11`, cumulative A+B `35/43`; [TEST-0210](test-cases.md#test-0210) remains `Planned`; later B packets, C/D, final activation, and DoD remain held. |
+| Status | Gate 2 accepted; ContractSlice A merged/exact-main green. `B-SURFACE-01` and `B-CODEC-ACTIVATION-01` are exact-head hosted green; `B-WIRE-REPOSITORY-TREE-01` is `FrozenDesign`/inactive pending its exact design-head hosted gate; B `3/11`, cumulative A+B `35/43`; [TEST-0210](test-cases.md#test-0210) remains `Planned`; later B packets, C/D, final activation, and DoD remain held. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Test | [TEST-0210](test-cases.md#test-0210) |
 | Gate 3 micro-delivery routing | Historical A delivery remains owned by the [A micro-delivery control plan](subf-0143-micro-delivery-plan.md). Current B design routing is the [ContractSlice B micro-delivery plan](subf-0143-contractslice-b-micro-delivery-plan.md); packet labels refine delivery but activate no executable work. |
 | Exact-main design baseline | Accepted A merge commit [`51623f4d404a95e0f706d72805cf7ddbbbd293b8`](https://github.com/hasanmanzak/meAndAI/commit/51623f4d404a95e0f706d72805cf7ddbbbd293b8), validated by exact-main [run 31304787603](https://github.com/hasanmanzak/meAndAI/actions/runs/31304787603) |
-| Design and Gate 3 authority | Historical A directives and clarifications remain immutable evidence. The accepted B design plus current packet authority has been exercised through `B-CODEC-ACTIVATION-01` local green and permits only its synchronized commit/push, draft-PR update, and hosted correction. `B-WIRE-REPOSITORY-TREE-01`, later B packets, C/D, final activation, merge, release, and publication remain outside that authority. |
+| Design and Gate 3 authority | Historical A directives and clarifications remain immutable evidence. Surface and codec activation are immutable hosted-green predecessors. The maintainer directive names the ordered B sequence, but repository-tree executable work remains gated by this packet-specific design review, commit/push, and exact-head hosted green. Later B packets remain predecessor-gated; C/D, final activation, merge, release, and publication remain outside that authority. |
 | Completed predecessor | [SUBF-0153](README.md#subf-0153) / [TEST-0221](test-cases.md#test-0221), merged through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173) and exact-main validated by [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) |
 
 ## Directive and hard boundary
@@ -26,73 +26,19 @@ release binding, provider-neutral typed model, admission, cache, applicability,
 evaluator, finding, evaluation, and aggregation handoff required by the
 accepted [SUBF-0153](README.md#subf-0153) design.
 
-The current
+The historical
 [ContractSlice B design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5230762350)
 authorized only the linked B micro-delivery plan and normative B freeze. That
 predecessor authority activated no executable work. After its accepted
-exact-main delivery, the later maintainer packet authority named only
-`B-SURFACE-01`; its immutable SurfaceRed and bounded structural C# green are
-now complete locally. BehaviorRed and every later B packet remain inactive.
+exact-main delivery, later packet authority closed the surface and codec
+activation predecessors. The current ordered-B maintainer directive names the
+remaining B sequence without bypassing any packet's dependency, design,
+expected-red, review, or hosted gate.
 
-The append-only
-[BehaviorRed evidence clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139945054)
-changes only the standard-TRX evidence oracle: the failed-result message is the
-exact proof node, one run-summary adapter echo is tolerated, and assertion type
-comes from reviewed source plus the immutable xUnit lock. It changes no test,
-marker, product topology, or implementation authority. Every observation made
-before its applicable clarification remains diagnostic. The fresh post-
-synchronization same-FQN run recorded below is the canonical first A
-BehaviorRed.
-
-The later append-only
-[RunInfo clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5140224849)
-likewise changes evidence wording only. It distinguishes at most one locked-
-adapter, marker-free same-FQN `[FAIL]` bookkeeping node from an independent or
-contradictory diagnostic. The run observed before that distinction remains
-diagnostic and cannot be promoted retroactively.
-
-The 2026-08-01 append-only
-[FIND-0443](README.md#find-0443) [assertion-stack clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5150679793)
-also changes evidence wording only. It aligns the packet-level oracle with this
-design's accepted same-result, marker-free standard assertion `StackTrace` and
-requires a fresh post-synchronization 0003 invocation. The exposing run and the
-later `9a39...` run remain diagnostic: the latter satisfied the technical TRX
-shape but preceded complete repository index synchronization. A renewed full-
-record/source review and another fresh same-marker/FQN/ordinal invocation were
-required before bounded green authority.
-
-The third 0003 observation at
-`D:\Temp\meandai-test-0210-a-c96f8fa926734506b50d17637e4e2dbe\TEST-0210-A-BEHAVIOR-RED-0003.trx`,
-SHA-256 `F4190734BC91DB6879DCCC92633BBCB6DF4B9400A8CD4D47A7C6DF9030358C3A`,
-used a previously nonexistent directory that was empty immediately before its
-single invocation. With `VSTEST_CONNECTION_TIMEOUT` unset, the default
-90-second testhost connection timeout aborted before discovery. The TRX has no
-`UnitTestResult`, all 16 counters are zero, and one infrastructure
-`RunInfo outcome="Error"` names PID `211000`; it is invalid red and remains a
-third diagnostic observation under the existing environment-failure clause.
-
-This observation changes no design semantic and does not broaden the
-BehaviorRed result oracle. It amended only the packet-specific execution
-envelope after renewed record/source review: one new nonexistent-and-empty GUID
-directory, one otherwise identical exact-FQN-filtered `dotnet test` invocation,
-one TRX logger, `--no-restore`, `--no-build`, child-process
-`VSTEST_CONNECTION_TIMEOUT=300`, and an exact 420-second outer timeout. Neither
-timeout could be raised automatically and no automatic retry was permitted. A
-second infrastructure failure would have blocked the packet rather than
-changing the oracle or source.
-
-That one bounded replacement invocation produced canonical 0003 R at
-`D:\Temp\meandai-test-0210-a-96ff2a5352c141f78f8bebbfc0f957f0\TEST-0210-A-BEHAVIOR-RED-0003.trx`,
-SHA-256 `4B7B8398362E23B9364BBB7C11C4A538BA984B3474A52F2D95567CB340545FDE`.
-Its sole exact-FQN result is Failed with the exact marker message, one permitted
-nonempty marker-free standard assertion stack, one permitted byte-identical
-echo, and one exact marker-free same-FQN `[FAIL]` RunInfo. The Failed summary
-has all 16 exact counters: `total=1`, `executed=1`, and `failed=1`, with every
-other counter zero. No attachment or independent diagnostic exists. The parent
-`VSTEST_CONNECTION_TIMEOUT` remained unset after the child completed. This R
-changes neither the reviewed source nor the existing BehaviorRed oracle; all
-three earlier observations remain diagnostic. The bounded green below now
-establishes packet-local `ReviewedLocalGreen`.
+Historical A message/echo, RunInfo, assertion-stack, bounded-timeout
+diagnostics, and the accepted 0003 red remain owned by their packet evidence
+ledgers. They add no current B authority; the bounded-green record below keeps
+only the retained outcome needed by this design.
 
 ### `A-SCHEMA-SLOT-01` bounded-green evidence
 
@@ -1364,11 +1310,11 @@ resource accounting, sealed ContextProof/Root shapes, and codec-derived
 reference narrowing. It does not own parser/index/projector/selector or
 provider-neutral capability semantics, shared-root ledgers, staged planning,
 kernel evaluation, real Policy export, the initial real-rule set, Scenario
-activation, workflow filters, or runtime-efficiency changes. The design phase
-has P/R/G `NotApplicable`, an
-empty executable allowlist, and no B implementation authority. Beyond the
-separately authorized `B-SURFACE-01`, B activation remains forbidden until the
-next packet receives its own reviewed maintainer directive.
+activation, workflow filters, or runtime-efficiency changes. The original B
+design phase had P/R/G `NotApplicable` and an empty executable allowlist.
+Surface and codec activation are now immutable hosted-green history; the
+repository-tree wire remains inactive until its packet-specific freeze is
+reviewed and exact-head hosted green.
 
 ## Gate 2 outcome
 
@@ -4352,6 +4298,187 @@ writer and qualifier without introducing their successor-owned inputs, intents,
 or resource meter early. Later packets may only add the exact final `Write`,
 `Qualify`, and meter members already frozen above; they may not replace this
 identity, add a direction-specific registration, or introduce an adapter.
+
+`B-WIRE-REPOSITORY-TREE-01` deliberately keeps that generic interface
+memberless. [TEST-0210](test-cases.md#test-0210) extends the already registered
+Tests-owned `RepositoryTreeCodecMirror` and `RepositoryTreeModelMirror` as the
+same partial identities, adding one closed `WriteRepositoryTree` /
+`QualifyRepositoryTree` mirror core and closed Written/Rejected plus
+Qualified/Rejected leaves in the repository-tree Fact file. This is
+qualification-fixture staging, not a second codec architecture: no alternate
+interface, adapter, static encoder, service lookup, public or production type is
+introduced. After all three wire cores and the later resource carriers exist,
+the final generic methods may delegate on these same mirror objects. Real
+manifest-bound Policy implementations remain ContractSlice D work.
+
+The packet-local signatures are exact:
+
+```csharp
+internal sealed class RepositoryTreePayloadEntryMirror
+{
+    internal string RepositoryRelativePath { get; }
+    internal RepositoryEntryKind Kind { get; }
+    internal static RepositoryTreePayloadEntryMirror Create(
+        string repositoryRelativePath,
+        RepositoryEntryKind kind);
+}
+
+internal sealed partial class RepositoryTreeModelMirror
+{
+    internal EvidenceScope Scope { get; }
+    internal SnapshotEvidenceLocation Location { get; }
+    internal IReadOnlyList<RepositoryTreePayloadEntryMirror> Entries { get; }
+    internal static RepositoryTreeModelMirror Create(
+        EvidenceScope scope,
+        SnapshotEvidenceLocation location,
+        IEnumerable<RepositoryTreePayloadEntryMirror> entries);
+}
+
+internal abstract class RepositoryTreeWriteMirrorResult
+{
+    private RepositoryTreeWriteMirrorResult();
+    internal static RepositoryTreeWriteMirrorResult Written(
+        CanonicalEvidencePayload payload);
+    internal static RepositoryTreeWriteMirrorResult Rejected(
+        string failureCode);
+    internal abstract TResult Accept<TResult>(
+        IRepositoryTreeWriteMirrorResultVisitor<TResult> visitor);
+}
+
+internal interface IRepositoryTreeWriteMirrorResultVisitor<TResult>
+{
+    TResult VisitWritten(CanonicalEvidencePayload payload);
+    TResult VisitRejected(string failureCode);
+}
+
+internal abstract class RepositoryTreeQualificationMirrorResult
+{
+    private RepositoryTreeQualificationMirrorResult();
+    internal static RepositoryTreeQualificationMirrorResult Qualified(
+        RepositoryTreeModelMirror model);
+    internal static RepositoryTreeQualificationMirrorResult Rejected(
+        string failureCode);
+    internal abstract TResult Accept<TResult>(
+        IRepositoryTreeQualificationMirrorResultVisitor<TResult> visitor);
+}
+
+internal interface IRepositoryTreeQualificationMirrorResultVisitor<TResult>
+{
+    TResult VisitQualified(RepositoryTreeModelMirror model);
+    TResult VisitRejected(string failureCode);
+}
+
+internal sealed partial class RepositoryTreeCodecMirror
+{
+    internal RepositoryTreeWriteMirrorResult WriteRepositoryTree(
+        EvidenceScope scope,
+        SnapshotEvidenceLocation location,
+        IReadOnlyList<RepositoryTreePayloadEntryMirror> entries,
+        CancellationToken cancellationToken);
+    internal RepositoryTreeQualificationMirrorResult QualifyRepositoryTree(
+        EvidenceBinding binding,
+        CancellationToken cancellationToken);
+}
+```
+
+Written carries one `CanonicalEvidencePayload`; Qualified carries one
+`RepositoryTreeModelMirror` retaining the decoded scope, Snapshot location, and
+ordinal immutable entry copy. Each Rejected leaf carries exactly one declared
+codec failure code. Null arguments remain argument failures and cancellation is
+out of band; neither is a semantic rejection. Each abstract result has exactly
+two private nested sealed leaves, named `WrittenCase`/`RejectedCase` and
+`QualifiedCase`/`RejectedCase`; callers observe them only through `Accept`.
+Every factory materializes once and retains a defensive read-only copy. Writer
+input is never sorted: it must already be unique and strictly increasing by
+`StringComparer.Ordinal`; a duplicate or out-of-order row is rejected.
+`RepositoryTreePayloadEntryMirror.Create` rejects only null path/kind and
+otherwise preserves the supplied path text byte-for-byte so the writer remains
+the sole path-grammar owner. `RepositoryTreeModelMirror.Create` rejects null
+scope/location/entries and null entry elements, requires the Snapshot
+location's scope to equal the supplied scope, then stores one defensive copy;
+the qualifier calls it only after the complete wire has passed every oracle.
+A null writer-list element throws `ArgumentException` with `ParamName=entries`
+before semantic row validation. A structurally valid writer `scope` unequal to
+`location.Scope` returns Rejected with
+`protocol.codec.embedded-identity-mismatch`.
+
+The repository-tree core implements the exact persistent frame below, the
+`257`-byte golden SHA-256
+`C5A8CB268E42C8A8C532A42C86ECDB0200B4C75186364B6399AD1AE5A40AE97F`,
+and the `197`-byte empty-tree SHA-256
+`BD2C4A254E295AE63E3EC7B610B7A6E88FC345E5D4DBD99C9AFFB61397E98676`.
+The canonical semantic fixture is:
+
+| Field | Exact value |
+| --- | --- |
+| Target subject / source / surface | `repo` / `git` / `repository` |
+| Target snapshot / identity | `exact-commit` / fixture commit: `0123456789abcdef0123456789abcdef01234567` |
+| Boundary snapshot / identity | `exact-commit` / fixture commit: `0123456789abcdef0123456789abcdef01234567` |
+| Started / completed UTC ticks | `0` / `1` |
+| Location | Snapshot, rank `3`, reusing the exact scope |
+| Entry 1 | `AGENTS.md` / File / kind byte `1` |
+| Entry 2 | `docs` / Directory / kind byte `0` |
+| Entry 3 | `links/latest` / SymbolicLink / kind byte `2` |
+| Entry 4 | `vendor/protocol` / GitLink / kind byte `3` |
+
+The four-entry canonical Base64 is
+`cHJvdG9jb2wucmVwb3NpdG9yeS10cmVlLzEKAAAABHJlcG8AAAADZ2l0AAAACnJlcG9zaXRvcnkAAAAMZXhhY3QtY29tbWl0AAAAKDAxMjM0NTY3ODlhYmNkZWYwMTIzNDU2Nzg5YWJjZGVmMDEyMzQ1NjcAAAAMZXhhY3QtY29tbWl0AAAAKDAxMjM0NTY3ODlhYmNkZWYwMTIzNDU2Nzg5YWJjZGVmMDEyMzQ1NjcAAAAAAAAAAAAAAAAAAAABAwAAAAQAAAAJQUdFTlRTLm1kAQAAAARkb2NzAAAAAAxsaW5rcy9sYXRlc3QCAAAAD3ZlbmRvci9wcm90b2NvbAM=`.
+The empty-tree Base64 uses the same fixture and is
+`cHJvdG9jb2wucmVwb3NpdG9yeS10cmVlLzEKAAAABHJlcG8AAAADZ2l0AAAACnJlcG9zaXRvcnkAAAAMZXhhY3QtY29tbWl0AAAAKDAxMjM0NTY3ODlhYmNkZWYwMTIzNDU2Nzg5YWJjZGVmMDEyMzQ1NjcAAAAMZXhhY3QtY29tbWl0AAAAKDAxMjM0NTY3ODlhYmNkZWYwMTIzNDU2Nzg5YWJjZGVmMDEyMzQ1NjcAAAAAAAAAAAAAAAAAAAABAwAAAAA=`.
+
+It permits at most `200,000` entries, `16,777,216` aggregate strict-UTF-8 path
+bytes before retention, and `16,777,216` payload bytes. Count equality is
+reachable with `e000000` through `e199999` File rows and must succeed; adding
+`e200000` rejects before encoding. Payload equality is reachable with exactly
+`4,091` ordinal `p000000/`-style File rows: the first `4,090` paths are padded
+to `4,096` UTF-8 bytes and the last to `3,924`, making the `197`-byte empty
+frame plus five framing bytes per row exactly `16,777,216`; extending the last
+path by one byte rejects. Aggregate path-byte equality is algebraically
+dominated because its nonzero framing makes the payload exceed its ceiling: it
+passes the path counter then rejects on payload size; path first-one-over stops
+before framing or retention. These are wire-local fail-closed bounds;
+four-counter ledger equality, dominated, and unreachable accounting remain
+wholly owned by `B-RESOURCE-01`.
+
+Failure precedence is exact: hard size/count first-one-over is
+`protocol.codec.resource-limit-exceeded`; a known non-Repository surface or
+non-Snapshot location is `protocol.codec.payload-location-mismatch`; a valid
+embedded identity unequal to the enclosing binding is
+`protocol.codec.embedded-identity-mismatch`; and malformed header/rank/kind,
+UTF-8, length/count, EOF, trailing bytes, path grammar, duplication, or ordering
+is `protocol.codec.invalid-repository-tree`. The executable allowlist is only
+the retained activation test's partial-identity edit plus the new repository-
+tree test/core file, with no production delta and a `700` normalized-line hard
+cap. Canonical R is the exact FQN/marker/one-shot TRX route owned by the B plan
+and current memory handoff; it cannot execute before the synchronized design
+head is hosted green.
+
+The mandatory malformed matrix is exact: wrong or mutated ASCII header;
+BOM/invalid/overlong/surrogate UTF-8; premature EOF at every primitive;
+declared text length or entry count overflow/mismatch; trailing byte; unknown
+surface, location rank, or kind byte `4`; structurally valid known-but-
+disallowed surface/location; structurally valid embedded scope/location unequal
+to the enclosing binding; and empty, leading-slash, trailing-slash, backslash,
+empty-segment, dot-segment, dot-dot-segment, drive-form, duplicate, and non-
+ordinal paths. Writer tests construct invalid path text through the permissive
+entry carrier and exercise count/path/payload first-one-over in that order;
+unknown kind and malformed primitive cases are qualifier-only byte mutations.
+Schema key/version mismatch belongs to invalid-repository-tree before any
+embedded identity comparison. Count equality and payload equality are green as
+specified above; aggregate path-byte equality is the declared dominated
+resource rejection, while its first-one-over rejects before framing/retention.
+
+Writer order is: null arguments, cancellation, known source surface/location,
+source scope/location equality, one-time entry materialization and count,
+per-row path/kind/order plus aggregate path bytes, computed payload size, then
+encoding. Qualifier order is: null argument, cancellation, payload byte ceiling,
+exact schema key/version, strict grammar and primitive bounds, entry count,
+known embedded surface/location, row grammar/order/kind/path bytes, trailing-
+byte closure, enclosing binding surface/location, then embedded-versus-
+enclosing identity equality. Schema metadata mismatch, an unknown surface/rank,
+or any construction failure in the decoded scope is invalid-repository-tree;
+known-but-disallowed surface/rank is payload-location-mismatch. Only a fully
+parsed valid embedded identity can reach embedded-identity-mismatch.
 
 The complete Tests-only causal surface is:
 

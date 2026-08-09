@@ -1,22 +1,22 @@
-# ContractSlice B codec-activation packet freeze
+# ContractSlice B codec-activation and repository-tree wire packet freeze
 
 | Field | Value |
 | --- | --- |
-| Packet | `B-CODEC-ACTIVATION-01` |
-| State | `ReviewedLocalGreen`; exact-head hosted pending |
+| Packet | `B-CODEC-ACTIVATION-01` / `B-WIRE-REPOSITORY-TREE-01` |
+| State | Codec activation `ReviewedHostedGreen`; repository-tree wire `FrozenDesign` / executable work held until this exact design head is hosted green |
 | Parent | [ContractSlice B micro-delivery plan](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-contractslice-b-micro-delivery-plan.md) |
 | Scenario | [TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210), retained `Planned` |
-| Exact predecessor | [`2d5f5c6ed5c5317b827e7ee6f969d58822c663e9`](https://github.com/hasanmanzak/meAndAI/commit/2d5f5c6ed5c5317b827e7ee6f969d58822c663e9); exact-head [run 31312309195](https://github.com/hasanmanzak/meAndAI/actions/runs/31312309195) passed Ubuntu `20m25s`, Windows `16m49s`, publication verification skipped |
+| Exact codec predecessor | [`8ac8175a034fc0645d47a8209a314b401e6d3574`](https://github.com/hasanmanzak/meAndAI/commit/8ac8175a034fc0645d47a8209a314b401e6d3574); exact-head [run 31315251575](https://github.com/hasanmanzak/meAndAI/actions/runs/31315251575) passed Ubuntu `20m46s`, Windows `17m19s`, publication verification skipped |
 | Implementation language | C# only |
 
-## Frozen executable boundary
+## Immutable codec-activation boundary
 
-The packet may add one Abstractions registration file, one Conformance
-activation file, and one retained test file, and may update only the existing B
+The completed codec packet added one Abstractions registration file, one
+Conformance activation file, and one retained test file, and updated only the existing B
 ownership fact plus the retained A PublicApi Fact's obsolete
 `ICodecRegistration`-absence row. That exact predecessor assertion transition
 changes no A FQN, trait, public member snapshot, or 48-type containment. The
-product surface is limited to:
+completed product surface is limited to:
 
 - internal `IProtocolSemanticModel` and `ModelTypeToken<TModel>`;
 - internal `ICanonicalPayloadCodec<TModel>` as the constrained, memberless
@@ -82,10 +82,125 @@ No public API, other A source/test, Domain, Policy, project, package, lock,
 workflow, Scenario/status/
 owner/filter, writer input/intent, wire bytes, resource meter, cache, ticket,
 qualification, admission result, sealed context, C/D, release, or publication
-mutation is allowed. `B-WIRE-REPOSITORY-TREE-01` and every later packet remain
-inactive until this exact packet is reviewed, synchronized, pushed, and exact-
-head hosted green. The accepted schema-2 graph ceilings remain `8,192` relations
-and `8,388,608` parsed bytes.
+mutation was allowed. At that codec checkpoint, repository-tree wire and every
+later packet remained inactive. The codec exact head is now hosted green; the
+current packet-specific wire staging below owns the next gate. The accepted
+schema-2 graph ceilings remain `8,192` relations and `8,388,608` parsed bytes.
+
+## Frozen `B-WIRE-REPOSITORY-TREE-01` staging
+
+The typed evaluation-kernel design is the normative executable contract. This
+handoff mirrors routing, review, and immutable evidence only and adds no
+executable authority.
+
+This packet extends the already registered test-owned
+`RepositoryTreeCodecMirror` and `RepositoryTreeModelMirror` identities on the
+same object. Both identities become `partial`; the new file owns the one direct
+Fact plus a closed writer/qualifier mirror core. It adds no second codec,
+adapter, static encoder, direction-specific interface, service lookup, or real
+Policy implementation. `ICanonicalPayloadCodec<TModel>` remains the same
+constrained memberless identity in this packet. After all three wire mirrors
+and the later resource carriers exist, only its already accepted final
+`Write`, `Qualify`, and meter members may be added, with the same mirror objects
+delegating to these cores.
+
+The exact packet-local methods are:
+
+```csharp
+RepositoryTreeWriteMirrorResult WriteRepositoryTree(
+    EvidenceScope scope,
+    SnapshotEvidenceLocation location,
+    IReadOnlyList<RepositoryTreePayloadEntryMirror> entries,
+    CancellationToken cancellationToken);
+RepositoryTreeQualificationMirrorResult QualifyRepositoryTree(
+    EvidenceBinding binding,
+    CancellationToken cancellationToken);
+```
+
+Written carries one `CanonicalEvidencePayload`; Rejected carries exactly one of
+the four declared codec failure-code strings. Qualified carries one
+`RepositoryTreeModelMirror` retaining the decoded scope, Snapshot location, and
+ordinal immutable entry copy; Rejected carries exactly one declared failure
+code. Null arguments fail their argument boundary, cancellation remains out of
+band, and neither becomes a semantic rejection. These names and signatures are
+Tests-owned staging only and confer no public or Policy authority.
+
+The exact executable allowlist is:
+
+- modify `ContractSliceBActivationTests.cs` only to make the retained tree
+  codec/model identities partial;
+- add `ContractSliceBRepositoryTreeCodecTests.cs`, containing the sole Fact,
+  tree entry/model carriers, the same-object mirror core, and its closed
+  Written/Rejected and Qualified/Rejected result leaves; and
+- change no production, public API, project, package, lock, friend, workflow,
+  Domain, Conformance, Policy, admission-harness, cache, resource-ledger,
+  capability/index, Scenario/status/owner/filter, or runtime-efficiency file.
+
+The packet may change at most two test files and `700` normalized test lines;
+`701` or more requires a design redraw. The valid-fixture red body changes only
+`WriteRepositoryTree(...)`'s non-null semantic result to `return null!;`. Setup
+and every qualifier/golden/negative assertion are marker-free; only that null
+return may call direct `Assert.Fail("TEST-0210-B-BEHAVIOR-RED-0002")`.
+
+The exact persistent frame is:
+
+```text
+ASCII "protocol.repository-tree/1\n"
+seven EvidenceScope text leaves
+i64 StartedAtUtc UTC ticks
+i64 CompletedAtUtc UTC ticks
+u8 Snapshot location rank = 3
+u32 entry count
+repeat in StringComparer.Ordinal RepositoryRelativePath order:
+  text RepositoryRelativePath
+  u8 Directory=0 | File=1 | SymbolicLink=2 | GitLink=3
+```
+
+`u32` and `i64` are big-endian. `text` is a big-endian `u32` byte length
+followed by strict BOM-free UTF-8. The embedded target surface is Repository,
+the location is Snapshot and reuses the embedded scope, paths are unique and
+use the accepted repository-relative grammar, and no normalization or trailing
+byte is allowed. The four-entry golden vector is `257` bytes, Base64
+`cHJvdG9jb2wucmVwb3NpdG9yeS10cmVlLzEKAAAABHJlcG8AAAADZ2l0AAAACnJlcG9zaXRvcnkAAAAMZXhhY3QtY29tbWl0AAAAKDAxMjM0NTY3ODlhYmNkZWYwMTIzNDU2Nzg5YWJjZGVmMDEyMzQ1NjcAAAAMZXhhY3QtY29tbWl0AAAAKDAxMjM0NTY3ODlhYmNkZWYwMTIzNDU2Nzg5YWJjZGVmMDEyMzQ1NjcAAAAAAAAAAAAAAAAAAAABAwAAAAQAAAAJQUdFTlRTLm1kAQAAAARkb2NzAAAAAAxsaW5rcy9sYXRlc3QCAAAAD3ZlbmRvci9wcm90b2NvbAM=`
+and SHA-256
+`C5A8CB268E42C8A8C532A42C86ECDB0200B4C75186364B6399AD1AE5A40AE97F`.
+The empty-tree vector is `197` bytes, Base64
+`cHJvdG9jb2wucmVwb3NpdG9yeS10cmVlLzEKAAAABHJlcG8AAAADZ2l0AAAACnJlcG9zaXRvcnkAAAAMZXhhY3QtY29tbWl0AAAAKDAxMjM0NTY3ODlhYmNkZWYwMTIzNDU2Nzg5YWJjZGVmMDEyMzQ1NjcAAAAMZXhhY3QtY29tbWl0AAAAKDAxMjM0NTY3ODlhYmNkZWYwMTIzNDU2Nzg5YWJjZGVmMDEyMzQ1NjcAAAAAAAAAAAAAAAAAAAABAwAAAAA=`
+and SHA-256
+`BD2C4A254E295AE63E3EC7B610B7A6E88FC345E5D4DBD99C9AFFB61397E98676`.
+
+Wire-local ceilings are `200,000` entries, `16,777,216` aggregate strict-UTF-8
+path bytes before retention, and `16,777,216` canonical payload bytes. The
+declared qualification budget remains `(16777216, 64, 200000, 2000000)`, but
+four-counter equality, first-one-over, dominated, and unreachable accounting
+remain wholly owned by `B-RESOURCE-01`.
+
+Failure precedence is mutually exclusive. A hard byte/count ceiling breach is
+`protocol.codec.resource-limit-exceeded`. An exact known non-Repository surface
+or non-Snapshot location is `protocol.codec.payload-location-mismatch`. A
+structurally valid embedded scope/location unequal to the enclosing binding is
+`protocol.codec.embedded-identity-mismatch`. Header mutation, unknown rank or
+kind, BOM/invalid/overlong/surrogate UTF-8, premature EOF, numeric/length/count
+overflow or mismatch, trailing bytes, invalid path grammar, duplicate path, or
+non-ordinal rows is `protocol.codec.invalid-repository-tree`. The test covers
+every class, empty tree, four kinds, round trip, and the entry/path/payload
+first-one-over boundaries without asserting later resource-ledger semantics.
+
+The exact retained Fact is
+`MeAndAI.Protocol.Conformance.Tests.ContractSliceBRepositoryTreeCodecTests.Round_trips_exact_repository_tree_wire`:
+one direct non-skipped Fact, exactly one `ContractSlice=B` trait, no Scenario,
+Theory, overload, inheritance, or class-level trait. Its sole canonical red uses
+marker `TEST-0210-B-BEHAVIOR-RED-0002`, a fresh external result root, one exact
+Release FQN-filtered invocation, process-scoped
+`VSTEST_CONNECTION_TIMEOUT=300`, a `420`-second outer bound, and the frozen
+standard one-result/one-definition/one-entry TRX oracle. Once the child starts,
+ordinal `0002` is consumed and never rerun.
+
+Required green is focused `1/1`, B `4/4`, A+B/full Conformance `36/36`, Domain
+`98/98`, warning/error-free Release build, format/locks/diff, StructureOnly,
+publication evidence `7/7` without publication claim, and independent
+product/test plus evidence/scope reviews `0/0/0`. Later B packets, real Policy,
+C/D, final activation, merge, release, and publication remain held.
 
 ## Immutable canonical BehaviorRed
 
@@ -133,11 +248,13 @@ once. It is immutable and must never be rerun.
   commit-reference recurrence, with no publication claim.
 - Default-severity format verification and diff check were clean; schema-2
   graph ceilings were respected by StructureOnly.
-- The exact tree containing this evidence row must repeat StructureOnly and
-  publication evidence green before commit. Commit/push and hosted gates remain
-  pending at this record point; no later record edit may reuse an earlier run.
+- The exact codec implementation tree repeated StructureOnly and publication
+  evidence green before commit; its commit/push/hosted result is immutable at
+  the exact predecessor named above. No later record edit may reuse an earlier
+  run. The repository-tree design cohort must receive its own exact-head hosted
+  green before canonical red.
 
-## Pre-red reviews
+## Immutable codec-activation pre-red reviews
 
 - Architecture/semantic-boundary review: `0 Blocking / 0 Important / 0 Minor`.
   The activation-stage marker preserves the final one-object writer/qualifier
@@ -146,3 +263,15 @@ once. It is immutable and must never be rerun.
   one exact red identity, one absent predicate, one-shot invocation, exact
   production/test allowlist, cumulative cardinalities, and downstream holds are
   finite and fail-closed.
+
+## Repository-tree wire design reviews
+
+- Semantic/runner D/RT: `0 Blocking / 0 Important / 0 Minor`; exact topology,
+  fixture, limits, precedence, one-shot boundary, custody, and no-retry contract
+  are frozen without implementation authority.
+- Route/content/scope review: `0 Blocking / 0 Important / 0 Minor`; the mutation
+  surface remains the exact twelve-document design cohort and the later two-test-
+  file executable allowlist, with no production or downstream-slice mutation.
+- Canonical schema-2 projection: `364` nodes / `4,143` relations / `319` parsed
+  blobs / `4,270,665` parsed bytes; the typed design is `521,578 / 524,288`
+  bytes. Canonical red remains held until this exact design head is hosted green.

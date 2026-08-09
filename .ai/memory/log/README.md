@@ -6,11 +6,12 @@ and follow its canonical links.
 ## Current continuation
 
 Follow the current
-[ContractSlice B codec-activation handoff](2026-08-09-feat-0065-subf-0143-contractslice-b-codec-activation-freeze.md).
-ContractSlice A is merged/exact-main green; `B-SURFACE-01` is exact-head hosted
-green and `B-CODEC-ACTIVATION-01` is `ReviewedLocalGreen` at B `3/11` and
-cumulative A+B `35/43`, exact-head hosted pending. `B-WIRE-REPOSITORY-TREE-01`
-and later packets are inactive; the parent scenario remains `Planned`.
+[ContractSlice B codec-activation and repository-tree wire handoff](2026-08-09-feat-0065-subf-0143-contractslice-b-codec-activation-freeze.md).
+ContractSlice A is merged/exact-main green; `B-SURFACE-01` and
+`B-CODEC-ACTIVATION-01` are exact-head hosted green at B `3/11` and cumulative
+A+B `35/43`. `B-WIRE-REPOSITORY-TREE-01` is `FrozenDesign`/inactive pending its
+exact design-head hosted gate; later packets are inactive and the parent
+scenario remains `Planned`.
 
 Follow the current
 [instruction-graph capacity handoff](2026-08-09-feat-0069-instruction-graph-capacity.md)
@@ -391,7 +392,7 @@ conversations while disallowing force pushes and deletion.
 
 ## History
 
-- [2026-08-09 - ContractSlice B codec activation](2026-08-09-feat-0065-subf-0143-contractslice-b-codec-activation-freeze.md)
+- [2026-08-09 - ContractSlice B codec activation and repository-tree wire](2026-08-09-feat-0065-subf-0143-contractslice-b-codec-activation-freeze.md)
 - [2026-08-09 - ContractSlice B structural surface](2026-08-09-feat-0065-subf-0143-contractslice-b-surface-freeze.md)
 - [2026-08-09 - ContractSlice B design freeze](2026-08-09-feat-0065-subf-0143-contractslice-b-design-freeze.md)
 - [2026-08-07 - ContractSlice A lifecycle ReviewedLocalGreen](2026-08-07-feat-0065-subf-0143-contractslice-a-lifecycle-green.md)
