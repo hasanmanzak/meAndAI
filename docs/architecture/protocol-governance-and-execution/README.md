@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Architecture design |
-| Status | Accepted architecture; [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143) Gate 2 accepted. ContractSlice A is merged/exact-main green; `B-SURFACE-01` and `B-CODEC-ACTIVATION-01` are exact-head hosted green with B `3/11` and cumulative A+B `35/43`. `B-WIRE-REPOSITORY-TREE-01` is `FrozenDesign`/inactive pending its exact design-head hosted gate. Parent scenario `Planned`; no activation/DoD. |
+| Status | Accepted architecture; [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143) Gate 2 accepted. ContractSlice A is merged/exact-main green; B surface and codec activation are exact-head hosted green. `B-WIRE-REPOSITORY-TREE-01` is `ReviewedLocalGreen` with its exact implementation head hosted gate pending; B `4/11`, cumulative A+B `36/43`. Parent scenario `Planned`; no activation/DoD. |
 | Owning epic | [EPIC-0002 / issue #163](https://github.com/hasanmanzak/meAndAI/issues/163) |
 | Owning task | [TASK-0003 / issue #164](https://github.com/hasanmanzak/meAndAI/issues/164) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
@@ -11,10 +11,10 @@
 | Successor allocation | [Successor delivery and qualification plan](successor-delivery-plan.md) |
 | Preserved WIP disposition | [Exact extraction ledger](wip-extraction-ledger.md) |
 | Accepted Gate-2 baseline | Exact-main typed-handoff predecessor [`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7) |
-| Current slice boundary | ContractSlice A is immutable merged history. ContractSlice B structural surface and codec activation are hosted green; repository-tree wire is frozen/inactive pending its design-head gate, while later B packets, C/D, and final activation remain held. |
+| Current slice boundary | ContractSlice A is immutable merged history. ContractSlice B structural surface and codec activation are hosted green; repository-tree wire is local green/hosted pending at B `4/11`, A+B `36/43`, while later B packets, C/D, and final activation remain held. |
 | Hosted correction chain | Historical `bfa961d...` / run `30712296217` exposed [TEST-0175](../../features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175), then `43c1800...` / run `30714966450` exposed [TEST-0178](../../features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178). Their exact links remain canonical in the owning findings. The bounded documentation/memory correction at exact [`25e26f9...`](https://github.com/hasanmanzak/meAndAI/commit/25e26f908e1f123640c758e42e1db92d5eea6dde) closes both findings; publication verification was correctly skipped. |
 | Preserved implementation input | [`1873c98638ba4960734aadb188eb8c8d70b4bc52`](https://github.com/hasanmanzak/meAndAI/commit/1873c98638ba4960734aadb188eb8c8d70b4bc52) on [draft PR #160](https://github.com/hasanmanzak/meAndAI/pull/160) |
-| Current authority | The maintainer directive names the remaining B sequence, but executable repository-tree red remains held until this frozen design cohort is reviewed, committed, pushed, and exact-head hosted green. Later B packets remain predecessor-gated; C/D, final Scenario/status/owner/workflow, runtime-efficiency activation, WIP, consumer, merge, release, publication, authority transfer, and PowerShell retirement remain held. |
+| Current authority | The repository-tree wire has one immutable canonical red and bounded local green; its exact implementation head must still be committed, pushed, and hosted green before the next B packet. C/D, final Scenario/status/owner/workflow, runtime-efficiency activation, WIP, consumer, merge, release, publication, authority transfer, and PowerShell retirement remain held. |
 
 ## 1. Outcome
 

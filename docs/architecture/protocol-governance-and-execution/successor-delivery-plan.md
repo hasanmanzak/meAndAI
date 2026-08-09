@@ -6,7 +6,7 @@
 | Parent epic | [EPIC-0002 / issue #163](https://github.com/hasanmanzak/meAndAI/issues/163) |
 | Architecture task | [TASK-0003 / issue #164](https://github.com/hasanmanzak/meAndAI/issues/164) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
-| Current authority | ContractSlice A is merged/exact-main green. `B-SURFACE-01` and `B-CODEC-ACTIVATION-01` are exact-head hosted green at B `3/11` and A+B `35/43`; `B-WIRE-REPOSITORY-TREE-01` is frozen/inactive pending its design-head hosted gate. C/D, activation, merge/release/publication remain held. |
+| Current authority | ContractSlice A is merged/exact-main green. B surface and codec activation are exact-head hosted green; `B-WIRE-REPOSITORY-TREE-01` is local green/hosted pending at B `4/11`, A+B `36/43`. Later B packets remain predecessor-gated; C/D, activation, merge/release/publication remain held. |
 
 This plan allocates the accepted architecture to stable delivery records. It
 did not itself authorize implementation. The later

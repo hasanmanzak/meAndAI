@@ -3,10 +3,10 @@
 | Field | Value |
 | --- | --- |
 | Packet | `B-CODEC-ACTIVATION-01` / `B-WIRE-REPOSITORY-TREE-01` |
-| State | Codec activation `ReviewedHostedGreen`; repository-tree wire `FrozenDesign` / executable work held until this exact design head is hosted green |
+| State | Codec activation `ReviewedHostedGreen`; repository-tree wire `ReviewedLocalGreen` / exact implementation head hosted gate pending |
 | Parent | [ContractSlice B micro-delivery plan](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-contractslice-b-micro-delivery-plan.md) |
 | Scenario | [TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210), retained `Planned` |
-| Exact codec predecessor | [`8ac8175a034fc0645d47a8209a314b401e6d3574`](https://github.com/hasanmanzak/meAndAI/commit/8ac8175a034fc0645d47a8209a314b401e6d3574); exact-head [run 31315251575](https://github.com/hasanmanzak/meAndAI/actions/runs/31315251575) passed Ubuntu `20m46s`, Windows `17m19s`, publication verification skipped |
+| Exact wire design predecessor | [`e38bedd0fc3d3761f217fccde8271c0caa42af60`](https://github.com/hasanmanzak/meAndAI/commit/e38bedd0fc3d3761f217fccde8271c0caa42af60); exact-head [run 31325450263](https://github.com/hasanmanzak/meAndAI/actions/runs/31325450263) passed Ubuntu `19m35s`, Windows `47m57s`, publication verification skipped |
 | Implementation language | C# only |
 
 ## Immutable codec-activation boundary
@@ -87,7 +87,7 @@ later packet remained inactive. The codec exact head is now hosted green; the
 current packet-specific wire staging below owns the next gate. The accepted
 schema-2 graph ceilings remain `8,192` relations and `8,388,608` parsed bytes.
 
-## Frozen `B-WIRE-REPOSITORY-TREE-01` staging
+## Implemented `B-WIRE-REPOSITORY-TREE-01` local-green boundary
 
 The typed evaluation-kernel design is the normative executable contract. This
 handoff mirrors routing, review, and immutable evidence only and adds no
@@ -264,7 +264,7 @@ once. It is immutable and must never be rerun.
   production/test allowlist, cumulative cardinalities, and downstream holds are
   finite and fail-closed.
 
-## Repository-tree wire design reviews
+## Immutable repository-tree wire design reviews
 
 - Semantic/runner D/RT: `0 Blocking / 0 Important / 0 Minor`; exact topology,
   fixture, limits, precedence, one-shot boundary, custody, and no-retry contract
@@ -272,6 +272,29 @@ once. It is immutable and must never be rerun.
 - Route/content/scope review: `0 Blocking / 0 Important / 0 Minor`; the mutation
   surface remains the exact twelve-document design cohort and the later two-test-
   file executable allowlist, with no production or downstream-slice mutation.
-- Canonical schema-2 projection: `364` nodes / `4,143` relations / `319` parsed
-  blobs / `4,270,665` parsed bytes; the typed design is `521,578 / 524,288`
-  bytes. Canonical red remains held until this exact design head is hosted green.
+- Canonical pre-red schema-2 projection: `364` nodes / `4,143` relations / `319`
+  parsed blobs / `4,268,778` parsed bytes. The capacity interlude raised only
+  prospective `v0.17.0` per-blob capacity to `1,048,576`; other graph and runtime
+  ceilings remain unchanged.
+
+## Immutable repository-tree wire red and bounded green
+
+- The sole accepted R=0002 used runner SHA-256
+  `4C806A083465E8DCE370CE1957D3C860F158B443F4B0BD0F2B58D37D775DEB8B`.
+  Its report SHA-256 is
+  `58E1ADFBA8169DA9C0998BB2D14D2B417A6F9C968AA76F3B21FAC3CE70A7E158`;
+  the one TRX SHA-256 is
+  `E9B79AADBEA9B0A6EB9D810816AD8959685A9E592ABA22015C19D8B9E03F024C`.
+- Native exit `1` produced exactly one Failed result/definition/entry at the
+  frozen FQN, the exact marker-only message, exact sixteen counters, and no
+  forbidden diagnostics or attachments. R=0002 is immutable and never reruns.
+- Bounded green changes only the test-owned mirror: the retained tree codec/model
+  identities become partial and the new file owns the same-object writer,
+  qualifier, carriers, result leaves, and sole Fact. Production delta is zero.
+- Release build is `0` warnings / `0` errors; format is clean; focused `1/1`, B
+  `4/4`, full Conformance `36/36`, and Domain `98/98` pass. The executable delta
+  is `581/1,200` normalized lines; locks, projects, packages, and workflows are
+  unchanged. Product/test and evidence/scope reviews are `0/0/0`.
+- B is now `4/11` and cumulative A+B is `36/43`. Exact implementation-head
+  StructureOnly, publication evidence, commit/push, and hosted green remain the
+  delivery gates; all later packets and downstream holds remain inactive.

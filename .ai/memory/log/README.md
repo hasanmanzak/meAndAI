@@ -8,9 +8,9 @@ and follow its canonical links.
 Follow the current
 [ContractSlice B codec-activation and repository-tree wire handoff](2026-08-09-feat-0065-subf-0143-contractslice-b-codec-activation-freeze.md).
 ContractSlice A is merged/exact-main green; `B-SURFACE-01` and
-`B-CODEC-ACTIVATION-01` are exact-head hosted green at B `3/11` and cumulative
-A+B `35/43`. `B-WIRE-REPOSITORY-TREE-01` is `FrozenDesign`/inactive pending its
-exact design-head hosted gate; later packets are inactive and the parent
+`B-CODEC-ACTIVATION-01` are exact-head hosted green. `B-WIRE-REPOSITORY-TREE-01`
+is `ReviewedLocalGreen` with its exact implementation head hosted gate pending;
+B is `4/11`, cumulative A+B is `36/43`, later packets are inactive, and the parent
 scenario remains `Planned`.
 
 Follow the current

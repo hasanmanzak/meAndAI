@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Gate 2 micro-delivery plan and design freeze |
-| State | `B-SURFACE-01` and `B-CODEC-ACTIVATION-01` exact-head hosted green; `B-WIRE-REPOSITORY-TREE-01` `FrozenDesign`/inactive pending its exact design-head hosted gate; B `3/11`, cumulative A+B `35/43`; later packets inactive |
+| State | `B-SURFACE-01` and `B-CODEC-ACTIVATION-01` exact-head hosted green; `B-WIRE-REPOSITORY-TREE-01` `ReviewedLocalGreen`/exact implementation head hosted pending; B `4/11`, cumulative A+B `36/43`; later packets inactive |
 | Parent | Owning feature and current subfeature |
 | Scenario | [TEST-0210](test-cases.md#test-0210), still `Planned` |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
@@ -104,7 +104,7 @@ semantic packages own one Fact and one immutable BehaviorRed ordinal each.
 | `B-CODEC-DERIVATION-01` | Codec-derived reference frame, manifest component/artifact/model identity, same-or-narrower location, structural comparator, collision and foreign-session rejection; no parser/index derivation | `TEST-0210-B-BEHAVIOR-RED-0009`; `ContractSliceBQualifiedReferenceTests.Seals_exact_codec_derived_reference_and_location_narrowing` | Focused `1/1`; B `11/11`; A+B `43/43` |
 | `B-CONVERGE-01` | Pure cumulative audit of exact source/test/export/friend/trait/lock/project state; P/R/G `NotApplicable` | None; every canonical red remains immutable and is never rerun | B `11/11`; A+B/full Conformance `43/43`; Domain `98/98`; Release build/format/locks/diff/StructureOnly/publication evidence/reviews green |
 
-### Frozen `B-WIRE-REPOSITORY-TREE-01` staging boundary
+### Implemented `B-WIRE-REPOSITORY-TREE-01` local-green boundary
 
 The hosted-green activation packet retains the constrained memberless
 `ICanonicalPayloadCodec<TModel>` identity and the object-identical Tests-owned
@@ -306,10 +306,10 @@ project, package, lock, workflow, release, or consumer file. The user-owned
 
 ## Exit condition
 
-This plan is the accepted `FrozenDesign` predecessor. The surface and codec
-activation packets are immutable exact-head hosted-green history. The ordered-B
-maintainer directive names `B-WIRE-REPOSITORY-TREE-01`, but canonical red and
-C# mutation remain held until this packet-specific frozen design is reviewed,
-committed, pushed, and exact-head hosted green. C/D, final
+This plan was the accepted `FrozenDesign` predecessor. The surface and codec
+activation packets are immutable exact-head hosted-green history. The repository-
+tree wire now retains one immutable canonical red plus bounded local green at B
+`4/11` and A+B `36/43`; its exact implementation head remains hosted pending,
+and every successor stays inactive until that gate closes. C/D, final
 activation, feature DoD, release, publication, consumer mutation, authority
 transfer, and PowerShell retirement remain held.

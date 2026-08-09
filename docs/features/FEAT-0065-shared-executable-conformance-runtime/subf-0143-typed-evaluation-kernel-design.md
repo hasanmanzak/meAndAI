@@ -3,14 +3,14 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted; ContractSlice A merged/exact-main green. `B-SURFACE-01` and `B-CODEC-ACTIVATION-01` are exact-head hosted green; `B-WIRE-REPOSITORY-TREE-01` is `FrozenDesign`/inactive pending its exact design-head hosted gate; B `3/11`, cumulative A+B `35/43`; [TEST-0210](test-cases.md#test-0210) remains `Planned`; later B packets, C/D, final activation, and DoD remain held. |
+| Status | Gate 2 accepted; ContractSlice A merged/exact-main green. B surface and codec activation are exact-head hosted green; `B-WIRE-REPOSITORY-TREE-01` is `ReviewedLocalGreen`/exact implementation head hosted pending; B `4/11`, cumulative A+B `36/43`. [TEST-0210](test-cases.md#test-0210) remains `Planned`; later B packets, C/D, final activation, and DoD remain held. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Test | [TEST-0210](test-cases.md#test-0210) |
 | Gate 3 micro-delivery routing | Historical A delivery remains owned by the [A micro-delivery control plan](subf-0143-micro-delivery-plan.md). Current B design routing is the [ContractSlice B micro-delivery plan](subf-0143-contractslice-b-micro-delivery-plan.md); packet labels refine delivery but activate no executable work. |
 | Exact-main design baseline | Accepted A merge commit [`51623f4d404a95e0f706d72805cf7ddbbbd293b8`](https://github.com/hasanmanzak/meAndAI/commit/51623f4d404a95e0f706d72805cf7ddbbbd293b8), validated by exact-main [run 31304787603](https://github.com/hasanmanzak/meAndAI/actions/runs/31304787603) |
-| Design and Gate 3 authority | Historical A directives and clarifications remain immutable evidence. Surface and codec activation are immutable hosted-green predecessors. The maintainer directive names the ordered B sequence, but repository-tree executable work remains gated by this packet-specific design review, commit/push, and exact-head hosted green. Later B packets remain predecessor-gated; C/D, final activation, merge, release, and publication remain outside that authority. |
+| Design and Gate 3 authority | Historical A directives and clarifications remain immutable evidence. Surface and codec activation are immutable hosted-green predecessors. Repository-tree retains one immutable canonical red and bounded local green; its implementation-head hosted gate remains open. Later B packets remain predecessor-gated; C/D, final activation, merge, release, and publication remain outside that authority. |
 | Completed predecessor | [SUBF-0153](README.md#subf-0153) / [TEST-0221](test-cases.md#test-0221), merged through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173) and exact-main validated by [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) |
 
 ## Directive and hard boundary
@@ -1312,9 +1312,9 @@ provider-neutral capability semantics, shared-root ledgers, staged planning,
 kernel evaluation, real Policy export, the initial real-rule set, Scenario
 activation, workflow filters, or runtime-efficiency changes. The original B
 design phase had P/R/G `NotApplicable` and an empty executable allowlist.
-Surface and codec activation are now immutable hosted-green history; the
-repository-tree wire remains inactive until its packet-specific freeze is
-reviewed and exact-head hosted green.
+Surface and codec activation are now immutable hosted-green history. The
+repository-tree wire is bounded local green with its implementation-head hosted
+gate pending; no successor packet is active yet.
 
 ## Gate 2 outcome
 
@@ -8607,8 +8607,9 @@ invocation, or weaken
 ContractSlice A's historical delivery is owned by its
 [micro-delivery control plan](subf-0143-micro-delivery-plan.md). ContractSlice
 B is decomposed by the current
-[B micro-delivery plan](subf-0143-contractslice-b-micro-delivery-plan.md), which
-is `FrozenDesign` but activates no test or implementation.
+[B micro-delivery plan](subf-0143-contractslice-b-micro-delivery-plan.md). Its
+first two packets are hosted green and repository-tree wire is local green with
+its implementation-head hosted gate pending; later B packets remain inactive.
 
 B implementation and C/D still require separate future activation, and no
 packet is active merely from this list. No directive here allocates new stable

@@ -170,7 +170,7 @@ internal sealed class GovernedTextModelMirror : IProtocolSemanticModel;
 
 internal sealed class RepositoryTargetModelMirror : IProtocolSemanticModel;
 
-internal sealed class RepositoryTreeModelMirror : IProtocolSemanticModel;
+internal sealed partial class RepositoryTreeModelMirror : IProtocolSemanticModel;
 
 internal sealed class GovernedTextCodecMirror :
     ICanonicalPayloadCodec<GovernedTextModelMirror>;
@@ -178,7 +178,7 @@ internal sealed class GovernedTextCodecMirror :
 internal sealed class RepositoryTargetCodecMirror :
     ICanonicalPayloadCodec<RepositoryTargetModelMirror>;
 
-internal sealed class RepositoryTreeCodecMirror :
+internal sealed partial class RepositoryTreeCodecMirror :
     ICanonicalPayloadCodec<RepositoryTreeModelMirror>;
 
 internal sealed class ContractSliceBActivationProof :
