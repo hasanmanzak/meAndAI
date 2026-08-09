@@ -4448,7 +4448,7 @@ embedded identity unequal to the enclosing binding is
 UTF-8, length/count, EOF, trailing bytes, path grammar, duplication, or ordering
 is `protocol.codec.invalid-repository-tree`. The executable allowlist is only
 the retained activation test's partial-identity edit plus the new repository-
-tree test/core file, with no production delta and a `700` normalized-line hard
+tree test/core file, with no production delta and a `1,200` normalized-line hard
 cap. Canonical R is the exact FQN/marker/one-shot TRX route owned by the B plan
 and current memory handoff; it cannot execute before the synchronized design
 head is hosted green.

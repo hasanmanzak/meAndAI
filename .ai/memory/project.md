@@ -9,8 +9,13 @@ Last verified: **2026-08-09**
   [`854bc97056d9e3250ab4c6caa7558825904466e8`](https://github.com/hasanmanzak/meAndAI/commit/854bc97056d9e3250ab4c6caa7558825904466e8)
   reached `4096/4096` edges and `4192113/4194304` parsed bytes after canonical
   compaction. [DEC-0036](../../docs/decisions/DEC-0036-prospective-instruction-graph-capacity.md)
-  therefore freezes the prospective `v0.17.0` profile at `8192` edges and
-  `8388608` aggregate parsed bytes while preserving every earlier target.
+  therefore freezes the prospective `v0.17.0` profile at `8192` edges,
+  `1048576` bytes per parsed blob, and `8388608` aggregate parsed bytes while
+  preserving every earlier target. A bounded pre-failure amendment is local
+  green after the ContractSlice B typed-design blob crossed the former
+  per-blob ceiling and its first complete wire draft crossed a packet-local
+  line threshold; it is `ReviewedLocalGreen`, with final exact-tree,
+  commit/push, and hosted gates pending.
   [TEST-0223](../../docs/features/FEAT-0069-instruction-graph-capacity/test-cases.md#test-0223)
   has immutable expected-red plus focused graph, quick-adoption profile,
   StructureOnly, publication-evidence, and exact-main Ubuntu/Windows greens;

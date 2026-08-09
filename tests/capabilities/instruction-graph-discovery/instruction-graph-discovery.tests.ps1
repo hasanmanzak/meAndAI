@@ -2370,14 +2370,14 @@ docs/SHOULD_NOT_BE_DISCOVERED.md
         Assert-True -Condition ([string]$graph.digest -ceq [string]$shuffled.digest) `
             -Message 'TEST-0151 shuffled exact-tree input changed the graph digest.'
         Assert-True -Condition ([string]$graph.digest -ceq `
-            'cf7175dc852404020da91236ce1acaf9827a18c8cc4a7e7ff766ea7edf305845') `
+            '990fb0f87cb6b86d5c715bd07884f30d0d525f0c20cbfd749daf3c6a70eaed74') `
             -Message "TEST-0151 fixed graph digest differs across supported hosts: $([string]$graph.digest)."
         $compactGraphJson = $graph | ConvertTo-Json -Depth 20 -Compress
         $compactGraphJsonSha = & $getSha256Action -Bytes (
             [Text.UTF8Encoding]::new($false).GetBytes($compactGraphJson)
         )
         Assert-True -Condition ($compactGraphJsonSha -ceq `
-            '4a3f0faa29c18e01fee674f09bc5da20256899fda9daf222362c1a1756e4d0e8') `
+            '04ba96bd4b76c98bc6b385b3caeb0841e66dc2a6fb21bb4766b54102f2e9d120') `
             -Message "TEST-0151 fixed compact graph serialization differs across supported hosts: $compactGraphJsonSha."
         Assert-True -Condition (
             ($graph | ConvertTo-Json -Depth 20 -Compress) -ceq
@@ -5036,7 +5036,7 @@ Required reading: [live](docs/INVALID-INFO-LIVE.md).
             [int]$limits.MaximumNodes -eq 512 -and
             [int]$limits.MaximumEdges -eq 8192 -and
             [int]$limits.MaximumDepth -eq 32 -and
-            [int]$limits.MaximumBlobBytes -eq 524288 -and
+            [int]$limits.MaximumBlobBytes -eq 1048576 -and
             [int]$limits.MaximumAggregateBlobBytes -eq 8388608 -and
             [int]$limits.MaximumPathUtf8Bytes -eq 32768
         ) -Message 'TEST-0223 prospective release-owned graph capacity differs from DEC-0036.'
@@ -5051,13 +5051,23 @@ Required reading: [live](docs/INVALID-INFO-LIVE.md).
             [int]$limits.MaximumAggregateBlobBytes - 1
         Set-TestInstructionGraphDigest -Graph $aggregateLimitDigestGraph `
             -PolicyModule $policyModule
+        $blobLimitDigestGraph = Copy-TestInstructionGraph -Graph $graph
+        $blobLimitDigestGraph.limits.maximumBlobBytes =
+            [int]$limits.MaximumBlobBytes - 1
+        Set-TestInstructionGraphDigest -Graph $blobLimitDigestGraph `
+            -PolicyModule $policyModule
         Assert-True -Condition (
             [string]$edgeLimitDigestGraph.digest -cne [string]$graph.digest -and
+            [string]$blobLimitDigestGraph.digest -cne [string]$graph.digest -and
             [string]$aggregateLimitDigestGraph.digest -cne
                 [string]$graph.digest -and
             [string]$edgeLimitDigestGraph.digest -cne
+                [string]$aggregateLimitDigestGraph.digest -and
+            [string]$edgeLimitDigestGraph.digest -cne
+                [string]$blobLimitDigestGraph.digest -and
+            [string]$blobLimitDigestGraph.digest -cne
                 [string]$aggregateLimitDigestGraph.digest
-        ) -Message 'TEST-0223 revised edge or aggregate capacity did not remain an exact canonical digest input.'
+        ) -Message 'TEST-0223 revised edge, per-blob, or aggregate capacity did not remain an exact canonical digest input.'
 
         [byte[]]$realisticGovernanceRootBytes =
             [Text.Encoding]::UTF8.GetBytes(

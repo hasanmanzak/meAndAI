@@ -4,8 +4,8 @@
 | --- | --- |
 | Authority | [FEAT-0069](../../../docs/features/FEAT-0069-instruction-graph-capacity/README.md), [DEC-0036](../../../docs/decisions/DEC-0036-prospective-instruction-graph-capacity.md), and [issue #175](https://github.com/hasanmanzak/meAndAI/issues/175) |
 | Baseline | Exact [`854bc97056d9e3250ab4c6caa7558825904466e8`](https://github.com/hasanmanzak/meAndAI/commit/854bc97056d9e3250ab4c6caa7558825904466e8): `356` nodes, `4096` edges, `311` parsed blobs, `4192113` parsed bytes |
-| Decision | Prospective `v0.17.0` remains schema `2`; edges become `8192` and aggregate parsed bytes become `8388608`; all unrelated limits and every target through `v0.16.0` remain exact |
-| State | Local verification complete; exact-head hosted delivery pending |
+| Decision | Prospective `v0.17.0` remains schema `2`; edges become `8192`, one parsed blob becomes `1048576`, and aggregate parsed bytes become `8388608`; every target through `v0.16.0` remains exact |
+| State | Per-blob amendment ReviewedLocalGreen; final exact-tree recurrence and delivery pending |
 
 ## Test-first evidence
 
@@ -27,6 +27,30 @@
   oracle at expected `91` versus actual `93`; the two new profile checks explain
   the exact delta. The bounded `93` oracle passed its owner in `7.6s`, and
   replacement hosted validation remains pending.
+
+## Per-blob and packet-budget amendment
+
+- A canonical ContractSlice B typed-design blob reached `525145/524288` before
+  safe historical compaction and retained only `2710` bytes of reserve after it.
+  The first complete B-WIRE test draft reached `996/700` normalized lines.
+- The maintainer authorized a bounded pre-failure amendment: prospective
+  `v0.17.0` per-blob capacity becomes `1048576`; immutable targets through
+  `v0.16.0` remain `524288`; B-WIRE aligns to the existing general `1200`-line
+  packet ceiling. Node, relation, aggregate, path, wire, runner, and evidence
+  limits do not broaden.
+- Fresh expected-red was exact: `234.1s`, exit `1`, and only the owned
+  prospective-capacity mismatch. Focused green passed in `236.2s` with all four
+  graph scenarios and exact `2/2` process plus `4/4` request counters.
+- Quick-adoption `ContractsPreflight` passed in `27.8s` with exact immutable and
+  prospective target profiles; direct source-graph dispatch passed in `5.1s`.
+  A broader vertical shard timed out at `304s` without a failure and remains
+  inconclusive rather than evidence.
+- The first StructureOnly run found only nine record-link structure defects.
+  After an edge-neutral wording correction, StructureOnly passed in `427.2s`
+  with owner observation `425411ms`; publication evidence passed `7/7` in
+  `286.7s` without a publication claim. Fresh amendment code/test and
+  content/scope reviews closed `0/0/0`; the evidence-only sync now requires one
+  final exact-tree recurrence before commit/push/hosted delivery.
 
 ## Boundary
 

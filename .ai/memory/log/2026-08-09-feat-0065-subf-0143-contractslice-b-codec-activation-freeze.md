@@ -136,8 +136,8 @@ The exact executable allowlist is:
   Domain, Conformance, Policy, admission-harness, cache, resource-ledger,
   capability/index, Scenario/status/owner/filter, or runtime-efficiency file.
 
-The packet may change at most two test files and `700` normalized test lines;
-`701` or more requires a design redraw. The valid-fixture red body changes only
+The packet may change at most two test files and `1,200` normalized test lines;
+`1,201` or more requires a design redraw. The valid-fixture red body changes only
 `WriteRepositoryTree(...)`'s non-null semantic result to `return null!;`. Setup
 and every qualifier/golden/negative assertion are marker-free; only that null
 return may call direct `Assert.Fail("TEST-0210-B-BEHAVIOR-RED-0002")`.

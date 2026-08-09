@@ -7,8 +7,11 @@ Latest immutable release before this unmerged development: **0.16.0**
 
 The bounded-capacity delivery is complete through
 [FEAT-0069](../../docs/features/FEAT-0069-instruction-graph-capacity/README.md):
-the prospective `v0.17.0` schema-2 profile selects `8192` edges and `8388608`
-aggregate parsed bytes while every target through `v0.16.0` remains immutable.
+the prospective `v0.17.0` schema-2 profile selects `8192` edges, `1048576`
+bytes per parsed blob, and `8388608` aggregate parsed bytes while every target
+through `v0.16.0` remains immutable. The bounded per-blob amendment is
+`ReviewedLocalGreen` and awaits its final exact-tree, commit/push, and hosted
+gates.
 Focused graph, quick-adoption profile, StructureOnly, and publication-evidence
 gates plus merged exact-main Ubuntu/Windows validation are green; canonical
 details remain in the

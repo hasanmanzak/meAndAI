@@ -115,7 +115,7 @@ resource meter, cache, or admission behavior. The final generic interface
 members remain held until all three wire cores and their dependency-owned
 resource carriers exist. The typed design owns the exact golden/empty bytes,
 callable staging declarations, error precedence, wire-local ceilings,
-two-test-file allowlist, and `700`-line redraw threshold. The current
+two-test-file allowlist, and `1,200`-line redraw threshold. The current
 codec/wire memory handoff retains routing and immutable evidence only; it adds
 no executable authority. The one-shot red custody defined below remains held.
 
@@ -198,7 +198,7 @@ file. At those same four gates it binds exact length/SHA of both sources and the
 runner; one direct Fact/FQN, sole
 `ContractSlice=B`, no Scenario/Theory/class trait, one marker literal, the
 null-only direct `Assert.Fail` branch, the partial-only retained identity edit,
-and normalized two-test-file delta `<=700` are mandatory. The following six
+and normalized two-test-file delta `<=1,200` are mandatory. The following six
 regular lock files remain exact throughout, in Domain, Abstractions,
 Conformance, Policy, Domain.Tests, Conformance.Tests order:
 

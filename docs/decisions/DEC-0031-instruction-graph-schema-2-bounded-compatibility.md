@@ -7,7 +7,7 @@
 - Related feature: [FEAT-0056](../features/FEAT-0056-v0155-instruction-graph-resilience/README.md)
 - Tracking: [BUG-0037 / issue #140](https://github.com/hasanmanzak/meAndAI/issues/140), [BUG-0039 / issue #142](https://github.com/hasanmanzak/meAndAI/issues/142), [BUG-0040 / issue #143](https://github.com/hasanmanzak/meAndAI/issues/143), [BUG-0043 / issue #146](https://github.com/hasanmanzak/meAndAI/issues/146), and [BUG-0044 / issue #147](https://github.com/hasanmanzak/meAndAI/issues/147)
 - Supersedes: [DEC-0024](DEC-0024-exact-instruction-graph-adoption-evidence.md) only for the current graph schema, current per-blob ceiling, and current protected-extension vocabulary; clarifies schema-2 reference/authority invariants without reinterpreting immutable schema-1 evidence
-- Prospective capacity revision: [DEC-0036](DEC-0036-prospective-instruction-graph-capacity.md) raises only the `v0.17.0` edge and aggregate parsed-byte ceilings; this decision remains authoritative for schema-2 grammar and every target through `v0.16.0`
+- Prospective capacity revision: [DEC-0036](DEC-0036-prospective-instruction-graph-capacity.md) raises only the `v0.17.0` edge, per-blob, and aggregate parsed-byte ceilings; this decision remains authoritative for schema-2 grammar and every target through `v0.16.0`
 
 ## Context
 
@@ -66,8 +66,8 @@ closed.
 2. Through `v0.16.0`, schema 2 raises only the inclusive per-blob parsing
    ceiling from 262,144 to 524,288 bytes. The aggregate parsed-blob ceiling
    remains 4,194,304 bytes; the tree, node, edge, depth, tree-path, and
-   graph-path limits are unchanged. The prospective `v0.17.0` edge and
-   aggregate revision is owned by [DEC-0036](DEC-0036-prospective-instruction-graph-capacity.md).
+   graph-path limits are unchanged. The prospective `v0.17.0` edge, per-blob,
+   and aggregate revision is owned by [DEC-0036](DEC-0036-prospective-instruction-graph-capacity.md).
 3. Schema 2 adds only `.mqproj` to the terminal protected source/binary
    vocabulary. An ordinary reference produces an unopened `ProtectedNonText`
    node and edge. The target is neither a compatibility candidate nor a
@@ -104,9 +104,9 @@ closed.
    | `v0.15.2` through `v0.15.4` | `1` / `262144` | `512` / `4096` / `32768` | `9` Proposed/Completed; `10` Publishing |
    | `v0.15.5` through `v0.16.0` | `2` / `524288` | `512` / `4096` / `32768` | `9` Proposed/Completed; `10` Publishing |
 
-   The separately reviewed prospective `v0.17.0` row retains schema `2`, blob
-   `524288`, nodes `512`, path `32768`, and marker family `9`/`10`, while
-   selecting edges `8192` and aggregate parsed bytes `8388608`. Gaps and other
+   The separately reviewed prospective `v0.17.0` row retains schema `2`, nodes
+   `512`, path `32768`, and marker family `9`/`10`, while selecting blob
+   `1048576`, edges `8192`, and aggregate parsed bytes `8388608`. Gaps and other
    future tags remain unsupported.
 
 8. All assessment, graph, strategy, closure, and marker semantics come from

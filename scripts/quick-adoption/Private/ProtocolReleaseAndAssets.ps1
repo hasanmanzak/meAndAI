@@ -575,7 +575,7 @@ function Import-CanonicalInitialAdoptionPolicy {
             },
             [pscustomobject]@{
                 MinimumTag = 'v0.17.0'; MaximumTag = 'v0.17.0'
-                Schema = 2; MaximumBlobBytes = 524288
+                Schema = 2; MaximumBlobBytes = 1048576
                 MaximumNodes = 512; MaximumEdges = 8192
                 MaximumAggregateBlobBytes = 8388608
                 MaximumPathUtf8Bytes = 32768

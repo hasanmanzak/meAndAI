@@ -16,7 +16,9 @@ scenario remains `Planned`.
 Follow the current
 [instruction-graph capacity handoff](2026-08-09-feat-0069-instruction-graph-capacity.md)
 for the prospective `v0.17.0` profile and immutable prior-target boundary.
-Merged exact-main Ubuntu/Windows validation is green; release and publication
+The original edge/aggregate delivery has merged exact-main Ubuntu/Windows
+green. Its bounded per-blob/B-WIRE-budget amendment is `ReviewedLocalGreen` and
+awaits final exact-tree, commit/push, and hosted gates; release and publication
 remain separate.
 
 Follow the current

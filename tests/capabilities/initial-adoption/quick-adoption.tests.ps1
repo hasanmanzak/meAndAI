@@ -3939,6 +3939,7 @@ try {
                 Tag = 'v0.16.0'
                 Workflow = $runtimeWorkflowSnapshot
                 Policy = $runtimePolicySnapshot
+                BlobBytes = 524288
                 Edges = 4096
                 AggregateBytes = 4194304
             },
@@ -3947,6 +3948,7 @@ try {
                 Tag = 'v0.17.0'
                 Workflow = $prospectiveWorkflowSnapshot
                 Policy = $prospectivePolicySnapshot
+                BlobBytes = 1048576
                 Edges = 8192
                 AggregateBytes = 8388608
             }
@@ -3967,7 +3969,8 @@ try {
                     [string]$capacityContract.ImportedTag -cne
                         [string]$capacityCase.Tag -or
                     [int]$capacityContract.GraphSchema -ne 2 -or
-                    [int]$capacityContract.MaximumBlobBytes -ne 524288 -or
+                    [int]$capacityContract.MaximumBlobBytes -ne
+                        [int]$capacityCase.BlobBytes -or
                     [int]$capacityContract.MaximumEdges -ne
                         [int]$capacityCase.Edges -or
                     [int]$capacityContract.MaximumAggregateBlobBytes -ne

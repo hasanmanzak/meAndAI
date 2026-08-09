@@ -158,7 +158,7 @@ reruns it. Its activation-stage codec interface remains memberless, focused/B/
 cumulative green is `1/1`, `3/3`, and `35/35`, and its exact head is hosted
 green. `B-WIRE-REPOSITORY-TREE-01` freezes the same-object Tests-owned mirror
 core, `257`-byte golden and `197`-byte empty frame, four mutually exclusive
-failure categories, two-test-file/`700`-line boundary, and sole ordinal `0002`
+failure categories, two-test-file/`1,200`-line boundary (`1,201` redraws), and sole ordinal `0002`
 red. Executable work remains inactive until the synchronized design head is
 hosted green; every later packet remains predecessor-gated.
 

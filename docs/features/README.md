@@ -68,7 +68,7 @@
 | [FEAT-0066](FEAT-0066-shared-execution-authority-foundation/README.md) | [Shared execution-authority foundation](FEAT-0066-shared-execution-authority-foundation/README.md) | Proposed under accepted architecture / implementation not authorized | 0.17.0 |
 | [FEAT-0067](FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md) | [Evidence acquisition and managed consumer integration](FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md) | Proposed under accepted architecture / implementation not authorized | 0.17.0 |
 | [FEAT-0068](FEAT-0068-protocol-release-finalizer-authority-transfer/README.md) | [Protocol release finalizer and authority transfer](FEAT-0068-protocol-release-finalizer-authority-transfer/README.md) | Proposed under accepted architecture / implementation not authorized | 0.17.0 |
-| [FEAT-0069](FEAT-0069-instruction-graph-capacity/README.md) | [Bounded instruction-graph capacity revision](FEAT-0069-instruction-graph-capacity/README.md) | Local verification complete; exact-head hosted gate pending | 0.17.0 |
+| [FEAT-0069](FEAT-0069-instruction-graph-capacity/README.md) | [Bounded instruction-graph capacity revision](FEAT-0069-instruction-graph-capacity/README.md) | Per-blob amendment ReviewedLocalGreen; delivery pending | 0.17.0 |
 
 The [preserved coverage-equivalence WIP draft](https://github.com/hasanmanzak/meAndAI/blob/1873c98638ba4960734aadb188eb8c8d70b4bc52/docs/features/FEAT-0064-governance-coverage-equivalence/README.md?plain=1)
 was allocated only on the preserved, unmerged
