@@ -3,14 +3,14 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted; ContractSlice A merged and exact-main hosted green. ContractSlice B is `FrozenDesign`/inactive pending this design delivery's exact-head hosted-green gate and a separate implementation directive; [TEST-0210](test-cases.md#test-0210) remains `Planned`; C/D, final activation, and DoD remain held. |
+| Status | Gate 2 accepted; ContractSlice A merged/exact-main green. `B-SURFACE-01` is `ReviewedLocalGreen`, B `2/11`, cumulative A+B `34/43`, exact-head hosted pending; [TEST-0210](test-cases.md#test-0210) remains `Planned`; later B packets, C/D, final activation, and DoD remain held. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Test | [TEST-0210](test-cases.md#test-0210) |
 | Gate 3 micro-delivery routing | Historical A delivery remains owned by the [A micro-delivery control plan](subf-0143-micro-delivery-plan.md). Current B design routing is the [ContractSlice B micro-delivery plan](subf-0143-contractslice-b-micro-delivery-plan.md); packet labels refine delivery but activate no executable work. |
 | Exact-main design baseline | Accepted A merge commit [`51623f4d404a95e0f706d72805cf7ddbbbd293b8`](https://github.com/hasanmanzak/meAndAI/commit/51623f4d404a95e0f706d72805cf7ddbbbd293b8), validated by exact-main [run 31304787603](https://github.com/hasanmanzak/meAndAI/actions/runs/31304787603) |
-| Design and Gate 3 authority | Historical A directives and clarifications remain immutable evidence. The current [ContractSlice B design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5230762350) authorizes only the B micro-delivery plan, design freeze, reviews, record synchronization, commit/push, draft PR, and hosted-check correction. It authorizes no B red, test, C# implementation, or executable-surface change; C/D, final activation, merge, release, and publication remain outside that authority. |
+| Design and Gate 3 authority | Historical A directives and clarifications remain immutable evidence. The accepted B design delivery plus maintainer packet authority permits only `B-SURFACE-01` canonical SurfaceRed, bounded structural C#, tests, synchronization, commit/push, draft PR, and hosted correction. `B-CODEC-ACTIVATION-01`, C/D, final activation, merge, release, and publication remain outside that authority. |
 | Completed predecessor | [SUBF-0153](README.md#subf-0153) / [TEST-0221](test-cases.md#test-0221), merged through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173) and exact-main validated by [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) |
 
 ## Directive and hard boundary
@@ -28,12 +28,11 @@ accepted [SUBF-0153](README.md#subf-0153) design.
 
 The current
 [ContractSlice B design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5230762350)
-authorizes only the linked B micro-delivery plan and the normative B freeze in
-this record. It does not authorize SurfaceRed, BehaviorRed, a test/source/
-project/package/lock/workflow change, or any C# implementation. Those actions
-remain inactive until this exact design cohort is committed, pushed, exact-head
-hosted green, accepted through review, and followed by a separate maintainer
-implementation directive naming the first active packet.
+authorized only the linked B micro-delivery plan and normative B freeze. That
+predecessor authority activated no executable work. After its accepted
+exact-main delivery, the later maintainer packet authority named only
+`B-SURFACE-01`; its immutable SurfaceRed and bounded structural C# green are
+now complete locally. BehaviorRed and every later B packet remain inactive.
 
 The append-only
 [BehaviorRed evidence clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139945054)
@@ -1350,6 +1349,15 @@ will be exactly `11` direct Facts with only `ContractSlice=B`, no `Scenario`,
 and ordinal LF-terminated FQN digest
 `FAA35F542B1C88DFD228920CB437A9F38C220591726F1ACCA3D756603DAD62AB`.
 
+Public export-total ownership advances with the active slice. The retained A
+PublicApi Fact preserves its exact FQN, direct Fact/trait, and A-owned
+type/member/friend/negative-surface snapshot, but proves those 48 exports by
+exact containment rather than claiming that the growing assemblies contain no
+later-slice exports. The B PublicApi Fact is the sole exact cumulative-total
+owner at `72`. C and D must repeat the same predecessor-containment/current-
+total transition; no retained predecessor Fact may become stale when a later
+public surface is added.
+
 B owns codec activation, the three persistent protocol wires, Tests-only
 private proof admission, the decode/model cache, codec-local four-counter
 resource accounting, sealed ContextProof/Root shapes, and codec-derived
@@ -1358,10 +1366,9 @@ provider-neutral capability semantics, shared-root ledgers, staged planning,
 kernel evaluation, real Policy export, the initial real-rule set, Scenario
 activation, workflow filters, or runtime-efficiency changes. The design phase
 has P/R/G `NotApplicable`, an
-empty executable allowlist, and no B implementation authority. Global B
-activation remains forbidden until this design delivery is reviewed, committed,
-pushed, exact-head hosted green, accepted, and followed by a separate
-maintainer implementation directive.
+empty executable allowlist, and no B implementation authority. Beyond the
+separately authorized `B-SURFACE-01`, B activation remains forbidden until the
+next packet receives its own reviewed maintainer directive.
 
 ## Gate 2 outcome
 

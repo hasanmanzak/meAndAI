@@ -6,7 +6,7 @@
 | Parent epic | [EPIC-0002 / issue #163](https://github.com/hasanmanzak/meAndAI/issues/163) |
 | Architecture task | [TASK-0003 / issue #164](https://github.com/hasanmanzak/meAndAI/issues/164) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
-| Current authority | ContractSlice A is merged and exact-main hosted green. ContractSlice B is `FrozenDesign`/inactive; design delivery is authorized, but SurfaceRed, BehaviorRed, tests, C# implementation, C/D, activation, merge/release/publication remain held. |
+| Current authority | ContractSlice A is merged/exact-main green. `B-SURFACE-01` is `ReviewedLocalGreen` at B `2/11` and A+B `34/43`, hosted pending; `B-CODEC-ACTIVATION-01`, C/D, activation, merge/release/publication remain held. |
 
 This plan allocates the accepted architecture to stable delivery records. It
 did not itself authorize implementation. The later
@@ -235,11 +235,11 @@ enumeration, pagination, freshness, and acquisition completeness belong to
 | Stable successor features and issue links | Satisfied by this plan |
 | First rule/specification/qualification/evidence matrix | Satisfied at design level by [the first matrix](#5-first-rulespecificationqualificationevidence-matrix) |
 | Exact WIP disposition and destination | Satisfied at design level by the [WIP extraction ledger](wip-extraction-ledger.md); no extraction is authorized |
-| Selected-slice Gate 1 and expected-red design | Predecessor Gate 1 slices and scenarios are complete. [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)/[TEST-0210](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) ContractSlice A is merged; B is design-frozen/inactive; the scenario remains `Planned`. |
+| Selected-slice Gate 1 and expected-red design | Predecessor Gate 1 slices and scenarios are complete. [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)/[TEST-0210](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) ContractSlice A is merged; B structural surface is local green while later B packets are inactive; the scenario remains `Planned`. |
 | Feature Gate 2 design review | Completed for [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152); accepted/merged/exact-main for [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153); accepted/merged/bounded exact-main for [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143) at [`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7); every later slice remains unsatisfied |
 | Exact accepted-head structural validation | Architecture and predecessor subfeatures are exact-main validated. ContractSlice A was completed through [merged PR #174](https://github.com/hasanmanzak/meAndAI/pull/174); its exact merge/run evidence is owned by the current B plan and canonical handoff. |
 | [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143) typed-handoff Gate 2 | Satisfied at exact-main predecessor [`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7); downstream activation remains gated. |
-| Separate maintainer implementation directive | Historical A authority is satisfied. The current B directive is design-only and does not authorize a red, test, or C# implementation; a new directive must name the first active B packet after design acceptance. C/D, final Scenario/status/owner/workflow, runtime-efficiency activation, merge, release, and publication remain held. |
+| Separate maintainer implementation directive | Satisfied for the bounded `B-SURFACE-01` structural packet only; its canonical SurfaceRed is immutable and structural green is local. A new directive must name `B-CODEC-ACTIVATION-01`; C/D, final Scenario/status/owner/workflow, runtime-efficiency activation, merge, release, and publication remain held. |
 
 The issued [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153)
 directive names exactly one dependency-closed subfeature and its bounded

@@ -3,14 +3,14 @@
 | Field | Value |
 | --- | --- |
 | Classification | Gate 2 micro-delivery plan and design freeze |
-| State | `FrozenDesign`; implementation inactive pending this design delivery's exact-head hosted-green gate and a separate implementation directive |
+| State | `B-SURFACE-01` `ReviewedLocalGreen`; B `2/11`, cumulative A+B `34/43`, exact-head hosted pending; later packets inactive |
 | Parent | Owning feature and current subfeature |
 | Scenario | [TEST-0210](test-cases.md#test-0210), still `Planned` |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Design-only authority | [Maintainer directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5230762350) |
 | Accepted predecessor | Accepted A merge commit [`51623f4d404a95e0f706d72805cf7ddbbbd293b8`](https://github.com/hasanmanzak/meAndAI/commit/51623f4d404a95e0f706d72805cf7ddbbbd293b8); exact-main [run 31304787603](https://github.com/hasanmanzak/meAndAI/actions/runs/31304787603) passed Ubuntu `6m11s`, Windows `11m21s`, publication verification skipped |
 | Normative owner | [Typed evaluation kernel design](subf-0143-typed-evaluation-kernel-design.md) |
-| Implementation language | C# only; this design delivery changes no executable surface |
+| Implementation language | C# only; the active structural packet changes only its frozen carrier/test surface |
 
 ## Authority and non-goals
 
@@ -92,7 +92,7 @@ semantic packages own one Fact and one immutable BehaviorRed ordinal each.
 
 | Packet | Frozen contract | Red identity | Required green boundary |
 | --- | --- | --- | --- |
-| `B-SURFACE-01` | Exact 24-type B public surface, member/nullability/factory inventory, cumulative export count `72`, exact friend matrix, zero Domain export, and negative public surface | Permanent SurfaceRed: `CS0246`, `ContractSliceB.SurfaceRed.cs`, `5:38-5:65`, token `IObservedQualificationProof`; no BehaviorRed | PublicApi `1/1`, Ownership `1/1`, B `2/2`, cumulative A+B `34/34`; no runtime activation |
+| `B-SURFACE-01` | Exact 24-type B public surface, member/nullability/factory inventory, cumulative export count `72`, exact friend matrix, zero Domain export, negative public surface, and transfer of whole-assembly export-total ownership from the retained A PublicApi Fact to the B PublicApi Fact | Permanent SurfaceRed: `CS0246`, `ContractSliceB.SurfaceRed.cs`, `5:38-5:65`, token `IObservedQualificationProof`; no BehaviorRed | PublicApi `1/1`, Ownership `1/1`, B `2/2`, cumulative A+B `34/34`; retained A PublicApi FQN/trait/member snapshot green; no runtime activation |
 | `B-CODEC-ACTIVATION-01` | Exact codec-registration/model-token subset, writer/qualifier pair ownership, Tests-only private activation proof, and non-null activated harness | `TEST-0210-B-BEHAVIOR-RED-0001`; `ContractSliceBActivationTests.Activates_exact_codec_mirror` | Focused `1/1`; B `3/3`; A+B `35/35` |
 | `B-WIRE-REPOSITORY-TREE-01` | `protocol.repository-tree/1` golden bytes, strict frame, scope/location equality, exact entry-kind/path order, empty tree, malformed grammar | `TEST-0210-B-BEHAVIOR-RED-0002`; `ContractSliceBRepositoryTreeCodecTests.Round_trips_exact_repository_tree_wire` | Focused `1/1`; B `4/4`; A+B `36/36` |
 | `B-WIRE-GOVERNED-TEXT-01` | `protocol.governed-text/1` golden bytes, strict UTF-8 framing, byte preservation, empty body, Repository/Provider leaf matrix | `TEST-0210-B-BEHAVIOR-RED-0003`; `ContractSliceBGovernedTextCodecTests.Round_trips_exact_governed_text_wire` | Focused `1/1`; B `5/5`; A+B `37/37` |
@@ -112,6 +112,13 @@ proves initial B surface absence once. The public surface must then close as one
 reviewed structural phase because exposing multiple missing symbols would
 invalidate the one-diagnostic oracle. Its internal file staging cannot be
 pushed, published, or treated as independent packet completion.
+
+The retained A PublicApi Fact keeps its exact FQN, direct Fact and
+`ContractSlice=A` trait, A-owned 48-type/member snapshot, friend boundary, and
+negative surface. Its obsolete whole-assembly-total equality becomes exact
+containment of the A-owned exports. The B PublicApi Fact becomes the sole owner
+of current cumulative assembly-total equality at `72`. Every later slice
+surface repeats this predecessor-containment/current-total ownership transfer.
 
 Each semantic packet begins only after a warning-free Release build of its
 accepted predecessor. Its temporary implementation changes exactly the tested
@@ -143,12 +150,14 @@ Before each packet, freeze and review:
 No active packet may mutate more than eight production files and two test files
 or add more than 1,200 normalized lines without a reviewed redraw. The one
 structural exception may create at most 24 public-type carrier files plus two
-test files and add at most 2,500 normalized lines; the exact public type
-inventory, not one-type-per-file layout, is authoritative and the packet owns
-no semantic activation.
-Existing project, package, lock, workflow, A test/source, and Domain source
-files are immutable unless a packet freeze names and proves an unavoidable
-exact change. No packet may change the final Scenario/status/owner/filter route.
+B test files, modify only the retained A PublicApi test file for the exact
+total-to-containment ownership transfer above, and add at most 2,500 normalized
+source/test lines. The exact public type inventory, not one-type-per-file
+layout, is authoritative and the packet owns no semantic activation.
+Existing project, package, lock, workflow, every other A test/source file, and
+Domain source files are immutable unless a packet freeze names and proves an
+unavoidable exact change. No packet may change the final
+Scenario/status/owner/filter route.
 
 ## Green, review, and delivery gates
 
@@ -180,10 +189,9 @@ project, package, lock, workflow, release, or consumer file. The user-owned
 
 ## Exit condition
 
-This plan becomes an accepted `FrozenDesign` predecessor only after its exact
-record cohort passes link/StructureOnly/publication-evidence checks, two final
-reviews, commit/push, and exact-head hosted green. That outcome authorizes no B
-test or C# implementation by itself. A separate maintainer implementation
-directive must name the first active packet. C/D, final activation, feature
-DoD, release, publication, consumer mutation, authority transfer, and
-PowerShell retirement remain held.
+This plan is the accepted `FrozenDesign` predecessor. The later maintainer
+directive named only `B-SURFACE-01`, whose immutable red and bounded structural
+green are now local. That outcome authorizes no next B test or C# implementation
+by itself. A separate directive must name `B-CODEC-ACTIVATION-01`. C/D, final
+activation, feature DoD, release, publication, consumer mutation, authority
+transfer, and PowerShell retirement remain held.

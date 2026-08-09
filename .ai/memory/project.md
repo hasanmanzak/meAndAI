@@ -151,7 +151,7 @@ Last verified: **2026-08-09**
   Ubuntu in `20m44s` and Windows in `46m51s`; publication verification was
   correctly skipped. The exact lifecycle implementation identity recorded in
   the canonical handoff passed Ubuntu in `19m36s` and Windows in `36m02s`; publication verification was
-  correctly skipped. ContractSlice A is merged and exact-main hosted green. ContractSlice B is `FrozenDesign`/inactive pending its design delivery's exact-head hosted-green gate and a separate implementation directive; the parent scenario, C/D, and final activation remain held. Follow the current [canonical log index](log/README.md). The
+  correctly skipped. ContractSlice A is merged/exact-main green. `B-SURFACE-01` is `ReviewedLocalGreen` at B `2/11` and cumulative A+B `34/43`, exact-head hosted pending; the parent scenario, later B packets, C/D, and final activation remain held. Follow the current [canonical log index](log/README.md). The
   predecessor-manifest exact-head hosted-green handoff indexed there is
   immutable history; the admission-proof reviewed-local-green handoff,
   the selector reviewed-local-green handoff in the canonical log index,

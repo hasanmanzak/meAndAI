@@ -6,10 +6,10 @@ and follow its canonical links.
 ## Current continuation
 
 Follow the current
-[ContractSlice B design-freeze handoff](2026-08-09-feat-0065-subf-0143-contractslice-b-design-freeze.md).
-ContractSlice A is merged and exact-main hosted green; B is `FrozenDesign` and
-inactive pending this design delivery's exact-head hosted-green gate and a
-separate implementation directive. The parent scenario remains `Planned`.
+[ContractSlice B surface handoff](2026-08-09-feat-0065-subf-0143-contractslice-b-surface-freeze.md).
+ContractSlice A is merged/exact-main green; `B-SURFACE-01` is
+`ReviewedLocalGreen` at B `2/11` and cumulative A+B `34/43`, exact-head hosted
+pending. Later B packets are inactive and the parent scenario remains `Planned`.
 
 Follow the current
 [instruction-graph capacity handoff](2026-08-09-feat-0069-instruction-graph-capacity.md)
@@ -390,6 +390,7 @@ conversations while disallowing force pushes and deletion.
 
 ## History
 
+- [2026-08-09 - ContractSlice B structural surface](2026-08-09-feat-0065-subf-0143-contractslice-b-surface-freeze.md)
 - [2026-08-09 - ContractSlice B design freeze](2026-08-09-feat-0065-subf-0143-contractslice-b-design-freeze.md)
 - [2026-08-07 - ContractSlice A lifecycle ReviewedLocalGreen](2026-08-07-feat-0065-subf-0143-contractslice-a-lifecycle-green.md)
 - [2026-08-07 - ContractSlice A lifecycle FrozenDesign](2026-08-07-feat-0065-subf-0143-contractslice-a-lifecycle-freeze.md)
