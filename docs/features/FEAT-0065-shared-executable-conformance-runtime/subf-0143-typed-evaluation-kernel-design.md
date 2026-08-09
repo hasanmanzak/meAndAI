@@ -3,14 +3,14 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted; ContractSlice A merged/exact-main green. B surface, codec activation, and repository-tree wire are exact-head hosted green; `B-WIRE-GOVERNED-TEXT-01` is `FrozenDesign`/inactive pending this synchronized design head's hosted gate. B is `4/11`, cumulative A+B is `36/43`. [TEST-0210](test-cases.md#test-0210) remains `Planned`; later B packets, C/D, final activation, and DoD remain held. |
+| Status | Gate 2 accepted; ContractSlice A merged/exact-main green. B surface, codec activation, and repository-tree wire are exact-head hosted green; `B-WIRE-GOVERNED-TEXT-01` is `ReviewedLocalGreen` with its implementation-head hosted gate pending. B is `5/11`, cumulative A+B is `37/43`. [TEST-0210](test-cases.md#test-0210) remains `Planned`; later B packets, C/D, final activation, and DoD remain held. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Test | [TEST-0210](test-cases.md#test-0210) |
 | Gate 3 micro-delivery routing | Historical A delivery remains owned by the [A micro-delivery control plan](subf-0143-micro-delivery-plan.md). Current B design routing is the [ContractSlice B micro-delivery plan](subf-0143-contractslice-b-micro-delivery-plan.md); packet labels refine delivery but activate no executable work. |
 | Exact-main design baseline | Accepted A merge commit [`51623f4d404a95e0f706d72805cf7ddbbbd293b8`](https://github.com/hasanmanzak/meAndAI/commit/51623f4d404a95e0f706d72805cf7ddbbbd293b8), validated by exact-main [run 31304787603](https://github.com/hasanmanzak/meAndAI/actions/runs/31304787603) |
-| Design and Gate 3 authority | Historical A directives and clarifications remain immutable evidence. Surface, codec activation, and repository-tree wire are immutable hosted-green predecessors. Governed-text is frozen below but remains inactive until the exact commit containing this synchronized design is hosted green. Later B packets remain predecessor-gated; C/D, final activation, merge, release, and publication remain outside that authority. |
+| Design and Gate 3 authority | Historical A directives and clarifications remain immutable evidence. Surface, codec activation, and repository-tree wire are immutable hosted-green predecessors. Governed-text has one immutable canonical red and bounded local green; its successor stays inactive until the exact implementation commit is hosted green. Later B packets remain predecessor-gated; C/D, final activation, merge, release, and publication remain outside that authority. |
 | Completed predecessor | [SUBF-0153](README.md#subf-0153) / [TEST-0221](test-cases.md#test-0221), merged through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173) and exact-main validated by [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) |
 
 ## Directive and hard boundary
@@ -4480,7 +4480,7 @@ or any construction failure in the decoded scope is invalid-repository-tree;
 known-but-disallowed surface/rank is payload-location-mismatch. Only a fully
 parsed valid embedded identity can reach embedded-identity-mismatch.
 
-### Frozen `B-WIRE-GOVERNED-TEXT-01` staging contract
+### Reviewed-local-green `B-WIRE-GOVERNED-TEXT-01` staging contract
 
 The repository-tree implementation is immutable exact-head hosted-green
 predecessor evidence. Governed text reuses the same Tests-owned same-object
@@ -4593,16 +4593,17 @@ The exact Provider fixture is:
 | Field | Exact value |
 | --- | --- |
 | Target subject / source / surface | `provider` / `github` / `provider` |
-| Target and boundary snapshot / identity | `provider-event` / `event-42` |
+| Target snapshot / identity | `provider-event` / `event-42` |
+| Boundary snapshot / identity | `provider-event` / `0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef` |
 | Started / completed UTC ticks | `0` / `1` |
 | Location | Provider rank `1`; service `github`; object type `provider.issue`; stable object `object42`; version `version-7`; field `body`; line/fragment null |
 | Body | exact ASCII bytes for `provider body\n` |
 
-Its canonical payload is `218` bytes with SHA-256
-`61741F3C96D96032352AAEA65B20324C178A7ED066254FE6C87F8057C2C6B6EA`:
+Its canonical payload is `274` bytes with SHA-256
+`D75DBDC44A92B21AADF730B6E5D65A992E74C8847F613DC7D378CA1F6B104F5E`:
 
 ```text
-cHJvdG9jb2wuZ292ZXJuZWQtdGV4dC8xCgAAAAhwcm92aWRlcgAAAAZnaXRodWIAAAAIcHJvdmlkZXIAAAAOcHJvdmlkZXItZXZlbnQAAAAIZXZlbnQtNDIAAAAOcHJvdmlkZXItZXZlbnQAAAAIZXZlbnQtNDIAAAAAAAAAAAAAAAAAAAABAQAAAAZnaXRodWIAAAAOcHJvdmlkZXIuaXNzdWUAAAAIb2JqZWN0NDIAAAAJdmVyc2lvbi03AQAAAARib2R5AAAAAAAOcHJvdmlkZXIgYm9keQo=
+cHJvdG9jb2wuZ292ZXJuZWQtdGV4dC8xCgAAAAhwcm92aWRlcgAAAAZnaXRodWIAAAAIcHJvdmlkZXIAAAAOcHJvdmlkZXItZXZlbnQAAAAIZXZlbnQtNDIAAAAOcHJvdmlkZXItZXZlbnQAAABAMDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWYwMTIzNDU2Nzg5YWJjZGVmMDEyMzQ1Njc4OWFiY2RlZgAAAAAAAAAAAAAAAAAAAAEBAAAABmdpdGh1YgAAAA5wcm92aWRlci5pc3N1ZQAAAAhvYmplY3Q0MgAAAAl2ZXJzaW9uLTcBAAAABGJvZHkAAAAAAA5wcm92aWRlciBib2R5Cg==
 ```
 
 The source-body and complete-payload ceilings are independently

@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Gate 2 micro-delivery plan and design freeze |
-| State | `B-SURFACE-01`, `B-CODEC-ACTIVATION-01`, and `B-WIRE-REPOSITORY-TREE-01` exact-head hosted green; `B-WIRE-GOVERNED-TEXT-01` `FrozenDesign`/inactive pending this synchronized design head's hosted gate; B `4/11`, cumulative A+B `36/43`; later packets inactive |
+| State | `B-SURFACE-01`, `B-CODEC-ACTIVATION-01`, and `B-WIRE-REPOSITORY-TREE-01` exact-head hosted green; `B-WIRE-GOVERNED-TEXT-01` `ReviewedLocalGreen` with its implementation-head hosted gate pending; B `5/11`, cumulative A+B `37/43`; later packets inactive |
 | Parent | Owning feature and current subfeature |
 | Scenario | [TEST-0210](test-cases.md#test-0210), still `Planned` |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
@@ -144,9 +144,9 @@ rather than accumulates predecessor commit/run relations. The schema-2 graph
 ceilings remain `8,192` relations and `8,388,608` parsed bytes; an exact-tree
 projection and fresh wire-specific reviews are mandatory before commit.
 
-### Frozen `B-WIRE-GOVERNED-TEXT-01` staging boundary
+### Reviewed-local-green `B-WIRE-GOVERNED-TEXT-01` staging boundary
 
-The next wire packet extends only the retained same-object Tests-owned
+The governed-text wire packet extends only the retained same-object Tests-owned
 `GovernedTextCodecMirror` and `GovernedTextModelMirror` identities as partial
 types. It modifies only `ContractSliceBActivationTests.cs` for those two
 partial declarations and adds only
@@ -332,8 +332,8 @@ project, package, lock, workflow, release, or consumer file. The user-owned
 
 This plan was the accepted `FrozenDesign` predecessor. The surface, codec
 activation, and repository-tree wire packets are immutable exact-head hosted-
-green history. Governed-text is `FrozenDesign`/inactive at B `4/11` and A+B
-`36/43`; its exact synchronized design head must become hosted green before
-canonical red, and every successor stays inactive until that gate closes. C/D, final
+green history. Governed-text is `ReviewedLocalGreen` at B `5/11` and A+B
+`37/43`; its exact implementation head must become hosted green before the next
+packet can activate. Every successor stays inactive until that gate closes. C/D, final
 activation, feature DoD, release, publication, consumer mutation, authority
 transfer, and PowerShell retirement remain held.

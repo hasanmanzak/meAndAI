@@ -166,13 +166,13 @@ public sealed class ContractSliceBActivationTests
     }
 }
 
-internal sealed class GovernedTextModelMirror : IProtocolSemanticModel;
+internal sealed partial class GovernedTextModelMirror : IProtocolSemanticModel;
 
 internal sealed class RepositoryTargetModelMirror : IProtocolSemanticModel;
 
 internal sealed partial class RepositoryTreeModelMirror : IProtocolSemanticModel;
 
-internal sealed class GovernedTextCodecMirror :
+internal sealed partial class GovernedTextCodecMirror :
     ICanonicalPayloadCodec<GovernedTextModelMirror>;
 
 internal sealed class RepositoryTargetCodecMirror :

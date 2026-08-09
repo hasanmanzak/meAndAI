@@ -3,11 +3,12 @@
 | Field | Value |
 | --- | --- |
 | Packet | `B-CODEC-ACTIVATION-01` / `B-WIRE-REPOSITORY-TREE-01` / `B-WIRE-GOVERNED-TEXT-01` |
-| State | Codec activation and repository-tree wire `ReviewedHostedGreen`; corrected governed-text `FrozenDesign`/inactive pending the synchronized correction head's hosted gate |
+| State | Codec activation and repository-tree wire `ReviewedHostedGreen`; governed-text `ReviewedLocalGreen` with its implementation-head hosted gate pending |
 | Parent | Owning ContractSlice B micro-delivery plan |
 | Scenario | Parent scenario retained `Planned` |
 | Exact repository-tree predecessor | [`be94ea6da507e654e325b7cfc97074b3b0e5bacd`](https://github.com/hasanmanzak/meAndAI/commit/be94ea6da507e654e325b7cfc97074b3b0e5bacd); exact-head [run 31329704543](https://github.com/hasanmanzak/meAndAI/actions/runs/31329704543) passed Ubuntu `21m01s`, Windows `46m10s`, publication verification skipped |
-| Exact first-design diagnostic | [`15032cd84cf1bee66cfe37d528dca4e938f03311`](https://github.com/hasanmanzak/meAndAI/commit/15032cd84cf1bee66cfe37d528dca4e938f03311); exact-head [run 31334875316](https://github.com/hasanmanzak/meAndAI/actions/runs/31334875316) passed Ubuntu `19m47s`, Windows `47m09s`, publication verification skipped; pre-red byte audit then found the optional-null vector defect, with no runner/red/implementation |
+| Exact first-design diagnostic | The first hosted design passed both stable jobs; pre-red byte audit then found the optional-null vector defect, with no runner/red/implementation, so that predecessor grants no authority |
+| Exact corrected design predecessor | [`af199d652aa8d92b74b88367ffb6e590a3bafd3c`](https://github.com/hasanmanzak/meAndAI/commit/af199d652aa8d92b74b88367ffb6e590a3bafd3c); exact-head [run 31338164901](https://github.com/hasanmanzak/meAndAI/actions/runs/31338164901) passed Ubuntu `21m49s`, Windows `48m51s`, publication verification skipped |
 | Implementation language | C# only |
 
 ## Immutable codec-activation boundary
@@ -296,7 +297,8 @@ once. It is immutable and must never be rerun.
   `4/4`, full Conformance `36/36`, and Domain `98/98` pass. The executable delta
   is `581/1,200` normalized lines; locks, projects, packages, and workflows are
   unchanged. Product/test and evidence/scope reviews are `0/0/0`.
-- B is `4/11` and cumulative A+B is `36/43`. Exact implementation-head
+- At that repository-tree checkpoint, B was `4/11` and cumulative A+B was
+  `36/43`. Exact implementation-head
   StructureOnly, publication evidence, commit/push, and hosted validation are
   green at the exact predecessor above; the canonical red is immutable.
 
@@ -314,8 +316,9 @@ once. It is immutable and must never be rerun.
   start before the commit containing this exact twelve-record freeze is pushed
   and exact-head hosted green.
 - The frozen green boundary is focused `1/1`, B `5/5`, A+B/full Conformance
-  `37/37`, and Domain `98/98`. B remains `4/11` and A+B `36/43` until then;
-  the parent scenario and every later/downstream hold remain unchanged.
+  `37/37`, and Domain `98/98`. At that design checkpoint B remained `4/11` and
+  A+B `36/43`; the parent scenario and every later/downstream hold remained
+  unchanged.
 
 ## Corrected governed-text wire design reviews
 
@@ -324,9 +327,11 @@ once. It is immutable and must never be rerun.
   `optional T` grammar and Domain leaf invariants. The byte-level review occurred
   before runner materialization, canonical red, or source/test implementation;
   that first design is diagnostic-only and grants no executable authority.
-- Corrected Repository, empty, and Provider vectors are respectively
-  `270/93261D43...CDAA`, `261/89DD683B...452F`, and
-  `218/61741F3C...B6EA`; every declared null optional is now one exact zero tag.
+- Corrected Repository and empty vectors are `270/93261D43...CDAA` and
+  `261/89DD683B...452F`. Green model validation then proved ProviderEvent target
+  identity `event-42` must pair with a SHA-256 boundary identity; the final
+  Provider vector is `274/D75DBDC4...4F5E`. Every declared null optional remains
+  one exact zero tag, and canonical R=0003's Repository fixture is unchanged.
 - Renewed semantic/runner D/RT: `0 Blocking / 0 Important / 0 Minor`; the same-object
   topology, closed carrier/result declarations, exact Repository/Provider/empty
   vectors, UTF-8/BOM grammar, failure precedence, equality/first-one-over
@@ -340,6 +345,33 @@ once. It is immutable and must never be rerun.
   redraw. Node, relation, aggregate-byte, runner-log, report, timeout, and
   evidence-root limits remain unchanged; exact-tree StructureOnly and the
   publication-evidence recurrence must pass before commit.
-- The packet remains `FrozenDesign`/inactive. These reviews authorize only the
-  design delivery; no runner materialization, canonical red, or implementation
-  begins before its exact synchronized design head is hosted green.
+- That corrected design delivery became exact-head hosted green before any
+  runner materialization or canonical red. Its immutable execution evidence is
+  recorded below.
+
+## Governed-text immutable red and bounded local green
+
+- The sole accepted R=0003 used runner `37,101` bytes / SHA-256
+  `C420175B0379338CE88F6B97B7719F4F7D293C243DFC72CEA9AA74FE249F7EEB`.
+  Report SHA-256 is
+  `958C025A49A8E353290EB6C7E6E8DCBC0444EE1010CEF191ACF53987C119A126`;
+  the one TRX SHA-256 is
+  `9FA8F2BF89B5FD9452032663BF53210CC4096E87E0419DCFE0B23FBC41CD8B91`.
+- Native exit `1` and runner exit `0` sealed exactly one Failed result,
+  definition, and entry at the frozen FQN, exact marker-only message, sixteen
+  counters, and no forbidden diagnostics or attachments. R=0003 is immutable
+  and never reruns.
+- Bounded green changes only the two Tests-owned files; production delta is
+  zero. Provider boundary validation and the null repository-blob round trip
+  were corrected without changing the immutable Repository red fixture.
+- Release build is `0` warnings / `0` errors; focused/B/full Conformance/Domain
+  pass `1/1`, `5/5`, `37/37`, and `98/98`. Format and diff are clean; executable
+  scope is `1,174/1,200` normalized lines.
+- Exact-tree StructureOnly passed with `elapsedMs=448526`; publication evidence
+  passed `7/7` in `281.8s` without a publication claim. Product/test and
+  evidence/scope reviews are `0/0/0`.
+- B is `5/11`, cumulative A+B is `37/43`, and governed-text is
+  `ReviewedLocalGreen`. `B-WIRE-REPOSITORY-TARGET-01` and every later packet
+  remain inactive until this implementation commit is pushed and exact-head
+  hosted green; parent Scenario, C/D, activation, merge, release, and
+  publication remain held.

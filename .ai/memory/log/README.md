@@ -9,9 +9,9 @@ Follow the current
 [ContractSlice B codec-activation and wire handoff](2026-08-09-feat-0065-subf-0143-contractslice-b-codec-activation-freeze.md).
 ContractSlice A is merged/exact-main green; `B-SURFACE-01` and
 `B-CODEC-ACTIVATION-01` plus `B-WIRE-REPOSITORY-TREE-01` are exact-head hosted
-green. `B-WIRE-GOVERNED-TEXT-01` is `FrozenDesign`/inactive pending its
-synchronized design head's hosted gate; B is `4/11`, cumulative A+B is `36/43`,
-later packets are inactive, and the parent scenario remains `Planned`.
+green. `B-WIRE-GOVERNED-TEXT-01` is `ReviewedLocalGreen` with its implementation-
+head hosted gate pending; B is `5/11`, cumulative A+B is `37/43`, later packets
+are inactive, and the parent scenario remains `Planned`.
 
 Follow the current
 [instruction-graph capacity handoff](2026-08-09-feat-0069-instruction-graph-capacity.md)
