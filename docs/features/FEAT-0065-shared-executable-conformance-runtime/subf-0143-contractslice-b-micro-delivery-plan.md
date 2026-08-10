@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Gate 2 micro-delivery plan and design freeze |
-| State | B surface, codec, three wire packets, `B-RESOURCE-01`, and `B-CACHE-01` exact-head hosted green; repository-target R=0004 plus admission R=0008/R=0009/R=0010 diagnostic/no-success, R=0005, resource R=0006, and cache R=0007 accepted/immutable; B `8/11`, cumulative A+B `40/43`; `B-ADMISSION-01` third-corrected `FrozenDesign`/inactive pending this exact synchronized correction-design head's hosted gate |
+| State | B surface, codec, three wire packets, `B-RESOURCE-01`, and `B-CACHE-01` exact-head hosted green; repository-target R=0004 plus admission R=0008/R=0009/R=0010 diagnostic/no-success, R=0005, resource R=0006, cache R=0007, and admission R=0011 accepted/immutable; B `9/11`, cumulative A+B `41/43`; `B-ADMISSION-01` `ReviewedLocalGreen` with its implementation head hosted pending |
 | Parent | Owning feature and current subfeature |
 | Scenario | [TEST-0210](test-cases.md#test-0210), still `Planned` |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
@@ -361,7 +361,7 @@ The owning ledger's exact cache implementation identity passed Ubuntu in
 `20m42s` and Windows in `49m17s`; publication verification was skipped.
 B-CACHE is immutable hosted history.
 
-### Third-corrected frozen `B-ADMISSION-01` staging boundary
+### Reviewed-local-green `B-ADMISSION-01` staging boundary
 
 This packet modifies only
 `tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ContractSliceBActivationTests.cs`
@@ -481,6 +481,18 @@ A+B/full Conformance `41/41`, Domain `98/98`, build/format/locks/diff/
 StructureOnly/publication, and two fresh `0/0/0` reviews. B-SEALED-CONTEXT and
 all later scopes remain held until the exact admission implementation head is
 hosted green.
+
+Canonical R=0011 is accepted and immutable. Its one-shot runner bound exact
+hosted design head, source/status/locks, and `1,676/2,400` lines; the sole child
+returned native exit `1` and produced one exact marker-only failed result. The
+TRX is `4,868` bytes / SHA-256 `B28FC956...5E36`, report `15,213` /
+`34341B88...9167`, with exact sixteen counters and no forbidden diagnostics or
+attachments. Bounded green changes only the final aggregate return and passes
+focused `1/1`, B `9/9`, full Conformance `41/41`, Domain `98/98`, Release build
+`0/0`, format/diff, publication `7/7` without publication claim, and
+StructureOnly. Code/test and evidence/scope reviews are `0/0/0`. B-ADMISSION is
+`ReviewedLocalGreen`; its implementation head must be hosted green before the
+sealed-context design can become active.
 
 ## SurfaceRed and BehaviorRed contract
 
@@ -652,10 +664,10 @@ Conformance/Domain are `1/1`, `7/7`, `39/39`, and `98/98`, and the Tests-only
 source is `1,176/1,200` normalized lines with zero production delta. Cache
 R=0007 is accepted once and never rerun; `B-CACHE-01` is exact-head hosted green
 at focused/B/full/Domain `1/1`, `8/8`, `40/40`, and `98/98`, with one
-`1,063/1,200`-line Tests-only file and zero production delta. B is `8/11`,
-cumulative A+B is `40/43`; admission R=0008, R=0009, and R=0010 are immutable
-diagnostics/no-success, and B-ADMISSION is third-corrected `FrozenDesign`/
-inactive pending this exact synchronized correction-design head's hosted gate.
+`1,063/1,200`-line Tests-only file and zero production delta. B is `9/11`,
+cumulative A+B is `41/43`; admission R=0008, R=0009, and R=0010 are immutable
+diagnostics/no-success, R=0011 is accepted/immutable, and B-ADMISSION is
+`ReviewedLocalGreen` with its implementation head hosted pending.
 Every successor remains held.
 C/D, final
 activation, feature DoD, release, publication, consumer mutation, authority

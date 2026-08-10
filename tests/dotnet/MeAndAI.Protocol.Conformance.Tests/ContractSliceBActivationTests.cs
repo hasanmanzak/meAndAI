@@ -102,7 +102,7 @@ public sealed class ContractSliceBActivationTests
                 new ForeignActivationProof(manifest)));
     }
 
-    private static FinalizedPolicyManifest CreateManifest()
+    internal static FinalizedPolicyManifest CreateManifest()
     {
         var source = ContractSliceAFullManifestGraphTests.CreateManifest();
         var proofType = typeof(ContractSliceBActivationProof);
@@ -193,6 +193,8 @@ internal sealed class ContractSliceBActivationProof :
     private readonly RepositoryTargetCodecMirror _targetCodec;
     private readonly RepositoryTreeCodecMirror _treeCodec;
     private readonly bool _provesMirror;
+    private readonly IReadOnlyList<IAdmissionProofCandidate>
+        _admissionCandidates;
 
     internal ContractSliceBActivationProof(
         FinalizedPolicyManifest manifest,
@@ -202,7 +204,8 @@ internal sealed class ContractSliceBActivationProof :
         GovernedTextCodecMirror governedCodec,
         RepositoryTargetCodecMirror targetCodec,
         RepositoryTreeCodecMirror treeCodec,
-        bool provesMirror = true)
+        bool provesMirror = true,
+        IEnumerable<IAdmissionProofCandidate>? admissionCandidates = null)
     {
         _manifest = manifest;
         _governed = governed;
@@ -212,6 +215,17 @@ internal sealed class ContractSliceBActivationProof :
         _targetCodec = targetCodec;
         _treeCodec = treeCodec;
         _provesMirror = provesMirror;
+        var candidates = admissionCandidates?.ToArray() ?? [];
+        if (candidates.Any(candidate => candidate is null) ||
+            candidates.Distinct(ReferenceEqualityComparer.Instance).Count() !=
+                candidates.Length)
+        {
+            throw new ArgumentException(
+                "Admission candidates must be non-null distinct references.",
+                nameof(admissionCandidates));
+        }
+
+        _admissionCandidates = Array.AsReadOnly(candidates);
     }
 
     public string ContractKey => _manifest.ActivationProofContract.ContractKey;
@@ -233,7 +247,9 @@ internal sealed class ContractSliceBActivationProof :
 
     public bool Proves(CompletePolicyPackExport policy) => false;
 
-    public bool Proves(IAdmissionProofCandidate candidate) => false;
+    public bool Proves(IAdmissionProofCandidate candidate) =>
+        candidate is not null &&
+        _admissionCandidates.Any(item => ReferenceEquals(item, candidate));
 
     public bool ProvesCodecMirror(
         FinalizedPolicyManifest manifest,

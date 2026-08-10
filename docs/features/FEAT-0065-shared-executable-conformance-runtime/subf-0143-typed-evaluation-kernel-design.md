@@ -3,14 +3,14 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted; ContractSlice A merged/exact-main green. B surface, codec activation, all three wire packets, `B-RESOURCE-01`, and `B-CACHE-01` are exact-head hosted green. Repository-target R=0004 plus admission R=0008/R=0009/R=0010 remain diagnostics/no-success; R=0005, resource R=0006, and cache R=0007 remain accepted and immutable. B is `8/11`, cumulative A+B is `40/43`; `B-ADMISSION-01` is third-corrected `FrozenDesign`/inactive pending this exact synchronized correction-design head's hosted gate. [TEST-0210](test-cases.md#test-0210) remains `Planned`; later B, C/D, activation, and DoD remain held. |
+| Status | Gate 2 accepted; ContractSlice A merged/exact-main green. B surface, codec activation, all three wire packets, `B-RESOURCE-01`, and `B-CACHE-01` are exact-head hosted green. Repository-target R=0004 plus admission R=0008/R=0009/R=0010 remain diagnostics/no-success; R=0005, resource R=0006, cache R=0007, and admission R=0011 remain accepted and immutable. B is `9/11`, cumulative A+B is `41/43`; `B-ADMISSION-01` is `ReviewedLocalGreen` with its implementation head hosted pending. [TEST-0210](test-cases.md#test-0210) remains `Planned`; later B, C/D, activation, and DoD remain held. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Test | [TEST-0210](test-cases.md#test-0210) |
 | Gate 3 micro-delivery routing | Historical A delivery remains owned by the [A micro-delivery control plan](subf-0143-micro-delivery-plan.md). Current B design routing is the [ContractSlice B micro-delivery plan](subf-0143-contractslice-b-micro-delivery-plan.md); packet labels refine delivery but activate no executable work. |
 | Exact-main design baseline | Accepted A merge commit [`51623f4d404a95e0f706d72805cf7ddbbbd293b8`](https://github.com/hasanmanzak/meAndAI/commit/51623f4d404a95e0f706d72805cf7ddbbbd293b8), validated by exact-main [run 31304787603](https://github.com/hasanmanzak/meAndAI/actions/runs/31304787603) |
-| Design and Gate 3 authority | Historical A directives and clarifications remain immutable evidence. B surface, codec activation, all three wire packets, B-RESOURCE, and B-CACHE are immutable hosted-green predecessors; R=0006 and cache R=0007 remain accepted, while admission R=0008/R=0009/R=0010 are immutable diagnostics/no-success. B-ADMISSION is third-corrected `FrozenDesign`/inactive and owns no further implementation authority until this synchronized correction-design head passes exact hosted validation. C/D, final activation, merge, release, and publication remain outside this authority. |
+| Design and Gate 3 authority | Historical A directives and clarifications remain immutable evidence. B surface, codec activation, all three wire packets, B-RESOURCE, and B-CACHE are immutable hosted-green predecessors; R=0006, cache R=0007, and admission R=0011 remain accepted, while admission R=0008/R=0009/R=0010 are immutable diagnostics/no-success. B-ADMISSION is `ReviewedLocalGreen`; its implementation head must pass exact hosted validation before the next packet can activate. C/D, final activation, merge, release, and publication remain outside this authority. |
 | Completed predecessor | [SUBF-0153](README.md#subf-0153) / [TEST-0221](test-cases.md#test-0221), merged through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173) and exact-main validated by [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) |
 
 ## Directive and hard boundary
@@ -1235,9 +1235,8 @@ design phase had P/R/G `NotApplicable` and an empty executable allowlist.
 Surface, codec activation, all three wires, and B-RESOURCE are now immutable
 hosted-green history. Cache R=0007 is accepted/immutable and B-CACHE is
 exact-head hosted green. Admission R=0008, R=0009, and R=0010 are immutable diagnostics/
-no-success; B-ADMISSION is third-corrected `FrozenDesign`/inactive pending this
-exact synchronized correction-design head's hosted gate; no later packet is
-active.
+no-success; R=0011 is accepted/immutable and B-ADMISSION is `ReviewedLocalGreen`
+with its implementation head hosted pending; no later packet is active.
 
 ## Gate 2 outcome
 
@@ -8804,11 +8803,12 @@ The owning ledger's exact cache implementation identity passed Ubuntu in
 `20m42s` and Windows in `49m17s`; publication verification was skipped.
 B-CACHE is immutable exact-head hosted history.
 
-### Third-corrected frozen `B-ADMISSION-01` proof-candidate admission contract
+### Reviewed-local-green `B-ADMISSION-01` proof-candidate admission contract
 
-`B-ADMISSION-01` starts only from the exact hosted-green cache predecessor
-above. At this design checkpoint B remains `8/11` and cumulative A+B remains
-`40/43`. The executable mutation allowlist is exactly:
+`B-ADMISSION-01` started only from the exact hosted-green cache predecessor
+above. At its design checkpoint B remained `8/11` and cumulative A+B remained
+`40/43`; accepted R=0011 and bounded green now move them to `9/11` and `41/43`.
+The executable mutation allowlist is exactly:
 
 - modify
   `tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ContractSliceBActivationTests.cs`;
@@ -9259,6 +9259,17 @@ and fresh code/test plus evidence/scope reviews `0/0/0`. B-SEALED-CONTEXT and
 every later packet remain held until the exact admission implementation head is
 hosted green. This design itself grants no R or implementation authority until
 its synchronized commit is exact-head hosted green.
+
+R=0011 is accepted/immutable under the exact one-shot custody in the owning
+ledger. It proves the direct Fact, marker-only assertion path, exact
+result/definition/entry identity, sixteen counters, source/runner/lock/build/
+DLL/PDB closure, native exit `1`, runner exit `0`, and no forbidden diagnostic
+or attachment. Bounded green changes only the final aggregate return and passes
+focused `1/1`, B `9/9`, full Conformance `41/41`, Domain `98/98`, warning-free
+Release build, format/diff, publication `7/7` without publication claim, and
+StructureOnly. Code/test and evidence/scope reviews are each `0/0/0`.
+B-ADMISSION is `ReviewedLocalGreen`; its exact implementation head remains the
+sole hosted gate before B-SEALED-CONTEXT design activation.
 
 ## [TEST-0210](test-cases.md#test-0210) expected-red contract
 
@@ -10042,10 +10053,10 @@ B is decomposed by the current
 [B micro-delivery plan](subf-0143-contractslice-b-micro-delivery-plan.md).
 Surface, codec activation, all three wires, B-RESOURCE, and B-CACHE are hosted
 green; repository-target R=0004 is diagnostic-only, while canonical R=0005,
-resource R=0006, and cache R=0007 are accepted/immutable. B is `8/11`, A+B is
-`40/43`. Admission R=0008 is immutable diagnostic/no-success; B-ADMISSION is
-corrected `FrozenDesign`/inactive pending the exact synchronized corrected-
-admission-design head's hosted gate; later packets remain inactive.
+resource R=0006, cache R=0007, and admission R=0011 are accepted/immutable. B
+is `9/11`, A+B is `41/43`. Admission R=0008/R=0009/R=0010 are immutable
+diagnostics/no-success; B-ADMISSION is `ReviewedLocalGreen` with its
+implementation head hosted pending, and later packets remain inactive.
 
 B implementation and C/D still require separate future activation, and no
 packet is active merely from this list. No directive here allocates new stable
