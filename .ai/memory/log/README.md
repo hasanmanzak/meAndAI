@@ -10,8 +10,9 @@ Follow the current
 ContractSlice A is merged/exact-main green; `B-SURFACE-01` and
 `B-CODEC-ACTIVATION-01` plus `B-WIRE-REPOSITORY-TREE-01` are exact-head hosted
 green. `B-WIRE-GOVERNED-TEXT-01` is exact-head hosted green;
-`B-WIRE-REPOSITORY-TARGET-01` is `FrozenDesign`/inactive pending its exact
-design-head hosted gate; B is `5/11`, cumulative A+B is `37/43`, later packets
+Repository-target R=0004 is an immutable oracle-rejected diagnostic with no
+canonical red; corrected R=0005 is `FrozenDesign`/inactive pending its exact
+correction-design-head hosted gate. B is `5/11`, cumulative A+B is `37/43`, later packets
 are inactive, and the parent scenario remains `Planned`.
 
 Follow the current

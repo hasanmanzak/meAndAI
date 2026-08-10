@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Packet | `B-CODEC-ACTIVATION-01` / `B-WIRE-REPOSITORY-TREE-01` / `B-WIRE-GOVERNED-TEXT-01` / `B-WIRE-REPOSITORY-TARGET-01` |
-| State | Codec activation, repository-tree, and governed-text `ReviewedHostedGreen`; repository-target `FrozenDesign`/inactive pending its exact design-head hosted gate |
+| State | Codec activation, repository-tree, and governed-text `ReviewedHostedGreen`; repository-target R=0004 immutable diagnostic-only; corrected R=0005 `FrozenDesign`/inactive pending exact correction-design-head hosted gate |
 | Parent | Owning ContractSlice B micro-delivery plan |
 | Scenario | Parent scenario retained `Planned` |
 | Exact repository-tree predecessor | [`be94ea6da507e654e325b7cfc97074b3b0e5bacd`](https://github.com/hasanmanzak/meAndAI/commit/be94ea6da507e654e325b7cfc97074b3b0e5bacd); exact-head [run 31329704543](https://github.com/hasanmanzak/meAndAI/actions/runs/31329704543) passed Ubuntu `21m01s`, Windows `46m10s`, publication verification skipped |
@@ -371,16 +371,17 @@ once. It is immutable and must never be rerun.
   passed `7/7` in `281.8s` without a publication claim. Product/test and
   evidence/scope reviews are `0/0/0`.
 - B is `5/11`, cumulative A+B is `37/43`, and governed-text is immutable
-  `ReviewedHostedGreen` at the exact implementation above. Repository-target is
-  `FrozenDesign`/inactive until its synchronized design commit is pushed and
-  exact-head hosted green; parent Scenario, later B packets, C/D, activation,
+  `ReviewedHostedGreen` at the exact implementation above. Repository-target
+  R=0004 is diagnostic-only; corrected R=0005 is `FrozenDesign`/inactive until
+  its synchronized correction-design commit is pushed and exact-head hosted
+  green; parent Scenario, later B packets, C/D, activation,
   merge, release, and publication remain held.
 
 ## Frozen `B-WIRE-REPOSITORY-TARGET-01` routing
 
 - The typed design solely owns the exact three-selector demand/payload vector,
   callable same-object mirror contract, result/content row union, validation
-  precedence, wire-local ceilings, executable allowlist, and one-shot `0004`
+  precedence, wire-local ceilings, executable allowlist, and corrected one-shot `0005`
   runner contract. This memory record is routing/evidence only.
 - The executable allowlist is exactly a partial-identity modification to the
   retained activation test plus one new repository-target test/core file; all
@@ -394,11 +395,11 @@ once. It is immutable and must never be rerun.
   redrawn.
 - The sole future Fact is the exact repository-target FQN with one
   `ContractSlice=B` trait, no Scenario, and marker
-  `TEST-0210-B-BEHAVIOR-RED-0004`. No runner/red/source implementation may start
+  `TEST-0210-B-BEHAVIOR-RED-0005`. No corrected runner/red/source implementation may start
   until this exact twelve-record design freeze is committed, pushed, and
   exact-head hosted green.
 
-## Frozen repository-target design delivery checks
+## Original R=0004 repository-target design delivery checks
 
 - Semantic/runner D/RT and route/content/scope review are each
   `0 Blocking / 0 Important / 0 Minor`; the exact vector, same-object topology,
@@ -412,4 +413,38 @@ once. It is immutable and must never be rerun.
 - Exact-tree preliminary StructureOnly passed with `elapsedMs=436713`;
   publication evidence passed `7/7` in `282.0s`, including the fresh commit-
   reference recurrence and making no publication claim. These checks grant no
-  runner/red authority before the exact design-head hosted gate.
+  runner/red authority before the exact correction-design-head hosted gate.
+
+## Immutable repository-target R=0004 diagnostic and corrected R=0005 freeze
+
+- R=0004 reached `InvocationCommitted`, built Release at `0` warnings / `0`
+  errors, and its sole child returned native `1`; it is never rerun. The exact
+  runner is `37,198` bytes at SHA-256
+  `8A5E3FD7C580F57C429DA89996D5A073A3E416E9D31BCD985BF99E04E3879192`.
+- Its one-file result root contains only the `5,512`-byte R=0004 TRX at
+  `CC5D494F1154113A9735935F5238711520C5E5F1C9292D60F931CFF4AA5E993D`.
+  Report/stdout/stderr SHA-256 values are respectively
+  `0D300970B537A0265DC3E39732333ED63385D82D8EC038EA40262ABACD1493F8`,
+  `EF16C548E3B59CB32BA9C4A919C007CA2B014B5C0DF65DD552678EDA2BA4659B`,
+  and `C4C7FD4E938F7978061AC0EDC9B69CD8DD798E1631946F1E4B74D0F7615DC7E9`.
+- The exact first failure is marker-free: stale expected demand digest
+  `9DF61AC4D5F82C17F68486C14C66C58E65603F02A34A2D2B18B461E74922672E`
+  differs from actual frozen-frame SHA-256
+  `9DF61AC4D5F82C5FDA121B05319B16399580FC0A8D28B4AC62D1879D24899CBA`.
+  The report closes `OracleRejected`; raw marker count is `0`, so R=0004 is no
+  canonical red and contributes no success evidence.
+- Corrected R=0005 changes only that constant and marker identity, retains the
+  `2,823/3,200` source-line budget and every other source/oracle/limit, and is
+  inactive until this exact twelve-record correction freeze is committed,
+  pushed, and exact-head hosted green.
+
+## Corrected R=0005 design delivery checks
+
+- Corrected semantic/runner and content/scope reviews are each
+  `0 Blocking / 0 Important / 0 Minor`; no executable or downstream authority
+  is granted before the exact correction-design-head hosted gate.
+- Exact-tree publication evidence passed `7/7` in `296s` without a publication
+  claim; StructureOnly passed with `elapsedMs=434145`.
+- Canonical schema-2 graph validation is green at
+  `357` nodes / `4,133` relations / `319` parsed blobs / `4329611` parsed bytes;
+  typed design is `554293/1048576` bytes and source budget is `2823/3200`.

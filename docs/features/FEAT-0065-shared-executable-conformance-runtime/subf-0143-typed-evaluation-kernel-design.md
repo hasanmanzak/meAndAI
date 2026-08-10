@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted; ContractSlice A merged/exact-main green. B surface, codec activation, repository-tree, and governed-text are exact-head hosted green. `B-WIRE-REPOSITORY-TARGET-01` is `FrozenDesign`/inactive pending its exact design-head hosted gate. B is `5/11`, cumulative A+B is `37/43`. [TEST-0210](test-cases.md#test-0210) remains `Planned`; later B packets, C/D, final activation, and DoD remain held. |
+| Status | Gate 2 accepted; ContractSlice A merged/exact-main green. B surface, codec activation, repository-tree, and governed-text are exact-head hosted green. Repository-target R=0004 is immutable diagnostic-only; corrected R=0005 is `FrozenDesign`/inactive pending its exact correction-design-head hosted gate. B is `5/11`, cumulative A+B is `37/43`. [TEST-0210](test-cases.md#test-0210) remains `Planned`; later B packets, C/D, final activation, and DoD remain held. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
@@ -4976,15 +4976,30 @@ for later packets unless separately reviewed.
 The test is one direct non-skipped Fact at
 `MeAndAI.Protocol.Conformance.Tests.ContractSliceBRepositoryTargetCodecTests.Round_trips_exact_repository_target_resolution_wire`,
 with exactly one `ContractSlice=B` trait, no Scenario/Theory/class trait or
-overload, and marker `TEST-0210-B-BEHAVIOR-RED-0004`. Its red temporarily makes
+overload, and marker `TEST-0210-B-BEHAVIOR-RED-0005`. Its red temporarily makes
 only the fully prepared valid `WriteRepositoryTargetResolution` semantic
 return `null!`; only that null calls direct `Assert.Fail(marker)`. Setup,
 exceptions, wrong non-null results, negative vectors, and qualifier assertions
 remain marker-free. Green is focused `1/1`, cumulative B `6/6`, A+B/full
 Conformance `38/38`, and Domain `98/98`.
 
-Canonical R uses one fresh external CreateNew runner matching
-`D:\Temp\meandai-test-0210-b-repository-target-r0004-runner-<32-lowercase-hex-guid>.ps1`,
+R=0004 is immutable `OracleRejected/NoCanonicalRed` evidence. Its exact
+37,198-byte runner SHA-256 is
+`8A5E3FD7C580F57C429DA89996D5A073A3E416E9D31BCD985BF99E04E3879192`;
+report/TRX SHA-256 values are
+`0D300970B537A0265DC3E39732333ED63385D82D8EC038EA40262ABACD1493F8` and
+`CC5D494F1154113A9735935F5238711520C5E5F1C9292D60F931CFF4AA5E993D`.
+The child returned native `1`, but the stale fixture digest ended in
+`...2C17...` while the actual frozen frame SHA-256 ends in `...2C5F...`;
+therefore writer preparation returned a marker-free rejection, the later
+digest assertion failed, raw marker count was `0`, and R=0004 is never rerun.
+
+Corrected R=0005 changes only the source `DemandDigest` constant to exact
+`9df61ac4d5f82c5fda121b05319b16399580fc0a8d28b4ac62d1879d24899cba`
+and the marker from `0004` to `0005`; the valid writer's `null!` staging and
+every other source/design byte remain semantically unchanged. Canonical R=0005
+uses one fresh external CreateNew runner matching
+`D:\Temp\meandai-test-0210-b-repository-target-r0005-runner-<32-lowercase-hex-guid>.ps1`,
 fresh report/log siblings, and a different fresh result root. It inherits the
 governed-text runner's exact source/Git/lock/build/DLL/PDB/hash, `8,388,608`-
 byte complete-log, `1,048,576`-byte report, process-scoped
@@ -4993,7 +5008,7 @@ byte complete-log, `1,048,576`-byte report, process-scoped
 two source files, the `3,200`-line ceiling, marker/FQN, and this exact command:
 
 ```text
-dotnet test tests/dotnet/MeAndAI.Protocol.Conformance.Tests/MeAndAI.Protocol.Conformance.Tests.csproj --configuration Release --no-restore --no-build --nologo --verbosity minimal --results-directory "<fresh-root>" --logger "trx;LogFileName=TEST-0210-B-BEHAVIOR-RED-0004.trx" --filter "ContractSlice=B&FullyQualifiedName=MeAndAI.Protocol.Conformance.Tests.ContractSliceBRepositoryTargetCodecTests.Round_trips_exact_repository_target_resolution_wire"
+dotnet test tests/dotnet/MeAndAI.Protocol.Conformance.Tests/MeAndAI.Protocol.Conformance.Tests.csproj --configuration Release --no-restore --no-build --nologo --verbosity minimal --results-directory "<fresh-root>" --logger "trx;LogFileName=TEST-0210-B-BEHAVIOR-RED-0005.trx" --filter "ContractSlice=B&FullyQualifiedName=MeAndAI.Protocol.Conformance.Tests.ContractSliceBRepositoryTargetCodecTests.Round_trips_exact_repository_target_resolution_wire"
 ```
 
 The exact twelve-record design cohort adds no tracked node and must validate
@@ -5001,7 +5016,7 @@ under schema-2 ceilings `512` nodes / `8,192` relations / `1,048,576` bytes per
 parsed blob / `8,388,608` aggregate bytes. No runner may be materialized and no
 canonical red or implementation may start until the exact commit containing
 this freeze is pushed and exact-head hosted green. R=0001..0003 remain
-immutable and are never rerun.
+immutable; R=0004 is immutable diagnostic-only; none is ever rerun.
 
 The complete Tests-only causal surface is:
 
@@ -9132,7 +9147,7 @@ ContractSlice A's historical delivery is owned by its
 B is decomposed by the current
 [B micro-delivery plan](subf-0143-contractslice-b-micro-delivery-plan.md).
 Surface, codec activation, repository-tree, and governed-text are hosted green;
-repository-target is FrozenDesign/inactive pending its exact design-head hosted
+repository-target R=0004 is diagnostic-only and corrected R=0005 is FrozenDesign/inactive pending its exact correction-design-head hosted
 gate, and later B packets remain inactive.
 
 B implementation and C/D still require separate future activation, and no

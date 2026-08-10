@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Gate 2 micro-delivery plan and design freeze |
-| State | `B-SURFACE-01`, `B-CODEC-ACTIVATION-01`, `B-WIRE-REPOSITORY-TREE-01`, and `B-WIRE-GOVERNED-TEXT-01` exact-head hosted green; `B-WIRE-REPOSITORY-TARGET-01` `FrozenDesign`/inactive pending its exact design-head hosted gate; B `5/11`, cumulative A+B `37/43`; later packets inactive |
+| State | `B-SURFACE-01`, `B-CODEC-ACTIVATION-01`, `B-WIRE-REPOSITORY-TREE-01`, and `B-WIRE-GOVERNED-TEXT-01` exact-head hosted green; repository-target R=0004 is diagnostic-only and corrected R=0005 is `FrozenDesign`/inactive pending its exact correction-design-head hosted gate; B `5/11`, cumulative A+B `37/43`; later packets inactive |
 | Parent | Owning feature and current subfeature |
 | Scenario | [TEST-0210](test-cases.md#test-0210), still `Planned` |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
@@ -96,12 +96,12 @@ semantic packages own one Fact and one immutable BehaviorRed ordinal each.
 | `B-CODEC-ACTIVATION-01` | Exact codec-registration/model-token subset, writer/qualifier pair ownership, Tests-only private activation proof, and non-null activated harness | `TEST-0210-B-BEHAVIOR-RED-0001`; `ContractSliceBActivationTests.Activates_exact_codec_mirror` | Focused `1/1`; B `3/3`; A+B `35/35` |
 | `B-WIRE-REPOSITORY-TREE-01` | `protocol.repository-tree/1` golden bytes, strict frame, scope/location equality, exact entry-kind/path order, empty tree, malformed grammar | `TEST-0210-B-BEHAVIOR-RED-0002`; `ContractSliceBRepositoryTreeCodecTests.Round_trips_exact_repository_tree_wire` | Focused `1/1`; B `4/4`; A+B `36/36` |
 | `B-WIRE-GOVERNED-TEXT-01` | `protocol.governed-text/1` golden bytes, strict UTF-8 framing, byte preservation, empty body, Repository/Provider leaf matrix | `TEST-0210-B-BEHAVIOR-RED-0003`; `ContractSliceBGovernedTextCodecTests.Round_trips_exact_governed_text_wire` | Focused `1/1`; B `5/5`; A+B `37/37` |
-| `B-WIRE-REPOSITORY-TARGET-01` | `protocol.repository-target-resolution/1` demand echo/digest, ItemId/content tables, three selector variants, canonical row order, self-consistency rejection, wire-local ceilings; no target-index capability semantics | `TEST-0210-B-BEHAVIOR-RED-0004`; `ContractSliceBRepositoryTargetCodecTests.Round_trips_exact_repository_target_resolution_wire` | Focused `1/1`; B `6/6`; A+B `38/38` |
-| `B-RESOURCE-01` | Codec-local four-counter independent meter, claimed-versus-measured equality, selected payload row plus codec node ledger, checked arithmetic, equality/first-one-over/dominated/unreachable vectors | `TEST-0210-B-BEHAVIOR-RED-0005`; `ContractSliceBResourceLedgerTests.Enforces_exact_codec_local_four_counter_ledger` | Focused `1/1`; B `7/7`; A+B `39/39` |
-| `B-CACHE-01` | Codec-model key bytes, collision closure, single-flight, success/declared-failure retention, deterministic eviction, exact-release/session isolation, no cancellation/host/integrity caching | `TEST-0210-B-BEHAVIOR-RED-0006`; `ContractSliceBDecodeModelCacheTests.Enforces_exact_codec_cache_single_flight_collision_and_eviction` | Focused `1/1`; B `8/8`; A+B `40/40` |
-| `B-ADMISSION-01` | Receipt frame after measured qualification/cache closure, exact instruction/proof bijection, manifest/type/artifact validation, Observed/Failed/NoInput leaf exclusivity, writer-before-qualifier lifecycle, forged/stale/partial rejection | `TEST-0210-B-BEHAVIOR-RED-0007`; `ContractSliceBAdmissionProofTests.Admits_exact_observed_failed_and_no_input_proofs` | Focused `1/1`; B `9/9`; A+B `41/41` |
-| `B-SEALED-CONTEXT-01` | Exact sealed Authority/Manifest/Catalog/slot/scope projection plus ContextProof and Root reference shapes; no raw payload/digest factory and no selector semantics | `TEST-0210-B-BEHAVIOR-RED-0008`; `ContractSliceBSealedContextTests.Seals_exact_context_proof_and_root_references` | Focused `1/1`; B `10/10`; A+B `42/42` |
-| `B-CODEC-DERIVATION-01` | Codec-derived reference frame, manifest component/artifact/model identity, same-or-narrower location, structural comparator, collision and foreign-session rejection; no parser/index derivation | `TEST-0210-B-BEHAVIOR-RED-0009`; `ContractSliceBQualifiedReferenceTests.Seals_exact_codec_derived_reference_and_location_narrowing` | Focused `1/1`; B `11/11`; A+B `43/43` |
+| `B-WIRE-REPOSITORY-TARGET-01` | `protocol.repository-target-resolution/1` demand echo/digest, ItemId/content tables, three selector variants, canonical row order, self-consistency rejection, wire-local ceilings; no target-index capability semantics | Corrected canonical red `TEST-0210-B-BEHAVIOR-RED-0005`; R=0004 is immutable diagnostic-only; `ContractSliceBRepositoryTargetCodecTests.Round_trips_exact_repository_target_resolution_wire` | Focused `1/1`; B `6/6`; A+B `38/38` |
+| `B-RESOURCE-01` | Codec-local four-counter independent meter, claimed-versus-measured equality, selected payload row plus codec node ledger, checked arithmetic, equality/first-one-over/dominated/unreachable vectors | `TEST-0210-B-BEHAVIOR-RED-0006`; `ContractSliceBResourceLedgerTests.Enforces_exact_codec_local_four_counter_ledger` | Focused `1/1`; B `7/7`; A+B `39/39` |
+| `B-CACHE-01` | Codec-model key bytes, collision closure, single-flight, success/declared-failure retention, deterministic eviction, exact-release/session isolation, no cancellation/host/integrity caching | `TEST-0210-B-BEHAVIOR-RED-0007`; `ContractSliceBDecodeModelCacheTests.Enforces_exact_codec_cache_single_flight_collision_and_eviction` | Focused `1/1`; B `8/8`; A+B `40/40` |
+| `B-ADMISSION-01` | Receipt frame after measured qualification/cache closure, exact instruction/proof bijection, manifest/type/artifact validation, Observed/Failed/NoInput leaf exclusivity, writer-before-qualifier lifecycle, forged/stale/partial rejection | `TEST-0210-B-BEHAVIOR-RED-0008`; `ContractSliceBAdmissionProofTests.Admits_exact_observed_failed_and_no_input_proofs` | Focused `1/1`; B `9/9`; A+B `41/41` |
+| `B-SEALED-CONTEXT-01` | Exact sealed Authority/Manifest/Catalog/slot/scope projection plus ContextProof and Root reference shapes; no raw payload/digest factory and no selector semantics | `TEST-0210-B-BEHAVIOR-RED-0009`; `ContractSliceBSealedContextTests.Seals_exact_context_proof_and_root_references` | Focused `1/1`; B `10/10`; A+B `42/42` |
+| `B-CODEC-DERIVATION-01` | Codec-derived reference frame, manifest component/artifact/model identity, same-or-narrower location, structural comparator, collision and foreign-session rejection; no parser/index derivation | `TEST-0210-B-BEHAVIOR-RED-0010`; `ContractSliceBQualifiedReferenceTests.Seals_exact_codec_derived_reference_and_location_narrowing` | Focused `1/1`; B `11/11`; A+B `43/43` |
 | `B-CONVERGE-01` | Pure cumulative audit of exact source/test/export/friend/trait/lock/project state; P/R/G `NotApplicable` | None; every canonical red remains immutable and is never rerun | B `11/11`; A+B/full Conformance `43/43`; Domain `98/98`; Release build/format/locks/diff/StructureOnly/publication evidence/reviews green |
 
 ### Immutable `B-WIRE-REPOSITORY-TREE-01` hosted-green boundary
@@ -184,7 +184,7 @@ The typed design normatively owns the internal callable/result/content/row
 declarations; exact `318`-byte demand frame and `1,465`-byte golden payload;
 three selector families and eight closed result variants; strict row/content
 order, digest, self-consistency, error precedence, defensive copying, and six
-wire-local equality/first-one-over ceilings; exact `0004` one-shot runner; and
+wire-local equality/first-one-over ceilings; corrected `0005` one-shot runner; and
 the packet-specific `3,200` normalized-line redraw threshold. This reviewed
 redraw is intentionally larger than the default `1,200` because the packet
 must retain all three selector/result grammars and two content-key families in
@@ -194,10 +194,19 @@ raise any later packet's default threshold.
 The sole direct non-skipped Fact is
 `MeAndAI.Protocol.Conformance.Tests.ContractSliceBRepositoryTargetCodecTests.Round_trips_exact_repository_target_resolution_wire`,
 with only `ContractSlice=B`, no Scenario/Theory/class trait/overload, and exact
-marker `TEST-0210-B-BEHAVIOR-RED-0004`. The red changes only the fully prepared
+marker `TEST-0210-B-BEHAVIOR-RED-0005`. The red changes only the fully prepared
 valid writer's non-null semantic return to `null!`; only that null reaches
 direct `Assert.Fail(marker)`. Green is focused `1/1`, cumulative B `6/6`,
 A+B/full Conformance `38/38`, and Domain `98/98`.
+
+R=0004 is immutable `OracleRejected/NoCanonicalRed` evidence. Its sole child
+returned native `1`, but the valid fixture carried stale digest
+`9DF61AC4D5F82C17F68486C14C66C58E65603F02A34A2D2B18B461E74922672E`
+instead of the frozen demand-frame SHA-256
+`9DF61AC4D5F82C5FDA121B05319B16399580FC0A8D28B4AC62D1879D24899CBA`;
+the writer therefore returned a marker-free rejection and the later digest
+assertion failed. R=0004 is never rerun. Corrected R=0005 changes only that
+constant plus the marker identity before the same null-only canonical red.
 
 The exact design cohort remains the same twelve existing Markdown paths. It
 adds no tracked node; schema-2 limits remain `512` nodes, `8,192` relations,
@@ -371,10 +380,10 @@ project, package, lock, workflow, release, or consumer file. The user-owned
 
 ## Exit condition
 
-This plan was the accepted `FrozenDesign` predecessor. The surface, codec
+This plan records the corrected `FrozenDesign` predecessor. The surface, codec
 activation, repository-tree, and governed-text packets are immutable exact-head
-hosted-green history at B `5/11` and A+B `37/43`. Repository-target is
-`FrozenDesign`/inactive and cannot execute until this synchronized design head
+hosted-green history at B `5/11` and A+B `37/43`. Repository-target R=0004 is
+diagnostic-only; corrected R=0005 is `FrozenDesign`/inactive and cannot execute until this synchronized correction-design head
 is committed, pushed, and exact-head hosted green. Every successor stays
 inactive until its predecessor gate closes. C/D, final
 activation, feature DoD, release, publication, consumer mutation, authority
