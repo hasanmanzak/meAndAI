@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Gate 2 micro-delivery plan and design freeze |
-| State | B surface, codec, three wire packets, `B-RESOURCE-01`, and `B-CACHE-01` exact-head hosted green; repository-target R=0004 diagnostic-only, R=0005, resource R=0006, and cache R=0007 accepted/immutable; B `8/11`, cumulative A+B `40/43`; `B-ADMISSION-01` `FrozenDesign`/inactive pending this exact synchronized design head's hosted gate |
+| State | B surface, codec, three wire packets, `B-RESOURCE-01`, and `B-CACHE-01` exact-head hosted green; repository-target R=0004 and admission R=0008 diagnostic/no-success, R=0005, resource R=0006, and cache R=0007 accepted/immutable; B `8/11`, cumulative A+B `40/43`; `B-ADMISSION-01` corrected `FrozenDesign`/inactive pending this exact synchronized corrected-design head's hosted gate |
 | Parent | Owning feature and current subfeature |
 | Scenario | [TEST-0210](test-cases.md#test-0210), still `Planned` |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
@@ -99,9 +99,9 @@ semantic packages own one Fact and one immutable BehaviorRed ordinal each.
 | `B-WIRE-REPOSITORY-TARGET-01` | `protocol.repository-target-resolution/1` demand echo/digest, ItemId/content tables, three selector variants, canonical row order, self-consistency rejection, wire-local ceilings; no target-index capability semantics | Corrected canonical red `TEST-0210-B-BEHAVIOR-RED-0005`; R=0004 is immutable diagnostic-only; `ContractSliceBRepositoryTargetCodecTests.Round_trips_exact_repository_target_resolution_wire` | Focused `1/1`; B `6/6`; A+B `38/38` |
 | `B-RESOURCE-01` | Codec-local four-counter independent meter, claimed-versus-measured equality, selected payload row plus codec node ledger, checked arithmetic, equality/first-one-over/dominated/unreachable vectors | `TEST-0210-B-BEHAVIOR-RED-0006`; `ContractSliceBResourceLedgerTests.Enforces_exact_codec_local_four_counter_ledger` | Focused `1/1`; B `7/7`; A+B `39/39` |
 | `B-CACHE-01` | Codec-model key bytes, collision closure, single-flight, success/declared-failure retention, deterministic eviction, exact-release/session isolation, no cancellation/host/integrity caching | `TEST-0210-B-BEHAVIOR-RED-0007`; `ContractSliceBDecodeModelCacheTests.Enforces_exact_codec_cache_single_flight_collision_and_eviction` | Focused `1/1`; B `8/8`; A+B `40/40` |
-| `B-ADMISSION-01` | Receipt frame after measured qualification/cache closure, exact instruction/proof bijection, manifest/type/artifact validation, Observed/Failed/NoInput leaf exclusivity, writer-before-qualifier lifecycle, forged/stale/partial rejection | `TEST-0210-B-BEHAVIOR-RED-0008`; `ContractSliceBAdmissionProofTests.Admits_exact_observed_failed_and_no_input_proofs` | Focused `1/1`; B `9/9`; A+B `41/41` |
-| `B-SEALED-CONTEXT-01` | Exact sealed Authority/Manifest/Catalog/slot/scope projection plus ContextProof and Root reference shapes; no raw payload/digest factory and no selector semantics | `TEST-0210-B-BEHAVIOR-RED-0009`; `ContractSliceBSealedContextTests.Seals_exact_context_proof_and_root_references` | Focused `1/1`; B `10/10`; A+B `42/42` |
-| `B-CODEC-DERIVATION-01` | Codec-derived reference frame, manifest component/artifact/model identity, same-or-narrower location, structural comparator, collision and foreign-session rejection; no parser/index derivation | `TEST-0210-B-BEHAVIOR-RED-0010`; `ContractSliceBQualifiedReferenceTests.Seals_exact_codec_derived_reference_and_location_narrowing` | Focused `1/1`; B `11/11`; A+B `43/43` |
+| `B-ADMISSION-01` | Receipt frame after measured qualification/cache closure, exact instruction/proof bijection, manifest/type/artifact validation, Observed/Failed/NoInput leaf exclusivity, writer-before-qualifier lifecycle, forged/stale/partial rejection; R=0008 is immutable diagnostic/no-success | Corrected `TEST-0210-B-BEHAVIOR-RED-0009`; `ContractSliceBAdmissionProofTests.Admits_exact_observed_failed_and_no_input_proofs` | Focused `1/1`; B `9/9`; A+B `41/41` |
+| `B-SEALED-CONTEXT-01` | Exact sealed Authority/Manifest/Catalog/slot/scope projection plus ContextProof and Root reference shapes; no raw payload/digest factory and no selector semantics | `TEST-0210-B-BEHAVIOR-RED-0010`; `ContractSliceBSealedContextTests.Seals_exact_context_proof_and_root_references` | Focused `1/1`; B `10/10`; A+B `42/42` |
+| `B-CODEC-DERIVATION-01` | Codec-derived reference frame, manifest component/artifact/model identity, same-or-narrower location, structural comparator, collision and foreign-session rejection; no parser/index derivation | `TEST-0210-B-BEHAVIOR-RED-0011`; `ContractSliceBQualifiedReferenceTests.Seals_exact_codec_derived_reference_and_location_narrowing` | Focused `1/1`; B `11/11`; A+B `43/43` |
 | `B-CONVERGE-01` | Pure cumulative audit of exact source/test/export/friend/trait/lock/project state; P/R/G `NotApplicable` | None; every canonical red remains immutable and is never rerun | B `11/11`; A+B/full Conformance `43/43`; Domain `98/98`; Release build/format/locks/diff/StructureOnly/publication evidence/reviews green |
 
 ### Immutable `B-WIRE-REPOSITORY-TREE-01` hosted-green boundary
@@ -361,7 +361,7 @@ The owning ledger's exact cache implementation identity passed Ubuntu in
 `20m42s` and Windows in `49m17s`; publication verification was skipped.
 B-CACHE is immutable hosted history.
 
-### Frozen `B-ADMISSION-01` staging boundary
+### Corrected frozen `B-ADMISSION-01` staging boundary
 
 This packet modifies only
 `tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ContractSliceBActivationTests.cs`
@@ -384,17 +384,21 @@ the existing activation Fact byte-semantically unchanged and
 
 The new file owns one direct Fact,
 `MeAndAI.Protocol.Conformance.Tests.ContractSliceBAdmissionProofTests.Admits_exact_observed_failed_and_no_input_proofs`,
-one `ContractSlice=B` trait, no Scenario/Theory/class trait, and marker
-`TEST-0210-B-BEHAVIOR-RED-0008`. P is `NotApplicable`. R implements the complete
+one `ContractSlice=B` trait, no Scenario/Theory/class trait, and corrected marker
+`TEST-0210-B-BEHAVIOR-RED-0009`. P is `NotApplicable`. R implements the complete
 test-owned admission mirror and sets only its final valid aggregate return to
 `null!`; G restores that already computed aggregate. The retained activation
 Fact must remain green through both identities.
 
 The fixture rebuilds only the three manifest admission declarations so their
 Observed, Failed, and NoInput proof components are the exact three test-owned
-candidate types bound to `MeAndAI.Protocol.Conformance.Tests.dll`; contract
-keys/versions, surfaces, material roles, activation proof, payload schemas,
-components outside those three bindings, and every artifact remain unchanged.
+candidate types bound to `MeAndAI.Protocol.Conformance.Tests.dll`. The source
+manifest's `MeAndAI.Protocol.Application.dll` artifact row is removed because
+its only three component bindings are precisely the replaced admission-proof
+components; retaining that row would leave an unbound artifact and must fail
+canonical parsing. Contract keys/versions, surfaces, material roles, activation
+proof, payload schemas, all non-admission components, and every other artifact
+row/order/digest remain unchanged.
 Three canonical singleton instructions bind, respectively,
 `protocol.slot.repository-tree`, `protocol.slot.provider-governed-text`, and
 `protocol.slot.repository-target-resolution` to Repository Observed, Provider
@@ -426,10 +430,20 @@ partial Observed state, and mutated receipt all fail atomically with
 canonical receipt bytes fails first with `CacheIdentityCollision`. No partial
 receipt set escapes.
 
-The packet-specific canonical red command is Release `--no-restore --no-build`
-against the exact FQN/filter above, one fresh R=0008 TRX logger/root, process-
-scoped `VSTEST_CONNECTION_TIMEOUT=300`, and the inherited `420000`-ms/8-MiB-
-log/1-MiB-report one-shot runner contract. Green is focused `1/1`, B `9/9`,
+R=0008 is immutable diagnostic/no-success and is never rerun. Its sole child
+executed the exact Fact but failed during manifest parsing before the marker:
+`System.FormatException: The manifest artifactFiles array must be fully bound.`
+The one TRX had raw marker count `0`; the runner correctly rejected the attempt.
+The exact artifact and runner custody is retained by the owning handoff.
+
+The corrected packet-specific canonical red command is Release `--no-restore
+--no-build` against the exact FQN/filter above, one fresh R=0009 TRX logger/root,
+process-scoped `VSTEST_CONNECTION_TIMEOUT=300`, and a fresh `420000`-ms/8-MiB-
+log/1-MiB-report one-shot runner. Its TRX oracle requires one marker-only error
+message, permits zero or one byte-identical marker echo in the same result's
+StdOut, permits zero or one marker-free same-FQN `[FAIL]` RunInfo, and therefore
+accepts raw marker count only in `[1,2]`; all sixteen counters and every other
+diagnostic/attachment prohibition remain exact. Green is focused `1/1`, B `9/9`,
 A+B/full Conformance `41/41`, Domain `98/98`, build/format/locks/diff/
 StructureOnly/publication, and two fresh `0/0/0` reviews. B-SEALED-CONTEXT and
 all later scopes remain held until the exact admission implementation head is
@@ -606,8 +620,9 @@ source is `1,176/1,200` normalized lines with zero production delta. Cache
 R=0007 is accepted once and never rerun; `B-CACHE-01` is exact-head hosted green
 at focused/B/full/Domain `1/1`, `8/8`, `40/40`, and `98/98`, with one
 `1,063/1,200`-line Tests-only file and zero production delta. B is `8/11`,
-cumulative A+B is `40/43`; B-ADMISSION is `FrozenDesign`/inactive pending this
-exact synchronized design head's hosted gate. Every successor remains held.
+cumulative A+B is `40/43`; admission R=0008 is immutable diagnostic/no-success,
+and B-ADMISSION is corrected `FrozenDesign`/inactive pending this exact
+synchronized corrected-design head's hosted gate. Every successor remains held.
 C/D, final
 activation, feature DoD, release, publication, consumer mutation, authority
 transfer, and PowerShell retirement remain held.

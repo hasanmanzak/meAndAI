@@ -3,11 +3,11 @@
 | Field | Value |
 | --- | --- |
 | Packet | `B-CODEC-ACTIVATION-01` / `B-WIRE-REPOSITORY-TREE-01` / `B-WIRE-GOVERNED-TEXT-01` / `B-WIRE-REPOSITORY-TARGET-01` / `B-RESOURCE-01` / `B-CACHE-01` / `B-ADMISSION-01` |
-| State | Codec activation, all three wire packets, resource, and cache `ReviewedHostedGreen`; repository-target R=0004 diagnostic-only, R=0005, resource R=0006, and cache R=0007 accepted/immutable; B `8/11`, A+B `40/43`; B-ADMISSION `FrozenDesign`/inactive pending this exact synchronized design head's hosted gate |
+| State | Codec activation, all three wire packets, resource, and cache `ReviewedHostedGreen`; repository-target R=0004 and admission R=0008 diagnostic/no-success, R=0005, resource R=0006, and cache R=0007 accepted/immutable; B `8/11`, A+B `40/43`; B-ADMISSION corrected `FrozenDesign`/inactive pending this exact synchronized corrected-design head's hosted gate |
 | Parent | Owning ContractSlice B micro-delivery plan |
 | Scenario | Parent scenario retained `Planned` |
-| Exact resource implementation | [`fa67864f57f97e8a7960ad13fbde91c7c09f5d77`](https://github.com/hasanmanzak/meAndAI/commit/fa67864f57f97e8a7960ad13fbde91c7c09f5d77); exact-head [run 31367753569](https://github.com/hasanmanzak/meAndAI/actions/runs/31367753569) passed Ubuntu `15m52s`, Windows `49m31s`, publication verification skipped |
-| Exact first-design diagnostic | The first hosted design passed both stable jobs; pre-red byte audit then found the optional-null vector defect, with no runner/red/implementation, so that predecessor grants no authority |
+| Exact resource implementation | Immutable hosted-green resource identity and run custody remain owned by the resource packet records below |
+| Exact admission original design | [`3e9714d9379646a5e8dcdff46877792a0847c8d8`](https://github.com/hasanmanzak/meAndAI/commit/3e9714d9379646a5e8dcdff46877792a0847c8d8); exact-head [run 31394929734](https://github.com/hasanmanzak/meAndAI/actions/runs/31394929734) passed Ubuntu `20m15s`, Windows `46m04s`, publication verification skipped; R=0008 later exposed the bounded design defect recorded below |
 | Exact cache implementation | [`f0a66e86c7875019d7347eb044428b279bcb0717`](https://github.com/hasanmanzak/meAndAI/commit/f0a66e86c7875019d7347eb044428b279bcb0717); exact-head [run 31383308571](https://github.com/hasanmanzak/meAndAI/actions/runs/31383308571) passed Ubuntu `20m42s`, Windows `49m17s`, publication verification skipped |
 | Implementation language | C# only |
 
@@ -619,7 +619,7 @@ once. It is immutable and must never be rerun.
   publication verification was skipped. B-CACHE is
   immutable `ReviewedHostedGreen` and R=0007 is never rerun.
 
-## Frozen `B-ADMISSION-01` routing
+## Corrected frozen `B-ADMISSION-01` routing
 
 - The executable allowlist is exactly one retained-test modification,
   `ContractSliceBActivationTests.cs`, plus one new Tests-owned file,
@@ -635,20 +635,24 @@ once. It is immutable and must never be rerun.
   aggregate. The existing activation Fact stays green throughout.
 - The one new Fact is
   `ContractSliceBAdmissionProofTests.Admits_exact_observed_failed_and_no_input_proofs`,
-  with only `ContractSlice=B`, no Scenario/Theory/class trait, and marker
-  `TEST-0210-B-BEHAVIOR-RED-0008`.
+  with only `ContractSlice=B`, no Scenario/Theory/class trait, and corrected
+  marker `TEST-0210-B-BEHAVIOR-RED-0009`.
 - The typed design exclusively owns exact carrier signatures, three singleton
-  instruction/request fixtures, admission-proof manifest substitutions,
+  instruction/request fixtures, corrected admission-proof manifest/artifact substitutions,
   receipt framing, exact candidate/instruction/receipt bijections, closed
   resource/cache state, writer-before-qualifier lifecycle, leaf exclusivity,
   collision/forgery/staleness/partial negatives, precedence, and one-shot red
   custody. Green targets are focused `1/1`, B `9/9`, A+B/full `41/41`, and
   Domain `98/98`.
-- B-ADMISSION is inactive until this synchronized design commit is exact-head
-  hosted green. B-SEALED-CONTEXT, B-CODEC-DERIVATION, B-CONVERGE, parent
+- The corrected manifest replaces the three admission component bindings with
+  Tests-owned components and removes the now-unbound
+  `MeAndAI.Protocol.Application.dll` artifact row; every other artifact row and
+  all non-admission components remain unchanged.
+- B-ADMISSION is inactive until this synchronized corrected-design commit is
+  exact-head hosted green. B-SEALED-CONTEXT, B-CODEC-DERIVATION, B-CONVERGE, parent
   Scenario, C/D, activation, merge, release, publication, and DoD remain held.
 
-## `B-ADMISSION-01` frozen-design reviews
+## Immutable original `B-ADMISSION-01` frozen-design reviews
 
 - Semantic/custody D/RT: `0 Blocking / 0 Important / 0 Minor`; exact manifest
   substitution, private carriers/factories, instruction/receipt frames,
@@ -660,5 +664,51 @@ once. It is immutable and must never be rerun.
 - Exact-tree publication evidence passed `7/7` without a publication claim;
   StructureOnly/capacity validation passed with `elapsedMs=446372`. The staged
   typed-design blob is `598408/1048576` bytes and diff-check is clean.
-- Commit/push and hosted design-head validation remain mandatory before R=0008
-  or source implementation.
+- The original design commit and hosted run are exact above. These reviews
+  authorized only the now-consumed R=0008 identity and cannot authorize a retry.
+
+## Immutable admission R=0008 diagnostic
+
+- The first external runner candidate failed ValidateOnly before any child,
+  root, report, or log because its source-shape predicate counted both the
+  retained activation-proof overload and the foreign proof overload. It created
+  no R evidence and was never reused.
+- The corrected runner at
+  `D:\Temp\meandai-test-0210-b-admission-r0008-runner-a80e24b0378143958f2ddc60db2d947e.ps1`
+  was `37,427` bytes with SHA-256
+  `DDE1F9EC2E197020FFF394FFB269990B5E68B531C5FC10E22A07C69DB8FCC2B3`.
+  ValidateOnly bound exact design head, branch/status, two source identities,
+  `1,609/2,400` changed lines, and all six lock identities.
+- Its sole committed child built with `0` warnings/errors and selected the exact
+  Fact, but manifest parsing threw `System.FormatException: The manifest
+  artifactFiles array must be fully bound.` before the marker. The source
+  replaced the only three `MeAndAI.Protocol.Application.dll` component bindings
+  while incorrectly retaining that artifact row.
+- The fresh root was
+  `D:\Temp\meandai-test-0210-b-0f6e8a413b924c9ea52f858fa880da31` and contained
+  only `TEST-0210-B-BEHAVIOR-RED-0008.trx`, `8,057` bytes / SHA-256
+  `A03E01BB075E75CA16B78D5A71C36DE18A4782A00BA0B86C61147757080F564A`.
+  It had one Failed result/definition/entry at the exact FQN, exact `1/1/1`
+  total/executed/failed counters, raw marker count `0`, and the manifest error.
+- The terminal `OracleRejected` report was `568` bytes / SHA-256
+  `81A6867573F55C4AB053A742A676DF67DA052E6B1389E7FB341BCB6FD12BA778`;
+  complete stdout/stderr logs were `3,627` / `196` bytes with SHA-256
+  `E230246C49FF6B37294165246685E1D1E689858B487E88098AD94CC907C1CCC1` /
+  `469324CCF44DC001AB0B39BD1958517F0034BACDF96B0CD5B9ED6AE2C8697445`.
+  R=0008 is immutable diagnostic/no-success and is never rerun.
+
+## Corrected `B-ADMISSION-01` freeze gate
+
+- Corrected R=0009 requires one marker-only ErrorInfo Message, permits zero or
+  one byte-identical same-result StdOut marker echo and zero or one marker-free
+  same-FQN `[FAIL]` RunInfo, and accepts raw marker count only in `[1,2]`.
+- The executable allowlist, `2,400`-line ceiling, exact FQN, all sixteen counters,
+  source/build/binary/lock custody, `420000`-ms timeout, 8-MiB logs, 1-MiB report,
+  and no-retry behavior remain unchanged. Corrected design reviews and exact-head
+  hosted validation must close before a fresh R=0009 runner is materialized.
+
+| Corrected-design local check | Result |
+| --- | --- |
+| Semantic/custody review | `0 Blocking / 0 Important / 0 Minor`; the exact unbound-artifact cause, single-row removal, fresh marker identity, optional echo/RunInfo partition, and no-retry boundary are closed |
+| Route/content/scope review | `0 Blocking / 0 Important / 0 Minor`; exactly twelve record paths, zero executable staging, four ledger links, B `8/11`, A+B `40/43`, and every successor hold agree |
+| Preliminary executable evidence | Publication evidence `7/7` in `331.5s`, no publication claim; StructureOnly green with `elapsedMs=489898`; diff-check clean. Commit authorization additionally requires one exact-tree recurrence including this evidence table. |

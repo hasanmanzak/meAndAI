@@ -3,14 +3,14 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted; ContractSlice A merged/exact-main green. B surface, codec activation, all three wire packets, `B-RESOURCE-01`, and `B-CACHE-01` are exact-head hosted green. Repository-target R=0004 remains diagnostic-only; R=0005, resource R=0006, and cache R=0007 remain accepted and immutable. B is `8/11`, cumulative A+B is `40/43`; `B-ADMISSION-01` is `FrozenDesign`/inactive pending this exact synchronized design head's hosted gate. [TEST-0210](test-cases.md#test-0210) remains `Planned`; later B, C/D, activation, and DoD remain held. |
+| Status | Gate 2 accepted; ContractSlice A merged/exact-main green. B surface, codec activation, all three wire packets, `B-RESOURCE-01`, and `B-CACHE-01` are exact-head hosted green. Repository-target R=0004 and admission R=0008 remain diagnostic/no-success; R=0005, resource R=0006, and cache R=0007 remain accepted and immutable. B is `8/11`, cumulative A+B is `40/43`; `B-ADMISSION-01` is corrected `FrozenDesign`/inactive pending this exact synchronized corrected-design head's hosted gate. [TEST-0210](test-cases.md#test-0210) remains `Planned`; later B, C/D, activation, and DoD remain held. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Test | [TEST-0210](test-cases.md#test-0210) |
 | Gate 3 micro-delivery routing | Historical A delivery remains owned by the [A micro-delivery control plan](subf-0143-micro-delivery-plan.md). Current B design routing is the [ContractSlice B micro-delivery plan](subf-0143-contractslice-b-micro-delivery-plan.md); packet labels refine delivery but activate no executable work. |
 | Exact-main design baseline | Accepted A merge commit [`51623f4d404a95e0f706d72805cf7ddbbbd293b8`](https://github.com/hasanmanzak/meAndAI/commit/51623f4d404a95e0f706d72805cf7ddbbbd293b8), validated by exact-main [run 31304787603](https://github.com/hasanmanzak/meAndAI/actions/runs/31304787603) |
-| Design and Gate 3 authority | Historical A directives and clarifications remain immutable evidence. B surface, codec activation, all three wire packets, B-RESOURCE, and B-CACHE are immutable hosted-green predecessors; R=0006 and cache R=0007 remain accepted. B-ADMISSION is `FrozenDesign`/inactive and owns no implementation authority until this synchronized design head passes exact hosted validation. C/D, final activation, merge, release, and publication remain outside this authority. |
+| Design and Gate 3 authority | Historical A directives and clarifications remain immutable evidence. B surface, codec activation, all three wire packets, B-RESOURCE, and B-CACHE are immutable hosted-green predecessors; R=0006 and cache R=0007 remain accepted, while admission R=0008 is immutable diagnostic/no-success. B-ADMISSION is corrected `FrozenDesign`/inactive and owns no further implementation authority until this synchronized corrected-design head passes exact hosted validation. C/D, final activation, merge, release, and publication remain outside this authority. |
 | Completed predecessor | [SUBF-0153](README.md#subf-0153) / [TEST-0221](test-cases.md#test-0221), merged through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173) and exact-main validated by [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) |
 
 ## Directive and hard boundary
@@ -1234,8 +1234,9 @@ activation, workflow filters, or runtime-efficiency changes. The original B
 design phase had P/R/G `NotApplicable` and an empty executable allowlist.
 Surface, codec activation, all three wires, and B-RESOURCE are now immutable
 hosted-green history. Cache R=0007 is accepted/immutable and B-CACHE is
-exact-head hosted green. B-ADMISSION is `FrozenDesign`/inactive pending this
-exact synchronized design head's hosted gate; no later packet is active.
+exact-head hosted green. Admission R=0008 is immutable diagnostic/no-success;
+B-ADMISSION is corrected `FrozenDesign`/inactive pending this exact synchronized
+corrected-design head's hosted gate; no later packet is active.
 
 ## Gate 2 outcome
 
@@ -8802,7 +8803,7 @@ The owning ledger's exact cache implementation identity passed Ubuntu in
 `20m42s` and Windows in `49m17s`; publication verification was skipped.
 B-CACHE is immutable exact-head hosted history.
 
-### Frozen `B-ADMISSION-01` proof-candidate admission contract
+### Corrected frozen `B-ADMISSION-01` proof-candidate admission contract
 
 `B-ADMISSION-01` starts only from the exact hosted-green cache predecessor
 above. At this design checkpoint B remains `8/11` and cumulative A+B remains
@@ -9040,11 +9041,14 @@ For each row, component key/version are copied exactly from the corresponding
 source admission declaration; only assembly/type become the named Tests-owned
 proof type. The matching same-key old component binding is replaced once and
 the new component is bound to the already present
-`MeAndAI.Protocol.Conformance.Tests.dll` artifact. Contract key/version, kind,
-activation proof, artifact filename/length/digest/order, payload schemas, cache
-budget, every non-admission component, catalog slice, and complete catalog stay
-unchanged. Canonical write plus reparse must preserve the new manifest digest,
-all three declaration/type bindings, and the full component/artifact closure.
+`MeAndAI.Protocol.Conformance.Tests.dll` artifact. After those replacements the
+source `MeAndAI.Protocol.Application.dll` artifact has no remaining component:
+its exact row must be removed, while every other artifact filename/length/
+digest/order remains byte-identical. Contract key/version, kind, activation
+proof, payload schemas, cache budget, every non-admission component, catalog
+slice, and complete catalog stay unchanged. Canonical write plus reparse must
+preserve the new manifest digest, all three declaration/type bindings, and the
+complete no-unbound-artifact component/artifact closure.
 
 The three issued instructions are canonical by SlotKey and each owns exactly
 one request/requirement:
@@ -9153,8 +9157,8 @@ Admission itself reruns none of writer, qualifier, meter, or cache.
 
 The one direct Fact is
 `MeAndAI.Protocol.Conformance.Tests.ContractSliceBAdmissionProofTests.Admits_exact_observed_failed_and_no_input_proofs`,
-with only `ContractSlice=B`, no Scenario/Theory/class trait, and exact marker
-`TEST-0210-B-BEHAVIOR-RED-0008`. Before calling `Admit`, it assembles each
+with only `ContractSlice=B`, no Scenario/Theory/class trait, and corrected exact
+marker `TEST-0210-B-BEHAVIOR-RED-0009`. Before calling `Admit`, it assembles each
 expected instruction/receipt vector through an independent Fact-local sequence
 of explicit strict-UTF8 and `BinaryPrimitives` writes that shares no production
 or mirror frame helper, then asserts byte equality and SHA-256 equality. It
@@ -9164,21 +9168,40 @@ escape, and unchanged activation behavior.
 Red replaces only the final valid aggregate with `null!`; only that null reaches
 direct `Assert.Fail(marker)`.
 
+R=0008 is immutable diagnostic/no-success and is never rerun. The sole
+committed child built with zero warnings/errors, selected the exact Fact, and
+failed before the marker at `CreateAdmissionManifest` because the first design
+retained the now-unbound `MeAndAI.Protocol.Application.dll` artifact. The exact
+error was `System.FormatException: The manifest artifactFiles array must be
+fully bound.` Its one-result TRX was `8,057` bytes with SHA-256
+`A03E01BB075E75CA16B78D5A71C36DE18A4782A00BA0B86C61147757080F564A`;
+raw marker count was `0`, so the runner correctly ended `OracleRejected`.
+Report SHA-256 was
+`81A6867573F55C4AB053A742A676DF67DA052E6B1389E7FB341BCB6FD12BA778`.
+That failed attempt contributes no expected-red or green evidence. The
+corrected artifact closure and the corrected marker/echo oracle below own a
+fresh R=0009 identity only after this synchronized corrected-design head is
+hosted green.
+
 The packet-specific red command is exactly:
 
 ```text
-dotnet test tests/dotnet/MeAndAI.Protocol.Conformance.Tests/MeAndAI.Protocol.Conformance.Tests.csproj --configuration Release --no-restore --no-build --nologo --verbosity minimal --results-directory "<fresh-root>" --logger "trx;LogFileName=TEST-0210-B-BEHAVIOR-RED-0008.trx" --filter "ContractSlice=B&FullyQualifiedName=MeAndAI.Protocol.Conformance.Tests.ContractSliceBAdmissionProofTests.Admits_exact_observed_failed_and_no_input_proofs"
+dotnet test tests/dotnet/MeAndAI.Protocol.Conformance.Tests/MeAndAI.Protocol.Conformance.Tests.csproj --configuration Release --no-restore --no-build --nologo --verbosity minimal --results-directory "<fresh-root>" --logger "trx;LogFileName=TEST-0210-B-BEHAVIOR-RED-0009.trx" --filter "ContractSlice=B&FullyQualifiedName=MeAndAI.Protocol.Conformance.Tests.ContractSliceBAdmissionProofTests.Admits_exact_observed_failed_and_no_input_proofs"
 ```
 
 A fresh external runner specializes the accepted R=0007 custody contract to
 the two exact source paths, combined `2,400`-line ceiling, marker/FQN, fresh
-R=0008 root/report/log paths, exact source/self/HEAD/upstream/branch/status and
+R=0009 root/report/log paths, exact source/self/HEAD/upstream/branch/status and
 six-lock identities at start/pre-build/pre-test/post-test, warning-as-error
 Release build, fresh DLL/PDB, `--no-build`, child-only
 `VSTEST_CONNECTION_TIMEOUT=300`, monotonic `420000`-ms bound, complete
 `8,388,608`-byte stdout/stderr logs, `1,048,576`-byte atomic report, secure XML,
 native exit `1`, exact one-result TRX, sixteen counters, and zero forbidden
-diagnostics/attachments. `InvocationCommitted` irrevocably consumes R=0008 for
+diagnostics/attachments. The exact error Message is marker-only; the same
+result's StdOut may contain zero or one byte-identical marker echo, and the TRX
+may contain zero or one marker-free same-FQN `[FAIL]` RunInfo. Raw marker count
+is therefore exactly one or two; no other marker or diagnostic is accepted.
+`InvocationCommitted` irrevocably consumes R=0009 for
 every process-create, timeout, exit, interruption, artifact, or oracle outcome;
 no changed or unchanged retry exists. Only pre-commit preflight/build failures
 may be corrected under a new reviewed source/runner identity.
@@ -9973,7 +9996,8 @@ B is decomposed by the current
 Surface, codec activation, all three wires, B-RESOURCE, and B-CACHE are hosted
 green; repository-target R=0004 is diagnostic-only, while canonical R=0005,
 resource R=0006, and cache R=0007 are accepted/immutable. B is `8/11`, A+B is
-`40/43`. B-ADMISSION is `FrozenDesign`/inactive pending the exact synchronized
+`40/43`. Admission R=0008 is immutable diagnostic/no-success; B-ADMISSION is
+corrected `FrozenDesign`/inactive pending the exact synchronized corrected-
 admission-design head's hosted gate; later packets remain inactive.
 
 B implementation and C/D still require separate future activation, and no

@@ -1,7 +1,7 @@
 # Project-local AI Memory
 
 Scope: **this `meAndAI` repository only**<br>
-Last reviewed: **2026-08-09**<br>
+Last reviewed: **2026-08-10**<br>
 Protocol version: **0.16.0**<br>
 Latest immutable release before this unmerged development: **0.16.0**
 
@@ -316,7 +316,7 @@ The lifecycle records-only freeze head is exact-hosted-green: Ubuntu passed in
 `20m44s`, Windows in `46m51s`, and publication verification was correctly
 skipped. The exact lifecycle implementation identity recorded in the canonical
 handoff passed Ubuntu in `19m36s` and Windows in `36m02s`; publication verification was
-correctly skipped. ContractSlice A is merged/exact-main green. B surface, codec, three wire packets, B-RESOURCE, and B-CACHE are exact-head hosted green. Repository-target R=0004 is diagnostic-only; R=0005, resource R=0006, and cache R=0007 remain accepted/immutable. B is `8/11`, cumulative A+B is `40/43`; B-ADMISSION is `FrozenDesign`/inactive pending this exact synchronized design head's hosted gate. The parent scenario, later B packets, C/D, and final activation remain held.
+correctly skipped. ContractSlice A is merged/exact-main green. B surface, codec, three wire packets, B-RESOURCE, and B-CACHE are exact-head hosted green. Repository-target R=0004 and admission R=0008 are immutable diagnostics/no-success; R=0005, resource R=0006, and cache R=0007 remain accepted/immutable. B is `8/11`, cumulative A+B is `40/43`; B-ADMISSION is corrected `FrozenDesign`/inactive pending this exact synchronized corrected-design head's hosted gate. The parent scenario, later B packets, C/D, and final activation remain held.
 The exact record-delivery closure reached the full `4096/4096` instruction-graph
 budget. Ubuntu passed in `19m52s`; Windows reached its exact 45-minute job
 ceiling after every emitted suite result was successful. The bounded correction
