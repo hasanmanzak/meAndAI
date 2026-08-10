@@ -858,11 +858,12 @@ once. It is immutable and must never be rerun.
   ContextProof has no root/location/derivation/parent/selector; Root has exact
   root/location and none of the latter four. Derived/ExpectedSelector and every
   later behavior remain held.
-- Null/manifest/aggregate/admission/reference validation is exact and fail-
-  closed; all negative vectors are marker-free and no partial projection
-  escapes. Foreign-session rejection remains with B-CODEC-DERIVATION. The valid
-  R seam returns only final `null!`; G restores only the already computed
-  projection.
+- Null/manifest/aggregate/admission validation is exact and fail-closed; all
+  negative vectors are marker-free and no partial projection escapes. Exact
+  reference shapes are output postconditions because this packet accepts no
+  reference input. Malformed/foreign-session derived-reference rejection remains
+  with B-CODEC-DERIVATION. The valid R seam returns only final `null!`; G
+  restores only the already computed projection.
 - Canonical R uses one exact Release `--no-restore --no-build` child, fresh
   R=0012 TRX/root, env timeout `300`, monotonic `420000` ms, complete 8-MiB logs,
   1-MiB report, exact source/binary/lock/status closure, and the retained one-
@@ -876,4 +877,4 @@ once. It is immutable and must never be rerun.
 
 | B-SEALED design-delivery check | Result |
 | --- | --- |
-| Exact-tree local evidence | StructureOnly green in `456.832s`; publication evidence `7/7` including fresh link/commit-reference recurrence, no publication claim; typed design `612,533/1,048,576` normalized UTF-8 bytes; schema-2 limits green; D/RT/content/scope reviews `0/0/0` |
+| Exact-tree local evidence | StructureOnly green; publication evidence `7/7` including fresh link/commit-reference recurrence, no publication claim; typed design `612,653/1,048,576` normalized UTF-8 bytes; schema-2 limits green; D/RT/content/scope reviews `0/0/0` |

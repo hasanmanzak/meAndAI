@@ -9375,20 +9375,21 @@ Validation and error precedence are closed:
    `CatalogIntegrityCode.ManifestInvalid`;
 3. open lifecycle, wrong leaf counts, null/duplicate/non-ordinal receipts,
    wrong receipt leaf partition, receipt-byte/digest drift, unknown/foreign
-   slot, or failed/no-input admission is `AdmissionProofInvalid`;
+   slot, or failed/no-input admission is `AdmissionProofInvalid`; and
 4. Observed request/slot/requirement/status/context/binding/root/qualification
-   mismatch is `AdmissionProofInvalid`; and
-5. after valid admission, any wrong kind/root/location/derivation/parent/
-   selector shape or mutable reference is `ReferenceInvalid`.
+   mismatch is `AdmissionProofInvalid`.
 
 All negative vectors are marker-free and no partial context/reference set
 escapes. Reordered input is rejected rather than silently sorted; accepted
 output is already canonical. Input arrays/lists are mutated after sealing to
 prove defensive copies. Equality is structural and ordinal; reference object
 identity is never authority.
-Foreign-session reference rejection remains exclusively owned by
-`B-CODEC-DERIVATION-01`, whose reference frame carries that identity; this
-packet neither invents nor infers a session value.
+The coordinator accepts no caller-supplied reference, derivation, parent, or
+selector. Its ContextProof/Root null-empty/exact-location shapes are therefore
+positive output postconditions, not a synthetic `ReferenceInvalid` negative
+seam. Malformed/foreign-session derived-reference rejection remains exclusively
+owned by `B-CODEC-DERIVATION-01`, whose reference frame carries that identity;
+this packet neither invents nor infers a session value.
 
 The sole Fact is
 `MeAndAI.Protocol.Conformance.Tests.ContractSliceBSealedContextTests.Seals_exact_context_proof_and_root_references`.

@@ -334,10 +334,11 @@ Observed repository-tree receipt alone produces a one-slot/one-scope
 `SealedEvaluationContext`, one ContextProof, and one Root
 `QualifiedEvidenceReference`. Manifest/catalog/slot/requirement/scope/receipt-
 digest identity, exact null/empty shape, ordinal uniqueness, defensive copies,
-and manifest/admission/reference error precedence are normative in the typed
-design. Foreign-session rejection remains with B-CODEC-DERIVATION. Derived/
-ExpectedSelector, public factory, raw payload/digest seam, parser/index, Policy,
-C/D, and activation are held. R returns `null!` only after
+manifest/admission error precedence, and reference output postconditions are
+normative in the typed design. The packet accepts no caller-supplied reference;
+malformed/foreign-session derived-reference rejection remains with
+B-CODEC-DERIVATION. Derived/ExpectedSelector, public factory, raw payload/digest
+seam, parser/index, Policy, C/D, and activation are held. R returns `null!` only after
 the fully prepared valid projection; G restores only that projection. Required
 green is focused `1/1`, B `10/10`, full Conformance `42/42`, Domain `98/98`, and
 all retained gates/reviews. No R or implementation is authorized until this

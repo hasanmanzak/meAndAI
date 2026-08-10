@@ -550,14 +550,15 @@ the root list are ordinal, unique, immutable copies.
 Validation precedence is exact: null arguments; manifest authority/slice and
 catalog identity; aggregate lifecycle, leaf-count, null/order/duplicate and
 receipt-digest closure; canonical slot/requirement and complete Observed
-context/binding/root coherence; finally reference shape. Manifest defects map
-to `ManifestInvalid`, aggregate/admission defects to `AdmissionProofInvalid`,
-and an otherwise admitted malformed reference to `ReferenceInvalid`. Reordered,
-duplicate, unknown-slot, forged-receipt-digest, incomplete lifecycle, wrong leaf
-counts, scope/root mismatch, Failed/NoInput admission, non-empty derivation,
-selector/parent leakage, mutable input, and foreign-manifest aggregate vectors
-are marker-free. Foreign-session reference rejection remains owned by
-`B-CODEC-DERIVATION-01`; no partial context/reference set escapes.
+context/binding/root coherence. Manifest defects map to `ManifestInvalid` and
+aggregate/admission defects to `AdmissionProofInvalid`. The coordinator accepts
+no caller-supplied reference, derivation, parent, or selector, so exact minted
+reference shapes are positive postconditions rather than an invented
+`ReferenceInvalid` input seam. Reordered, duplicate, unknown-slot, forged-
+receipt-digest, incomplete lifecycle, wrong leaf counts, scope/root mismatch,
+Failed/NoInput admission, mutable input, and foreign-manifest aggregate vectors
+are marker-free. Malformed/foreign-session derived-reference rejection remains
+owned by `B-CODEC-DERIVATION-01`; no partial context/reference set escapes.
 
 The canonical R command is one Release `--no-restore --no-build` invocation of
 the exact FQN/filter above, one fresh R=0012 TRX logger/root, process-scoped
