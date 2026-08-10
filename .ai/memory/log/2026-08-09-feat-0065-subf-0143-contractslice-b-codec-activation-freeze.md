@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Packet | `B-CODEC-ACTIVATION-01` / `B-WIRE-REPOSITORY-TREE-01` / `B-WIRE-GOVERNED-TEXT-01` / `B-WIRE-REPOSITORY-TARGET-01` |
-| State | Codec activation, repository-tree, and governed-text `ReviewedHostedGreen`; repository-target R=0004 immutable diagnostic-only; corrected R=0005 `FrozenDesign`/inactive pending exact correction-design-head hosted gate |
+| State | Codec activation, repository-tree, and governed-text `ReviewedHostedGreen`; repository-target R=0004 immutable diagnostic-only; canonical R=0005 accepted and repository-target `ReviewedLocalGreen`, implementation head hosted pending |
 | Parent | Owning ContractSlice B micro-delivery plan |
 | Scenario | Parent scenario retained `Planned` |
 | Exact repository-tree predecessor | [`be94ea6da507e654e325b7cfc97074b3b0e5bacd`](https://github.com/hasanmanzak/meAndAI/commit/be94ea6da507e654e325b7cfc97074b3b0e5bacd); exact-head [run 31329704543](https://github.com/hasanmanzak/meAndAI/actions/runs/31329704543) passed Ubuntu `21m01s`, Windows `46m10s`, publication verification skipped |
@@ -370,11 +370,11 @@ once. It is immutable and must never be rerun.
 - Exact-tree StructureOnly passed with `elapsedMs=448526`; publication evidence
   passed `7/7` in `281.8s` without a publication claim. Product/test and
   evidence/scope reviews are `0/0/0`.
-- B is `5/11`, cumulative A+B is `37/43`, and governed-text is immutable
-  `ReviewedHostedGreen` at the exact implementation above. Repository-target
-  R=0004 is diagnostic-only; corrected R=0005 is `FrozenDesign`/inactive until
-  its synchronized correction-design commit is pushed and exact-head hosted
-  green; parent Scenario, later B packets, C/D, activation,
+- Governed-text is immutable `ReviewedHostedGreen` at the exact implementation
+  above. Repository-target R=0004 is diagnostic-only; canonical R=0005 is
+  accepted and repository-target is `ReviewedLocalGreen` at B `6/11`, A+B
+  `38/43`, with its implementation head hosted pending. B-RESOURCE, the parent
+  Scenario, later B packets, C/D, activation,
   merge, release, and publication remain held.
 
 ## Frozen `B-WIRE-REPOSITORY-TARGET-01` routing
@@ -393,11 +393,10 @@ once. It is immutable and must never be rerun.
   and six independent wire-local ceilings. `3,201` requires a new design;
   later packets retain the default `1,200` threshold unless independently
   redrawn.
-- The sole future Fact is the exact repository-target FQN with one
+- The sole Fact is the exact repository-target FQN with one
   `ContractSlice=B` trait, no Scenario, and marker
-  `TEST-0210-B-BEHAVIOR-RED-0005`. No corrected runner/red/source implementation may start
-  until this exact twelve-record design freeze is committed, pushed, and
-  exact-head hosted green.
+  `TEST-0210-B-BEHAVIOR-RED-0005`. The exact twelve-record design freeze passed
+  its hosted gate before the sole corrected red and bounded green.
 
 ## Original R=0004 repository-target design delivery checks
 
@@ -448,3 +447,25 @@ once. It is immutable and must never be rerun.
 - Canonical schema-2 graph validation is green at
   `357` nodes / `4,133` relations / `319` parsed blobs / `4329611` parsed bytes;
   typed design is `554293/1048576` bytes and source budget is `2823/3200`.
+
+## Accepted R=0005 and bounded green
+
+- The sole corrected runner is `37,198` bytes at SHA-256
+  `987570C1E2B0E059DAFD4B2CAC725B4ED566961F225A1895F04A4955D26AC90F`.
+  It accepted canonical R=0005 once with native exit `1` and runner exit `0`;
+  it is never rerun.
+- The report SHA-256 is
+  `513677E6D4BB7552455E1DB3CDAA986384C6EA441B002F0718293633B0522EB7`;
+  the sole TRX SHA-256 is
+  `64D22B48825F0128D48FBB9FA500C4358B4321D2D804F7C46999B779EAA39F6C`.
+  Exact marker/FQN/result/definition/entry/counter/source/binary/lock/root oracles
+  closed before acceptance.
+- Bounded green changes only the retained activation test's two `partial`
+  declarations and the new test-owned repository-target mirror file. Release
+  build is `0` warnings / `0` errors; focused/B/full Conformance/Domain are
+  `1/1`, `6/6`, `38/38`, and `98/98`; format and diff checks are clean.
+  Executable scope is `2,849/3,200` normalized lines and production delta is
+  zero. Exact-tree publication evidence is `7/7` in `298.8s` with no publication
+  claim; StructureOnly is green at `elapsedMs=443370`. Product/test and
+  evidence/scope reviews are `0/0/0`; the implementation head remains hosted
+  pending.

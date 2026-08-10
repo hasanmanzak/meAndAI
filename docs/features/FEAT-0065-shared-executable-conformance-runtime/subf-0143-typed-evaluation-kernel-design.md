@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted; ContractSlice A merged/exact-main green. B surface, codec activation, repository-tree, and governed-text are exact-head hosted green. Repository-target R=0004 is immutable diagnostic-only; corrected R=0005 is `FrozenDesign`/inactive pending its exact correction-design-head hosted gate. B is `5/11`, cumulative A+B is `37/43`. [TEST-0210](test-cases.md#test-0210) remains `Planned`; later B packets, C/D, final activation, and DoD remain held. |
+| Status | Gate 2 accepted; ContractSlice A merged/exact-main green. B surface, codec activation, repository-tree, and governed-text are exact-head hosted green. Repository-target R=0004 is immutable diagnostic-only; canonical R=0005 is accepted and repository-target is `ReviewedLocalGreen` with its implementation head hosted pending. B is `6/11`, cumulative A+B is `38/43`. `B-RESOURCE-01` is inactive; [TEST-0210](test-cases.md#test-0210) remains `Planned`; later B packets, C/D, final activation, and DoD remain held. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
@@ -5011,12 +5011,16 @@ two source files, the `3,200`-line ceiling, marker/FQN, and this exact command:
 dotnet test tests/dotnet/MeAndAI.Protocol.Conformance.Tests/MeAndAI.Protocol.Conformance.Tests.csproj --configuration Release --no-restore --no-build --nologo --verbosity minimal --results-directory "<fresh-root>" --logger "trx;LogFileName=TEST-0210-B-BEHAVIOR-RED-0005.trx" --filter "ContractSlice=B&FullyQualifiedName=MeAndAI.Protocol.Conformance.Tests.ContractSliceBRepositoryTargetCodecTests.Round_trips_exact_repository_target_resolution_wire"
 ```
 
-The exact twelve-record design cohort adds no tracked node and must validate
+The exact twelve-record design cohort added no tracked node and validated
 under schema-2 ceilings `512` nodes / `8,192` relations / `1,048,576` bytes per
-parsed blob / `8,388,608` aggregate bytes. No runner may be materialized and no
-canonical red or implementation may start until the exact commit containing
-this freeze is pushed and exact-head hosted green. R=0001..0003 remain
-immutable; R=0004 is immutable diagnostic-only; none is ever rerun.
+parsed blob / `8,388,608` aggregate bytes. Its exact correction head passed both
+stable hosted jobs before R=0005. R=0001..0003 remain immutable; R=0004 is
+immutable diagnostic-only; none is ever rerun. Canonical R=0005 was accepted
+once (native exit `1`, runner exit `0`, report SHA-256
+`513677E6D4BB7552455E1DB3CDAA986384C6EA441B002F0718293633B0522EB7`,
+TRX SHA-256 `64D22B48825F0128D48FBB9FA500C4358B4321D2D804F7C46999B779EAA39F6C`).
+The bounded green is `1/1`, `6/6`, `38/38`, and `98/98` at `2,849/3,200`
+normalized lines, with zero production delta; its implementation head is hosted pending.
 
 The complete Tests-only causal surface is:
 
@@ -9147,8 +9151,9 @@ ContractSlice A's historical delivery is owned by its
 B is decomposed by the current
 [B micro-delivery plan](subf-0143-contractslice-b-micro-delivery-plan.md).
 Surface, codec activation, repository-tree, and governed-text are hosted green;
-repository-target R=0004 is diagnostic-only and corrected R=0005 is FrozenDesign/inactive pending its exact correction-design-head hosted
-gate, and later B packets remain inactive.
+repository-target R=0004 is diagnostic-only and canonical R=0005 is accepted;
+repository-target is `ReviewedLocalGreen` with its implementation head hosted
+pending at B `6/11`, A+B `38/43`, while B-RESOURCE and later packets remain inactive.
 
 B implementation and C/D still require separate future activation, and no
 packet is active merely from this list. No directive here allocates new stable

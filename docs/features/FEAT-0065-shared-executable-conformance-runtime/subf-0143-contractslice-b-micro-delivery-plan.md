@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Gate 2 micro-delivery plan and design freeze |
-| State | `B-SURFACE-01`, `B-CODEC-ACTIVATION-01`, `B-WIRE-REPOSITORY-TREE-01`, and `B-WIRE-GOVERNED-TEXT-01` exact-head hosted green; repository-target R=0004 is diagnostic-only and corrected R=0005 is `FrozenDesign`/inactive pending its exact correction-design-head hosted gate; B `5/11`, cumulative A+B `37/43`; later packets inactive |
+| State | `B-SURFACE-01`, `B-CODEC-ACTIVATION-01`, `B-WIRE-REPOSITORY-TREE-01`, and `B-WIRE-GOVERNED-TEXT-01` exact-head hosted green; repository-target R=0004 diagnostic-only, canonical R=0005 accepted, and `B-WIRE-REPOSITORY-TARGET-01` `ReviewedLocalGreen` with implementation head hosted pending; B `6/11`, cumulative A+B `38/43`; `B-RESOURCE-01` and later packets inactive |
 | Parent | Owning feature and current subfeature |
 | Scenario | [TEST-0210](test-cases.md#test-0210), still `Planned` |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
@@ -380,11 +380,13 @@ project, package, lock, workflow, release, or consumer file. The user-owned
 
 ## Exit condition
 
-This plan records the corrected `FrozenDesign` predecessor. The surface, codec
+This plan records repository-target `ReviewedLocalGreen`. The surface, codec
 activation, repository-tree, and governed-text packets are immutable exact-head
-hosted-green history at B `5/11` and A+B `37/43`. Repository-target R=0004 is
-diagnostic-only; corrected R=0005 is `FrozenDesign`/inactive and cannot execute until this synchronized correction-design head
-is committed, pushed, and exact-head hosted green. Every successor stays
-inactive until its predecessor gate closes. C/D, final
+hosted-green history. R=0004 is diagnostic-only; canonical R=0005 is accepted,
+focused/B/full Conformance/Domain are `1/1`, `6/6`, `38/38`, and `98/98`, and
+the bounded executable delta is `2,849/3,200` normalized lines. B is `6/11`,
+cumulative A+B is `38/43`, and the implementation head remains hosted pending.
+`B-RESOURCE-01` and every successor stay inactive until that predecessor gate
+closes. C/D, final
 activation, feature DoD, release, publication, consumer mutation, authority
 transfer, and PowerShell retirement remain held.
