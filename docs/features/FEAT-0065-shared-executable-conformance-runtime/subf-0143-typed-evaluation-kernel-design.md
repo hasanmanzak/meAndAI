@@ -3,14 +3,14 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted; ContractSlice A merged/exact-main green. B surface, codec activation, and three wire packets are exact-head hosted green. Repository-target R=0004 remains diagnostic-only and R=0005 accepted. `B-RESOURCE-01` canonical R=0006 is accepted and `ReviewedLocalGreen` at B `7/11`, cumulative A+B `39/43`, with exact implementation-head hosted pending; [TEST-0210](test-cases.md#test-0210) remains `Planned`; B-CACHE and later B, C/D, activation, and DoD remain held. |
+| Status | Gate 2 accepted; ContractSlice A merged/exact-main green. B surface, codec activation, all three wire packets, and `B-RESOURCE-01` are exact-head hosted green. Repository-target R=0004 remains diagnostic-only; R=0005 and resource R=0006 remain accepted and immutable. B is `7/11`, cumulative A+B is `39/43`; `B-CACHE-01` is `FrozenDesign`/inactive pending this exact design head's hosted gate. [TEST-0210](test-cases.md#test-0210) remains `Planned`; later B, C/D, activation, and DoD remain held. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Test | [TEST-0210](test-cases.md#test-0210) |
 | Gate 3 micro-delivery routing | Historical A delivery remains owned by the [A micro-delivery control plan](subf-0143-micro-delivery-plan.md). Current B design routing is the [ContractSlice B micro-delivery plan](subf-0143-contractslice-b-micro-delivery-plan.md); packet labels refine delivery but activate no executable work. |
 | Exact-main design baseline | Accepted A merge commit [`51623f4d404a95e0f706d72805cf7ddbbbd293b8`](https://github.com/hasanmanzak/meAndAI/commit/51623f4d404a95e0f706d72805cf7ddbbbd293b8), validated by exact-main [run 31304787603](https://github.com/hasanmanzak/meAndAI/actions/runs/31304787603) |
-| Design and Gate 3 authority | Historical A directives and clarifications remain immutable evidence. B surface, codec activation, and all three wire packets are immutable hosted-green predecessors. B-RESOURCE R=0006 is accepted and local green, but B-CACHE stays inactive until the exact resource implementation head is hosted green and separately frozen. Later B packets remain predecessor-gated; C/D, final activation, merge, release, and publication remain outside that authority. |
+| Design and Gate 3 authority | Historical A directives and clarifications remain immutable evidence. B surface, codec activation, all three wire packets, and B-RESOURCE are immutable hosted-green predecessors; R=0006 remains accepted. B-CACHE is now `FrozenDesign`/inactive until this exact synchronized design head is hosted green. Later B packets remain predecessor-gated; C/D, final activation, merge, release, and publication remain outside that authority. |
 | Completed predecessor | [SUBF-0153](README.md#subf-0153) / [TEST-0221](test-cases.md#test-0221), merged through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173) and exact-main validated by [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) |
 
 ## Directive and hard boundary
@@ -1172,92 +1172,12 @@ Conformance are `32/32`, Domain is `98/98`, production remains `0`, and fresh
 code/test plus evidence/scope reviews each closed `0/0/0`. At that packet
 checkpoint, progress was `19/20` (`95%`); any future production need still reopens D/RT.
 
-### Exact-head hosted-green `A-COMPLETE-PROFILE-01` closure
+### Historical `A-COMPLETE-PROFILE-01` closure
 
-The A-COMPLETE design-only predecessor builds on the recorded A-FULL delivery
-and is exact hosted-green through run `30844428072`. Gate 3 is
-active. Its corrected exact Fact/FQN is
-`MeAndAI.Protocol.Conformance.Tests.ContractSliceACompleteCatalogProfileTests.Enforces_exact_provider_profile_genesis_catalog_inventory_digest_and_added_transitions`,
-with expected-red marker/TRX stem `TEST-0210-A-BEHAVIOR-RED-0013`, one Fact,
-only `ContractSlice=A`, and no Scenario.
-
-The discovered marker `0012` / exact FQN
-`MeAndAI.Protocol.Conformance.Tests.ContractSliceACompleteCatalogProfileTests.Enforces_exact_genesis_catalog_inventory_digest_profile_and_added_transitions`
-used `Repository + Provider` profile surfaces.
-That contradicts the frozen Provider-only axis because surface intersection
-would resolve all five rules while the fixture lists only `RULE-0003` through
-`RULE-0005`. Its TRX SHA-256
-`950F15AA946EF42E1549EF7C356E6EDF7E5F1227285FA0A39511C51E43B4CB62`
-and source SHA-256
-`2129E819F0313FE4C9AF09613B16C2F7772EACB60DEBCA21C6DDE550CFA00701`
-are retained only as an invalid diagnostic attempt. The identity is never
-retried or promoted. Green stopped, its partial mutation was removed, and the
-packet returned to D/RT. The corrected source uses only `Provider`. Renewed
-D/RT and source review closed `0/0/0`; Release build passed with zero
-warnings/errors. Its single accepted canonical R is
-`D:\Temp\meandai-test-0210-a-3f6e8a12c4b7490db2561e978a34f0cd\TEST-0210-A-BEHAVIOR-RED-0013.trx`,
-SHA-256 `34CD24791964B8602240E3B1CA31CC570E18ABA911A5E9343C4018402C724C7C`,
-with source SHA-256
-`7239A20F27B488B750E0AE29CF2B50DAA162EF283F8CFBF05736C19DEF474644`.
-The independent oracle audit closed `0/0/0`; R is never rerun. Bounded
-implementation subsequently became packet-local `ReviewedLocalGreen` without
-rerunning R.
-
-P changes only internal compile seams. `ParsedCanonicalManifest` carries
-nullable `Slice` plus optional trailing nullable `CompleteCatalog`; the parsed
-Writer guard checks `slice is null || manifest.CompleteCatalog is not null`
-before any dereference and retains the current exact qualification-only
-`InvalidOperationException` message. The A-FULL fixture factory becomes
-internal. Public API, friend grants, complete serialization, parsing, and
-runtime behavior remain unchanged in P.
-
-Canonical R builds every factory value outside the guard, derives its graph from
-the A-FULL fixture, and replaces only the authority/union with exact
-`CompleteProtocolSnapshot`, `Slice=null`, and a valid genesis
-`CompleteCatalog`. It then invokes only the parsed Writer. Reader and Finalized
-projection do not enter R; only the frozen exception type/message may emit the
-single marker.
-
-Green adds the complete branch without weakening the exact-one union. The root
-encodes exactly one of `slice` or `completeCatalog`; shared rules still feed the
-existing schema/slot/component closure. The complete body has ordered
-`predecessor`, `completeInventoryDigest`, `baselineProfileName`, `rules`,
-`transitions`, and `namedProfiles`. The Reader reconstructs the same declaration,
-compares the serialized inventory digest to the independently derived digest,
-and `FinalizedPolicyManifest` retains the selected union arm. Writer -> Reader
--> Writer bytes and manifest digest must be identical.
-
-This packet admits only Genesis catalog version `1` at protocol `0.17.0`, the
-five current revision-1 rules, and one Added transition per rule with the exact
-ContractSlice A Gate 3 directive authority already frozen earlier in this
-record.
-The inventory frame is exactly `104` bytes and hashes to
-`c013e4b9937f225163f58e41b893600b87d88faf6340678a79242041443f8af3`.
-The sole baseline/named profile
-`protocol.profile.consumer-provider-exact-commit-conformance-audit` has axes
-Consumer, Conformance, ExactCommit, Provider, and Audit; exact compatibility is
-role/operation/snapshot equality plus surface intersection, ignores enforcement
-phase, and resolves only `RULE-0003`, `RULE-0004`, and `RULE-0005`.
-
-The retained negative boundary is both/neither union arms, inventory digest
-inequality, compatible profile omission/addition, and missing/extra/non-Added
-transition rows. Existing predecessor wire serialization/parsing and its
-version/digest semantics, other transition kinds,
-cross-version lifecycle, exhaustive malformed-wire coverage, resource bounds,
-kernel/export/registration, final activation, and B/C/D remain later. Source is
-limited to Reader, Writer, Finalized manifest, `CompleteCatalogDeclaration`, the
-new test, and the A-FULL helper visibility seam. Hard caps are `430` production,
-`240` test, and `680` combined, with mandatory redesign at `700`. Expected green
-is focused `1/1`, cumulative/Conformance `28/28`, and Domain `98/98`. Release
-build is `0/0`, format/diff are green, production is `+283/-37`, test is
-`+162/-1`, and combined additions are `445`. The initial code review's
-Existing-predecessor finding was corrected without adding Existing semantics;
-renewed code and evidence reviews closed `0/0/0`. Progress remains `15/20`
-(`75%`). Exact-head hosted validation is green at the implementation identity
-recorded in the canonical owning finding; Windows
-passed in `44m13s`, Ubuntu in `11m50s`, and publication verification was
-correctly skipped. This closes only A-COMPLETE packet evidence; no full-A
-completion, final activation, B/C/D, or DoD is claimed.
+The corrected A complete-profile directive, its invalid diagnostic, single
+canonical red, bounded C# green, reviews, and exact-head hosted evidence remain
+immutable in the owning historical ledger. It closed only that completed A
+packet and granted no later-slice authority.
 
 That corrected directive still does **not** authorize:
 
@@ -1312,9 +1232,9 @@ provider-neutral capability semantics, shared-root ledgers, staged planning,
 kernel evaluation, real Policy export, the initial real-rule set, Scenario
 activation, workflow filters, or runtime-efficiency changes. The original B
 design phase had P/R/G `NotApplicable` and an empty executable allowlist.
-Surface and codec activation are now immutable hosted-green history. The
-repository-tree wire is bounded local green with its implementation-head hosted
-gate pending; no successor packet is active yet.
+Surface, codec activation, all three wires, and B-RESOURCE are now immutable
+hosted-green history. B-CACHE is `FrozenDesign`/inactive pending its exact
+synchronized design-head hosted gate; no later packet is active.
 
 ## Gate 2 outcome
 
@@ -8639,8 +8559,229 @@ report SHA-256 is `44A095FDE501917EE56823CE5BABBCF95AB83EE53E7A1ACA430B2614C5DD6
 and TRX SHA-256 is `EC2AF7C6ECC03F039F2DEAC0258D34DCD07ACBAC5FBC6CC68E2B2644087E7518`.
 Bounded green changes only the valid-success return, remains `1,176/1,200`
 lines with zero production delta, and passes `1/1`, `7/7`, `39/39`, and `98/98`.
-The resource packet is `ReviewedLocalGreen`; its exact implementation-head
-hosted gate and every B-CACHE/downstream hold remain.
+The resource packet is immutable `ReviewedHostedGreen`; its exact implementation
+and hosted-run identities are owned by the canonical B ledger. Ubuntu passed in
+`15m52s` and Windows in `49m31s`, while publication verification was correctly
+skipped. Every B-CACHE/downstream hold remained through that gate.
+
+### Frozen `B-CACHE-01` codec-model cache contract
+
+`B-CACHE-01` starts only from the exact hosted-green resource predecessor above.
+At this design checkpoint B is `7/11` and cumulative A+B is `39/43`. The packet
+adds only
+`tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ContractSliceBDecodeModelCacheTests.cs`,
+changes no retained source/test file and no production, interface, project,
+package, lock, workflow, Scenario, admission, sealed-context, reference, Policy,
+C, or D surface. The new file may contain at most `1,200` normalized lines;
+`1,201` requires a reviewed redraw before build or red. The design cohort remains
+the same twelve Markdown/memory paths, adds no tracked node, and must preserve at
+least `2,048` bytes of typed-design per-blob headroom under schema 2.
+P is `NotApplicable`: no retained compile seam is required. R adds the complete
+new test-owned cache mirror with only its final valid aggregate result set to
+`null!`; G changes only that final return to the already computed non-null
+aggregate. No intermediate source identity is deliverable.
+
+The Tests-owned cache mirror receives already validated codec-model canonical
+key bytes; it does not duplicate writer, qualifier, resource-meter, or admission
+semantics. Its exact declarations are:
+
+```csharp
+internal sealed class CodecModelCacheKeyMirror : IComparable<CodecModelCacheKeyMirror>
+{
+    internal string ReleaseIdentity { get; }
+    internal ReadOnlyMemory<byte> CanonicalBytes { get; }
+    internal ReadOnlyMemory<byte> Digest { get; }
+    internal static CodecModelCacheKeyMirror Create(
+        string releaseIdentity, ReadOnlyMemory<byte> canonicalBytes);
+    internal static CodecModelCacheKeyMirror CreateCollisionProbe(
+        string releaseIdentity, ReadOnlyMemory<byte> canonicalBytes,
+        ReadOnlyMemory<byte> forcedDigest);
+    public int CompareTo(CodecModelCacheKeyMirror? other);
+}
+
+internal sealed class DecodeModelValueMirror
+{
+    internal string Identity { get; }
+    internal ReadOnlyMemory<byte> CanonicalBytes { get; }
+    internal static DecodeModelValueMirror Create(
+        string identity, ReadOnlyMemory<byte> canonicalBytes);
+}
+
+internal sealed class DeclaredDecodeFailureMirror
+{
+    internal string Code { get; }
+    internal ReadOnlyMemory<byte> CanonicalBytes { get; }
+    internal static DeclaredDecodeFailureMirror Create(
+        string code, ReadOnlyMemory<byte> canonicalBytes);
+}
+
+internal abstract class DecodeAttemptMirror
+{
+    private DecodeAttemptMirror();
+    internal static DecodeAttemptMirror Succeeded(DecodeModelValueMirror value);
+    internal static DecodeAttemptMirror DeclaredFailure(
+        DeclaredDecodeFailureMirror failure);
+    internal abstract TResult Accept<TResult>(IDecodeAttemptMirrorVisitor<TResult> visitor);
+}
+
+internal interface IDecodeAttemptMirrorVisitor<TResult>
+{
+    TResult VisitSucceeded(DecodeModelValueMirror value);
+    TResult VisitDeclaredFailure(DeclaredDecodeFailureMirror failure);
+}
+
+internal enum DecodeCacheDispositionMirror { Produced, Joined, Retained }
+
+internal sealed class DecodeCacheResultMirror
+{
+    internal DecodeAttemptMirror Attempt { get; }
+    internal DecodeCacheDispositionMirror Disposition { get; }
+}
+
+internal sealed class DecodeModelCacheMirror
+{
+    internal static DecodeModelCacheMirror Create(
+        string releaseIdentity, string sessionIdentity,
+        int maximumEntries, long maximumCanonicalBytes,
+        int maximumConcurrentAttempts);
+    internal Task<DecodeCacheResultMirror> GetOrAddAsync(
+        CodecModelCacheKeyMirror key,
+        Func<CancellationToken, Task<DecodeAttemptMirror>> attempt,
+        CancellationToken cancellationToken);
+}
+
+internal sealed class DecodeCacheIntegrityMirrorException : Exception
+{
+    internal string Code { get; }
+    internal DecodeCacheIntegrityMirrorException(string code);
+}
+```
+
+Every carrier has a private instance constructor, copies all text/bytes, rejects
+null/empty identity and empty canonical bytes, and exposes no mutable array.
+`Create` computes SHA-256 over exact key bytes. `CreateCollisionProbe` is the sole
+test-only cryptographic-collision seam; it requires an exact 32-byte digest and
+is used only to prove unequal-byte collision rejection. Ordering is unsigned
+lexicographic canonical bytes, then shorter equal prefix first. The cache copies
+its release/session identities, requires nonnegative retention count/bytes and a
+positive concurrency ceiling, and owns no real `SessionCacheBudget` instance.
+Exact null parameter names are `releaseIdentity`, `sessionIdentity`,
+`canonicalBytes`, `forcedDigest`, `key`, and `attempt`. `GetOrAddAsync` order is
+argument boundaries, pre-cancellation, release identity, digest/byte collision,
+existing retained/in-flight lookup, then new queue registration. A producer that
+returns null throws `InvalidOperationException` with exact message
+`Decode attempt returned null.`, is removed, and is not cached.
+Negative `maximumEntries`/`maximumCanonicalBytes` and nonpositive
+`maximumConcurrentAttempts` throw `ArgumentOutOfRangeException` with that exact
+parameter name before any cache state exists.
+
+The three deterministic fixture keys are opaque, already validated upstream
+cache-key frames; this packet intentionally does not reimplement key grammar.
+Each is exactly `89` bytes. A/B/C Base64 and SHA-256 identities are respectively:
+
+```text
+A cHJvdG9jb2wuY2FjaGUta2V5LmZyYW1lLnYxCgBxdWFsaWZpY2F0aW9uLXNsaWNlfG1hbmlmZXN0fDF8cmVwb3NpdG9yeS10cmVlfGluc3RydWN0aW9uLUE=
+  3966ED0A5CD736B311F695A3746090A405345C47E8584888C7201D13F7583959
+B cHJvdG9jb2wuY2FjaGUta2V5LmZyYW1lLnYxCgBxdWFsaWZpY2F0aW9uLXNsaWNlfG1hbmlmZXN0fDF8cmVwb3NpdG9yeS10cmVlfGluc3RydWN0aW9uLUI=
+  585852BDC1A3395DFC01611685BCDB7337C1AD6377142CAD63F946EADBF9A842
+C cHJvdG9jb2wuY2FjaGUta2V5LmZyYW1lLnYxCgBxdWFsaWZpY2F0aW9uLXNsaWNlfG1hbmlmZXN0fDF8cmVwb3NpdG9yeS10cmVlfGluc3RydWN0aW9uLUM=
+  AC7CB7EF1168A6590480B247EA91A1F75CC7F5CCE7B57F95F293B7410E7F94C4
+```
+
+They begin with the exact schema header and codec-model rank, share the frozen
+release/schema/model fixture, differ only in the final discriminator, and sort
+A < B < C. The collision probe uses B bytes with A's digest. A different release
+identity or cache session uses a distinct cache and must invoke a fresh attempt;
+passing a foreign-release key to an existing cache throws
+`DecodeCacheIntegrityMirrorException` code
+`protocol.cache.release-identity-mismatch` before registration.
+
+The exact cache release identity is `qualification-slice|manifest|1` and session
+identity is `session-01`; isolation probes use
+`qualification-slice|manifest-foreign|1` and `session-02`. Successful model
+identities are `model-a`, `model-b`, and `model-c`; declared failure is
+`protocol.codec.invalid-repository-tree`. Canonical result/failure byte arrays
+are deterministic repeated-byte fixtures whose lengths are chosen explicitly by
+each boundary vector; their content is independently asserted before use.
+
+For one cache, digest is the primary candidate bucket, but reuse additionally
+requires exact release, byte length, and byte equality. Unequal bytes under one
+digest throw only `protocol.cache.key-collision`, with exact message
+`Conflicting decode cache key bytes.`, invoke no producer, publish no entry, and
+are never cached. An exact queued or running key joins the same Task; the
+producer is invoked once. A lock-held dispatcher sorts pending new keys by
+canonical bytes and starts at most `maximumConcurrentAttempts`; joining callers
+do not consume another slot. In-flight entries are never eviction candidates.
+The owner receives `Produced`, callers attached before completion receive
+`Joined`, and a later retained reuse receives `Retained`; all observe the same
+immutable `DecodeAttemptMirror` instance. A producer delegate supplied on a
+join or retained call is never invoked.
+
+The single-flight schedule uses asynchronous run continuations and explicit
+gates, never sleeps. Three A callers attach before the owner gate releases and
+prove one invocation plus `Produced/Joined/Joined`. With concurrency `1`, A is
+held running while C then B are queued; after A releases the observed start
+order is exactly A, B, C. Cancellation of the owner or a thrown timeout/host
+exception is observed by all joiners, removes the entry, and a later success
+invokes exactly once again.
+
+Only `Succeeded` and `DeclaredFailure` completions are retainable. Success cost
+is exact model canonical-byte length; declared-failure cost is its exact failure
+frame length. Cancellation, `TimeoutException`, any other unexpected exception,
+and cache-integrity failure remove the in-flight entry, propagate unchanged,
+and leave no retained entry; the next call is a fresh attempt. The first caller's
+token owns the shared attempt. A pre-cancelled token fails before registration;
+joiners observe the shared result and cannot substitute a different producer.
+
+After each cacheable completion, the retained set plus that completion is sorted
+by exact key bytes and greedily retained while both count and checked byte-cost
+ceilings fit. Iteration continues after an oversized entry. Thus a later lower
+key may evict a higher retained key, while an evicted/rejected higher key can
+never become eligible after additional lower keys arrive. Count or byte ceiling
+zero disables retention without disabling single-flight. Equality at both
+ceilings succeeds; the first count or byte over rejects only the crossing entry.
+Eviction changes reuse/invocation counts only, never returned semantic bytes.
+
+Exact retention vectors are allocation-small. With count `2`/bytes `10`, A cost
+`4` plus B cost `6` reaches both equalities and both retain; C cost `1` is the
+first crossing entry and is produced but not retained. Starting with B/C cost
+`5` each retains both; subsequently producing A cost `5` deterministically keeps
+A/B and evicts C. B cost `11` is skipped as oversized while later C cost `4`
+retains, proving iteration continues. Count `0` or bytes `0` produces twice for
+two sequential calls. Checked cost overflow rejects retention and throws
+`DecodeCacheIntegrityMirrorException` code
+`protocol.cache.retention-cost-overflow`; it never wraps or evicts an unrelated
+valid entry.
+
+The one direct Fact is
+`MeAndAI.Protocol.Conformance.Tests.ContractSliceBDecodeModelCacheTests.Enforces_exact_codec_cache_single_flight_collision_and_eviction`,
+with only `ContractSlice=B`, no Scenario/Theory/class trait, and exact marker
+`TEST-0210-B-BEHAVIOR-RED-0007`. It proves exact A/B/C key ordering, byte-equal
+retained hit, forced collision, same-key concurrent single-flight, concurrency ceiling,
+success and declared-failure retention, cancellation/timeout/host/integrity
+non-retention, release/session isolation, zero retention, count/byte equality,
+first-one-over, oversized-entry continuation, and deterministic low-key
+eviction. Red replaces only the final valid aggregate outcome with `null!`; only
+that null reaches direct `Assert.Fail(marker)`.
+
+The packet-specific red command is exactly:
+
+```text
+dotnet test tests/dotnet/MeAndAI.Protocol.Conformance.Tests/MeAndAI.Protocol.Conformance.Tests.csproj --configuration Release --no-restore --no-build --nologo --verbosity minimal --results-directory "<fresh-root>" --logger "trx;LogFileName=TEST-0210-B-BEHAVIOR-RED-0007.trx" --filter "ContractSlice=B&FullyQualifiedName=MeAndAI.Protocol.Conformance.Tests.ContractSliceBDecodeModelCacheTests.Enforces_exact_codec_cache_single_flight_collision_and_eviction"
+```
+
+One fresh external runner specializes the accepted R=0006 custody contract to
+the sole new source and marker. It binds exact hosted design HEAD/upstream/
+branch/status, source and self identities at start/pre-build/pre-test/post-test,
+the six locks, warning-as-error Release build, fresh DLL/PDB, child-only timeout
+`300`, monotonic outer bound `420000` ms, complete `8,388,608`-byte stdout/stderr
+logs, `1,048,576`-byte report, secure XML, native exit `1`, exact one-result TRX,
+sixteen counters, and zero forbidden diagnostics/attachments.
+`InvocationCommitted` irrevocably consumes R=0007 for every outcome; no changed
+or unchanged retry exists. Green is focused `1/1`, B `8/8`, A+B/full
+Conformance `40/40`, Domain `98/98`, plus build/format/locks/diff/StructureOnly/
+publication and two fresh `0/0/0` reviews. B-ADMISSION and every later packet
+remain held until the exact cache implementation head is hosted green.
 
 ## [TEST-0210](test-cases.md#test-0210) expected-red contract
 
@@ -9422,11 +9563,11 @@ ContractSlice A's historical delivery is owned by its
 [micro-delivery control plan](subf-0143-micro-delivery-plan.md). ContractSlice
 B is decomposed by the current
 [B micro-delivery plan](subf-0143-contractslice-b-micro-delivery-plan.md).
-Surface, codec activation, repository-tree, and governed-text are hosted green;
-repository-target R=0004 is diagnostic-only and canonical R=0005 is accepted;
-repository-target is exact-head hosted green. B-RESOURCE canonical R=0006 is
-accepted and `ReviewedLocalGreen` at B `7/11`, A+B `39/43`, with its exact
-implementation-head hosted gate pending; B-CACHE and later packets remain inactive.
+Surface, codec activation, all three wires, and B-RESOURCE are hosted green;
+repository-target R=0004 is diagnostic-only, while canonical R=0005 and resource
+R=0006 are accepted/immutable. B is `7/11`, A+B is `39/43`; B-CACHE is
+`FrozenDesign`/inactive pending this exact design head's hosted gate, and later
+packets remain inactive.
 
 B implementation and C/D still require separate future activation, and no
 packet is active merely from this list. No directive here allocates new stable

@@ -13,9 +13,10 @@ green. `B-WIRE-GOVERNED-TEXT-01` is exact-head hosted green;
 Repository-target R=0004 is an immutable oracle-rejected diagnostic with no
 canonical red. Canonical R=0005 is accepted and repository-target is exact-head
 hosted green; its owning B wire ledger retains exact implementation/run custody.
-B-RESOURCE R=0006 is accepted and `ReviewedLocalGreen` at B `7/11`, cumulative
-A+B `39/43`, with exact implementation-head hosted pending. B-CACHE/later
-packets remain inactive and the parent scenario remains `Planned`.
+B-RESOURCE R=0006 is accepted, immutable, and exact-head hosted green. B is
+`7/11`, cumulative A+B is `39/43`; B-CACHE is `FrozenDesign`/inactive pending
+this exact design head's hosted gate. Later packets remain inactive and the
+parent scenario remains `Planned`.
 
 Follow the current
 [instruction-graph capacity handoff](2026-08-09-feat-0069-instruction-graph-capacity.md)

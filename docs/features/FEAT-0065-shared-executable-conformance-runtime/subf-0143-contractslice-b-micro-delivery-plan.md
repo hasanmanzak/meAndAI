@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Gate 2 micro-delivery plan and design freeze |
-| State | B surface, codec, and three wire packets exact-head hosted green; repository-target R=0004 diagnostic-only and R=0005 accepted; `B-RESOURCE-01` canonical R=0006 accepted and `ReviewedLocalGreen` at B `7/11`, cumulative A+B `39/43`, with exact implementation-head hosted pending; `B-CACHE-01` and later packets inactive |
+| State | B surface, codec, three wire packets, and `B-RESOURCE-01` exact-head hosted green; repository-target R=0004 diagnostic-only, R=0005 and resource R=0006 accepted/immutable; B `7/11`, cumulative A+B `39/43`; `B-CACHE-01` `FrozenDesign`/inactive pending this exact design head's hosted gate; later packets inactive |
 | Parent | Owning feature and current subfeature |
 | Scenario | [TEST-0210](test-cases.md#test-0210), still `Planned` |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
@@ -284,10 +284,66 @@ later packet remain inactive until that implementation head is hosted green.
 
 R=0006 is accepted once and never rerun. Bounded green is `1/1`, `7/7`,
 `39/39`, and `98/98`, with Release `0/0`, format/diff clean, `1,176/1,200`
-source lines, and zero production delta. Preliminary post-green publication
-evidence is `7/7` in `308.1s` without publication claim and StructureOnly is
-green at `elapsedMs=443429`; the evidence-row edit requires both recurrences on
-the final exact bytes before commit. The implementation head remains hosted pending.
+source lines, and zero production delta. Final exact-tree publication evidence
+is `7/7` in `285.2s` without publication claim and StructureOnly is green at
+`elapsedMs=439938`. The exact implementation identity and hosted run are owned
+by the canonical B ledger: Ubuntu passed in `15m52s`, Windows in `49m31s`, and
+publication verification was skipped.
+
+### Frozen `B-CACHE-01` staging boundary
+
+This packet adds exactly one Tests-owned file,
+`tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ContractSliceBDecodeModelCacheTests.cs`,
+bounded at `1,200` normalized lines; `1,201` requires redesign before build/red.
+It changes no retained file and no production, interface, project, package,
+lock, workflow, Scenario, admission, sealed-context, reference, Policy, C, or D
+surface. The same twelve Markdown/memory paths form the complete design cohort;
+no tracked node is added. Schema-2 stays `512` nodes / `8,192` relations /
+`1,048,576` bytes per parsed blob / `8,388,608` aggregate, and the typed design
+must retain at least `2,048` bytes of per-blob headroom.
+P is `NotApplicable`; R adds the complete new Tests-owned mirror with only the
+final valid aggregate return as `null!`; G changes only that return to the
+already computed non-null aggregate. No intermediate source is deliverable.
+
+The new file owns one direct Fact at
+`MeAndAI.Protocol.Conformance.Tests.ContractSliceBDecodeModelCacheTests.Enforces_exact_codec_cache_single_flight_collision_and_eviction`,
+one `ContractSlice=B` trait, no Scenario/Theory/class trait, and marker
+`TEST-0210-B-BEHAVIOR-RED-0007`. It stages one Tests-only exact-release/session
+decode-model cache over opaque validated canonical key bytes. The typed design
+solely owns the exact carriers, three 89-byte Base64/SHA fixtures, collision
+probe, result union, concurrency/single-flight lifecycle, retainable and
+non-retainable outcomes, deterministic low-key eviction, equality/first-over
+vectors, release/session isolation, and failure precedence.
+
+Only byte-equal digest candidates reuse. Equal digest with unequal bytes is an
+integrity exception before producer invocation. Same-key callers share one
+attempt; pending new keys are dispatched in canonical byte order within the
+positive concurrency ceiling. Success and declared typed failure may be cached.
+Cancellation, timeout, unexpected host exception, and integrity failure are
+propagated and never retained. Retention greedily keeps canonical-lowest entries
+under checked count and canonical-byte ceilings, continues after oversized
+entries, accepts equality, rejects the first crossing entry, and is disabled by
+either zero ceiling. Release/session mismatch never reuses an entry.
+
+Only the final fully valid aggregate assertion's null result reaches direct
+`Assert.Fail(marker)` in red. Canonical R=0007 uses one fresh external runner,
+root, report, and complete logs under the accepted R=0006 custody contract. Its
+packet-specific child command is:
+
+```text
+dotnet test tests/dotnet/MeAndAI.Protocol.Conformance.Tests/MeAndAI.Protocol.Conformance.Tests.csproj --configuration Release --no-restore --no-build --nologo --verbosity minimal --results-directory "<fresh-root>" --logger "trx;LogFileName=TEST-0210-B-BEHAVIOR-RED-0007.trx" --filter "ContractSlice=B&FullyQualifiedName=MeAndAI.Protocol.Conformance.Tests.ContractSliceBDecodeModelCacheTests.Enforces_exact_codec_cache_single_flight_collision_and_eviction"
+```
+
+The runner binds exact hosted design HEAD/upstream/branch/status, sole source and
+self identities at four gates, six locks, warning-as-error Release build, fresh
+DLL/PDB, child-only timeout `300`, outer `420000` ms, complete logs capped at
+`8,388,608` bytes, atomic report capped at `1,048,576`, secure XML, native exit
+`1`, one exact TRX result/definition/entry, sixteen counters, and no forbidden
+diagnostics/attachments. `InvocationCommitted` consumes R=0007 for every outcome;
+no changed or unchanged retry exists. Green requires focused `1/1`, B `8/8`,
+A+B/full Conformance `40/40`, Domain `98/98`, build/format/locks/diff/
+StructureOnly/publication, and two fresh reviews `0/0/0`. B-ADMISSION and later
+packets remain held through the exact cache implementation-head hosted gate.
 
 ## SurfaceRed and BehaviorRed contract
 
@@ -452,13 +508,13 @@ project, package, lock, workflow, release, or consumer file. The user-owned
 
 ## Exit condition
 
-This plan records repository-target exact-head hosted green. The surface, codec,
-and three wire packets are immutable hosted-green history. Resource R=0006 is
-accepted once and never rerun; focused/B/full Conformance/Domain are `1/1`,
-`7/7`, `39/39`, and `98/98`, and the Tests-only source is `1,176/1,200`
-normalized lines with zero production delta. B is `7/11`, cumulative A+B is
-`39/43`, and `B-RESOURCE-01` is `ReviewedLocalGreen` pending its exact
-implementation-head hosted gate. `B-CACHE-01` and every successor remain held.
+This plan records repository-target and resource exact-head hosted green. The
+surface, codec, three wire packets, and resource packet are immutable hosted
+history. Resource R=0006 is accepted once and never rerun; focused/B/full
+Conformance/Domain are `1/1`, `7/7`, `39/39`, and `98/98`, and the Tests-only
+source is `1,176/1,200` normalized lines with zero production delta. B is
+`7/11`, cumulative A+B is `39/43`, and `B-CACHE-01` is `FrozenDesign`/inactive
+pending this exact design head's hosted gate. Every successor remains held.
 C/D, final
 activation, feature DoD, release, publication, consumer mutation, authority
 transfer, and PowerShell retirement remain held.
