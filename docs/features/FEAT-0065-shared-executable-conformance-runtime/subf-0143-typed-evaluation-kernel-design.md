@@ -3,14 +3,14 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted; ContractSlice A merged/exact-main green. B surface, codec activation, all three wire packets, `B-RESOURCE-01`, and `B-CACHE-01` are exact-head hosted green. Repository-target R=0004 plus admission R=0008/R=0009 remain diagnostics/no-success; R=0005, resource R=0006, and cache R=0007 remain accepted and immutable. B is `8/11`, cumulative A+B is `40/43`; `B-ADMISSION-01` is second-corrected `FrozenDesign`/inactive pending this exact synchronized correction-design head's hosted gate. [TEST-0210](test-cases.md#test-0210) remains `Planned`; later B, C/D, activation, and DoD remain held. |
+| Status | Gate 2 accepted; ContractSlice A merged/exact-main green. B surface, codec activation, all three wire packets, `B-RESOURCE-01`, and `B-CACHE-01` are exact-head hosted green. Repository-target R=0004 plus admission R=0008/R=0009/R=0010 remain diagnostics/no-success; R=0005, resource R=0006, and cache R=0007 remain accepted and immutable. B is `8/11`, cumulative A+B is `40/43`; `B-ADMISSION-01` is third-corrected `FrozenDesign`/inactive pending this exact synchronized correction-design head's hosted gate. [TEST-0210](test-cases.md#test-0210) remains `Planned`; later B, C/D, activation, and DoD remain held. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Test | [TEST-0210](test-cases.md#test-0210) |
 | Gate 3 micro-delivery routing | Historical A delivery remains owned by the [A micro-delivery control plan](subf-0143-micro-delivery-plan.md). Current B design routing is the [ContractSlice B micro-delivery plan](subf-0143-contractslice-b-micro-delivery-plan.md); packet labels refine delivery but activate no executable work. |
 | Exact-main design baseline | Accepted A merge commit [`51623f4d404a95e0f706d72805cf7ddbbbd293b8`](https://github.com/hasanmanzak/meAndAI/commit/51623f4d404a95e0f706d72805cf7ddbbbd293b8), validated by exact-main [run 31304787603](https://github.com/hasanmanzak/meAndAI/actions/runs/31304787603) |
-| Design and Gate 3 authority | Historical A directives and clarifications remain immutable evidence. B surface, codec activation, all three wire packets, B-RESOURCE, and B-CACHE are immutable hosted-green predecessors; R=0006 and cache R=0007 remain accepted, while admission R=0008/R=0009 are immutable diagnostics/no-success. B-ADMISSION is second-corrected `FrozenDesign`/inactive and owns no further implementation authority until this synchronized correction-design head passes exact hosted validation. C/D, final activation, merge, release, and publication remain outside this authority. |
+| Design and Gate 3 authority | Historical A directives and clarifications remain immutable evidence. B surface, codec activation, all three wire packets, B-RESOURCE, and B-CACHE are immutable hosted-green predecessors; R=0006 and cache R=0007 remain accepted, while admission R=0008/R=0009/R=0010 are immutable diagnostics/no-success. B-ADMISSION is third-corrected `FrozenDesign`/inactive and owns no further implementation authority until this synchronized correction-design head passes exact hosted validation. C/D, final activation, merge, release, and publication remain outside this authority. |
 | Completed predecessor | [SUBF-0153](README.md#subf-0153) / [TEST-0221](test-cases.md#test-0221), merged through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173) and exact-main validated by [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) |
 
 ## Directive and hard boundary
@@ -1234,8 +1234,8 @@ activation, workflow filters, or runtime-efficiency changes. The original B
 design phase had P/R/G `NotApplicable` and an empty executable allowlist.
 Surface, codec activation, all three wires, and B-RESOURCE are now immutable
 hosted-green history. Cache R=0007 is accepted/immutable and B-CACHE is
-exact-head hosted green. Admission R=0008 and R=0009 are immutable diagnostics/
-no-success; B-ADMISSION is second-corrected `FrozenDesign`/inactive pending this
+exact-head hosted green. Admission R=0008, R=0009, and R=0010 are immutable diagnostics/
+no-success; B-ADMISSION is third-corrected `FrozenDesign`/inactive pending this
 exact synchronized correction-design head's hosted gate; no later packet is
 active.
 
@@ -8804,7 +8804,7 @@ The owning ledger's exact cache implementation identity passed Ubuntu in
 `20m42s` and Windows in `49m17s`; publication verification was skipped.
 B-CACHE is immutable exact-head hosted history.
 
-### Second-corrected frozen `B-ADMISSION-01` proof-candidate admission contract
+### Third-corrected frozen `B-ADMISSION-01` proof-candidate admission contract
 
 `B-ADMISSION-01` starts only from the exact hosted-green cache predecessor
 above. At this design checkpoint B remains `8/11` and cumulative A+B remains
@@ -9159,7 +9159,7 @@ Admission itself reruns none of writer, qualifier, meter, or cache.
 The one direct Fact is
 `MeAndAI.Protocol.Conformance.Tests.ContractSliceBAdmissionProofTests.Admits_exact_observed_failed_and_no_input_proofs`,
 with only `ContractSlice=B`, no Scenario/Theory/class trait, and corrected exact
-marker `TEST-0210-B-BEHAVIOR-RED-0010`. Before calling `Admit`, it assembles each
+marker `TEST-0210-B-BEHAVIOR-RED-0011`. Before calling `Admit`, it assembles each
 expected instruction/receipt vector through an independent Fact-local sequence
 of explicit strict-UTF8 and `BinaryPrimitives` writes that shares no production
 or mirror frame helper, then asserts byte equality and SHA-256 equality. It
@@ -9198,7 +9198,21 @@ The TRX has one Failed result/definition/entry, exact `1/1/1` total/executed/
 failed counters, raw marker count `0`, and exact stack ownership at
 `CreateInstructions`; the runner correctly ended `OracleRejected`.
 
-Second-corrected R=0010 changes only the marker plus the slot-selection fixture.
+R=0010 is a third immutable diagnostic/no-success and is never rerun. The
+owning ledger's exact linked second-correction design head and run passed
+hosted validation (Ubuntu `21m14s`, Windows
+`43m27s`, publication verification skipped). The sole committed child rebuilt
+warning-free and selected the exact Fact, but the Joined-state negative vector
+reached `AdmissionMirrorFrame.WriteObserved`. The existing frame switch encoded
+only Produced/Retained and threw marker-free `System.InvalidOperationException:
+Operation is not valid due to the current state of the object.` before the
+coordinator could reject Joined. The one-result TRX was `8,395` bytes / SHA-256
+`584BC5F27E66E38659E052791C5B01D10720AD3BE87A1E0A97FC43E45F83FEC2`,
+had exact `1/1/1` total/executed/failed counters and raw marker count `0`, and
+the runner ended `OracleRejected`. The owning ledger retains exact runner,
+root, report, and log custody.
+
+The retained second correction changes only the slot-selection fixture.
 `RequireCanonicalSlot(manifest, slotKey, expectedOccurrences)` flattens the
 catalog rules in their canonical manifest order, filters by exact ordinal
 SlotKey, requires Provider governed-text=`3`, repository-target=`3`, and
@@ -9208,18 +9222,23 @@ occurrence equals it in `Requirement`, `ProfileSurfaces`, `MaterialRole`,
 or semantically unequal repeated declarations fail marker-free before any
 instruction or candidate is constructed. No dictionary collapse, manifest
 mutation, new carrier, admission behavior change, or line-cap exception is
-permitted. The final valid aggregate remains `null!` for R and is exactly
+permitted. Third-corrected R=0011 additionally maps only the test-owned receipt
+frame's `DecodeCacheDispositionMirror.Joined` to byte rank `2`; Produced stays
+`0`, Retained stays `1`, and every unknown value remains unencodable. Rank `2`
+is deterministic invalid-candidate identity only: the coordinator must still
+reject Joined as `AdmissionProofInvalid`, and no admitted semantics change.
+The final valid aggregate remains `null!` for R and is exactly
 `new AdmissionAggregateMirror(receipts, (1, 1, 1), true)` for G.
 
 The packet-specific red command is exactly:
 
 ```text
-dotnet test tests/dotnet/MeAndAI.Protocol.Conformance.Tests/MeAndAI.Protocol.Conformance.Tests.csproj --configuration Release --no-restore --no-build --nologo --verbosity minimal --results-directory "<fresh-root>" --logger "trx;LogFileName=TEST-0210-B-BEHAVIOR-RED-0010.trx" --filter "ContractSlice=B&FullyQualifiedName=MeAndAI.Protocol.Conformance.Tests.ContractSliceBAdmissionProofTests.Admits_exact_observed_failed_and_no_input_proofs"
+dotnet test tests/dotnet/MeAndAI.Protocol.Conformance.Tests/MeAndAI.Protocol.Conformance.Tests.csproj --configuration Release --no-restore --no-build --nologo --verbosity minimal --results-directory "<fresh-root>" --logger "trx;LogFileName=TEST-0210-B-BEHAVIOR-RED-0011.trx" --filter "ContractSlice=B&FullyQualifiedName=MeAndAI.Protocol.Conformance.Tests.ContractSliceBAdmissionProofTests.Admits_exact_observed_failed_and_no_input_proofs"
 ```
 
 A fresh external runner specializes the accepted R=0007 custody contract to
 the two exact source paths, combined `2,400`-line ceiling, marker/FQN, fresh
-R=0010 root/report/log paths, exact source/self/HEAD/upstream/branch/status and
+R=0011 root/report/log paths, exact source/self/HEAD/upstream/branch/status and
 six-lock identities at start/pre-build/pre-test/post-test, warning-as-error
 Release build, fresh DLL/PDB, `--no-build`, child-only
 `VSTEST_CONNECTION_TIMEOUT=300`, monotonic `420000`-ms bound, complete
@@ -9229,7 +9248,7 @@ diagnostics/attachments. The exact error Message is marker-only; the same
 result's StdOut may contain zero or one byte-identical marker echo, and the TRX
 may contain zero or one marker-free same-FQN `[FAIL]` RunInfo. Raw marker count
 is therefore exactly one or two; no other marker or diagnostic is accepted.
-`InvocationCommitted` irrevocably consumes R=0010 for
+`InvocationCommitted` irrevocably consumes R=0011 for
 every process-create, timeout, exit, interruption, artifact, or oracle outcome;
 no changed or unchanged retry exists. Only pre-commit preflight/build failures
 may be corrected under a new reviewed source/runner identity.

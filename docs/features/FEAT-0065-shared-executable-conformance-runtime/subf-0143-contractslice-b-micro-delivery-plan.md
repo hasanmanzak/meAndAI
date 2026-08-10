@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Gate 2 micro-delivery plan and design freeze |
-| State | B surface, codec, three wire packets, `B-RESOURCE-01`, and `B-CACHE-01` exact-head hosted green; repository-target R=0004 plus admission R=0008/R=0009 diagnostic/no-success, R=0005, resource R=0006, and cache R=0007 accepted/immutable; B `8/11`, cumulative A+B `40/43`; `B-ADMISSION-01` second-corrected `FrozenDesign`/inactive pending this exact synchronized correction-design head's hosted gate |
+| State | B surface, codec, three wire packets, `B-RESOURCE-01`, and `B-CACHE-01` exact-head hosted green; repository-target R=0004 plus admission R=0008/R=0009/R=0010 diagnostic/no-success, R=0005, resource R=0006, and cache R=0007 accepted/immutable; B `8/11`, cumulative A+B `40/43`; `B-ADMISSION-01` third-corrected `FrozenDesign`/inactive pending this exact synchronized correction-design head's hosted gate |
 | Parent | Owning feature and current subfeature |
 | Scenario | [TEST-0210](test-cases.md#test-0210), still `Planned` |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
@@ -99,9 +99,9 @@ semantic packages own one Fact and one immutable BehaviorRed ordinal each.
 | `B-WIRE-REPOSITORY-TARGET-01` | `protocol.repository-target-resolution/1` demand echo/digest, ItemId/content tables, three selector variants, canonical row order, self-consistency rejection, wire-local ceilings; no target-index capability semantics | Corrected canonical red `TEST-0210-B-BEHAVIOR-RED-0005`; R=0004 is immutable diagnostic-only; `ContractSliceBRepositoryTargetCodecTests.Round_trips_exact_repository_target_resolution_wire` | Focused `1/1`; B `6/6`; A+B `38/38` |
 | `B-RESOURCE-01` | Codec-local four-counter independent meter, claimed-versus-measured equality, selected payload row plus codec node ledger, checked arithmetic, equality/first-one-over/dominated/unreachable vectors | `TEST-0210-B-BEHAVIOR-RED-0006`; `ContractSliceBResourceLedgerTests.Enforces_exact_codec_local_four_counter_ledger` | Focused `1/1`; B `7/7`; A+B `39/39` |
 | `B-CACHE-01` | Codec-model key bytes, collision closure, single-flight, success/declared-failure retention, deterministic eviction, exact-release/session isolation, no cancellation/host/integrity caching | `TEST-0210-B-BEHAVIOR-RED-0007`; `ContractSliceBDecodeModelCacheTests.Enforces_exact_codec_cache_single_flight_collision_and_eviction` | Focused `1/1`; B `8/8`; A+B `40/40` |
-| `B-ADMISSION-01` | Receipt frame after measured qualification/cache closure, exact instruction/proof bijection, manifest/type/artifact validation, Observed/Failed/NoInput leaf exclusivity, writer-before-qualifier lifecycle, forged/stale/partial rejection; R=0008 and R=0009 are immutable diagnostics/no-success | Second-corrected `TEST-0210-B-BEHAVIOR-RED-0010`; `ContractSliceBAdmissionProofTests.Admits_exact_observed_failed_and_no_input_proofs` | Focused `1/1`; B `9/9`; A+B `41/41` |
-| `B-SEALED-CONTEXT-01` | Exact sealed Authority/Manifest/Catalog/slot/scope projection plus ContextProof and Root reference shapes; no raw payload/digest factory and no selector semantics | `TEST-0210-B-BEHAVIOR-RED-0011`; `ContractSliceBSealedContextTests.Seals_exact_context_proof_and_root_references` | Focused `1/1`; B `10/10`; A+B `42/42` |
-| `B-CODEC-DERIVATION-01` | Codec-derived reference frame, manifest component/artifact/model identity, same-or-narrower location, structural comparator, collision and foreign-session rejection; no parser/index derivation | `TEST-0210-B-BEHAVIOR-RED-0012`; `ContractSliceBQualifiedReferenceTests.Seals_exact_codec_derived_reference_and_location_narrowing` | Focused `1/1`; B `11/11`; A+B `43/43` |
+| `B-ADMISSION-01` | Receipt frame after measured qualification/cache closure, exact instruction/proof bijection, manifest/type/artifact validation, Observed/Failed/NoInput leaf exclusivity, writer-before-qualifier lifecycle, forged/stale/partial rejection; R=0008, R=0009, and R=0010 are immutable diagnostics/no-success | Third-corrected `TEST-0210-B-BEHAVIOR-RED-0011`; `ContractSliceBAdmissionProofTests.Admits_exact_observed_failed_and_no_input_proofs` | Focused `1/1`; B `9/9`; A+B `41/41` |
+| `B-SEALED-CONTEXT-01` | Exact sealed Authority/Manifest/Catalog/slot/scope projection plus ContextProof and Root reference shapes; no raw payload/digest factory and no selector semantics | `TEST-0210-B-BEHAVIOR-RED-0012`; `ContractSliceBSealedContextTests.Seals_exact_context_proof_and_root_references` | Focused `1/1`; B `10/10`; A+B `42/42` |
+| `B-CODEC-DERIVATION-01` | Codec-derived reference frame, manifest component/artifact/model identity, same-or-narrower location, structural comparator, collision and foreign-session rejection; no parser/index derivation | `TEST-0210-B-BEHAVIOR-RED-0013`; `ContractSliceBQualifiedReferenceTests.Seals_exact_codec_derived_reference_and_location_narrowing` | Focused `1/1`; B `11/11`; A+B `43/43` |
 | `B-CONVERGE-01` | Pure cumulative audit of exact source/test/export/friend/trait/lock/project state; P/R/G `NotApplicable` | None; every canonical red remains immutable and is never rerun | B `11/11`; A+B/full Conformance `43/43`; Domain `98/98`; Release build/format/locks/diff/StructureOnly/publication evidence/reviews green |
 
 ### Immutable `B-WIRE-REPOSITORY-TREE-01` hosted-green boundary
@@ -361,7 +361,7 @@ The owning ledger's exact cache implementation identity passed Ubuntu in
 `20m42s` and Windows in `49m17s`; publication verification was skipped.
 B-CACHE is immutable hosted history.
 
-### Second-corrected frozen `B-ADMISSION-01` staging boundary
+### Third-corrected frozen `B-ADMISSION-01` staging boundary
 
 This packet modifies only
 `tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ContractSliceBActivationTests.cs`
@@ -384,8 +384,8 @@ the existing activation Fact byte-semantically unchanged and
 
 The new file owns one direct Fact,
 `MeAndAI.Protocol.Conformance.Tests.ContractSliceBAdmissionProofTests.Admits_exact_observed_failed_and_no_input_proofs`,
-one `ContractSlice=B` trait, no Scenario/Theory/class trait, and second-corrected marker
-`TEST-0210-B-BEHAVIOR-RED-0010`. P is `NotApplicable`. R implements the complete
+one `ContractSlice=B` trait, no Scenario/Theory/class trait, and third-corrected marker
+`TEST-0210-B-BEHAVIOR-RED-0011`. P is `NotApplicable`. R implements the complete
 test-owned admission mirror and sets only its final valid aggregate return to
 `null!`; G restores that already computed aggregate. The retained activation
 Fact must remain green through both identities.
@@ -445,17 +445,32 @@ contains more than one element`; raw marker count was `0` and the runner ended
 `OracleRejected`. The owning handoff retains exact script/root/TRX/report/log
 custody.
 
-Second-corrected R=0010 replaces only that fixture selector and the marker. It
-flattens rules in canonical manifest order, requires exact slot occurrence
+R=0010 is a third immutable diagnostic/no-success and is never rerun. The exact
+second-correction design head was hosted green and its sole warning-free child
+selected the exact Fact, but the Joined negative vector reached
+`AdmissionMirrorFrame.WriteObserved`, whose frame switch encoded only Produced
+and Retained. It threw marker-free `System.InvalidOperationException: Operation
+is not valid due to the current state of the object.` before admission; raw
+marker count was `0` and the runner ended `OracleRejected`. Exact artifact
+custody remains in the owning handoff.
+
+The retained second correction flattens rules in canonical manifest order and
+requires exact slot occurrence
 counts Provider governed-text=`3`, repository-target=`3`, repository-tree=`2`,
 and chooses the first occurrence only after every repeated declaration equals
 it in requirement, profile surfaces, material role, target-selector key, and
 ordered capability identities. Missing, extra, or semantically unequal repeats
-fail marker-free before admission. It does not change the manifest, instruction
-values, admission logic, final `null!`, executable allowlist, or line ceiling.
+fail marker-free before admission. Third-corrected R=0011 retains all of that
+and changes only the marker plus the test-owned receipt-frame switch:
+Produced=`0`, Retained=`1`, Joined=`2`, and every unknown value remains
+unencodable. Rank `2` exists solely to give the invalid Joined candidate a
+deterministic identity so the coordinator can reject it as
+`AdmissionProofInvalid`; Joined never becomes a valid admitted state. No
+manifest, instruction, admission, final `null!`, allowlist, or line-cap change
+is permitted.
 
-The second-corrected packet-specific canonical red command is Release `--no-restore
---no-build` against the exact FQN/filter above, one fresh R=0010 TRX logger/root,
+The third-corrected packet-specific canonical red command is Release `--no-restore
+--no-build` against the exact FQN/filter above, one fresh R=0011 TRX logger/root,
 process-scoped `VSTEST_CONNECTION_TIMEOUT=300`, and a fresh `420000`-ms/8-MiB-
 log/1-MiB-report one-shot runner. Its TRX oracle requires one marker-only error
 message, permits zero or one byte-identical marker echo in the same result's
@@ -638,8 +653,8 @@ source is `1,176/1,200` normalized lines with zero production delta. Cache
 R=0007 is accepted once and never rerun; `B-CACHE-01` is exact-head hosted green
 at focused/B/full/Domain `1/1`, `8/8`, `40/40`, and `98/98`, with one
 `1,063/1,200`-line Tests-only file and zero production delta. B is `8/11`,
-cumulative A+B is `40/43`; admission R=0008 and R=0009 are immutable
-diagnostics/no-success, and B-ADMISSION is second-corrected `FrozenDesign`/
+cumulative A+B is `40/43`; admission R=0008, R=0009, and R=0010 are immutable
+diagnostics/no-success, and B-ADMISSION is third-corrected `FrozenDesign`/
 inactive pending this exact synchronized correction-design head's hosted gate.
 Every successor remains held.
 C/D, final

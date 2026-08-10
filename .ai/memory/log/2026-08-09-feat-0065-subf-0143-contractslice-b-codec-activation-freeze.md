@@ -3,11 +3,12 @@
 | Field | Value |
 | --- | --- |
 | Packet | `B-CODEC-ACTIVATION-01` / `B-WIRE-REPOSITORY-TREE-01` / `B-WIRE-GOVERNED-TEXT-01` / `B-WIRE-REPOSITORY-TARGET-01` / `B-RESOURCE-01` / `B-CACHE-01` / `B-ADMISSION-01` |
-| State | Codec activation, all three wire packets, resource, and cache `ReviewedHostedGreen`; repository-target R=0004 plus admission R=0008/R=0009 diagnostic/no-success, R=0005, resource R=0006, and cache R=0007 accepted/immutable; B `8/11`, A+B `40/43`; B-ADMISSION second-corrected `FrozenDesign`/inactive pending this exact synchronized correction-design head's hosted gate |
+| State | Codec activation, all three wire packets, resource, and cache `ReviewedHostedGreen`; repository-target R=0004 plus admission R=0008/R=0009/R=0010 diagnostic/no-success, R=0005, resource R=0006, and cache R=0007 accepted/immutable; B `8/11`, A+B `40/43`; B-ADMISSION third-corrected `FrozenDesign`/inactive pending this exact synchronized correction-design head's hosted gate |
 | Parent | Owning ContractSlice B micro-delivery plan |
 | Scenario | Parent scenario retained `Planned` |
 | Exact resource implementation | Immutable hosted-green resource identity and run custody remain owned by the resource packet records below |
-| Exact admission first-correction design | [`3574e047f8df9bd23e9eb8ba05848c889f60af50`](https://github.com/hasanmanzak/meAndAI/commit/3574e047f8df9bd23e9eb8ba05848c889f60af50); exact-head [run 31405333801](https://github.com/hasanmanzak/meAndAI/actions/runs/31405333801) passed Ubuntu `21m06s`, Windows `50m29s`, publication verification skipped; R=0009 later exposed the bounded five-rule fixture defect recorded below |
+| Exact admission predecessor history | First-correction commit/run custody remains immutable in PR history; R=0009 exposed the bounded five-rule fixture defect recorded below |
+| Exact admission second-correction design | [`7116e449b7e8fddd89312f064281eda43ce9707c`](https://github.com/hasanmanzak/meAndAI/commit/7116e449b7e8fddd89312f064281eda43ce9707c); exact-head [run 31414824476](https://github.com/hasanmanzak/meAndAI/actions/runs/31414824476) passed Ubuntu `21m14s`, Windows `43m27s`, publication verification skipped; R=0010 later exposed the bounded Joined-frame defect recorded below |
 | Exact cache implementation | Immutable cache commit/run custody remains in the earlier packet history below; no cache authority is reopened |
 | Implementation language | C# only |
 
@@ -619,7 +620,7 @@ once. It is immutable and must never be rerun.
   publication verification was skipped. B-CACHE is
   immutable `ReviewedHostedGreen` and R=0007 is never rerun.
 
-## Second-corrected frozen `B-ADMISSION-01` routing
+## Third-corrected frozen `B-ADMISSION-01` routing
 
 - The executable allowlist is exactly one retained-test modification,
   `ContractSliceBActivationTests.cs`, plus one new Tests-owned file,
@@ -636,7 +637,7 @@ once. It is immutable and must never be rerun.
 - The one new Fact is
   `ContractSliceBAdmissionProofTests.Admits_exact_observed_failed_and_no_input_proofs`,
   with only `ContractSlice=B`, no Scenario/Theory/class trait, and second-
-  corrected marker `TEST-0210-B-BEHAVIOR-RED-0010`.
+  corrected marker `TEST-0210-B-BEHAVIOR-RED-0011`.
 - The typed design exclusively owns exact carrier signatures, three singleton
   instruction/request fixtures, corrected admission-proof manifest/artifact substitutions,
   receipt framing, exact candidate/instruction/receipt bijections, closed
@@ -726,9 +727,40 @@ once. It is immutable and must never be rerun.
   `DEF57F2B782F8E9BD59E6FD711410E10C460E911C416CB9CF2D47E00ABE6CE13`.
   R=0009 is immutable diagnostic/no-success and is never rerun.
 
-## Second-corrected `B-ADMISSION-01` freeze gate
+## Immutable admission R=0010 diagnostic
 
-- Second-corrected R=0010 requires one marker-only ErrorInfo Message, permits zero or
+- The exact second-correction design head and hosted run are linked above. The
+  fresh runner at
+  `D:\Temp\meandai-test-0210-b-admission-r0010-runner-8f0c36a7b13c43a88d0869d4b758e012.ps1`
+  was `37,821` bytes / SHA-256
+  `3666ABC9924EA684C027893C27BABD6EB78CEFD436AD408689CD391C1F153186`;
+  its AST had `5,399` tokens / `39` top-level statements / zero errors.
+  ValidateOnly bound exact head/upstream/branch/status, exact activation source
+  `13,875` bytes / `51832A2F...339C`, admission source `64,498` bytes /
+  `304ED7F8...5C21`, `1,675/2,400` changed lines, all six locks, and absent
+  root/report/log paths.
+- The sole committed child rebuilt warning-free and selected the exact Fact,
+  but the Joined-state negative vector reached `AdmissionMirrorFrame.WriteObserved`.
+  That frame encoded Produced/Retained only and threw marker-free
+  `System.InvalidOperationException: Operation is not valid due to the current
+  state of the object.` before the coordinator could reject Joined as
+  `AdmissionProofInvalid`.
+- The fresh root
+  `D:\Temp\meandai-test-0210-b-de14f3dc9b0643beb8709fc835d79517`
+  contains only `TEST-0210-B-BEHAVIOR-RED-0010.trx`, `8,395` bytes / SHA-256
+  `584BC5F27E66E38659E052791C5B01D10720AD3BE87A1E0A97FC43E45F83FEC2`.
+  It has one Failed result/definition/entry, exact `1/1/1` total/executed/failed
+  counters, raw marker count `0`, and exact source stack at `WriteObserved`.
+- The append-state report is `575` bytes / SHA-256
+  `FFBE05FAC9FF9EFD14F528868C1075F20A46CDE13404CD621581B643EBF067E2`;
+  complete stdout/stderr are `3,796` / `196` bytes at SHA-256
+  `9688595C5512159DC904AA7FEFE8047E9E265259C2825F4FB3D040F8F8628D17` /
+  `BCA17A98189B9D629E72DAEF7B5DE12C80598225313DC1B2AA726BF09D281CE0`.
+  R=0010 is immutable diagnostic/no-success and is never rerun.
+
+## Third-corrected `B-ADMISSION-01` freeze gate
+
+- Third-corrected R=0011 requires one marker-only ErrorInfo Message, permits zero or
   one byte-identical same-result StdOut marker echo and zero or one marker-free
   same-FQN `[FAIL]` RunInfo, and accepts raw marker count only in `[1,2]`.
 - The executable allowlist, `2,400`-line ceiling, exact FQN, all sixteen counters,
@@ -738,7 +770,13 @@ once. It is immutable and must never be rerun.
   requirement, profile surfaces, material role, target-selector key, and
   ordered capabilities before selecting the first declaration. Correction-
   design reviews and exact-head hosted validation must close before a fresh
-  R=0010 runner is materialized.
+  R=0011 runner is materialized.
+- The sole semantic correction adds deterministic frame rank `2` for
+  `DecodeCacheDispositionMirror.Joined`. Produced remains `0`, Retained remains
+  `1`, and every unknown value remains unencodable. Rank `2` makes the invalid
+  candidate identity reproducible only so the coordinator can reject Joined as
+  `AdmissionProofInvalid`; it never makes Joined admission-stable or successful.
+  No other source, carrier, fixture, manifest, instruction, or oracle changes.
 
 | Immutable first-correction design check | Result |
 | --- | --- |
@@ -749,3 +787,7 @@ once. It is immutable and must never be rerun.
 | Second-correction design check | Result |
 | --- | --- |
 | Current gate | R=0009 immutable diagnostic sealed; exact five-rule/repeated-slot cause frozen; publication evidence `7/7` in `299.7s`, no publication claim; StructureOnly green with `elapsedMs=467781`; canonical graph `364/4143/319/4421524`, typed design `601995/1048576`; diff-check clean; semantic/custody and route/content/scope reviews each `0/0/0`. Publication and StructureOnly must recur after this row and before commit. |
+
+| Third-correction design check | Result |
+| --- | --- |
+| Current gate | R=0010 immutable diagnostic sealed; exact Joined-frame cause and rank-2-only correction frozen; publication evidence `7/7` in `313.8s`, no publication claim; StructureOnly green with `elapsedMs=474424`; canonical graph `364/4143/319/4427431`, digest `3494ed8a...5216`, typed design `603303/1048576`; diff-check clean; semantic/custody and route/content/scope reviews each `0/0/0`. Publication and StructureOnly must recur after this row and before commit. |
