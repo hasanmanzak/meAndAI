@@ -3,14 +3,14 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted; ContractSlice A merged/exact-main green. B surface, codec activation, repository-tree, governed-text, and repository-target are exact-head hosted green. Repository-target R=0004 is immutable diagnostic-only and canonical R=0005 remains accepted. B is `6/11`, cumulative A+B is `38/43`. `B-RESOURCE-01` is `FrozenDesign`/inactive pending its synchronized design-head hosted gate; [TEST-0210](test-cases.md#test-0210) remains `Planned`; later B packets, C/D, final activation, and DoD remain held. |
+| Status | Gate 2 accepted; ContractSlice A merged/exact-main green. B surface, codec activation, and three wire packets are exact-head hosted green. Repository-target R=0004 remains diagnostic-only and R=0005 accepted. `B-RESOURCE-01` canonical R=0006 is accepted and `ReviewedLocalGreen` at B `7/11`, cumulative A+B `39/43`, with exact implementation-head hosted pending; [TEST-0210](test-cases.md#test-0210) remains `Planned`; B-CACHE and later B, C/D, activation, and DoD remain held. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Test | [TEST-0210](test-cases.md#test-0210) |
 | Gate 3 micro-delivery routing | Historical A delivery remains owned by the [A micro-delivery control plan](subf-0143-micro-delivery-plan.md). Current B design routing is the [ContractSlice B micro-delivery plan](subf-0143-contractslice-b-micro-delivery-plan.md); packet labels refine delivery but activate no executable work. |
 | Exact-main design baseline | Accepted A merge commit [`51623f4d404a95e0f706d72805cf7ddbbbd293b8`](https://github.com/hasanmanzak/meAndAI/commit/51623f4d404a95e0f706d72805cf7ddbbbd293b8), validated by exact-main [run 31304787603](https://github.com/hasanmanzak/meAndAI/actions/runs/31304787603) |
-| Design and Gate 3 authority | Historical A directives and clarifications remain immutable evidence. Surface, codec activation, and repository-tree wire are immutable hosted-green predecessors. Governed-text has one immutable canonical red and bounded local green; its successor stays inactive until the exact implementation commit is hosted green. Later B packets remain predecessor-gated; C/D, final activation, merge, release, and publication remain outside that authority. |
+| Design and Gate 3 authority | Historical A directives and clarifications remain immutable evidence. B surface, codec activation, and all three wire packets are immutable hosted-green predecessors. B-RESOURCE R=0006 is accepted and local green, but B-CACHE stays inactive until the exact resource implementation head is hosted green and separately frozen. Later B packets remain predecessor-gated; C/D, final activation, merge, release, and publication remain outside that authority. |
 | Completed predecessor | [SUBF-0153](README.md#subf-0153) / [TEST-0221](test-cases.md#test-0221), merged through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173) and exact-main validated by [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) |
 
 ## Directive and hard boundary
@@ -8374,7 +8374,7 @@ The full sibling inventory is:
 
 The repository-target implementation is exact-head hosted green and the owning
 B wire ledger retains exact commit/run custody; R=0004 remains diagnostic-only
-and canonical R=0005 remains immutable. B is `6/11`, cumulative A+B is `38/43`. The resource packet is a
+and canonical R=0005 remains immutable. At the resource design checkpoint B was `6/11`, cumulative A+B was `38/43`. The resource packet is a
 Tests-owned conformance mirror of the already accepted production contract. It
 adds only
 `tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ContractSliceBResourceLedgerTests.cs`,
@@ -8631,8 +8631,16 @@ native exit `1`, exact result/definition/entry/FQN/marker/sixteen counters, and 
 forbidden diagnostics/attachments. `InvocationCommitted` irrevocably consumes
 R=0006 for every outcome; no changed or unchanged retry exists. Green is focused
 `1/1`, B `7/7`, A+B/full Conformance `39/39`, Domain `98/98`, and all retained
-build/format/locks/diff/StructureOnly/publication/review gates. Canonical red is
-held until this exact twelve-record design head is pushed and hosted green.
+build/format/locks/diff/StructureOnly/publication/review gates. That exact
+twelve-record design head passed hosted validation before canonical R=0006.
+
+Canonical R=0006 was accepted once with native exit `1` and runner exit `0`;
+report SHA-256 is `44A095FDE501917EE56823CE5BABBCF95AB83EE53E7A1ACA430B2614C5DD6A0E`
+and TRX SHA-256 is `EC2AF7C6ECC03F039F2DEAC0258D34DCD07ACBAC5FBC6CC68E2B2644087E7518`.
+Bounded green changes only the valid-success return, remains `1,176/1,200`
+lines with zero production delta, and passes `1/1`, `7/7`, `39/39`, and `98/98`.
+The resource packet is `ReviewedLocalGreen`; its exact implementation-head
+hosted gate and every B-CACHE/downstream hold remain.
 
 ## [TEST-0210](test-cases.md#test-0210) expected-red contract
 
@@ -9416,9 +9424,9 @@ B is decomposed by the current
 [B micro-delivery plan](subf-0143-contractslice-b-micro-delivery-plan.md).
 Surface, codec activation, repository-tree, and governed-text are hosted green;
 repository-target R=0004 is diagnostic-only and canonical R=0005 is accepted;
-repository-target is exact-head hosted green at B `6/11`, A+B `38/43`, while
-B-RESOURCE is `FrozenDesign`/inactive pending its synchronized design-head
-hosted gate and later packets remain inactive.
+repository-target is exact-head hosted green. B-RESOURCE canonical R=0006 is
+accepted and `ReviewedLocalGreen` at B `7/11`, A+B `39/43`, with its exact
+implementation-head hosted gate pending; B-CACHE and later packets remain inactive.
 
 B implementation and C/D still require separate future activation, and no
 packet is active merely from this list. No directive here allocates new stable

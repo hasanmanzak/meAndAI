@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Gate 2 micro-delivery plan and design freeze |
-| State | `B-SURFACE-01`, `B-CODEC-ACTIVATION-01`, `B-WIRE-REPOSITORY-TREE-01`, `B-WIRE-GOVERNED-TEXT-01`, and `B-WIRE-REPOSITORY-TARGET-01` exact-head hosted green; repository-target R=0004 diagnostic-only and canonical R=0005 accepted; B `6/11`, cumulative A+B `38/43`; `B-RESOURCE-01` `FrozenDesign`/inactive pending its synchronized design-head hosted gate; later packets inactive |
+| State | B surface, codec, and three wire packets exact-head hosted green; repository-target R=0004 diagnostic-only and R=0005 accepted; `B-RESOURCE-01` canonical R=0006 accepted and `ReviewedLocalGreen` at B `7/11`, cumulative A+B `39/43`, with exact implementation-head hosted pending; `B-CACHE-01` and later packets inactive |
 | Parent | Owning feature and current subfeature |
 | Scenario | [TEST-0210](test-cases.md#test-0210), still `Planned` |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
@@ -282,6 +282,13 @@ StructureOnly, publication evidence `7/7` without a publication claim, and
 independent product/test plus evidence/scope reviews `0/0/0`. B-CACHE and every
 later packet remain inactive until that implementation head is hosted green.
 
+R=0006 is accepted once and never rerun. Bounded green is `1/1`, `7/7`,
+`39/39`, and `98/98`, with Release `0/0`, format/diff clean, `1,176/1,200`
+source lines, and zero production delta. Preliminary post-green publication
+evidence is `7/7` in `308.1s` without publication claim and StructureOnly is
+green at `elapsedMs=443429`; the evidence-row edit requires both recurrences on
+the final exact bytes before commit. The implementation head remains hosted pending.
+
 ## SurfaceRed and BehaviorRed contract
 
 `B-SURFACE-01` is the accepted one-diagnostic compile-red exception. The exact
@@ -445,13 +452,13 @@ project, package, lock, workflow, release, or consumer file. The user-owned
 
 ## Exit condition
 
-This plan records repository-target exact-head hosted green. The surface, codec
-activation, repository-tree, governed-text, and repository-target packets are
-immutable hosted-green history. R=0004 is diagnostic-only; canonical R=0005 is
-accepted, focused/B/full Conformance/Domain are `1/1`, `6/6`, `38/38`, and
-`98/98`, and the bounded executable delta is `2,849/3,200` normalized lines. B
-is `6/11` and cumulative A+B is `38/43`. `B-RESOURCE-01` is `FrozenDesign`/
-inactive until the commit containing this exact synchronized design is pushed
-and exact-head hosted green; every successor remains held. C/D, final
+This plan records repository-target exact-head hosted green. The surface, codec,
+and three wire packets are immutable hosted-green history. Resource R=0006 is
+accepted once and never rerun; focused/B/full Conformance/Domain are `1/1`,
+`7/7`, `39/39`, and `98/98`, and the Tests-only source is `1,176/1,200`
+normalized lines with zero production delta. B is `7/11`, cumulative A+B is
+`39/43`, and `B-RESOURCE-01` is `ReviewedLocalGreen` pending its exact
+implementation-head hosted gate. `B-CACHE-01` and every successor remain held.
+C/D, final
 activation, feature DoD, release, publication, consumer mutation, authority
 transfer, and PowerShell retirement remain held.

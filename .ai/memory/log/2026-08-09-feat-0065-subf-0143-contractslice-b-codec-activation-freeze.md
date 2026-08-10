@@ -3,12 +3,12 @@
 | Field | Value |
 | --- | --- |
 | Packet | `B-CODEC-ACTIVATION-01` / `B-WIRE-REPOSITORY-TREE-01` / `B-WIRE-GOVERNED-TEXT-01` / `B-WIRE-REPOSITORY-TARGET-01` / `B-RESOURCE-01` |
-| State | Codec activation and all three wire packets `ReviewedHostedGreen`; repository-target R=0004 immutable diagnostic-only and canonical R=0005 accepted; `B-RESOURCE-01` `FrozenDesign`/inactive pending synchronized design-head hosted green |
+| State | Codec activation and all three wire packets `ReviewedHostedGreen`; repository-target R=0004 diagnostic-only and R=0005 accepted; `B-RESOURCE-01` R=0006 accepted and `ReviewedLocalGreen` at B `7/11`, A+B `39/43`, exact implementation-head hosted pending; B-CACHE inactive |
 | Parent | Owning ContractSlice B micro-delivery plan |
 | Scenario | Parent scenario retained `Planned` |
 | Exact repository-target implementation | [`ad92909d197b8de4c8f9500d63678165644a3ac4`](https://github.com/hasanmanzak/meAndAI/commit/ad92909d197b8de4c8f9500d63678165644a3ac4); exact-head [run 31356599800](https://github.com/hasanmanzak/meAndAI/actions/runs/31356599800) passed both stable jobs and skipped publication verification |
 | Exact first-design diagnostic | The first hosted design passed both stable jobs; pre-red byte audit then found the optional-null vector defect, with no runner/red/implementation, so that predecessor grants no authority |
-| Exact governed-text implementation | [`71c860ab2adb08796930bd047842e9a1ea065c32`](https://github.com/hasanmanzak/meAndAI/commit/71c860ab2adb08796930bd047842e9a1ea065c32); exact-head [run 31342521885](https://github.com/hasanmanzak/meAndAI/actions/runs/31342521885) passed Ubuntu `19m30s`, Windows `46m39s`, publication verification skipped |
+| Exact resource design | [`b9323f99fb82eb5a84bba0f5b542f9685e7f1945`](https://github.com/hasanmanzak/meAndAI/commit/b9323f99fb82eb5a84bba0f5b542f9685e7f1945); exact-head [run 31361723387](https://github.com/hasanmanzak/meAndAI/actions/runs/31361723387) passed Ubuntu `21m21s`, Windows `45m34s`, publication verification skipped |
 | Implementation language | C# only |
 
 ## Immutable codec-activation boundary
@@ -521,3 +521,25 @@ once. It is immutable and must never be rerun.
   `elapsedMs=446568`, proving the ordinary self-consumer graph remains inside
   the prospective schema-2 limits. The evidence-row mutation requires the same
   two gates to pass again on the final exact bytes before commit.
+
+## Accepted R=0006 and bounded green
+
+- The exact external runner is `34,947` bytes at SHA-256
+  `86783E0E3C94DA1EFEE8FB9CF91F5DB90C427AFA9AE953E8B24FC3C4990565FC`;
+  its AST is `5,038` tokens with zero parse errors. ValidateOnly proved exact
+  HEAD/upstream/branch/status, source `41,017` bytes at SHA-256
+  `105C1DED484A6D684A51FCE7EB323CFBECB270037072405372C59808D7697ADA`,
+  `1,174/1,200` source lines, six locks, and absent evidence paths.
+- Canonical R=0006 was invoked once, accepted native exit `1` with runner exit
+  `0`, and is never rerun. Report SHA-256 is
+  `44A095FDE501917EE56823CE5BABBCF95AB83EE53E7A1ACA430B2614C5DD6A0E`;
+  sole TRX SHA-256 is
+  `EC2AF7C6ECC03F039F2DEAC0258D34DCD07ACBAC5FBC6CC68E2B2644087E7518`.
+- Bounded green changes only the final valid coordinator return. Release build
+  is `0` warnings / `0` errors; focused/B/full Conformance/Domain are `1/1`,
+  `7/7`, `39/39`, and `98/98`; format and diff checks are clean. The final
+  source is `1,176/1,200` lines with zero production delta. Preliminary
+  post-green publication evidence passed `7/7` in `308.1s` without a publication
+  claim and StructureOnly passed with `elapsedMs=443429`; the evidence-row edit
+  requires both exact-tree recurrences once more. Hosted implementation evidence
+  remains pending. B-CACHE and every downstream hold remain intact.

@@ -155,7 +155,7 @@ Last verified: **2026-08-09**
   Ubuntu in `20m44s` and Windows in `46m51s`; publication verification was
   correctly skipped. The exact lifecycle implementation identity recorded in
   the canonical handoff passed Ubuntu in `19m36s` and Windows in `36m02s`; publication verification was
-  correctly skipped. ContractSlice A is merged/exact-main green. `B-SURFACE-01`, `B-CODEC-ACTIVATION-01`, `B-WIRE-REPOSITORY-TREE-01`, `B-WIRE-GOVERNED-TEXT-01`, and `B-WIRE-REPOSITORY-TARGET-01` are exact-head hosted green. Repository-target R=0004 is an immutable diagnostic and canonical R=0005 remains accepted; the owning B wire ledger retains exact implementation/run custody. B is `6/11` and cumulative A+B is `38/43`; `B-RESOURCE-01` is `FrozenDesign`/inactive pending its synchronized design-head hosted gate. The parent scenario, later B packets, C/D, and final activation remain held. Follow the current [canonical log index](log/README.md). The
+  correctly skipped. ContractSlice A is merged/exact-main green. B surface, codec, and three wire packets are exact-head hosted green. Repository-target R=0004 is diagnostic-only and R=0005 remains accepted. B-RESOURCE R=0006 is accepted and `ReviewedLocalGreen` at B `7/11`, cumulative A+B `39/43`, with its exact implementation-head hosted gate pending. B-CACHE, the parent scenario, later B packets, C/D, and final activation remain held. Follow the current [canonical log index](log/README.md). The
   predecessor-manifest exact-head hosted-green handoff indexed there is
   immutable history; the admission-proof reviewed-local-green handoff,
   the selector reviewed-local-green handoff in the canonical log index,
