@@ -3,14 +3,14 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted; ContractSlice A merged/exact-main green. B surface, codec activation, all three wire packets, and `B-RESOURCE-01` are exact-head hosted green. Repository-target R=0004 remains diagnostic-only; R=0005 and resource R=0006 remain accepted and immutable. B is `7/11`, cumulative A+B is `39/43`; `B-CACHE-01` is `FrozenDesign`/inactive pending this exact design head's hosted gate. [TEST-0210](test-cases.md#test-0210) remains `Planned`; later B, C/D, activation, and DoD remain held. |
+| Status | Gate 2 accepted; ContractSlice A merged/exact-main green. B surface, codec activation, all three wire packets, and `B-RESOURCE-01` are exact-head hosted green. Repository-target R=0004 remains diagnostic-only; R=0005, resource R=0006, and cache R=0007 remain accepted and immutable. `B-CACHE-01` is `ReviewedLocalGreen`; B is `8/11`, cumulative A+B is `40/43`. `B-ADMISSION-01` is candidate/inactive pending the exact cache implementation-head hosted gate and its own design freeze. [TEST-0210](test-cases.md#test-0210) remains `Planned`; later B, C/D, activation, and DoD remain held. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Test | [TEST-0210](test-cases.md#test-0210) |
 | Gate 3 micro-delivery routing | Historical A delivery remains owned by the [A micro-delivery control plan](subf-0143-micro-delivery-plan.md). Current B design routing is the [ContractSlice B micro-delivery plan](subf-0143-contractslice-b-micro-delivery-plan.md); packet labels refine delivery but activate no executable work. |
 | Exact-main design baseline | Accepted A merge commit [`51623f4d404a95e0f706d72805cf7ddbbbd293b8`](https://github.com/hasanmanzak/meAndAI/commit/51623f4d404a95e0f706d72805cf7ddbbbd293b8), validated by exact-main [run 31304787603](https://github.com/hasanmanzak/meAndAI/actions/runs/31304787603) |
-| Design and Gate 3 authority | Historical A directives and clarifications remain immutable evidence. B surface, codec activation, all three wire packets, and B-RESOURCE are immutable hosted-green predecessors; R=0006 remains accepted. B-CACHE is now `FrozenDesign`/inactive until this exact synchronized design head is hosted green. Later B packets remain predecessor-gated; C/D, final activation, merge, release, and publication remain outside that authority. |
+| Design and Gate 3 authority | Historical A directives and clarifications remain immutable evidence. B surface, codec activation, all three wire packets, and B-RESOURCE are immutable hosted-green predecessors; R=0006 and cache R=0007 remain accepted. B-CACHE is `ReviewedLocalGreen` pending its exact implementation-head hosted gate. B-ADMISSION remains candidate/inactive and owns no implementation authority until that predecessor and a fresh design freeze pass. C/D, final activation, merge, release, and publication remain outside this authority. |
 | Completed predecessor | [SUBF-0153](README.md#subf-0153) / [TEST-0221](test-cases.md#test-0221), merged through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173) and exact-main validated by [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) |
 
 ## Directive and hard boundary
@@ -1233,8 +1233,10 @@ kernel evaluation, real Policy export, the initial real-rule set, Scenario
 activation, workflow filters, or runtime-efficiency changes. The original B
 design phase had P/R/G `NotApplicable` and an empty executable allowlist.
 Surface, codec activation, all three wires, and B-RESOURCE are now immutable
-hosted-green history. B-CACHE is `FrozenDesign`/inactive pending its exact
-synchronized design-head hosted gate; no later packet is active.
+hosted-green history. Cache R=0007 is accepted/immutable and B-CACHE is
+`ReviewedLocalGreen` pending its exact implementation-head hosted gate.
+B-ADMISSION remains candidate/inactive pending that predecessor and its own
+design freeze; no later packet is active.
 
 ## Gate 2 outcome
 
@@ -8783,6 +8785,23 @@ Conformance `40/40`, Domain `98/98`, plus build/format/locks/diff/StructureOnly/
 publication and two fresh `0/0/0` reviews. B-ADMISSION and every later packet
 remain held until the exact cache implementation head is hosted green.
 
+The exact design head passed Ubuntu in `20m54s` and Windows in `47m35s`, with
+publication verification skipped. After one compile-only diagnostic and one
+ValidateOnly runner-shape diagnostic, neither of which started the canonical
+child, fresh runner identity `35,007` bytes / SHA-256 `5967E18E...FEA0AC`
+accepted the sole R=0007: native/runner exit `1/0`, report SHA-256
+`3B380FBB...9D3291`, and TRX SHA-256 `514CCAE6...FBFE52`. The red source was
+`1,063/1,200` lines / SHA-256 `999B4E84...EDB9E`; the TRX sealed one exact
+Failed result/definition/entry, all sixteen counters, and zero forbidden
+attachments/collector data. Bounded green changes only the final aggregate
+return and is `1,063/1,200` lines / `38,102` bytes / SHA-256
+`41F3FC40...4717E4`, with zero production delta, build `0/0`, focused/B/full/
+Domain `1/1`, `8/8`, `40/40`, `98/98`, and clean format/diff. Exact-tree
+StructureOnly is green; publication evidence is `7/7` without a publication
+claim; fresh code/test and evidence/scope reviews each closed `0/0/0`.
+Commit/push and hosted green remain before this
+packet becomes immutable hosted history.
+
 ## [TEST-0210](test-cases.md#test-0210) expected-red contract
 
 [TEST-0210](test-cases.md#test-0210) is project-neutral, table-driven, and
@@ -9564,10 +9583,11 @@ ContractSlice A's historical delivery is owned by its
 B is decomposed by the current
 [B micro-delivery plan](subf-0143-contractslice-b-micro-delivery-plan.md).
 Surface, codec activation, all three wires, and B-RESOURCE are hosted green;
-repository-target R=0004 is diagnostic-only, while canonical R=0005 and resource
-R=0006 are accepted/immutable. B is `7/11`, A+B is `39/43`; B-CACHE is
-`FrozenDesign`/inactive pending this exact design head's hosted gate, and later
-packets remain inactive.
+repository-target R=0004 is diagnostic-only, while canonical R=0005, resource
+R=0006, and cache R=0007 are accepted/immutable. B-CACHE is
+`ReviewedLocalGreen`; B is `8/11`, A+B is `40/43`. B-ADMISSION is
+candidate/inactive pending the exact cache implementation-head hosted gate and
+its own design freeze; later packets remain inactive.
 
 B implementation and C/D still require separate future activation, and no
 packet is active merely from this list. No directive here allocates new stable

@@ -3,12 +3,12 @@
 | Field | Value |
 | --- | --- |
 | Packet | `B-CODEC-ACTIVATION-01` / `B-WIRE-REPOSITORY-TREE-01` / `B-WIRE-GOVERNED-TEXT-01` / `B-WIRE-REPOSITORY-TARGET-01` / `B-RESOURCE-01` / `B-CACHE-01` |
-| State | Codec activation, all three wire packets, and resource `ReviewedHostedGreen`; repository-target R=0004 diagnostic-only, R=0005 and resource R=0006 accepted/immutable; B `7/11`, A+B `39/43`; B-CACHE `FrozenDesign`/inactive pending this exact design head's hosted gate |
+| State | Codec activation, all three wire packets, and resource `ReviewedHostedGreen`; repository-target R=0004 diagnostic-only, R=0005, resource R=0006, and cache R=0007 accepted/immutable; B-CACHE `ReviewedLocalGreen`; B `8/11`, A+B `40/43`; B-ADMISSION candidate/inactive pending the exact cache implementation-head hosted gate and its own design freeze |
 | Parent | Owning ContractSlice B micro-delivery plan |
 | Scenario | Parent scenario retained `Planned` |
 | Exact resource implementation | [`fa67864f57f97e8a7960ad13fbde91c7c09f5d77`](https://github.com/hasanmanzak/meAndAI/commit/fa67864f57f97e8a7960ad13fbde91c7c09f5d77); exact-head [run 31367753569](https://github.com/hasanmanzak/meAndAI/actions/runs/31367753569) passed Ubuntu `15m52s`, Windows `49m31s`, publication verification skipped |
 | Exact first-design diagnostic | The first hosted design passed both stable jobs; pre-red byte audit then found the optional-null vector defect, with no runner/red/implementation, so that predecessor grants no authority |
-| Exact resource design | [`b9323f99fb82eb5a84bba0f5b542f9685e7f1945`](https://github.com/hasanmanzak/meAndAI/commit/b9323f99fb82eb5a84bba0f5b542f9685e7f1945); exact-head [run 31361723387](https://github.com/hasanmanzak/meAndAI/actions/runs/31361723387) passed Ubuntu `21m21s`, Windows `45m34s`, publication verification skipped |
+| Exact cache design | [`e04f75448619fd1eb11527b5fa4a55981701c706`](https://github.com/hasanmanzak/meAndAI/commit/e04f75448619fd1eb11527b5fa4a55981701c706); exact-head [run 31375540961](https://github.com/hasanmanzak/meAndAI/actions/runs/31375540961) passed Ubuntu `20m54s`, Windows `47m35s`, publication verification skipped |
 | Implementation language | C# only |
 
 ## Immutable codec-activation boundary
@@ -583,3 +583,37 @@ once. It is immutable and must never be rerun.
   duplicate plain commit references. Preliminary StructureOnly passed with
   `elapsedMs=448146`; the final evidence-row mutation requires both gates once
   more on exact bytes before commit.
+
+## Accepted R=0007 and bounded local green
+
+- Before canonical red, the first source build stopped at `0` warnings / `7`
+  compiler/analyzer errors; no test child or evidence root existed. The bounded
+  correction closed three async-throws analyzer bindings and one inherited
+  member-name collision. The first cache runner then failed ValidateOnly on an
+  obsolete resource-method regex, with no report/root/log or child invocation;
+  it remains a preflight diagnostic and was replaced by a fresh runner identity.
+- The accepted runner is `35,007` bytes at SHA-256
+  `5967E18EB1B23F8592F236013143E7E337366EE84E78727C0B35BF3BFAFEA0AC`;
+  its AST is `5,038` tokens / `38` top-level statements / `0` errors.
+  ValidateOnly bound exact cache source `38,062` bytes at SHA-256
+  `999B4E84A64D08A82507440059C74E7197EE738C9B85717112F635635C4EDB9E`,
+  `1,063/1,200` normalized lines, exact HEAD/upstream/branch/status, six locks,
+  and four absent external evidence paths.
+- Canonical R=0007 was invoked once and is never rerun. Native exit is `1`,
+  runner exit is `0`, report SHA-256 is
+  `3B380FBB460CE91F4BEE75A61E64DE88028031A1285A47295D687777339D3291`,
+  and sole TRX SHA-256 is
+  `514CCAE6A4ECDA6D513A8840EDB7DA8429F803F42AD2AB7AFCBFD29739FBFE52`.
+  The TRX has one exact Failed result/definition/entry, marker count `2`, exact
+  sixteen counters, and zero attachments/collector data; the report seals four
+  source/runner/lock gates, fresh DLL/PDB, child timeout/env, and one-file root.
+- Bounded green changes only the final valid aggregate return. Release is `0`
+  warnings / `0` errors; focused/B/full Conformance/Domain are `1/1`, `8/8`,
+  `40/40`, and `98/98`; format and diff checks are clean. Final source is
+  `1,063/1,200` lines, `38,102` bytes at SHA-256
+  `41F3FC4003ED1A173A040F0728E8268941380EDA776647B15EB09C5C164717E4`,
+  with zero production delta. Exact-tree StructureOnly and publication evidence
+  passed, the latter `7/7` without a publication claim; fresh code/test and
+  evidence/scope reviews each closed `0/0/0`. Commit/push and hosted
+  implementation-head validation remain before
+  `ReviewedHostedGreen`; B-ADMISSION and every downstream hold remain intact.

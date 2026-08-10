@@ -3,14 +3,14 @@
 | Field | Value |
 | --- | --- |
 | Classification | Gate 2 micro-delivery plan and design freeze |
-| State | B surface, codec, three wire packets, and `B-RESOURCE-01` exact-head hosted green; repository-target R=0004 diagnostic-only, R=0005 and resource R=0006 accepted/immutable; B `7/11`, cumulative A+B `39/43`; `B-CACHE-01` `FrozenDesign`/inactive pending this exact design head's hosted gate; later packets inactive |
+| State | B surface, codec, three wire packets, and `B-RESOURCE-01` exact-head hosted green; repository-target R=0004 diagnostic-only, R=0005, resource R=0006, and cache R=0007 accepted/immutable; `B-CACHE-01` `ReviewedLocalGreen`; B `8/11`, cumulative A+B `40/43`; `B-ADMISSION-01` candidate/inactive pending the exact cache implementation-head hosted gate and its own design freeze |
 | Parent | Owning feature and current subfeature |
 | Scenario | [TEST-0210](test-cases.md#test-0210), still `Planned` |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Ordered-B authority | [Maintainer directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5230762350) |
 | Accepted predecessor | Accepted A merge commit [`51623f4d404a95e0f706d72805cf7ddbbbd293b8`](https://github.com/hasanmanzak/meAndAI/commit/51623f4d404a95e0f706d72805cf7ddbbbd293b8); exact-main [run 31304787603](https://github.com/hasanmanzak/meAndAI/actions/runs/31304787603) passed Ubuntu `6m11s`, Windows `11m21s`, publication verification skipped |
 | Normative owner | [Typed evaluation kernel design](subf-0143-typed-evaluation-kernel-design.md) |
-| Implementation language | C# only; the frozen resource packet may add only its one test-owned file |
+| Implementation language | C# only; the completed cache packet adds only its one test-owned file; later packets remain held |
 
 ## Authority and non-goals
 
@@ -345,6 +345,20 @@ A+B/full Conformance `40/40`, Domain `98/98`, build/format/locks/diff/
 StructureOnly/publication, and two fresh reviews `0/0/0`. B-ADMISSION and later
 packets remain held through the exact cache implementation-head hosted gate.
 
+The accepted R=0007 evidence is immutable and never rerun: exact runner
+`35,007` bytes / SHA-256 `5967E18E...FEA0AC`; red source `1,063/1,200` lines /
+SHA-256 `999B4E84...EDB9E`; native/runner exit `1/0`; report SHA-256
+`3B380FBB...9D3291`; sole TRX SHA-256 `514CCAE6...FBFE52`; one exact failed
+result/definition/entry, sixteen counters, and no attachments/collector data.
+Bounded green changes only the final aggregate return. Its source is
+`1,063/1,200` lines / `38,102` bytes / SHA-256 `41F3FC40...4717E4`, production
+delta is zero, build is `0/0`, focused/B/full Conformance/Domain are `1/1`,
+`8/8`, `40/40`, and `98/98`, and format/diff are clean. Exact-tree
+StructureOnly is green; publication evidence is `7/7` without a publication
+claim; both fresh final reviews are `0/0/0`.
+Commit/push and implementation-head hosted validation remain before B-CACHE
+becomes immutable hosted history.
+
 ## SurfaceRed and BehaviorRed contract
 
 `B-SURFACE-01` is the accepted one-diagnostic compile-red exception. The exact
@@ -512,9 +526,13 @@ This plan records repository-target and resource exact-head hosted green. The
 surface, codec, three wire packets, and resource packet are immutable hosted
 history. Resource R=0006 is accepted once and never rerun; focused/B/full
 Conformance/Domain are `1/1`, `7/7`, `39/39`, and `98/98`, and the Tests-only
-source is `1,176/1,200` normalized lines with zero production delta. B is
-`7/11`, cumulative A+B is `39/43`, and `B-CACHE-01` is `FrozenDesign`/inactive
-pending this exact design head's hosted gate. Every successor remains held.
+source is `1,176/1,200` normalized lines with zero production delta. Cache
+R=0007 is accepted once and never rerun; `B-CACHE-01` is `ReviewedLocalGreen`
+at focused/B/full/Domain `1/1`, `8/8`, `40/40`, and `98/98`, with one
+`1,063/1,200`-line Tests-only file and zero production delta. B is `8/11`,
+cumulative A+B is `40/43`; B-ADMISSION is candidate/inactive pending the exact
+cache implementation-head hosted gate and its own design freeze. Every
+successor remains held.
 C/D, final
 activation, feature DoD, release, publication, consumer mutation, authority
 transfer, and PowerShell retirement remain held.
