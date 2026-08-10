@@ -2,13 +2,13 @@
 
 | Field | Value |
 | --- | --- |
-| Packet | `B-CODEC-ACTIVATION-01` / `B-WIRE-REPOSITORY-TREE-01` / `B-WIRE-GOVERNED-TEXT-01` |
-| State | Codec activation and repository-tree wire `ReviewedHostedGreen`; governed-text `ReviewedLocalGreen` with its implementation-head hosted gate pending |
+| Packet | `B-CODEC-ACTIVATION-01` / `B-WIRE-REPOSITORY-TREE-01` / `B-WIRE-GOVERNED-TEXT-01` / `B-WIRE-REPOSITORY-TARGET-01` |
+| State | Codec activation, repository-tree, and governed-text `ReviewedHostedGreen`; repository-target `FrozenDesign`/inactive pending its exact design-head hosted gate |
 | Parent | Owning ContractSlice B micro-delivery plan |
 | Scenario | Parent scenario retained `Planned` |
 | Exact repository-tree predecessor | [`be94ea6da507e654e325b7cfc97074b3b0e5bacd`](https://github.com/hasanmanzak/meAndAI/commit/be94ea6da507e654e325b7cfc97074b3b0e5bacd); exact-head [run 31329704543](https://github.com/hasanmanzak/meAndAI/actions/runs/31329704543) passed Ubuntu `21m01s`, Windows `46m10s`, publication verification skipped |
 | Exact first-design diagnostic | The first hosted design passed both stable jobs; pre-red byte audit then found the optional-null vector defect, with no runner/red/implementation, so that predecessor grants no authority |
-| Exact corrected design predecessor | [`af199d652aa8d92b74b88367ffb6e590a3bafd3c`](https://github.com/hasanmanzak/meAndAI/commit/af199d652aa8d92b74b88367ffb6e590a3bafd3c); exact-head [run 31338164901](https://github.com/hasanmanzak/meAndAI/actions/runs/31338164901) passed Ubuntu `21m49s`, Windows `48m51s`, publication verification skipped |
+| Exact governed-text implementation | [`71c860ab2adb08796930bd047842e9a1ea065c32`](https://github.com/hasanmanzak/meAndAI/commit/71c860ab2adb08796930bd047842e9a1ea065c32); exact-head [run 31342521885](https://github.com/hasanmanzak/meAndAI/actions/runs/31342521885) passed Ubuntu `19m30s`, Windows `46m39s`, publication verification skipped |
 | Implementation language | C# only |
 
 ## Immutable codec-activation boundary
@@ -370,8 +370,46 @@ once. It is immutable and must never be rerun.
 - Exact-tree StructureOnly passed with `elapsedMs=448526`; publication evidence
   passed `7/7` in `281.8s` without a publication claim. Product/test and
   evidence/scope reviews are `0/0/0`.
-- B is `5/11`, cumulative A+B is `37/43`, and governed-text is
-  `ReviewedLocalGreen`. `B-WIRE-REPOSITORY-TARGET-01` and every later packet
-  remain inactive until this implementation commit is pushed and exact-head
-  hosted green; parent Scenario, C/D, activation, merge, release, and
-  publication remain held.
+- B is `5/11`, cumulative A+B is `37/43`, and governed-text is immutable
+  `ReviewedHostedGreen` at the exact implementation above. Repository-target is
+  `FrozenDesign`/inactive until its synchronized design commit is pushed and
+  exact-head hosted green; parent Scenario, later B packets, C/D, activation,
+  merge, release, and publication remain held.
+
+## Frozen `B-WIRE-REPOSITORY-TARGET-01` routing
+
+- The typed design solely owns the exact three-selector demand/payload vector,
+  callable same-object mirror contract, result/content row union, validation
+  precedence, wire-local ceilings, executable allowlist, and one-shot `0004`
+  runner contract. This memory record is routing/evidence only.
+- The executable allowlist is exactly a partial-identity modification to the
+  retained activation test plus one new repository-target test/core file; all
+  production, interface, project, package, lock, workflow, resource, cache,
+  admission, index, capability, Scenario, and downstream surfaces are frozen.
+- This packet receives a reviewed complexity redraw of at most `3,200`
+  normalized test lines because it owns three selector families, eight closed
+  result-row variants, two content-key families, exact demand-digest closure,
+  and six independent wire-local ceilings. `3,201` requires a new design;
+  later packets retain the default `1,200` threshold unless independently
+  redrawn.
+- The sole future Fact is the exact repository-target FQN with one
+  `ContractSlice=B` trait, no Scenario, and marker
+  `TEST-0210-B-BEHAVIOR-RED-0004`. No runner/red/source implementation may start
+  until this exact twelve-record design freeze is committed, pushed, and
+  exact-head hosted green.
+
+## Frozen repository-target design delivery checks
+
+- Semantic/runner D/RT and route/content/scope review are each
+  `0 Blocking / 0 Important / 0 Minor`; the exact vector, same-object topology,
+  closed result carriers, precedence, one-shot custody, and downstream holds
+  require no correction.
+- Capacity projection is `357` nodes / `4,133` relations / `319` parsed blobs /
+  `4324513` parsed bytes; the typed-design blob is `553227/1048576` bytes.
+  The packet-only `3,200`-line redraw closes the observed complexity while
+  schema-2 graph, log/report, timeout, evidence-root, and six wire-local limits
+  retain their independently frozen fail-closed values.
+- Exact-tree preliminary StructureOnly passed with `elapsedMs=436713`;
+  publication evidence passed `7/7` in `282.0s`, including the fresh commit-
+  reference recurrence and making no publication claim. These checks grant no
+  runner/red authority before the exact design-head hosted gate.

@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted; ContractSlice A merged/exact-main green. B surface, codec activation, and repository-tree wire are exact-head hosted green; `B-WIRE-GOVERNED-TEXT-01` is `ReviewedLocalGreen` with its implementation-head hosted gate pending. B is `5/11`, cumulative A+B is `37/43`. [TEST-0210](test-cases.md#test-0210) remains `Planned`; later B packets, C/D, final activation, and DoD remain held. |
+| Status | Gate 2 accepted; ContractSlice A merged/exact-main green. B surface, codec activation, repository-tree, and governed-text are exact-head hosted green. `B-WIRE-REPOSITORY-TARGET-01` is `FrozenDesign`/inactive pending its exact design-head hosted gate. B is `5/11`, cumulative A+B is `37/43`. [TEST-0210](test-cases.md#test-0210) remains `Planned`; later B packets, C/D, final activation, and DoD remain held. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
@@ -4480,7 +4480,7 @@ or any construction failure in the decoded scope is invalid-repository-tree;
 known-but-disallowed surface/rank is payload-location-mismatch. Only a fully
 parsed valid embedded identity can reach embedded-identity-mismatch.
 
-### Reviewed-local-green `B-WIRE-GOVERNED-TEXT-01` staging contract
+### Immutable hosted-green `B-WIRE-GOVERNED-TEXT-01` staging contract
 
 The repository-tree implementation is immutable exact-head hosted-green
 predecessor evidence. Governed text reuses the same Tests-owned same-object
@@ -4675,6 +4675,333 @@ dotnet test tests/dotnet/MeAndAI.Protocol.Conformance.Tests/MeAndAI.Protocol.Con
 No runner may be materialized and no canonical red may start until the exact
 commit containing this twelve-record freeze is pushed and exact-head hosted
 green. The accepted repository-tree red is immutable and is never rerun.
+
+### Frozen-design `B-WIRE-REPOSITORY-TARGET-01` staging contract
+
+The governed-text implementation is immutable exact-head hosted-green
+predecessor evidence. Repository-target reuses the same Tests-owned,
+same-object topology: only the retained `RepositoryTargetModelMirror` and
+`RepositoryTargetCodecMirror` declarations become `partial`, and one new test
+file supplies the packet-local core below. The memberless generic codec
+interface remains unchanged. No production codec, adapter, alternate encoder,
+resource meter, cache, admission path, index/capability semantics, project,
+package, lock, workflow, friend, or public API is activated.
+
+```csharp
+internal sealed partial class RepositoryTargetModelMirror
+{
+    internal EvidenceScope Scope { get; }
+    internal SnapshotEvidenceLocation Location { get; }
+    internal ExactSha256Digest DemandDigest { get; }
+    internal IReadOnlyList<RepositoryTargetResolutionDemandItem> DemandItems { get; }
+    internal IReadOnlyList<RepositoryTargetRowMirror> Rows { get; }
+    internal IReadOnlyList<RepositoryTargetContentMirror> Contents { get; }
+    internal static RepositoryTargetModelMirror Create(
+        EvidenceScope scope,
+        SnapshotEvidenceLocation location,
+        ExactSha256Digest demandDigest,
+        IEnumerable<RepositoryTargetResolutionDemandItem> demandItems,
+        IEnumerable<RepositoryTargetRowMirror> rows,
+        IEnumerable<RepositoryTargetContentMirror> contents);
+}
+
+internal abstract class RepositoryTargetContentMirror
+{
+    private RepositoryTargetContentMirror();
+    internal static RepositoryTargetContentMirror CommitObject(
+        string owningRepositoryIdentity,
+        string commitObjectId,
+        string normalizedRepositoryRelativePath,
+        string observedBlobObjectId,
+        ReadOnlyMemory<byte> bytes);
+    internal static RepositoryTargetContentMirror CapturedSnapshotPath(
+        string owningRepositoryIdentity,
+        string capturedSnapshotIdentity,
+        string normalizedRepositoryRelativePath,
+        string observedContentIdentity,
+        ReadOnlyMemory<byte> bytes);
+    internal abstract TResult Accept<TResult>(
+        IRepositoryTargetContentMirrorVisitor<TResult> visitor);
+}
+
+internal interface IRepositoryTargetContentMirrorVisitor<TResult>
+{
+    TResult VisitCommitObject(
+        string owner, string commit, string path, string blob,
+        ReadOnlyMemory<byte> bytes);
+    TResult VisitCapturedSnapshotPath(
+        string owner, string capture, string path, string contentIdentity,
+        ReadOnlyMemory<byte> bytes);
+}
+
+internal abstract class RepositoryTargetRowMirror
+{
+    private RepositoryTargetRowMirror();
+    internal RepositoryTargetResolutionDemandItem DemandItem { get; }
+    internal static RepositoryTargetRowMirror MissingCommit(
+        RepositoryTargetResolutionDemandItem demandItem);
+    internal static RepositoryTargetRowMirror PresentCommit(
+        RepositoryTargetResolutionDemandItem demandItem,
+        string observedOwner, string observedType, string observedIdentity);
+    internal static RepositoryTargetRowMirror PresentCommitMissingPath(
+        RepositoryTargetResolutionDemandItem demandItem,
+        string observedOwner, string observedType, string observedIdentity);
+    internal static RepositoryTargetRowMirror PresentCommitPath(
+        RepositoryTargetResolutionDemandItem demandItem,
+        string observedOwner, string observedType, string observedIdentity,
+        string observedPath, string observedPathType,
+        string observedPathIdentity, RepositoryTargetContentMirror? content);
+    internal static RepositoryTargetRowMirror MissingTag(
+        RepositoryTargetResolutionDemandItem demandItem);
+    internal static RepositoryTargetRowMirror PresentTag(
+        RepositoryTargetResolutionDemandItem demandItem,
+        string observedOwner, string observedRefName,
+        string observedRefType, string observedRefIdentity,
+        string observedPeeledType, string observedPeeledIdentity);
+    internal static RepositoryTargetRowMirror MissingCapturedPath(
+        RepositoryTargetResolutionDemandItem demandItem);
+    internal static RepositoryTargetRowMirror PresentCapturedPath(
+        RepositoryTargetResolutionDemandItem demandItem,
+        string observedOwner, string observedCapture, string observedPath,
+        string observedEntryKind, string observedContentIdentity,
+        RepositoryTargetContentMirror content);
+    internal abstract TResult Accept<TResult>(
+        IRepositoryTargetRowMirrorVisitor<TResult> visitor);
+}
+
+internal interface IRepositoryTargetRowMirrorVisitor<TResult>
+{
+    TResult VisitMissingCommit(RepositoryTargetResolutionDemandItem demand);
+    TResult VisitPresentCommit(
+        RepositoryTargetResolutionDemandItem demand,
+        string owner, string type, string identity);
+    TResult VisitPresentCommitMissingPath(
+        RepositoryTargetResolutionDemandItem demand,
+        string owner, string type, string identity);
+    TResult VisitPresentCommitPath(
+        RepositoryTargetResolutionDemandItem demand,
+        string owner, string type, string identity,
+        string path, string pathType, string pathIdentity,
+        RepositoryTargetContentMirror? content);
+    TResult VisitMissingTag(RepositoryTargetResolutionDemandItem demand);
+    TResult VisitPresentTag(
+        RepositoryTargetResolutionDemandItem demand,
+        string owner, string refName, string refType, string refIdentity,
+        string peeledType, string peeledIdentity);
+    TResult VisitMissingCapturedPath(
+        RepositoryTargetResolutionDemandItem demand);
+    TResult VisitPresentCapturedPath(
+        RepositoryTargetResolutionDemandItem demand,
+        string owner, string capture, string path, string entryKind,
+        string contentIdentity, RepositoryTargetContentMirror content);
+}
+
+internal abstract class RepositoryTargetWriteMirrorResult
+{
+    private RepositoryTargetWriteMirrorResult();
+    internal static RepositoryTargetWriteMirrorResult Written(
+        CanonicalEvidencePayload payload);
+    internal static RepositoryTargetWriteMirrorResult Rejected(
+        string failureCode);
+    internal abstract TResult Accept<TResult>(
+        IRepositoryTargetWriteMirrorResultVisitor<TResult> visitor);
+}
+
+internal interface IRepositoryTargetWriteMirrorResultVisitor<TResult>
+{
+    TResult VisitWritten(CanonicalEvidencePayload payload);
+    TResult VisitRejected(string failureCode);
+}
+
+internal abstract class RepositoryTargetQualificationMirrorResult
+{
+    private RepositoryTargetQualificationMirrorResult();
+    internal static RepositoryTargetQualificationMirrorResult Qualified(
+        RepositoryTargetModelMirror model);
+    internal static RepositoryTargetQualificationMirrorResult Rejected(
+        string failureCode);
+    internal abstract TResult Accept<TResult>(
+        IRepositoryTargetQualificationMirrorResultVisitor<TResult> visitor);
+}
+
+internal interface IRepositoryTargetQualificationMirrorResultVisitor<TResult>
+{
+    TResult VisitQualified(RepositoryTargetModelMirror model);
+    TResult VisitRejected(string failureCode);
+}
+
+internal sealed partial class RepositoryTargetCodecMirror
+{
+    internal RepositoryTargetWriteMirrorResult WriteRepositoryTargetResolution(
+        EvidenceScope scope,
+        SnapshotEvidenceLocation location,
+        ExactSha256Digest demandDigest,
+        IReadOnlyList<RepositoryTargetResolutionDemandItem> demandItems,
+        IReadOnlyList<RepositoryTargetRowMirror> rows,
+        IReadOnlyList<RepositoryTargetContentMirror> contents,
+        CancellationToken cancellationToken);
+    internal RepositoryTargetQualificationMirrorResult
+        QualifyRepositoryTargetResolution(
+            EvidenceBinding binding,
+            ExactSha256Digest expectedDemandDigest,
+            IReadOnlyList<RepositoryTargetResolutionDemandItem> expectedDemandItems,
+            CancellationToken cancellationToken);
+}
+```
+
+Each abstract carrier has only the private sealed leaves implied by its factory
+list; no public constructor, catch-all row, mutable property, direction-specific
+adapter, or second codec exists. Written and Qualified carry exactly one
+payload/model; Rejected carries exactly one declared code. Every list and every
+content byte sequence is copied once before retention. Input order is
+authoritative and must already be canonical; the writer never sorts or repairs
+rows, demand items, or content. Null list arguments are
+`ArgumentNullException`; a null element is `ArgumentException` with exact
+`ParamName` equal to `demandItems`, `rows`, or `contents` before semantic
+validation. Cancellation is checked before semantic work and remains out of
+band.
+
+Demand list/row list are non-empty, counts are equal, every demand has the same
+non-empty canonical owner, and ItemIds are non-negative and strictly increasing.
+A CommitObject demand
+without a path permits only MissingCommit or PresentCommit; one with a path
+permits only MissingCommit, PresentCommitMissingPath, or PresentCommitPath. A
+TagRoot permits only MissingTag/PresentTag and a CapturedSnapshotPath permits
+only MissingCapturedPath/PresentCapturedPath. PresentCommitPath may omit its
+content only when the requested fragment is null; PresentCapturedPath and every
+fragment-bearing present path require content. Writer rows reference the exact
+demand object at the same ordinal and content carriers by object identity;
+every referenced content object occurs exactly once in the contents list and no
+unreferenced content is accepted.
+
+The exact valid fixture uses one Repository/Snapshot scope with subject `repo`
+and source `git`. Fixture commit SHA: `0123456789abcdef0123456789abcdef01234567`;
+snapshot/boundary kind `exact-commit`, ticks `0/1`, and one owner shard
+`https://github.com/owner/repo`. Its exact demand rows are:
+
+| Item | Selector and requested tuple | Qualified row | Content |
+| --- | --- | --- | --- |
+| `0` | Fixture commit SHA: `0123456789abcdef0123456789abcdef01234567`, path `docs/README.md`, fragment `intro` | Present commit/path; exact owner; type `commit`; exact commit; exact path; type `blob`; fixture blob OID: `1e0981f10f35ca8f594fec2a03f11df5a7299098` | ordinal `0`; exact bytes `# Intro\n`; SHA-256 digest: `2A8A06BBB4A42EEE60F35E2C6EACB1C3BBE0F8748817D1547A59692784B53C33` |
+| `1` | Tag `v1` | Present tag; exact owner/ref `refs/tags/v1`; type `tag`; ref identity forty `1` digits; peeled type `commit`; exact fixture commit | none |
+| `2` | Test vector: `abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789`, path `src/file.txt`, fragment `L1` | Present captured path; exact owner/capture/path; entry kind `file`; SHA-256 digest: `c73b73af8851e9e91bc6b4dc12e7dace0a2bfb931c1d0b8b36ef367319f58cd1` | ordinal `1`; exact bytes `line\n`; same SHA-256 identity |
+
+The exact canonical demand frame is `318` bytes with SHA-256
+`9DF61AC4D5F82C5FDA121B05319B16399580FC0A8D28B4AC62D1879D24899CBA`:
+
+```text
+cHJvdG9jb2wuYWNxdWlzaXRpb24tZGVtYW5kLzEKAQAAAAMAAAAAAAAAHWh0dHBzOi8vZ2l0aHViLmNvbS9vd25lci9yZXBvAAAAACgwMTIzNDU2Nzg5YWJjZGVmMDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3AQAAAA5kb2NzL1JFQURNRS5tZAEAAAAFaW50cm8AAAABAAAAHWh0dHBzOi8vZ2l0aHViLmNvbS9vd25lci9yZXBvAQAAAAJ2MQAAAAIAAAAdaHR0cHM6Ly9naXRodWIuY29tL293bmVyL3JlcG8CAAAAQGFiY2RlZjAxMjM0NTY3ODlhYmNkZWYwMTIzNDU2Nzg5YWJjZGVmMDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODkAAAAMc3JjL2ZpbGUudHh0AAAAAkwx
+```
+
+The exact canonical payload is `1,465` bytes with SHA-256
+`936D99ECDDC7332999B2641787BF160A1D126F27DAEB4F54BE1EBC8F426EE6F0`:
+
+```text
+cHJvdG9jb2wucmVwb3NpdG9yeS10YXJnZXQtcmVzb2x1dGlvbi8xCgAAAARyZXBvAAAAA2dpdAAAAApyZXBvc2l0b3J5AAAADGV4YWN0LWNvbW1pdAAAACgwMTIzNDU2Nzg5YWJjZGVmMDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3AAAADGV4YWN0LWNvbW1pdAAAACgwMTIzNDU2Nzg5YWJjZGVmMDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3AAAAAAAAAAAAAAAAAAAAAQOd9hrE1fgsX9oSGwUxmxY5lYD8Co0otKxi0YedJImcugAAAAMAAAAAAAAAHWh0dHBzOi8vZ2l0aHViLmNvbS9vd25lci9yZXBvAAAAACgwMTIzNDU2Nzg5YWJjZGVmMDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3AQAAAA5kb2NzL1JFQURNRS5tZAEAAAAFaW50cm8BAAAAHWh0dHBzOi8vZ2l0aHViLmNvbS9vd25lci9yZXBvAAAABmNvbW1pdAAAACgwMTIzNDU2Nzg5YWJjZGVmMDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3AQAAAA5kb2NzL1JFQURNRS5tZAAAAARibG9iAAAAKDFlMDk4MWYxMGYzNWNhOGY1OTRmZWMyYTAzZjExZGY1YTcyOTkwOTgBAAAAAAAAAAEAAAAdaHR0cHM6Ly9naXRodWIuY29tL293bmVyL3JlcG8BAAAAAnYxAQAAAB1odHRwczovL2dpdGh1Yi5jb20vb3duZXIvcmVwbwAAAAxyZWZzL3RhZ3MvdjEAAAADdGFnAAAAKDExMTExMTExMTExMTExMTExMTExMTExMTExMTExMTExMTExMTExMTEAAAAGY29tbWl0AAAAKDAxMjM0NTY3ODlhYmNkZWYwMTIzNDU2Nzg5YWJjZGVmMDEyMzQ1NjcAAAACAAAAHWh0dHBzOi8vZ2l0aHViLmNvbS9vd25lci9yZXBvAgAAAEBhYmNkZWYwMTIzNDU2Nzg5YWJjZGVmMDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWYwMTIzNDU2Nzg5AAAADHNyYy9maWxlLnR4dAAAAAJMMQEAAAAdaHR0cHM6Ly9naXRodWIuY29tL293bmVyL3JlcG8AAABAYWJjZGVmMDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWYwMTIzNDU2Nzg5YWJjZGVmMDEyMzQ1Njc4OQAAAAxzcmMvZmlsZS50eHQAAAAEZmlsZQAAAEBjNzNiNzNhZjg4NTFlOWU5MWJjNmI0ZGMxMmU3ZGFjZTBhMmJmYjkzMWMxZDBiOGIzNmVmMzY3MzE5ZjU4Y2QxAAAAAQAAAAIAAAAAAAAAAB1odHRwczovL2dpdGh1Yi5jb20vb3duZXIvcmVwbwAAACgwMTIzNDU2Nzg5YWJjZGVmMDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3AAAADmRvY3MvUkVBRE1FLm1kAAAAKDFlMDk4MWYxMGYzNWNhOGY1OTRmZWMyYTAzZjExZGY1YTcyOTkwOTgAAAAIKooGu7SkLu5g814sbqyxw7vg+HSIF9FUellpJ4S1PDMjIEludHJvCgAAAAEBAAAAHWh0dHBzOi8vZ2l0aHViLmNvbS9vd25lci9yZXBvAAAAQGFiY2RlZjAxMjM0NTY3ODlhYmNkZWYwMTIzNDU2Nzg5YWJjZGVmMDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODkAAAAMc3JjL2ZpbGUudHh0AAAAQGM3M2I3M2FmODg1MWU5ZTkxYmM2YjRkYzEyZTdkYWNlMGEyYmZiOTMxYzFkMGI4YjM2ZWYzNjczMTlmNThjZDEAAAAFxztzr4hR6ekbxrTcEufazgor+5McHQuLNu82cxn1jNFsaW5lCg==
+```
+
+The writer recomputes the exact demand frame and digest before payload
+retention; the qualifier recomputes it from the caller-supplied expected demand
+and requires exact digest, row echo, and canonical byte equality. ItemIds are
+strictly increasing but need not be contiguous across a one-owner shard. Row
+count equals demand count and rows retain exact demand order. Contents are
+ordinal `0..N-1`, CommitObject keys precede CapturedSnapshotPath keys, then key
+fields compare ordinally. Every content row is referenced; a fragment-bearing
+present path references exactly one content; a path-only commit may reference
+none. No row/content repair, normalization, sorting, or deduplication occurs.
+
+Validation precedence is exact. Argument/null/cancellation boundaries occur
+first. The writer then checks row count, content count, aggregate strict-UTF-8
+row-text bytes, per-content bytes, aggregate unique-content bytes, Repository/
+Snapshot scope/location shape and equality, selector closure and one-owner
+demand order, demand digest, row bijection/variant fields, content ordinal/key/
+reference closure, commit-blob or capture SHA self-consistency, combined
+payload size, defensive copies, and encoding. The qualifier checks complete
+payload size, schema key/version, header and primitive framing, embedded scope/
+location construction, demand digest and expected-item equality, row/content
+grammar/order/reference closure, self-consistency, trailing-byte closure,
+enclosing Repository/Snapshot shape, and embedded-versus-enclosing identity.
+
+The exact failure partition is mutually exclusive:
+
+- any hard first-one-over or checked-arithmetic overflow is
+  `protocol.codec.resource-limit-exceeded`;
+- a structurally valid known non-Repository surface or non-Snapshot location is
+  `protocol.codec.payload-location-mismatch`;
+- a fully valid embedded scope/location unequal to the supplied writer scope
+  or enclosing binding is `protocol.codec.embedded-identity-mismatch`; and
+- wrong schema/header, invalid UTF-8 or selector/optional/outcome/owner-kind
+  byte, EOF/length/count mismatch, row echo/order/duplicate/missing/extra,
+  content ordinal/key/order/reference defect, trailing byte, invalid owner/tag/
+  path/fragment/object identity grammar, or self-inconsistent Git-blob/capture
+  content is `protocol.codec.invalid-repository-target-resolution`.
+
+The semantic `Unresolved`, `WrongRepository`, `WrongTarget`, `WrongObject`,
+`MissingFragment`, `WrongFragment`, and `Exact` capability outcomes remain held
+for the later repository-target index. This packet only persists and qualifies
+closed wire variants; it does not classify a final target view.
+
+Wire-local ceilings are exactly `50,000` rows, `64` referenced unique content
+objects, `16,777,216` aggregate strict-UTF-8 row-text bytes, `1,048,576` bytes
+per content, `16,777,216` aggregate unique-content bytes, and `33,554,432`
+complete payload bytes. Deterministic test constructors prove each reachable
+equality and first-one-over in that order, keeping all earlier counters below
+their ceilings; count equality uses increasing zero-padded selector identities,
+content equality uses canonical small keys, and the payload constructor adjusts
+its final valid ASCII path/content filler without crossing an earlier limit.
+First-one-over stops before retention/copy. These checks do not activate the
+later four-counter resource ledger or plan-global multi-owner aggregate.
+The row-text counter includes every serialized strict-UTF-8 demand echo,
+observed row field, and content-key text occurrence after scope/location and
+before raw content bytes; invalid UTF-16 input fails as invalid-repository-
+target-resolution at that gate rather than being replaced or counted.
+
+The malformed matrix mutates every header/digest/primitive boundary; every
+selector/optional/outcome/owner-kind tag; strict UTF-8 and path/tag/fragment/
+identity grammar; missing/extra/duplicate/reordered row; demand echo and digest;
+content ordinal/key/digest/length/bytes; unreferenced or multiply conflicting
+content; path-only versus required-fragment content; Git SHA-1 blob framing for
+40-hex commits; captured SHA-256 content; trailing bytes; and all six equality/
+one-over constructors. Source-array mutation after writer/model construction
+must not alter retained payload, rows, or contents.
+
+The executable allowlist is exactly a partial-identity-only modification to
+`ContractSliceBActivationTests.cs` plus one new
+`ContractSliceBRepositoryTargetCodecTests.cs`. Production, public surface,
+project, package, lock, workflow, Policy, resource, cache, admission, index,
+capability, and later-wire surfaces are immutable. This packet receives a
+reviewed complexity redraw to at most `3,200` normalized two-test-file lines;
+`3,201` requires renewed design. The default `1,200` ceiling remains unchanged
+for later packets unless separately reviewed.
+
+The test is one direct non-skipped Fact at
+`MeAndAI.Protocol.Conformance.Tests.ContractSliceBRepositoryTargetCodecTests.Round_trips_exact_repository_target_resolution_wire`,
+with exactly one `ContractSlice=B` trait, no Scenario/Theory/class trait or
+overload, and marker `TEST-0210-B-BEHAVIOR-RED-0004`. Its red temporarily makes
+only the fully prepared valid `WriteRepositoryTargetResolution` semantic
+return `null!`; only that null calls direct `Assert.Fail(marker)`. Setup,
+exceptions, wrong non-null results, negative vectors, and qualifier assertions
+remain marker-free. Green is focused `1/1`, cumulative B `6/6`, A+B/full
+Conformance `38/38`, and Domain `98/98`.
+
+Canonical R uses one fresh external CreateNew runner matching
+`D:\Temp\meandai-test-0210-b-repository-target-r0004-runner-<32-lowercase-hex-guid>.ps1`,
+fresh report/log siblings, and a different fresh result root. It inherits the
+governed-text runner's exact source/Git/lock/build/DLL/PDB/hash, `8,388,608`-
+byte complete-log, `1,048,576`-byte report, process-scoped
+`VSTEST_CONNECTION_TIMEOUT=300`, `420000`-ms monotonic, secure-TRX, atomic
+`InvocationCommitted`, and immutable no-retry contracts, specialized to these
+two source files, the `3,200`-line ceiling, marker/FQN, and this exact command:
+
+```text
+dotnet test tests/dotnet/MeAndAI.Protocol.Conformance.Tests/MeAndAI.Protocol.Conformance.Tests.csproj --configuration Release --no-restore --no-build --nologo --verbosity minimal --results-directory "<fresh-root>" --logger "trx;LogFileName=TEST-0210-B-BEHAVIOR-RED-0004.trx" --filter "ContractSlice=B&FullyQualifiedName=MeAndAI.Protocol.Conformance.Tests.ContractSliceBRepositoryTargetCodecTests.Round_trips_exact_repository_target_resolution_wire"
+```
+
+The exact twelve-record design cohort adds no tracked node and must validate
+under schema-2 ceilings `512` nodes / `8,192` relations / `1,048,576` bytes per
+parsed blob / `8,388,608` aggregate bytes. No runner may be materialized and no
+canonical red or implementation may start until the exact commit containing
+this freeze is pushed and exact-head hosted green. R=0001..0003 remain
+immutable and are never rerun.
 
 The complete Tests-only causal surface is:
 
@@ -8803,9 +9130,10 @@ invocation, or weaken
 ContractSlice A's historical delivery is owned by its
 [micro-delivery control plan](subf-0143-micro-delivery-plan.md). ContractSlice
 B is decomposed by the current
-[B micro-delivery plan](subf-0143-contractslice-b-micro-delivery-plan.md). Its
-first two packets are hosted green and repository-tree wire is local green with
-its implementation-head hosted gate pending; later B packets remain inactive.
+[B micro-delivery plan](subf-0143-contractslice-b-micro-delivery-plan.md).
+Surface, codec activation, repository-tree, and governed-text are hosted green;
+repository-target is FrozenDesign/inactive pending its exact design-head hosted
+gate, and later B packets remain inactive.
 
 B implementation and C/D still require separate future activation, and no
 packet is active merely from this list. No directive here allocates new stable

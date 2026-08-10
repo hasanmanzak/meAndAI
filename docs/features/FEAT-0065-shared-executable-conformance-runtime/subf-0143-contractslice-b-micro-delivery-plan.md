@@ -3,14 +3,14 @@
 | Field | Value |
 | --- | --- |
 | Classification | Gate 2 micro-delivery plan and design freeze |
-| State | `B-SURFACE-01`, `B-CODEC-ACTIVATION-01`, and `B-WIRE-REPOSITORY-TREE-01` exact-head hosted green; `B-WIRE-GOVERNED-TEXT-01` `ReviewedLocalGreen` with its implementation-head hosted gate pending; B `5/11`, cumulative A+B `37/43`; later packets inactive |
+| State | `B-SURFACE-01`, `B-CODEC-ACTIVATION-01`, `B-WIRE-REPOSITORY-TREE-01`, and `B-WIRE-GOVERNED-TEXT-01` exact-head hosted green; `B-WIRE-REPOSITORY-TARGET-01` `FrozenDesign`/inactive pending its exact design-head hosted gate; B `5/11`, cumulative A+B `37/43`; later packets inactive |
 | Parent | Owning feature and current subfeature |
 | Scenario | [TEST-0210](test-cases.md#test-0210), still `Planned` |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Ordered-B authority | [Maintainer directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5230762350) |
 | Accepted predecessor | Accepted A merge commit [`51623f4d404a95e0f706d72805cf7ddbbbd293b8`](https://github.com/hasanmanzak/meAndAI/commit/51623f4d404a95e0f706d72805cf7ddbbbd293b8); exact-main [run 31304787603](https://github.com/hasanmanzak/meAndAI/actions/runs/31304787603) passed Ubuntu `6m11s`, Windows `11m21s`, publication verification skipped |
 | Normative owner | [Typed evaluation kernel design](subf-0143-typed-evaluation-kernel-design.md) |
-| Implementation language | C# only; the frozen governed-text packet changes only its two test-owned files |
+| Implementation language | C# only; the frozen repository-target packet changes only its two test-owned files |
 
 ## Authority and non-goals
 
@@ -144,7 +144,7 @@ rather than accumulates predecessor commit/run relations. The schema-2 graph
 ceilings remain `8,192` relations and `8,388,608` parsed bytes; an exact-tree
 projection and fresh wire-specific reviews are mandatory before commit.
 
-### Reviewed-local-green `B-WIRE-GOVERNED-TEXT-01` staging boundary
+### Immutable hosted-green `B-WIRE-GOVERNED-TEXT-01` boundary
 
 The governed-text wire packet extends only the retained same-object Tests-owned
 `GovernedTextCodecMirror` and `GovernedTextModelMirror` identities as partial
@@ -166,6 +166,47 @@ synchronized design head is committed, pushed, and hosted green. Governed-text
 green is focused `1/1`, B `5/5`, A+B/full Conformance `37/37`, and Domain
 `98/98`; all later packet, Scenario/filter, runtime-efficiency, C/D, merge,
 release, and publication holds remain.
+
+### Frozen `B-WIRE-REPOSITORY-TARGET-01` staging boundary
+
+The governed-text implementation is immutable exact-head hosted-green
+predecessor evidence. Repository-target extends only the retained same-object
+Tests-owned `RepositoryTargetCodecMirror` and `RepositoryTargetModelMirror`
+identities as partial types. It modifies only
+`tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ContractSliceBActivationTests.cs`
+for those two declarations and adds only
+`tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ContractSliceBRepositoryTargetCodecTests.cs`.
+The memberless generic codec interface and every production/public/project/
+package/lock/workflow/Policy/resource/cache/admission/index/capability surface
+remain unchanged.
+
+The typed design normatively owns the internal callable/result/content/row
+declarations; exact `318`-byte demand frame and `1,465`-byte golden payload;
+three selector families and eight closed result variants; strict row/content
+order, digest, self-consistency, error precedence, defensive copying, and six
+wire-local equality/first-one-over ceilings; exact `0004` one-shot runner; and
+the packet-specific `3,200` normalized-line redraw threshold. This reviewed
+redraw is intentionally larger than the default `1,200` because the packet
+must retain all three selector/result grammars and two content-key families in
+one same-object mirror; `3,201` or more forces a new design review. It does not
+raise any later packet's default threshold.
+
+The sole direct non-skipped Fact is
+`MeAndAI.Protocol.Conformance.Tests.ContractSliceBRepositoryTargetCodecTests.Round_trips_exact_repository_target_resolution_wire`,
+with only `ContractSlice=B`, no Scenario/Theory/class trait/overload, and exact
+marker `TEST-0210-B-BEHAVIOR-RED-0004`. The red changes only the fully prepared
+valid writer's non-null semantic return to `null!`; only that null reaches
+direct `Assert.Fail(marker)`. Green is focused `1/1`, cumulative B `6/6`,
+A+B/full Conformance `38/38`, and Domain `98/98`.
+
+The exact design cohort remains the same twelve existing Markdown paths. It
+adds no tracked node; schema-2 limits remain `512` nodes, `8,192` relations,
+`1,048,576` bytes per parsed blob, and `8,388,608` aggregate parsed bytes.
+Runner complete stdout/stderr logs remain `8,388,608` bytes each, report remains
+`1,048,576`, and the sole child remains bounded by `420000` monotonic
+milliseconds. No canonical red or source/test implementation may begin before
+the commit containing this synchronized freeze is pushed and exact-head hosted
+green.
 
 ## SurfaceRed and BehaviorRed contract
 
@@ -331,9 +372,10 @@ project, package, lock, workflow, release, or consumer file. The user-owned
 ## Exit condition
 
 This plan was the accepted `FrozenDesign` predecessor. The surface, codec
-activation, and repository-tree wire packets are immutable exact-head hosted-
-green history. Governed-text is `ReviewedLocalGreen` at B `5/11` and A+B
-`37/43`; its exact implementation head must become hosted green before the next
-packet can activate. Every successor stays inactive until that gate closes. C/D, final
+activation, repository-tree, and governed-text packets are immutable exact-head
+hosted-green history at B `5/11` and A+B `37/43`. Repository-target is
+`FrozenDesign`/inactive and cannot execute until this synchronized design head
+is committed, pushed, and exact-head hosted green. Every successor stays
+inactive until its predecessor gate closes. C/D, final
 activation, feature DoD, release, publication, consumer mutation, authority
 transfer, and PowerShell retirement remain held.
