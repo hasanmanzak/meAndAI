@@ -3,12 +3,12 @@
 | Field | Value |
 | --- | --- |
 | Packet | `B-CODEC-ACTIVATION-01` / `B-WIRE-REPOSITORY-TREE-01` / `B-WIRE-GOVERNED-TEXT-01` / `B-WIRE-REPOSITORY-TARGET-01` / `B-RESOURCE-01` / `B-CACHE-01` / `B-ADMISSION-01` |
-| State | Codec activation, all three wire packets, resource, and cache `ReviewedHostedGreen`; repository-target R=0004 and admission R=0008 diagnostic/no-success, R=0005, resource R=0006, and cache R=0007 accepted/immutable; B `8/11`, A+B `40/43`; B-ADMISSION corrected `FrozenDesign`/inactive pending this exact synchronized corrected-design head's hosted gate |
+| State | Codec activation, all three wire packets, resource, and cache `ReviewedHostedGreen`; repository-target R=0004 plus admission R=0008/R=0009 diagnostic/no-success, R=0005, resource R=0006, and cache R=0007 accepted/immutable; B `8/11`, A+B `40/43`; B-ADMISSION second-corrected `FrozenDesign`/inactive pending this exact synchronized correction-design head's hosted gate |
 | Parent | Owning ContractSlice B micro-delivery plan |
 | Scenario | Parent scenario retained `Planned` |
 | Exact resource implementation | Immutable hosted-green resource identity and run custody remain owned by the resource packet records below |
-| Exact admission original design | [`3e9714d9379646a5e8dcdff46877792a0847c8d8`](https://github.com/hasanmanzak/meAndAI/commit/3e9714d9379646a5e8dcdff46877792a0847c8d8); exact-head [run 31394929734](https://github.com/hasanmanzak/meAndAI/actions/runs/31394929734) passed Ubuntu `20m15s`, Windows `46m04s`, publication verification skipped; R=0008 later exposed the bounded design defect recorded below |
-| Exact cache implementation | [`f0a66e86c7875019d7347eb044428b279bcb0717`](https://github.com/hasanmanzak/meAndAI/commit/f0a66e86c7875019d7347eb044428b279bcb0717); exact-head [run 31383308571](https://github.com/hasanmanzak/meAndAI/actions/runs/31383308571) passed Ubuntu `20m42s`, Windows `49m17s`, publication verification skipped |
+| Exact admission first-correction design | [`3574e047f8df9bd23e9eb8ba05848c889f60af50`](https://github.com/hasanmanzak/meAndAI/commit/3574e047f8df9bd23e9eb8ba05848c889f60af50); exact-head [run 31405333801](https://github.com/hasanmanzak/meAndAI/actions/runs/31405333801) passed Ubuntu `21m06s`, Windows `50m29s`, publication verification skipped; R=0009 later exposed the bounded five-rule fixture defect recorded below |
+| Exact cache implementation | Immutable cache commit/run custody remains in the earlier packet history below; no cache authority is reopened |
 | Implementation language | C# only |
 
 ## Immutable codec-activation boundary
@@ -619,7 +619,7 @@ once. It is immutable and must never be rerun.
   publication verification was skipped. B-CACHE is
   immutable `ReviewedHostedGreen` and R=0007 is never rerun.
 
-## Corrected frozen `B-ADMISSION-01` routing
+## Second-corrected frozen `B-ADMISSION-01` routing
 
 - The executable allowlist is exactly one retained-test modification,
   `ContractSliceBActivationTests.cs`, plus one new Tests-owned file,
@@ -635,8 +635,8 @@ once. It is immutable and must never be rerun.
   aggregate. The existing activation Fact stays green throughout.
 - The one new Fact is
   `ContractSliceBAdmissionProofTests.Admits_exact_observed_failed_and_no_input_proofs`,
-  with only `ContractSlice=B`, no Scenario/Theory/class trait, and corrected
-  marker `TEST-0210-B-BEHAVIOR-RED-0009`.
+  with only `ContractSlice=B`, no Scenario/Theory/class trait, and second-
+  corrected marker `TEST-0210-B-BEHAVIOR-RED-0010`.
 - The typed design exclusively owns exact carrier signatures, three singleton
   instruction/request fixtures, corrected admission-proof manifest/artifact substitutions,
   receipt framing, exact candidate/instruction/receipt bijections, closed
@@ -648,7 +648,7 @@ once. It is immutable and must never be rerun.
   Tests-owned components and removes the now-unbound
   `MeAndAI.Protocol.Application.dll` artifact row; every other artifact row and
   all non-admission components remain unchanged.
-- B-ADMISSION is inactive until this synchronized corrected-design commit is
+- B-ADMISSION is inactive until this synchronized correction-design commit is
   exact-head hosted green. B-SEALED-CONTEXT, B-CODEC-DERIVATION, B-CONVERGE, parent
   Scenario, C/D, activation, merge, release, publication, and DoD remain held.
 
@@ -697,18 +697,55 @@ once. It is immutable and must never be rerun.
   `469324CCF44DC001AB0B39BD1958517F0034BACDF96B0CD5B9ED6AE2C8697445`.
   R=0008 is immutable diagnostic/no-success and is never rerun.
 
-## Corrected `B-ADMISSION-01` freeze gate
+## Immutable admission R=0009 diagnostic
 
-- Corrected R=0009 requires one marker-only ErrorInfo Message, permits zero or
+- The first-correction design head and hosted run are exact above. A fresh
+  runner at
+  `D:\Temp\meandai-test-0210-b-admission-r0009-runner-c9c8f3d649d34ed39bd7c2a86a693ca4.ps1`
+  was `37,821` bytes / SHA-256
+  `2D76AEA3B55341E0811372B6593F5BBD4DE0629D1C162B515B094AEA33409D53`.
+  ValidateOnly bound exact head/upstream/branch/status, the two sources,
+  `1,633/2,400` changed lines, and all six lock identities.
+- The sole committed child rebuilt with zero warnings/errors and selected the
+  exact Fact, but `CreateInstructions` called `Rules.Single()` against the exact
+  five-rule catalog. It failed before the marker with
+  `System.InvalidOperationException: Sequence contains more than one element`.
+- The fresh root was
+  `D:\Temp\meandai-test-0210-b-0a7b95dc3fa5440f8d2e8438a39861be`
+  and contained only `TEST-0210-B-BEHAVIOR-RED-0009.trx`, `6,588` bytes /
+  SHA-256
+  `CE7F41C8E07180DB5437B8EBA238E392E7070991D62BE6EBCBED9048E705A299`.
+  It had one Failed result/definition/entry, exact `1/1/1` total/executed/failed
+  counters, raw marker count `0`, and exact source stack at
+  `CreateInstructions`.
+- The append-state `InvocationCommitted`/`OracleRejected` report was `575`
+  bytes / SHA-256
+  `4C465CB3CB41F3B80282755551EC5678A6BFAB10A51722888F8B09B362BFD9C5`;
+  complete stdout/stderr were `2,878` / `196` bytes at SHA-256
+  `0CED23BCD36169539D28B0DC509BD3C58E9BFD541E594B62E4CF079FC7280079` /
+  `DEF57F2B782F8E9BD59E6FD711410E10C460E911C416CB9CF2D47E00ABE6CE13`.
+  R=0009 is immutable diagnostic/no-success and is never rerun.
+
+## Second-corrected `B-ADMISSION-01` freeze gate
+
+- Second-corrected R=0010 requires one marker-only ErrorInfo Message, permits zero or
   one byte-identical same-result StdOut marker echo and zero or one marker-free
   same-FQN `[FAIL]` RunInfo, and accepts raw marker count only in `[1,2]`.
 - The executable allowlist, `2,400`-line ceiling, exact FQN, all sixteen counters,
   source/build/binary/lock custody, `420000`-ms timeout, 8-MiB logs, 1-MiB report,
-  and no-retry behavior remain unchanged. Corrected design reviews and exact-head
-  hosted validation must close before a fresh R=0009 runner is materialized.
+  and no-retry behavior remain unchanged. `RequireCanonicalSlot` must prove the
+  canonical repeated-slot counts `3/3/2` and semantic equality across
+  requirement, profile surfaces, material role, target-selector key, and
+  ordered capabilities before selecting the first declaration. Correction-
+  design reviews and exact-head hosted validation must close before a fresh
+  R=0010 runner is materialized.
 
-| Corrected-design local check | Result |
+| Immutable first-correction design check | Result |
 | --- | --- |
 | Semantic/custody review | `0 Blocking / 0 Important / 0 Minor`; the exact unbound-artifact cause, single-row removal, fresh marker identity, optional echo/RunInfo partition, and no-retry boundary are closed |
 | Route/content/scope review | `0 Blocking / 0 Important / 0 Minor`; exactly twelve record paths, zero executable staging, four ledger links, B `8/11`, A+B `40/43`, and every successor hold agree |
-| Preliminary executable evidence | Publication evidence `7/7` in `331.5s`, no publication claim; StructureOnly green with `elapsedMs=489898`; diff-check clean. Commit authorization additionally requires one exact-tree recurrence including this evidence table. |
+| Preliminary executable evidence | Publication evidence `7/7` in `331.5s`, no publication claim; StructureOnly green with `elapsedMs=489898`; diff-check clean. Its exact-tree recurrence subsequently passed before the first-correction design commit. |
+
+| Second-correction design check | Result |
+| --- | --- |
+| Current gate | R=0009 immutable diagnostic sealed; exact five-rule/repeated-slot cause frozen; publication evidence `7/7` in `299.7s`, no publication claim; StructureOnly green with `elapsedMs=467781`; canonical graph `364/4143/319/4421524`, typed design `601995/1048576`; diff-check clean; semantic/custody and route/content/scope reviews each `0/0/0`. Publication and StructureOnly must recur after this row and before commit. |
