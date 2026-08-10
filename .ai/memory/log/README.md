@@ -14,12 +14,12 @@ Repository-target R=0004 is an immutable oracle-rejected diagnostic with no
 canonical red. Canonical R=0005 is accepted and repository-target is exact-head
 hosted green; its owning B wire ledger retains exact implementation/run custody.
 B-RESOURCE R=0006 is accepted, immutable, and exact-head hosted green. Cache
-R=0007 is accepted/immutable and B-CACHE is exact-head hosted green; B is
-`9/11`, cumulative A+B is `41/43`. Admission R=0008, R=0009, and R=0010 are immutable
-diagnostic/no-success attempts; canonical R=0011 is accepted/immutable and
-B-ADMISSION is `ReviewedLocalGreen` with its implementation head hosted
-pending. Later
-packets remain inactive and the parent scenario remains `Planned`.
+R=0007 is accepted/immutable and B-CACHE plus B-ADMISSION are exact-head hosted
+green; B is `9/11`, cumulative A+B is `41/43`. Admission R=0008, R=0009, and
+R=0010 are immutable diagnostic/no-success attempts; canonical R=0011 is
+accepted/immutable. B-SEALED-CONTEXT is `FrozenDesign`/inactive pending its
+synchronized design-head hosted gate. Later packets remain inactive and the
+parent scenario remains `Planned`.
 
 Follow the current
 [instruction-graph capacity handoff](2026-08-09-feat-0069-instruction-graph-capacity.md)

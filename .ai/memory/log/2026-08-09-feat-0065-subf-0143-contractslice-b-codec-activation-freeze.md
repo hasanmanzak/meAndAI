@@ -1,14 +1,14 @@
-# ContractSlice B codec-activation and wire packet freeze
+# ContractSlice B packet freeze and evidence
 
 | Field | Value |
 | --- | --- |
-| Packet | `B-CODEC-ACTIVATION-01` / `B-WIRE-REPOSITORY-TREE-01` / `B-WIRE-GOVERNED-TEXT-01` / `B-WIRE-REPOSITORY-TARGET-01` / `B-RESOURCE-01` / `B-CACHE-01` / `B-ADMISSION-01` |
-| State | Codec activation, all three wire packets, resource, and cache `ReviewedHostedGreen`; repository-target R=0004 plus admission R=0008/R=0009/R=0010 diagnostic/no-success, R=0005, resource R=0006, cache R=0007, and admission R=0011 accepted/immutable; B `9/11`, A+B `41/43`; B-ADMISSION `ReviewedLocalGreen` with its implementation head hosted pending |
+| Packet | `B-CODEC-ACTIVATION-01` / `B-WIRE-REPOSITORY-TREE-01` / `B-WIRE-GOVERNED-TEXT-01` / `B-WIRE-REPOSITORY-TARGET-01` / `B-RESOURCE-01` / `B-CACHE-01` / `B-ADMISSION-01` / `B-SEALED-CONTEXT-01` |
+| State | Codec activation, all three wire packets, resource, cache, and admission `ReviewedHostedGreen`; repository-target R=0004 plus admission R=0008/R=0009/R=0010 diagnostic/no-success, R=0005, resource R=0006, cache R=0007, and admission R=0011 accepted/immutable; B `9/11`, A+B `41/43`; B-SEALED-CONTEXT `FrozenDesign`/inactive pending its synchronized design-head hosted gate |
 | Parent | Owning ContractSlice B micro-delivery plan |
 | Scenario | Parent scenario retained `Planned` |
 | Exact resource implementation | Immutable hosted-green resource identity and run custody remain owned by the resource packet records below |
 | Exact admission predecessor history | First-correction commit/run custody remains immutable in PR history; R=0009 exposed the bounded five-rule fixture defect recorded below |
-| Exact admission second-correction design | [`7116e449b7e8fddd89312f064281eda43ce9707c`](https://github.com/hasanmanzak/meAndAI/commit/7116e449b7e8fddd89312f064281eda43ce9707c); exact-head [run 31414824476](https://github.com/hasanmanzak/meAndAI/actions/runs/31414824476) passed Ubuntu `21m14s`, Windows `43m27s`, publication verification skipped; R=0010 later exposed the bounded Joined-frame defect recorded below |
+| Exact admission implementation | [`53996066abd3e18e26c237ab22a994d18ee71ad0`](https://github.com/hasanmanzak/meAndAI/commit/53996066abd3e18e26c237ab22a994d18ee71ad0); exact-head [run 31428555088](https://github.com/hasanmanzak/meAndAI/actions/runs/31428555088) passed Ubuntu `20m17s`, Windows `42m17s`, publication verification skipped |
 | Exact cache implementation | Immutable cache commit/run custody remains in the earlier packet history below; no cache authority is reopened |
 | Implementation language | C# only |
 
@@ -649,9 +649,11 @@ once. It is immutable and must never be rerun.
   Tests-owned components and removes the now-unbound
   `MeAndAI.Protocol.Application.dll` artifact row; every other artifact row and
   all non-admission components remain unchanged.
-- B-ADMISSION is inactive until this synchronized correction-design commit is
-  exact-head hosted green. B-SEALED-CONTEXT, B-CODEC-DERIVATION, B-CONVERGE, parent
-  Scenario, C/D, activation, merge, release, publication, and DoD remain held.
+- At that correction-design checkpoint B-ADMISSION was inactive until the
+  synchronized commit became exact-head hosted green. B-SEALED-CONTEXT,
+  B-CODEC-DERIVATION, B-CONVERGE, parent Scenario, C/D, activation, merge,
+  release, publication, and DoD remained held; later evidence closes only the
+  admission predecessor gate.
 
 ## Immutable original `B-ADMISSION-01` frozen-design reviews
 
@@ -829,4 +831,49 @@ once. It is immutable and must never be rerun.
 
 | Admission implementation check | Result |
 | --- | --- |
-| Current gate | R=0011 accepted/immutable; B-ADMISSION `ReviewedLocalGreen`; B `9/11`, A+B `41/43`; exact implementation-head hosted validation pending. B-SEALED-CONTEXT and all later scopes remain inactive. |
+| Current gate | R=0011 accepted/immutable; B-ADMISSION exact-head hosted green; B `9/11`, A+B `41/43`; B-SEALED-CONTEXT `FrozenDesign`/inactive pending this synchronized design head's hosted validation. All later scopes remain inactive. |
+
+## Frozen `B-SEALED-CONTEXT-01` routing and review contract
+
+- The typed design is the normative owner of the exact carrier declarations,
+  admission-to-context mapping, reference shapes, validation precedence,
+  one-shot R=0012 custody, green matrix, and holds. This memory ledger only
+  routes that contract and retains its later immutable evidence.
+- Exact executable scope modifies the retained admission test only to expose two
+  helpers internally and carry admitted authority/digest/catalog-version on its
+  Tests-owned aggregate, plus one new sealed-context test. The admission Fact/
+  marker/existing assertions remain unchanged; production, public API, projects,
+  packages, locks, workflows, Policy, Scenario, C, and D have zero delta.
+  Combined normalized changed lines are at most `1,200`; `1,201` requires
+  redesign.
+- The sole new Fact/FQN is the sealed-context identity frozen by the B plan,
+  with one `ContractSlice=B`, no Scenario/Theory/class trait, and marker
+  `TEST-0210-B-BEHAVIOR-RED-0012`. P is `NotApplicable`.
+- The Tests-owned coordinator consumes only the accepted closed admission
+  aggregate and actual finalized manifest, then mints actual public
+  `SealedEvaluationContext` and `QualifiedEvidenceReference` carriers through
+  existing internal constructors. It adds no production/public mint seam.
+- Only the complete Observed repository-tree receipt admits one slot/scope,
+  one ContextProof, and one Root. Failed and NoInput mint no admitted row.
+  ContextProof has no root/location/derivation/parent/selector; Root has exact
+  root/location and none of the latter four. Derived/ExpectedSelector and every
+  later behavior remain held.
+- Null/manifest/aggregate/admission/reference validation is exact and fail-
+  closed; all negative vectors are marker-free and no partial projection
+  escapes. Foreign-session rejection remains with B-CODEC-DERIVATION. The valid
+  R seam returns only final `null!`; G restores only the already computed
+  projection.
+- Canonical R uses one exact Release `--no-restore --no-build` child, fresh
+  R=0012 TRX/root, env timeout `300`, monotonic `420000` ms, complete 8-MiB logs,
+  1-MiB report, exact source/binary/lock/status closure, and the retained one-
+  result/16-counter/no-attachment oracle. `InvocationCommitted` consumes the
+  attempt and permits no retry.
+- Required green is focused `1/1`, B `10/10`, A+B/full Conformance `42/42`,
+  Domain `98/98`, build/format/locks/diff/StructureOnly/publication and two
+  reviews `0/0/0`. B-CODEC-DERIVATION, B-CONVERGE, parent Scenario, the runtime-
+  efficiency scenario, C/D, activation, merge, release, publication, and DoD
+  remain held.
+
+| B-SEALED design-delivery check | Result |
+| --- | --- |
+| Exact-tree local evidence | StructureOnly green in `456.832s`; publication evidence `7/7` including fresh link/commit-reference recurrence, no publication claim; typed design `612,533/1,048,576` normalized UTF-8 bytes; schema-2 limits green; D/RT/content/scope reviews `0/0/0` |

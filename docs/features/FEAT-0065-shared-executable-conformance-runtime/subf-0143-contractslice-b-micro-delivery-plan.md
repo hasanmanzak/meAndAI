@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Gate 2 micro-delivery plan and design freeze |
-| State | B surface, codec, three wire packets, `B-RESOURCE-01`, and `B-CACHE-01` exact-head hosted green; repository-target R=0004 plus admission R=0008/R=0009/R=0010 diagnostic/no-success, R=0005, resource R=0006, cache R=0007, and admission R=0011 accepted/immutable; B `9/11`, cumulative A+B `41/43`; `B-ADMISSION-01` `ReviewedLocalGreen` with its implementation head hosted pending |
+| State | B surface, codec, three wire packets, `B-RESOURCE-01`, `B-CACHE-01`, and `B-ADMISSION-01` exact-head hosted green; repository-target R=0004 plus admission R=0008/R=0009/R=0010 diagnostic/no-success, R=0005, resource R=0006, cache R=0007, and admission R=0011 accepted/immutable; B `9/11`, cumulative A+B `41/43`; `B-SEALED-CONTEXT-01` `FrozenDesign`/inactive pending its synchronized design-head hosted gate |
 | Parent | Owning feature and current subfeature |
 | Scenario | [TEST-0210](test-cases.md#test-0210), still `Planned` |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
@@ -361,7 +361,7 @@ The owning ledger's exact cache implementation identity passed Ubuntu in
 `20m42s` and Windows in `49m17s`; publication verification was skipped.
 B-CACHE is immutable hosted history.
 
-### Reviewed-local-green `B-ADMISSION-01` staging boundary
+### Immutable hosted-green `B-ADMISSION-01` staging boundary
 
 This packet modifies only
 `tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ContractSliceBActivationTests.cs`
@@ -478,9 +478,10 @@ StdOut, permits zero or one marker-free same-FQN `[FAIL]` RunInfo, and therefore
 accepts raw marker count only in `[1,2]`; all sixteen counters and every other
 diagnostic/attachment prohibition remain exact. Green is focused `1/1`, B `9/9`,
 A+B/full Conformance `41/41`, Domain `98/98`, build/format/locks/diff/
-StructureOnly/publication, and two fresh `0/0/0` reviews. B-SEALED-CONTEXT and
-all later scopes remain held until the exact admission implementation head is
-hosted green.
+StructureOnly/publication, and two fresh `0/0/0` reviews. At that design
+checkpoint, B-SEALED-CONTEXT and all later scopes remained held until the exact
+admission implementation head became hosted green; the immutable evidence below
+closes that predecessor gate only.
 
 Canonical R=0011 is accepted and immutable. Its one-shot runner bound exact
 hosted design head, source/status/locks, and `1,676/2,400` lines; the sole child
@@ -490,9 +491,84 @@ TRX is `4,868` bytes / SHA-256 `B28FC956...5E36`, report `15,213` /
 attachments. Bounded green changes only the final aggregate return and passes
 focused `1/1`, B `9/9`, full Conformance `41/41`, Domain `98/98`, Release build
 `0/0`, format/diff, publication `7/7` without publication claim, and
-StructureOnly. Code/test and evidence/scope reviews are `0/0/0`. B-ADMISSION is
-`ReviewedLocalGreen`; its implementation head must be hosted green before the
-sealed-context design can become active.
+StructureOnly. Code/test and evidence/scope reviews are `0/0/0`. The exact
+implementation head then passed Ubuntu in `20m17s` and Windows in `42m17s`;
+publication verification was skipped. B-ADMISSION is immutable exact-head
+hosted green and is the accepted predecessor for the following freeze.
+
+### Frozen `B-SEALED-CONTEXT-01` staging boundary
+
+This packet modifies only
+`tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ContractSliceBAdmissionProofTests.cs`
+to change `ExecuteContract` and `CreateAdmissionManifest` from `private static`
+to `internal static`, prepend exact `AuthorityKind`, `ManifestDigest`, and
+`CatalogVersion` identity to the Tests-owned `AdmissionAggregateMirror`, and
+populate those values from the admitted manifest; it adds only
+`tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ContractSliceBSealedContextTests.cs`.
+The retained admission Fact, marker, frames, candidates, receipts, and every
+existing assertion remain byte-semantically unchanged; the three successor-
+owned fields close detached aggregate-to-manifest authority without adding a
+second aggregate or production seam. Combined normalized changed lines are at
+most `1,200`; `1,201` requires reviewed redesign. Production, public API,
+project, package, lock, workflow, Policy, Scenario, C, and D deltas are exactly
+zero.
+
+The new file owns one direct Fact,
+`MeAndAI.Protocol.Conformance.Tests.ContractSliceBSealedContextTests.Seals_exact_context_proof_and_root_references`,
+one `ContractSlice=B` trait, no Scenario/Theory/class trait, and marker
+`TEST-0210-B-BEHAVIOR-RED-0012`. P is `NotApplicable`. R implements the complete
+Tests-owned seal core but returns `null!` only after the fully prepared valid
+projection; only that null reaches `Assert.Fail(Marker)`. G restores the already
+computed non-null projection. No alternate factory, adapter, second aggregate,
+or production coordinator is introduced.
+
+The exact Tests-owned declarations are one static
+`ContractSliceBSealedContextCoordinatorMirror.Seal(FinalizedPolicyManifest,
+AdmissionAggregateMirror)` method returning nullable
+`SealedContextProjectionMirror`, and one closed projection record containing
+one actual `SealedEvaluationContext`, one actual `QualifiedEvidenceReference`
+ContextProof, and a defensively copied root-reference list. The core uses the
+existing internal constructors of those public carriers; it adds no public
+constructor/factory and exposes no payload bytes, mutable digest seam, selector,
+derivation, parser, index, or kernel behavior.
+
+The valid fixture is exact. The independently rebuilt admission manifest has
+`QualificationSlice` authority and the same exact authority/digest/catalog-
+version triple carried by the accepted aggregate. The aggregate has three
+ordinal receipts, leaf counts `(1,1,1)`, and a closed lifecycle. Failed and
+NoInput remain non-admitted and mint no scope/reference. Only the complete
+Observed repository-tree receipt
+admits slot `protocol.slot.repository-tree` and scope Repository/ExactCommit at
+the synthetic commit value: `0123456789abcdef0123456789abcdef01234567`. The ContextProof binds exact
+manifest/catalog, slot, requirement `protocol.requirement.repository-tree`,
+scope, and receipt digest, with null root/location/parent/selector and zero
+derivations. Its one Root reference retains the exact structural
+`RootEvidenceReference` and location with the same identities/digest and the
+same four null/empty negative fields. Context admitted-slot and scope lists plus
+the root list are ordinal, unique, immutable copies.
+
+Validation precedence is exact: null arguments; manifest authority/slice and
+catalog identity; aggregate lifecycle, leaf-count, null/order/duplicate and
+receipt-digest closure; canonical slot/requirement and complete Observed
+context/binding/root coherence; finally reference shape. Manifest defects map
+to `ManifestInvalid`, aggregate/admission defects to `AdmissionProofInvalid`,
+and an otherwise admitted malformed reference to `ReferenceInvalid`. Reordered,
+duplicate, unknown-slot, forged-receipt-digest, incomplete lifecycle, wrong leaf
+counts, scope/root mismatch, Failed/NoInput admission, non-empty derivation,
+selector/parent leakage, mutable input, and foreign-manifest aggregate vectors
+are marker-free. Foreign-session reference rejection remains owned by
+`B-CODEC-DERIVATION-01`; no partial context/reference set escapes.
+
+The canonical R command is one Release `--no-restore --no-build` invocation of
+the exact FQN/filter above, one fresh R=0012 TRX logger/root, process-scoped
+`VSTEST_CONNECTION_TIMEOUT=300`, and the retained `420000`-ms/8-MiB-log/1-MiB-
+report one-shot custody. `InvocationCommitted` consumes R=0012; process-create,
+timeout, exit, interruption, root/TRX, source/binary, or oracle failure is
+immutable no-success/no-retry. The exact one-result marker/TRX/16-counter/no-
+attachment oracle is unchanged. Green is focused `1/1`, B `10/10`, A+B/full
+Conformance `42/42`, Domain `98/98`, warning-free Release build, format, six
+locks, diff, StructureOnly, publication evidence, and two fresh `0/0/0`
+reviews. B-CODEC-DERIVATION and all later scopes remain held.
 
 ## SurfaceRed and BehaviorRed contract
 
@@ -667,8 +743,8 @@ at focused/B/full/Domain `1/1`, `8/8`, `40/40`, and `98/98`, with one
 `1,063/1,200`-line Tests-only file and zero production delta. B is `9/11`,
 cumulative A+B is `41/43`; admission R=0008, R=0009, and R=0010 are immutable
 diagnostics/no-success, R=0011 is accepted/immutable, and B-ADMISSION is
-`ReviewedLocalGreen` with its implementation head hosted pending.
-Every successor remains held.
+exact-head hosted green. B-SEALED-CONTEXT is `FrozenDesign`/inactive pending
+this synchronized design head's hosted gate. Every successor remains held.
 C/D, final
 activation, feature DoD, release, publication, consumer mutation, authority
 transfer, and PowerShell retirement remain held.
