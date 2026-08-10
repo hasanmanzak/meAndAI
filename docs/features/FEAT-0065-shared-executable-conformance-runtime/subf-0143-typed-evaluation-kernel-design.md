@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted; ContractSlice A merged/exact-main green. B surface, codec activation, repository-tree, and governed-text are exact-head hosted green. Repository-target R=0004 is immutable diagnostic-only; canonical R=0005 is accepted and repository-target is `ReviewedLocalGreen` with its implementation head hosted pending. B is `6/11`, cumulative A+B is `38/43`. `B-RESOURCE-01` is inactive; [TEST-0210](test-cases.md#test-0210) remains `Planned`; later B packets, C/D, final activation, and DoD remain held. |
+| Status | Gate 2 accepted; ContractSlice A merged/exact-main green. B surface, codec activation, repository-tree, governed-text, and repository-target are exact-head hosted green. Repository-target R=0004 is immutable diagnostic-only and canonical R=0005 remains accepted. B is `6/11`, cumulative A+B is `38/43`. `B-RESOURCE-01` is `FrozenDesign`/inactive pending its synchronized design-head hosted gate; [TEST-0210](test-cases.md#test-0210) remains `Planned`; later B packets, C/D, final activation, and DoD remain held. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
@@ -8370,6 +8370,270 @@ The full sibling inventory is:
 | preserved [TEST-0195](../FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0195) | `Distinct historical WIP`; collapsed repository/report/CLI model is not reused |
 | [TEST-0191](../FEAT-0059-csharp-operational-foundation/test-cases.md#test-0191) and [TEST-0192](../FEAT-0059-csharp-operational-foundation/test-cases.md#test-0192) | `Distinct foundation`; portable runtime/process foundations are not catalog behavior |
 
+### Frozen `B-RESOURCE-01` codec-local ledger contract
+
+The repository-target implementation is exact-head hosted green and the owning
+B wire ledger retains exact commit/run custody; R=0004 remains diagnostic-only
+and canonical R=0005 remains immutable. B is `6/11`, cumulative A+B is `38/43`. The resource packet is a
+Tests-owned conformance mirror of the already accepted production contract. It
+adds only
+`tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ContractSliceBResourceLedgerTests.cs`,
+changes no retained file, production/interface/project/package/lock/workflow,
+and may contain at most `1,200` normalized lines. It does not activate cache,
+admission, sealed-context, qualified-reference, Policy, C/D, Scenario, or
+workflow behavior.
+
+The test-owned declarations are exact:
+
+```csharp
+internal sealed class SemanticResourceUsageMirror
+{
+    internal long Bytes { get; }
+    internal int MaxDepth { get; }
+    internal long Nodes { get; }
+    internal long Complexity { get; }
+    internal static SemanticResourceUsageMirror Create(
+        long bytes, int maxDepth, long nodes, long complexity);
+}
+
+internal sealed class SemanticResourceLocalUsageMirror
+{
+    internal long GeneratedBytes { get; }
+    internal int LayerDepth { get; }
+    internal long LayerNodes { get; }
+    internal long AdditionalComplexity { get; }
+    internal static SemanticResourceLocalUsageMirror Create(
+        long generatedBytes, int layerDepth, long layerNodes,
+        long additionalComplexity);
+}
+
+internal sealed class SemanticResourceBudgetMirror
+{
+    internal long MaximumBytes { get; }
+    internal int MaximumDepth { get; }
+    internal long MaximumNodes { get; }
+    internal long MaximumComplexity { get; }
+    internal static SemanticResourceBudgetMirror Create(
+        long maximumBytes, int maximumDepth, long maximumNodes,
+        long maximumComplexity);
+}
+
+internal sealed class SemanticResourceAllowanceMirror
+{
+    internal SemanticResourceBudgetMirror AggregateBudget { get; }
+    internal SemanticResourceUsageMirror SelectedBaseline { get; }
+    internal static SemanticResourceAllowanceMirror Create(
+        SemanticResourceBudgetMirror aggregateBudget,
+        SemanticResourceUsageMirror selectedBaseline);
+    internal ResourceFitMirror FitLocal(
+        SemanticResourceLocalUsageMirror localUsage);
+}
+
+internal enum ResourceCounterMirror { None, Bytes, MaxDepth, Nodes, Complexity }
+
+internal sealed class ResourceFitMirror
+{
+    internal bool Fits { get; }
+    internal ResourceCounterMirror FirstExceeded { get; }
+    internal SemanticResourceUsageMirror? Aggregate { get; }
+}
+
+internal sealed class SemanticResourceContributionMirror
+{
+    internal int KindRank { get; }
+    internal string RowKey { get; }
+    internal SemanticResourceUsageMirror Usage { get; }
+    internal static SemanticResourceContributionMirror Payload(
+        string rowKey, long bytes);
+    internal static SemanticResourceContributionMirror GeneratedBytes(
+        string rowKey, long bytes);
+    internal static SemanticResourceContributionMirror Layer(
+        string rowKey, int depth, long nodes);
+    internal static SemanticResourceContributionMirror ComplexityTerm(
+        string rowKey, long amount);
+}
+
+internal sealed class SemanticResourceLedgerMirror
+{
+    internal IReadOnlyList<SemanticResourceContributionMirror> Contributions { get; }
+    internal SemanticResourceUsageMirror Usage { get; }
+    internal static SemanticResourceLedgerMirror Create(
+        IEnumerable<SemanticResourceContributionMirror> contributions);
+}
+
+internal sealed class RepositoryTargetResourceInputMirror
+{
+    internal SemanticResourceAllowanceMirror Allowance { get; }
+    internal SemanticResourceContributionMirror SelectedPayload { get; }
+    internal static RepositoryTargetResourceInputMirror Create(
+        SemanticResourceAllowanceMirror allowance,
+        SemanticResourceContributionMirror selectedPayload);
+}
+
+internal sealed class RepositoryTargetResourceShapeMirror
+{
+    internal int LayerDepth { get; }
+    internal long LayerNodes { get; }
+    internal string InvocationDigest { get; }
+    internal static RepositoryTargetResourceShapeMirror Create(
+        int layerDepth, long layerNodes, string invocationDigest);
+}
+
+internal interface ISemanticResourceMeterMirror<TInput, TValue>
+{
+    SemanticResourceLocalUsageMirror MeasureLocal(
+        TInput input, TValue value, CancellationToken cancellationToken);
+}
+
+internal enum ResourceFailureMirror
+{
+    ProducerRejected,
+    RegistrationMismatch,
+    IntentInvalid
+}
+
+internal abstract class ResourceProducerIntentMirror<TValue>
+{
+    private ResourceProducerIntentMirror();
+    internal static ResourceProducerIntentMirror<TValue> Produced(
+        TValue value, SemanticResourceLocalUsageMirror claimedLocalUsage);
+    internal static ResourceProducerIntentMirror<TValue> Rejected(
+        ResourceFailureMirror failure);
+    internal abstract TResult Accept<TResult>(
+        IResourceProducerIntentMirrorVisitor<TValue, TResult> visitor);
+}
+
+internal interface IResourceProducerIntentMirrorVisitor<TValue, TResult>
+{
+    TResult VisitProduced(
+        TValue value, SemanticResourceLocalUsageMirror claimedLocalUsage);
+    TResult VisitRejected(ResourceFailureMirror failure);
+}
+
+internal abstract class ResourceQualificationMirrorResult
+{
+    private ResourceQualificationMirrorResult();
+    internal static ResourceQualificationMirrorResult Qualified(
+        SemanticResourceLocalUsageMirror measuredLocalUsage,
+        SemanticResourceLedgerMirror ledger);
+    internal static ResourceQualificationMirrorResult Rejected(
+        ResourceFailureMirror failure);
+    internal abstract TResult Accept<TResult>(
+        IResourceQualificationMirrorVisitor<TResult> visitor);
+}
+
+internal interface IResourceQualificationMirrorVisitor<TResult>
+{
+    TResult VisitQualified(
+        SemanticResourceLocalUsageMirror measuredLocalUsage,
+        SemanticResourceLedgerMirror ledger);
+    TResult VisitRejected(ResourceFailureMirror failure);
+}
+
+internal sealed class RepositoryTargetResourceCoordinatorMirror
+{
+    internal ResourceQualificationMirrorResult Qualify(
+        RepositoryTargetResourceInputMirror input,
+        ResourceProducerIntentMirror<RepositoryTargetResourceShapeMirror> intent,
+        ISemanticResourceMeterMirror<RepositoryTargetResourceInputMirror,
+            RepositoryTargetResourceShapeMirror>? meter,
+        CancellationToken cancellationToken);
+}
+
+internal sealed class ResourceLedgerCollisionMirrorException : Exception
+{
+    internal string RowKey { get; }
+    internal ResourceLedgerCollisionMirrorException(string rowKey);
+}
+```
+
+Every factory has a private instance constructor and defensively copies input.
+Each abstract union owns exactly its two private nested sealed leaves; factories
+construct those leaves and `Accept` dispatches only to the correspondingly
+named visitor member. The collision exception copies its nonempty ordinal key
+and has exact message `Conflicting resource row: <rowKey>.`.
+Null top-level arguments fail with the exact argument name. Negative scalar,
+empty/non-64-uppercase-hex digest, inconsistent `(depth=0,nodes>0)` or
+`(depth>0,nodes=0)`, and depth outside `0..4` fail at construction before any
+meter call. `RepositoryTargetResourceShapeMirror.Create(5, ...)` is the exact
+schema-unreachable vector and is never described as budget exhaustion.
+`RepositoryTargetResourceInputMirror.Create` accepts only a rank-0 payload row
+whose one-row ledger usage is field-for-field equal to `SelectedBaseline`; a
+wrong rank or baseline mismatch is `ArgumentException` with parameter
+`selectedPayload`, also before metering.
+
+Contribution ranks are payload `0`, generated bytes `1`, semantic layer `2`,
+and additional complexity `3`. Payload/generated rows require positive Bytes
+and contribute no depth/nodes; layer rows require positive depth and nodes and
+contribute no bytes; complexity rows require positive Complexity. Zero
+generated-byte and zero complexity terms are omitted. Ledger input is copied,
+ordinal-sorted by rank then key, and must contain unique canonical keys. Exact-
+equal duplicates collapse to one; the same key with unequal rank or usage throws
+only `ResourceLedgerCollisionMirrorException` carrying that key. The coordinator
+maps exactly that exception to `IntentInvalid`; it does not swallow any other
+exception. Checked sums derive `Bytes = rank0 + rank1`, `MaxDepth = max
+rank2 depth`, `Nodes = sum rank2 nodes`, and `Complexity = Bytes + Nodes + rank3`.
+
+`FitLocal` uses checked 64-bit arithmetic and exactly these formulas:
+
+```text
+Bytes      = SelectedBaseline.Bytes      + local.GeneratedBytes
+MaxDepth   = max(SelectedBaseline.MaxDepth, local.LayerDepth)
+Nodes      = SelectedBaseline.Nodes      + local.LayerNodes
+Complexity = SelectedBaseline.Complexity + local.GeneratedBytes
+           + local.LayerNodes + local.AdditionalComplexity
+```
+
+It accepts equality and returns the aggregate; overflow is non-fit. First
+exceeded order is exactly Bytes, MaxDepth, Nodes, Complexity. The canonical
+budget is `(33554432,64,500000,34054432)`. Boundary vectors use arithmetic-only
+fixtures without allocating proportional data: byte equality and first one-
+over, node equality and first one-over, complexity equality and first one-over,
+the legal repository-target depth `4`, first illegal depth `5` before metering,
+and a combined node-plus-complexity one-over whose deterministic first failure
+is Nodes. No impossible depth-64 repository-target success is fabricated.
+
+The golden payload row key is
+`0|protocol.repository-target-resolution|1|936D99ECDDC7332999B2641787BF160A1D126F27DAEB4F54BE1EBC8F426EE6F0`;
+the codec layer key is
+`2|protocol.codec.repository-target-resolution|1|0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF`.
+Selected payload usage is `(1465,0,0,1465)` and independently measured local
+usage is `(0,4,61,0)`. Qualified output contains exactly payload then layer and
+aggregate `(1465,4,61,1526)`.
+
+Qualification order is fail-closed: argument boundaries; cancellation;
+producer intent. A rejected producer is propagated and never metered. A missing
+meter returns `RegistrationMismatch`. A produced value is metered exactly once
+with the same input/value/token; cancellation and any other meter exception
+propagate unchanged. Claimed/measured inequality, invalid/overflowing ledger,
+collision, or over-budget success returns `IntentInvalid` and no ledger escapes.
+Only a completely valid result is Qualified. Meter output cannot inspect or
+echo the claim. No cache entry, handle, admission, plan, outcome, or later
+packet object is created here.
+
+The one direct Fact is
+`MeAndAI.Protocol.Conformance.Tests.ContractSliceBResourceLedgerTests.Enforces_exact_codec_local_four_counter_ledger`,
+with only `ContractSlice=B`, no Scenario/Theory/class trait, and exact marker
+`TEST-0210-B-BEHAVIOR-RED-0006`. Red replaces only the final valid coordinator
+result with `null!`; only that null reaches direct `Assert.Fail(marker)`. The
+packet-specific canonical invocation is exactly:
+
+```text
+dotnet test tests/dotnet/MeAndAI.Protocol.Conformance.Tests/MeAndAI.Protocol.Conformance.Tests.csproj --configuration Release --no-restore --no-build --nologo --verbosity minimal --results-directory "<fresh-root>" --logger "trx;LogFileName=TEST-0210-B-BEHAVIOR-RED-0006.trx" --filter "ContractSlice=B&FullyQualifiedName=MeAndAI.Protocol.Conformance.Tests.ContractSliceBResourceLedgerTests.Enforces_exact_codec_local_four_counter_ledger"
+```
+
+One fresh external runner specializes the prior fail-closed custody contract to
+that sole new source: exact hosted design HEAD/upstream/branch/status, source and
+runner identities at four gates, six locks, warning-as-error Release build,
+fresh DLL/PDB, `--no-build`, fresh one-file root, child-only timeout `300`, outer
+`420000` ms, complete `8,388,608`-byte logs, `1,048,576`-byte report, secure XML,
+native exit `1`, exact result/definition/entry/FQN/marker/sixteen counters, and no
+forbidden diagnostics/attachments. `InvocationCommitted` irrevocably consumes
+R=0006 for every outcome; no changed or unchanged retry exists. Green is focused
+`1/1`, B `7/7`, A+B/full Conformance `39/39`, Domain `98/98`, and all retained
+build/format/locks/diff/StructureOnly/publication/review gates. Canonical red is
+held until this exact twelve-record design head is pushed and hosted green.
+
 ## [TEST-0210](test-cases.md#test-0210) expected-red contract
 
 [TEST-0210](test-cases.md#test-0210) is project-neutral, table-driven, and
@@ -9152,8 +9416,9 @@ B is decomposed by the current
 [B micro-delivery plan](subf-0143-contractslice-b-micro-delivery-plan.md).
 Surface, codec activation, repository-tree, and governed-text are hosted green;
 repository-target R=0004 is diagnostic-only and canonical R=0005 is accepted;
-repository-target is `ReviewedLocalGreen` with its implementation head hosted
-pending at B `6/11`, A+B `38/43`, while B-RESOURCE and later packets remain inactive.
+repository-target is exact-head hosted green at B `6/11`, A+B `38/43`, while
+B-RESOURCE is `FrozenDesign`/inactive pending its synchronized design-head
+hosted gate and later packets remain inactive.
 
 B implementation and C/D still require separate future activation, and no
 packet is active merely from this list. No directive here allocates new stable

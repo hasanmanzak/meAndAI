@@ -2,11 +2,11 @@
 
 | Field | Value |
 | --- | --- |
-| Packet | `B-CODEC-ACTIVATION-01` / `B-WIRE-REPOSITORY-TREE-01` / `B-WIRE-GOVERNED-TEXT-01` / `B-WIRE-REPOSITORY-TARGET-01` |
-| State | Codec activation, repository-tree, and governed-text `ReviewedHostedGreen`; repository-target R=0004 immutable diagnostic-only; canonical R=0005 accepted and repository-target `ReviewedLocalGreen`, implementation head hosted pending |
+| Packet | `B-CODEC-ACTIVATION-01` / `B-WIRE-REPOSITORY-TREE-01` / `B-WIRE-GOVERNED-TEXT-01` / `B-WIRE-REPOSITORY-TARGET-01` / `B-RESOURCE-01` |
+| State | Codec activation and all three wire packets `ReviewedHostedGreen`; repository-target R=0004 immutable diagnostic-only and canonical R=0005 accepted; `B-RESOURCE-01` `FrozenDesign`/inactive pending synchronized design-head hosted green |
 | Parent | Owning ContractSlice B micro-delivery plan |
 | Scenario | Parent scenario retained `Planned` |
-| Exact repository-tree predecessor | [`be94ea6da507e654e325b7cfc97074b3b0e5bacd`](https://github.com/hasanmanzak/meAndAI/commit/be94ea6da507e654e325b7cfc97074b3b0e5bacd); exact-head [run 31329704543](https://github.com/hasanmanzak/meAndAI/actions/runs/31329704543) passed Ubuntu `21m01s`, Windows `46m10s`, publication verification skipped |
+| Exact repository-target implementation | [`ad92909d197b8de4c8f9500d63678165644a3ac4`](https://github.com/hasanmanzak/meAndAI/commit/ad92909d197b8de4c8f9500d63678165644a3ac4); exact-head [run 31356599800](https://github.com/hasanmanzak/meAndAI/actions/runs/31356599800) passed both stable jobs and skipped publication verification |
 | Exact first-design diagnostic | The first hosted design passed both stable jobs; pre-red byte audit then found the optional-null vector defect, with no runner/red/implementation, so that predecessor grants no authority |
 | Exact governed-text implementation | [`71c860ab2adb08796930bd047842e9a1ea065c32`](https://github.com/hasanmanzak/meAndAI/commit/71c860ab2adb08796930bd047842e9a1ea065c32); exact-head [run 31342521885](https://github.com/hasanmanzak/meAndAI/actions/runs/31342521885) passed Ubuntu `19m30s`, Windows `46m39s`, publication verification skipped |
 | Implementation language | C# only |
@@ -371,10 +371,10 @@ once. It is immutable and must never be rerun.
   passed `7/7` in `281.8s` without a publication claim. Product/test and
   evidence/scope reviews are `0/0/0`.
 - Governed-text is immutable `ReviewedHostedGreen` at the exact implementation
-  above. Repository-target R=0004 is diagnostic-only; canonical R=0005 is
-  accepted and repository-target is `ReviewedLocalGreen` at B `6/11`, A+B
-  `38/43`, with its implementation head hosted pending. B-RESOURCE, the parent
-  Scenario, later B packets, C/D, activation,
+  above. At that pre-target closure checkpoint repository-target R=0004 was
+  diagnostic-only; canonical R=0005 was accepted and repository-target was
+  `ReviewedLocalGreen` at B `6/11`, A+B `38/43`, with its implementation head
+  hosted pending. B-RESOURCE, the parent Scenario, later B packets, C/D, activation,
   merge, release, and publication remain held.
 
 ## Frozen `B-WIRE-REPOSITORY-TARGET-01` routing
@@ -467,5 +467,57 @@ once. It is immutable and must never be rerun.
   Executable scope is `2,849/3,200` normalized lines and production delta is
   zero. Exact-tree publication evidence is `7/7` in `298.8s` with no publication
   claim; StructureOnly is green at `elapsedMs=443370`. Product/test and
-  evidence/scope reviews are `0/0/0`; the implementation head remains hosted
-  pending.
+  evidence/scope reviews are `0/0/0`. The exact implementation identity and
+  hosted run in the metadata table passed both stable jobs; publication
+  verification was correctly skipped.
+
+## Frozen `B-RESOURCE-01` routing
+
+- The typed design is the sole executable authority for the exact Tests-owned
+  resource carriers, same-object coordinator, independent meter, failure
+  precedence, two-row golden ledger, checked four-counter algebra, boundary
+  vectors, and specialized R=0006 custody. This record is routing/evidence only.
+- The later executable allowlist adds only
+  `ContractSliceBResourceLedgerTests.cs`; no retained file or production,
+  interface, project, package, lock, workflow, Scenario, cache, admission,
+  Policy, C/D, or later-packet surface may change. The new file is bounded at
+  `1,200` normalized lines and `1,201` requires a redraw.
+- The sole Fact is the exact resource-ledger FQN with one `ContractSlice=B`
+  trait, no Scenario/Theory/class trait, and marker
+  `TEST-0210-B-BEHAVIOR-RED-0006`. Only the fully prepared valid result's null
+  red seam may emit the marker.
+- The selected payload is `1,465` bytes with SHA-256
+  `936D99ECDDC7332999B2641787BF160A1D126F27DAEB4F54BE1EBC8F426EE6F0`;
+  local `(0,4,61,0)` yields exact aggregate `(1465,4,61,1526)` under budget
+  `(33554432,64,500000,34054432)`. Equality, first one-over, combined-counter
+  precedence, checked overflow, canonical row collision, and depth-5 schema
+  rejection before metering are mandatory.
+- The one-shot runner retains the exact branch/HEAD/upstream/status, four-gate
+  source/self/locks, warning-as-error build, DLL/PDB, fresh root, `--no-build`,
+  child timeout `300`, outer `420000` ms, complete-log `8,388,608`, report
+  `1,048,576`, secure XML, TRX, sixteen-counter, and no-retry invariants.
+  `InvocationCommitted` consumes R=0006 for every outcome.
+- The complete design cohort is the existing twelve Markdown paths. It adds no
+  tracked node. Schema-2 remains `512` nodes / `8,192` relations / `1,048,576`
+  bytes per parsed blob / `8,388,608` aggregate bytes; exact-tree StructureOnly
+  and publication evidence must close before commit.
+- Required green is focused `1/1`, B `7/7`, A+B/full Conformance `39/39`, Domain
+  `98/98`, build/format/locks/diff/StructureOnly/publication green, and both
+  reviews `0/0/0`. B-CACHE, parent Scenario, later B, C/D, activation, merge,
+  release, and publication remain held.
+
+## `B-RESOURCE-01` design delivery checks
+
+- Semantic/runner D/RT: `0 Blocking / 0 Important / 0 Minor`; exact mirror
+  declarations, independent meter boundary, two-row ledger, four-counter
+  formulas, failure precedence, boundary vectors, one-shot custody, and
+  downstream holds require no correction.
+- Route/content/scope review: `0 Blocking / 0 Important / 0 Minor`; the design
+  cohort remains exactly twelve existing Markdown paths and the later
+  executable allowlist is one Tests-owned file bounded at `1,200` lines, with
+  zero production or downstream mutation.
+- Preliminary exact-tree publication evidence passed `7/7` in `286.7s` without
+  a publication claim. Preliminary StructureOnly passed with
+  `elapsedMs=446568`, proving the ordinary self-consumer graph remains inside
+  the prospective schema-2 limits. The evidence-row mutation requires the same
+  two gates to pass again on the final exact bytes before commit.

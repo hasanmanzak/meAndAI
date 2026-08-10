@@ -316,7 +316,7 @@ The lifecycle records-only freeze head is exact-hosted-green: Ubuntu passed in
 `20m44s`, Windows in `46m51s`, and publication verification was correctly
 skipped. The exact lifecycle implementation identity recorded in the canonical
 handoff passed Ubuntu in `19m36s` and Windows in `36m02s`; publication verification was
-correctly skipped. ContractSlice A is merged/exact-main green. `B-SURFACE-01`, `B-CODEC-ACTIVATION-01`, `B-WIRE-REPOSITORY-TREE-01`, and `B-WIRE-GOVERNED-TEXT-01` are exact-head hosted green. Repository-target R=0004 is an immutable diagnostic; canonical R=0005 is accepted and `B-WIRE-REPOSITORY-TARGET-01` is `ReviewedLocalGreen` with its implementation head hosted pending. B is `6/11` and cumulative A+B is `38/43`; `B-RESOURCE-01`, the parent scenario, later B packets, C/D, and final activation remain held.
+correctly skipped. ContractSlice A is merged/exact-main green. `B-SURFACE-01`, `B-CODEC-ACTIVATION-01`, `B-WIRE-REPOSITORY-TREE-01`, `B-WIRE-GOVERNED-TEXT-01`, and `B-WIRE-REPOSITORY-TARGET-01` are exact-head hosted green. Repository-target R=0004 is an immutable diagnostic and canonical R=0005 remains accepted; the owning B wire ledger retains exact implementation/run custody. B is `6/11` and cumulative A+B is `38/43`; `B-RESOURCE-01` is `FrozenDesign`/inactive pending its synchronized design-head hosted gate. The parent scenario, later B packets, C/D, and final activation remain held.
 The exact record-delivery closure reached the full `4096/4096` instruction-graph
 budget. Ubuntu passed in `19m52s`; Windows reached its exact 45-minute job
 ceiling after every emitted suite result was successful. The bounded correction

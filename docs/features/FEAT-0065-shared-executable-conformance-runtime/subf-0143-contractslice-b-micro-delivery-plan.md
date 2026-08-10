@@ -3,14 +3,14 @@
 | Field | Value |
 | --- | --- |
 | Classification | Gate 2 micro-delivery plan and design freeze |
-| State | `B-SURFACE-01`, `B-CODEC-ACTIVATION-01`, `B-WIRE-REPOSITORY-TREE-01`, and `B-WIRE-GOVERNED-TEXT-01` exact-head hosted green; repository-target R=0004 diagnostic-only, canonical R=0005 accepted, and `B-WIRE-REPOSITORY-TARGET-01` `ReviewedLocalGreen` with implementation head hosted pending; B `6/11`, cumulative A+B `38/43`; `B-RESOURCE-01` and later packets inactive |
+| State | `B-SURFACE-01`, `B-CODEC-ACTIVATION-01`, `B-WIRE-REPOSITORY-TREE-01`, `B-WIRE-GOVERNED-TEXT-01`, and `B-WIRE-REPOSITORY-TARGET-01` exact-head hosted green; repository-target R=0004 diagnostic-only and canonical R=0005 accepted; B `6/11`, cumulative A+B `38/43`; `B-RESOURCE-01` `FrozenDesign`/inactive pending its synchronized design-head hosted gate; later packets inactive |
 | Parent | Owning feature and current subfeature |
 | Scenario | [TEST-0210](test-cases.md#test-0210), still `Planned` |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Ordered-B authority | [Maintainer directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5230762350) |
 | Accepted predecessor | Accepted A merge commit [`51623f4d404a95e0f706d72805cf7ddbbbd293b8`](https://github.com/hasanmanzak/meAndAI/commit/51623f4d404a95e0f706d72805cf7ddbbbd293b8); exact-main [run 31304787603](https://github.com/hasanmanzak/meAndAI/actions/runs/31304787603) passed Ubuntu `6m11s`, Windows `11m21s`, publication verification skipped |
 | Normative owner | [Typed evaluation kernel design](subf-0143-typed-evaluation-kernel-design.md) |
-| Implementation language | C# only; the frozen repository-target packet changes only its two test-owned files |
+| Implementation language | C# only; the frozen resource packet may add only its one test-owned file |
 
 ## Authority and non-goals
 
@@ -217,6 +217,71 @@ milliseconds. No canonical red or source/test implementation may begin before
 the commit containing this synchronized freeze is pushed and exact-head hosted
 green.
 
+### Frozen `B-RESOURCE-01` staging boundary
+
+This packet adds exactly one Tests-owned file:
+`tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ContractSliceBResourceLedgerTests.cs`.
+It changes no retained source/test file and no production, project, package,
+lock, workflow, Scenario, filter, Domain, Policy, cache, admission, or later
+packet surface. The normalized new-file ceiling is `1,200` lines; `1,201`
+requires a reviewed redraw. The same twelve existing Markdown paths are the
+complete design cohort, no tracked node is added, and the prospective
+`v0.17.0` schema-2 limits remain `512` nodes, `8,192` relations, `1,048,576`
+bytes per parsed blob, and `8,388,608` aggregate parsed bytes.
+
+The new file owns one direct non-skipped Fact at
+`MeAndAI.Protocol.Conformance.Tests.ContractSliceBResourceLedgerTests.Enforces_exact_codec_local_four_counter_ledger`,
+exactly one `ContractSlice=B` trait, no Scenario/Theory/class trait/overload,
+and marker `TEST-0210-B-BEHAVIOR-RED-0006`. Tests-owned mirror carriers stage
+the already accepted four-counter algebra without implementing production
+interfaces. A same-object resource coordinator calls one independent meter
+exactly once after a successful raw value, compares claimed and measured local
+usage field-for-field, selects one payload row, adds one codec layer row, and
+returns a closed Qualified/Rejected result. Only the fully prepared valid call's
+null result may reach direct `Assert.Fail(marker)` in red; every wrong result,
+exception, or setup failure remains marker-free.
+
+The golden selected payload is `1,465` bytes at SHA-256
+`936D99ECDDC7332999B2641787BF160A1D126F27DAEB4F54BE1EBC8F426EE6F0`.
+Its measured local tuple is `(GeneratedBytes=0, LayerDepth=4, LayerNodes=61,
+AdditionalComplexity=0)`, producing aggregate `(Bytes=1465, MaxDepth=4,
+Nodes=61, Complexity=1526)` and exactly two canonical rows: rank-0 payload then
+rank-2 codec layer. The aggregate budget is `(33554432,64,500000,34054432)`.
+Checked 64-bit arithmetic, nonnegative values, canonical key order, exact-equal
+deduplication, unequal-key collision rejection, equality success, first one-
+over rejection, multi-counter precedence `Bytes -> MaxDepth -> Nodes ->
+Complexity`, and schema-unreachable repository-target depth `5` rejected before
+metering are mandatory. The typed design owns exact declarations, fixture keys,
+failure/argument/cancellation precedence, and the complete vector matrix.
+
+Canonical R=0006 is one fresh external runner/root/report/log identity and one
+child invocation only. After one warning-as-error Release `--no-restore` build,
+the packet-specific test argv is:
+
+```text
+dotnet test tests/dotnet/MeAndAI.Protocol.Conformance.Tests/MeAndAI.Protocol.Conformance.Tests.csproj --configuration Release --no-restore --no-build --nologo --verbosity minimal --results-directory "<fresh-root>" --logger "trx;LogFileName=TEST-0210-B-BEHAVIOR-RED-0006.trx" --filter "ContractSlice=B&FullyQualifiedName=MeAndAI.Protocol.Conformance.Tests.ContractSliceBResourceLedgerTests.Enforces_exact_codec_local_four_counter_ledger"
+```
+
+The runner repeats exact branch/HEAD/upstream/status/source/self/lock/DLL/PDB
+custody at start, pre-build, pre-test, and post-test; permits only the new test
+file plus the excluded user-owned NCrunch file; sets child-only
+`VSTEST_CONNECTION_TIMEOUT=300`; applies one `420000`-ms monotonic bound; and
+uses complete untruncated stdout/stderr logs capped at `8,388,608` bytes each
+and an atomic report capped at `1,048,576` bytes. Secure XML parsing, exact one-
+file root inventory, result/definition/entry bijection, exact FQN/marker-only
+message, exact sixteen counters, optional frozen marker-free stack/echo/RunInfo,
+and zero forbidden diagnostics/attachments are required. Atomic
+`InvocationCommitted` consumes R=0006 for every process-create, timeout,
+interruption, exit, TRX, or oracle outcome; no changed or unchanged retry is
+permitted. Only a pre-commit preflight/build failure may be corrected and
+revalidated under renewed review.
+
+Green requires focused `1/1`, B `7/7`, cumulative A+B/full Conformance `39/39`,
+Domain `98/98`, warning/error-free Release build, format/diff/locks,
+StructureOnly, publication evidence `7/7` without a publication claim, and
+independent product/test plus evidence/scope reviews `0/0/0`. B-CACHE and every
+later packet remain inactive until that implementation head is hosted green.
+
 ## SurfaceRed and BehaviorRed contract
 
 `B-SURFACE-01` is the accepted one-diagnostic compile-red exception. The exact
@@ -380,13 +445,13 @@ project, package, lock, workflow, release, or consumer file. The user-owned
 
 ## Exit condition
 
-This plan records repository-target `ReviewedLocalGreen`. The surface, codec
-activation, repository-tree, and governed-text packets are immutable exact-head
-hosted-green history. R=0004 is diagnostic-only; canonical R=0005 is accepted,
-focused/B/full Conformance/Domain are `1/1`, `6/6`, `38/38`, and `98/98`, and
-the bounded executable delta is `2,849/3,200` normalized lines. B is `6/11`,
-cumulative A+B is `38/43`, and the implementation head remains hosted pending.
-`B-RESOURCE-01` and every successor stay inactive until that predecessor gate
-closes. C/D, final
+This plan records repository-target exact-head hosted green. The surface, codec
+activation, repository-tree, governed-text, and repository-target packets are
+immutable hosted-green history. R=0004 is diagnostic-only; canonical R=0005 is
+accepted, focused/B/full Conformance/Domain are `1/1`, `6/6`, `38/38`, and
+`98/98`, and the bounded executable delta is `2,849/3,200` normalized lines. B
+is `6/11` and cumulative A+B is `38/43`. `B-RESOURCE-01` is `FrozenDesign`/
+inactive until the commit containing this exact synchronized design is pushed
+and exact-head hosted green; every successor remains held. C/D, final
 activation, feature DoD, release, publication, consumer mutation, authority
 transfer, and PowerShell retirement remain held.

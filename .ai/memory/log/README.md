@@ -11,9 +11,11 @@ ContractSlice A is merged/exact-main green; `B-SURFACE-01` and
 `B-CODEC-ACTIVATION-01` plus `B-WIRE-REPOSITORY-TREE-01` are exact-head hosted
 green. `B-WIRE-GOVERNED-TEXT-01` is exact-head hosted green;
 Repository-target R=0004 is an immutable oracle-rejected diagnostic with no
-canonical red. Canonical R=0005 is accepted and repository-target is
-`ReviewedLocalGreen` with its implementation head hosted pending. B is `6/11`, cumulative A+B is `38/43`, `B-RESOURCE-01` and later packets
-are inactive, and the parent scenario remains `Planned`.
+canonical red. Canonical R=0005 is accepted and repository-target is exact-head
+hosted green; its owning B wire ledger retains exact implementation/run custody.
+B is `6/11`, cumulative A+B is `38/43`; `B-RESOURCE-01` is `FrozenDesign`/
+inactive pending its synchronized design-head hosted gate, later packets remain
+inactive, and the parent scenario remains `Planned`.
 
 Follow the current
 [instruction-graph capacity handoff](2026-08-09-feat-0069-instruction-graph-capacity.md)
