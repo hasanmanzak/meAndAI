@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Backward-compatible prospective capacity revision |
-| Status | Per-blob capacity amendment `ReviewedLocalGreen`; delivery pending |
+| Status | Prospective edge/aggregate/per-blob capacity `ReviewedHostedGreen`; release/publication held |
 | Target version | 0.17.0 |
 | Issue | [#175](https://github.com/hasanmanzak/meAndAI/issues/175) |
 | Pull request | [#174](https://github.com/hasanmanzak/meAndAI/pull/174) |
@@ -62,8 +62,8 @@ packet with the existing general `1,200`-line micro-delivery ceiling.
 
 | ID | Slice | Test | Review gate | Status |
 | --- | --- | --- | --- | --- |
-| `SUBF-0155` <a name="subf-0155"></a> | Prospective edge and aggregate capacity with immutable target profiles | [TEST-0223](test-cases.md#test-0223) | Exact current/legacy limits, N/N+1, digest, actor parity, self-consumer graph, and no activation delta agree | Local verification complete; exact-head hosted gate pending |
-| `SUBF-0156` <a name="subf-0156"></a> | Prospective per-blob capacity and B-WIRE packet-budget alignment | [TEST-0223](test-cases.md#test-0223) | Exact current/legacy blob limits, N/N+1, digest, actor parity, self-consumer graph, and no semantic-limit expansion agree | ReviewedLocalGreen / commit, push, and hosted gate pending |
+| `SUBF-0155` <a name="subf-0155"></a> | Prospective edge and aggregate capacity with immutable target profiles | [TEST-0223](test-cases.md#test-0223) | Exact current/legacy limits, N/N+1, digest, actor parity, self-consumer graph, and no activation delta agree | `ReviewedHostedGreen`; immutable target profiles retained |
+| `SUBF-0156` <a name="subf-0156"></a> | Prospective per-blob capacity and B-WIRE packet-budget alignment | [TEST-0223](test-cases.md#test-0223) | Exact current/legacy blob limits, N/N+1, digest, actor parity, self-consumer graph, and no semantic-limit expansion agree | `ReviewedHostedGreen`; release/publication held |
 
 ## Definition of Ready
 
@@ -109,8 +109,8 @@ B-WIRE line ceiling changes only a design gate and does not widen wire semantics
 - [x] [TEST-0223](test-cases.md#test-0223) expected-red and focused-green evidence are recorded.
 - [x] The per-blob amendment's fresh expected-red and focused-green evidence are recorded.
 - [x] Focused compatibility, StructureOnly, and publication-evidence gates pass.
-- [ ] The amended exact-head hosted stable jobs pass.
+- [x] The amended exact-head hosted stable jobs pass.
 - [x] Fresh-diff amendment code/test and content/scope reviews closed `0/0/0`.
 - [x] Decision, registries, and project memory are synchronized.
-- [ ] The exact feature commit is pushed and the issue/draft PR are synchronized;
+- [x] The exact feature commit is pushed and the issue/draft PR are synchronized;
       merge/release/publication remain separate.

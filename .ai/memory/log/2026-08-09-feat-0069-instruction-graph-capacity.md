@@ -5,7 +5,8 @@
 | Authority | [FEAT-0069](../../../docs/features/FEAT-0069-instruction-graph-capacity/README.md), [DEC-0036](../../../docs/decisions/DEC-0036-prospective-instruction-graph-capacity.md), and [issue #175](https://github.com/hasanmanzak/meAndAI/issues/175) |
 | Baseline | Exact [`854bc97056d9e3250ab4c6caa7558825904466e8`](https://github.com/hasanmanzak/meAndAI/commit/854bc97056d9e3250ab4c6caa7558825904466e8): `356` nodes, `4096` edges, `311` parsed blobs, `4192113` parsed bytes |
 | Decision | Prospective `v0.17.0` remains schema `2`; edges become `8192`, one parsed blob becomes `1048576`, and aggregate parsed bytes become `8388608`; every target through `v0.16.0` remains exact |
-| State | Per-blob amendment ReviewedLocalGreen; final exact-tree recurrence and delivery pending |
+| State | Prospective edge/aggregate/per-blob capacity `ReviewedHostedGreen`; release/publication held |
+| Delivery | Exact [`e38bedd0fc3d3761f217fccde8271c0caa42af60`](https://github.com/hasanmanzak/meAndAI/commit/e38bedd0fc3d3761f217fccde8271c0caa42af60) passed exact-head [run 31325450263](https://github.com/hasanmanzak/meAndAI/actions/runs/31325450263): Ubuntu `19m35s`, Windows `47m57s`, publication verification skipped |
 
 ## Test-first evidence
 
@@ -25,8 +26,8 @@
   claim. Fresh code/test and content/scope reviews closed `0/0/0`.
 - The first hosted delivery exposed only the runtime-efficiency operation
   oracle at expected `91` versus actual `93`; the two new profile checks explain
-  the exact delta. The bounded `93` oracle passed its owner in `7.6s`, and
-  replacement hosted validation remains pending.
+  the exact delta. The bounded `93` oracle passed its owner in `7.6s`; the
+  replacement plus per-blob amendment then passed the exact delivery above.
 
 ## Per-blob and packet-budget amendment
 
@@ -49,8 +50,8 @@
   After an edge-neutral wording correction, StructureOnly passed in `427.2s`
   with owner observation `425411ms`; publication evidence passed `7/7` in
   `286.7s` without a publication claim. Fresh amendment code/test and
-  content/scope reviews closed `0/0/0`; the evidence-only sync now requires one
-  final exact-tree recurrence before commit/push/hosted delivery.
+  content/scope reviews closed `0/0/0`; the final exact-tree recurrence,
+  commit/push, and exact-head stable jobs subsequently passed.
 
 ## Boundary
 
@@ -59,5 +60,5 @@
 - The version remains `0.16.0` until a separately authorized immutable release;
   merge, release, publication, consumer mutation, ContractSlice activation,
   workflow filters, and B/C/D remain outside this delivery.
-- Complete delivery only after final exact-tree recurrence, commit/push,
-  draft-PR synchronization, and exact-head hosted stable jobs are green.
+- The bounded capacity delivery is complete at the exact immutable identity
+  above. Release and publication remain separately held.
