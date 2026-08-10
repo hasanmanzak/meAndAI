@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Gate 2 micro-delivery plan and design freeze |
-| State | B surface, codec, three wire packets, and `B-RESOURCE-01` exact-head hosted green; repository-target R=0004 diagnostic-only, R=0005, resource R=0006, and cache R=0007 accepted/immutable; `B-CACHE-01` `ReviewedLocalGreen`; B `8/11`, cumulative A+B `40/43`; `B-ADMISSION-01` candidate/inactive pending the exact cache implementation-head hosted gate and its own design freeze |
+| State | B surface, codec, three wire packets, `B-RESOURCE-01`, and `B-CACHE-01` exact-head hosted green; repository-target R=0004 diagnostic-only, R=0005, resource R=0006, and cache R=0007 accepted/immutable; B `8/11`, cumulative A+B `40/43`; `B-ADMISSION-01` `FrozenDesign`/inactive pending this exact synchronized design head's hosted gate |
 | Parent | Owning feature and current subfeature |
 | Scenario | [TEST-0210](test-cases.md#test-0210), still `Planned` |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
@@ -342,8 +342,9 @@ DLL/PDB, child-only timeout `300`, outer `420000` ms, complete logs capped at
 diagnostics/attachments. `InvocationCommitted` consumes R=0007 for every outcome;
 no changed or unchanged retry exists. Green requires focused `1/1`, B `8/8`,
 A+B/full Conformance `40/40`, Domain `98/98`, build/format/locks/diff/
-StructureOnly/publication, and two fresh reviews `0/0/0`. B-ADMISSION and later
-packets remain held through the exact cache implementation-head hosted gate.
+StructureOnly/publication, and two fresh reviews `0/0/0`. At that
+pre-implementation checkpoint B-ADMISSION and later packets remained held
+through the exact cache implementation-head hosted gate.
 
 The accepted R=0007 evidence is immutable and never rerun: exact runner
 `35,007` bytes / SHA-256 `5967E18E...FEA0AC`; red source `1,063/1,200` lines /
@@ -356,8 +357,83 @@ delta is zero, build is `0/0`, focused/B/full Conformance/Domain are `1/1`,
 `8/8`, `40/40`, and `98/98`, and format/diff are clean. Exact-tree
 StructureOnly is green; publication evidence is `7/7` without a publication
 claim; both fresh final reviews are `0/0/0`.
-Commit/push and implementation-head hosted validation remain before B-CACHE
-becomes immutable hosted history.
+The owning ledger's exact cache implementation identity passed Ubuntu in
+`20m42s` and Windows in `49m17s`; publication verification was skipped.
+B-CACHE is immutable hosted history.
+
+### Frozen `B-ADMISSION-01` staging boundary
+
+This packet modifies only
+`tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ContractSliceBActivationTests.cs`
+and adds only
+`tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ContractSliceBAdmissionProofTests.cs`.
+Their combined normalized changed-line count is at most `2,400`; `2,401`
+requires reviewed redesign before build/red. This packet-specific exception
+does not raise the general `1,200`-line B ceiling: it owns three closed proof
+leaves, two canonical frames, and the full bijection/lifecycle matrix in one
+test-owned boundary. Production, project, package,
+lock, workflow, Scenario, Policy, C, D, sealed-context, and reference deltas are
+zero. The design cohort is exactly the twelve existing Markdown/memory paths
+listed above, adds no tracked node and no new Markdown relation, and stays under
+schema-2 `512` nodes / `8,192` relations / `1,048,576` bytes per blob /
+`8,388,608` aggregate. The retained activation file only exposes its existing manifest helper
+internally and extends `ContractSliceBActivationProof` with a defensively copied
+optional exact candidate-reference allowlist; default-empty construction keeps
+the existing activation Fact byte-semantically unchanged and
+`Proves(IAdmissionProofCandidate)` false for every non-allowlisted object.
+
+The new file owns one direct Fact,
+`MeAndAI.Protocol.Conformance.Tests.ContractSliceBAdmissionProofTests.Admits_exact_observed_failed_and_no_input_proofs`,
+one `ContractSlice=B` trait, no Scenario/Theory/class trait, and marker
+`TEST-0210-B-BEHAVIOR-RED-0008`. P is `NotApplicable`. R implements the complete
+test-owned admission mirror and sets only its final valid aggregate return to
+`null!`; G restores that already computed aggregate. The retained activation
+Fact must remain green through both identities.
+
+The fixture rebuilds only the three manifest admission declarations so their
+Observed, Failed, and NoInput proof components are the exact three test-owned
+candidate types bound to `MeAndAI.Protocol.Conformance.Tests.dll`; contract
+keys/versions, surfaces, material roles, activation proof, payload schemas,
+components outside those three bindings, and every artifact remain unchanged.
+Three canonical singleton instructions bind, respectively,
+`protocol.slot.repository-tree`, `protocol.slot.provider-governed-text`, and
+`protocol.slot.repository-target-resolution` to Repository Observed, Provider
+Failed, and Repository NoInput requests. The typed design owns their exact
+target/request values, strict frame grammar, receipt projection, closed
+qualification/cache/resource state, and declarations.
+
+Admission enumerates each proof collection once, flattens exactly one leaf per
+candidate, and proves a bijection over singleton SlotKey, InstructionDigest,
+candidate object, and ReceiptDigest. It revalidates exact manifest digest,
+contract kind/key/version, CLR proof type, component/artifact binding, allowed
+surface/material role, request, activation-proof reference, instruction frame,
+receipt frame, and variant tail. Observed alone carries a complete structural
+result, exact codec binding, and privately stamped post-qualification state
+whose claimed/measured four counters match and whose cache disposition is
+Produced or Retained. Failed carries complete request failure coverage. NoInput
+has no result/tail and proves no writer, qualifier, or cache call.
+
+The lifecycle vectors are exact: source-intent rejection calls no downstream
+stage; writer rejection calls writer once and no qualifier/meter/cache;
+successful write then qualifier rejection calls writer/qualifier once and no
+meter/cache; only write plus qualification plus one measured-state closure and
+one cache completion produces Observed. NoInput calls none; cancellation,
+timeout, cache-integrity, or host failure produces no candidate.
+Missing/extra/duplicate, null, dual-leaf, multi-slot, wrong/stale
+manifest/instruction/request/contract/type/artifact/surface/material/activation,
+partial Observed state, and mutated receipt all fail atomically with
+`CatalogIntegrityCode.AdmissionProofInvalid`. Equal supplied digest with unequal
+canonical receipt bytes fails first with `CacheIdentityCollision`. No partial
+receipt set escapes.
+
+The packet-specific canonical red command is Release `--no-restore --no-build`
+against the exact FQN/filter above, one fresh R=0008 TRX logger/root, process-
+scoped `VSTEST_CONNECTION_TIMEOUT=300`, and the inherited `420000`-ms/8-MiB-
+log/1-MiB-report one-shot runner contract. Green is focused `1/1`, B `9/9`,
+A+B/full Conformance `41/41`, Domain `98/98`, build/format/locks/diff/
+StructureOnly/publication, and two fresh `0/0/0` reviews. B-SEALED-CONTEXT and
+all later scopes remain held until the exact admission implementation head is
+hosted green.
 
 ## SurfaceRed and BehaviorRed contract
 
@@ -527,12 +603,11 @@ surface, codec, three wire packets, and resource packet are immutable hosted
 history. Resource R=0006 is accepted once and never rerun; focused/B/full
 Conformance/Domain are `1/1`, `7/7`, `39/39`, and `98/98`, and the Tests-only
 source is `1,176/1,200` normalized lines with zero production delta. Cache
-R=0007 is accepted once and never rerun; `B-CACHE-01` is `ReviewedLocalGreen`
+R=0007 is accepted once and never rerun; `B-CACHE-01` is exact-head hosted green
 at focused/B/full/Domain `1/1`, `8/8`, `40/40`, and `98/98`, with one
 `1,063/1,200`-line Tests-only file and zero production delta. B is `8/11`,
-cumulative A+B is `40/43`; B-ADMISSION is candidate/inactive pending the exact
-cache implementation-head hosted gate and its own design freeze. Every
-successor remains held.
+cumulative A+B is `40/43`; B-ADMISSION is `FrozenDesign`/inactive pending this
+exact synchronized design head's hosted gate. Every successor remains held.
 C/D, final
 activation, feature DoD, release, publication, consumer mutation, authority
 transfer, and PowerShell retirement remain held.

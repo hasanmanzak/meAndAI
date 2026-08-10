@@ -2,13 +2,13 @@
 
 | Field | Value |
 | --- | --- |
-| Packet | `B-CODEC-ACTIVATION-01` / `B-WIRE-REPOSITORY-TREE-01` / `B-WIRE-GOVERNED-TEXT-01` / `B-WIRE-REPOSITORY-TARGET-01` / `B-RESOURCE-01` / `B-CACHE-01` |
-| State | Codec activation, all three wire packets, and resource `ReviewedHostedGreen`; repository-target R=0004 diagnostic-only, R=0005, resource R=0006, and cache R=0007 accepted/immutable; B-CACHE `ReviewedLocalGreen`; B `8/11`, A+B `40/43`; B-ADMISSION candidate/inactive pending the exact cache implementation-head hosted gate and its own design freeze |
+| Packet | `B-CODEC-ACTIVATION-01` / `B-WIRE-REPOSITORY-TREE-01` / `B-WIRE-GOVERNED-TEXT-01` / `B-WIRE-REPOSITORY-TARGET-01` / `B-RESOURCE-01` / `B-CACHE-01` / `B-ADMISSION-01` |
+| State | Codec activation, all three wire packets, resource, and cache `ReviewedHostedGreen`; repository-target R=0004 diagnostic-only, R=0005, resource R=0006, and cache R=0007 accepted/immutable; B `8/11`, A+B `40/43`; B-ADMISSION `FrozenDesign`/inactive pending this exact synchronized design head's hosted gate |
 | Parent | Owning ContractSlice B micro-delivery plan |
 | Scenario | Parent scenario retained `Planned` |
 | Exact resource implementation | [`fa67864f57f97e8a7960ad13fbde91c7c09f5d77`](https://github.com/hasanmanzak/meAndAI/commit/fa67864f57f97e8a7960ad13fbde91c7c09f5d77); exact-head [run 31367753569](https://github.com/hasanmanzak/meAndAI/actions/runs/31367753569) passed Ubuntu `15m52s`, Windows `49m31s`, publication verification skipped |
 | Exact first-design diagnostic | The first hosted design passed both stable jobs; pre-red byte audit then found the optional-null vector defect, with no runner/red/implementation, so that predecessor grants no authority |
-| Exact cache design | [`e04f75448619fd1eb11527b5fa4a55981701c706`](https://github.com/hasanmanzak/meAndAI/commit/e04f75448619fd1eb11527b5fa4a55981701c706); exact-head [run 31375540961](https://github.com/hasanmanzak/meAndAI/actions/runs/31375540961) passed Ubuntu `20m54s`, Windows `47m35s`, publication verification skipped |
+| Exact cache implementation | [`f0a66e86c7875019d7347eb044428b279bcb0717`](https://github.com/hasanmanzak/meAndAI/commit/f0a66e86c7875019d7347eb044428b279bcb0717); exact-head [run 31383308571](https://github.com/hasanmanzak/meAndAI/actions/runs/31383308571) passed Ubuntu `20m42s`, Windows `49m17s`, publication verification skipped |
 | Implementation language | C# only |
 
 ## Immutable codec-activation boundary
@@ -614,6 +614,51 @@ once. It is immutable and must never be rerun.
   `41F3FC4003ED1A173A040F0728E8268941380EDA776647B15EB09C5C164717E4`,
   with zero production delta. Exact-tree StructureOnly and publication evidence
   passed, the latter `7/7` without a publication claim; fresh code/test and
-  evidence/scope reviews each closed `0/0/0`. Commit/push and hosted
-  implementation-head validation remain before
-  `ReviewedHostedGreen`; B-ADMISSION and every downstream hold remain intact.
+  evidence/scope reviews each closed `0/0/0`. The exact implementation
+  identity linked above passed Ubuntu in `20m42s` and Windows in `49m17s`;
+  publication verification was skipped. B-CACHE is
+  immutable `ReviewedHostedGreen` and R=0007 is never rerun.
+
+## Frozen `B-ADMISSION-01` routing
+
+- The executable allowlist is exactly one retained-test modification,
+  `ContractSliceBActivationTests.cs`, plus one new Tests-owned file,
+  `ContractSliceBAdmissionProofTests.cs`; combined normalized changed lines are
+  capped at `2,400`, with `2,401` requiring redesign. This admission-only
+  exception leaves the general `1,200`-line B ceiling unchanged. Production, project,
+  package, lock, workflow, Scenario, Policy, C, and D deltas are zero.
+- The exact design cohort is the existing twelve Markdown/memory paths; it adds
+  no node and no unique Markdown relation. Schema-2 stays `512` nodes / `8,192`
+  relations / `1,048,576` bytes per blob / `8,388,608` aggregate.
+- P is `NotApplicable`. R adds the complete admission mirror and changes only
+  its final valid aggregate return to `null!`; G restores the already computed
+  aggregate. The existing activation Fact stays green throughout.
+- The one new Fact is
+  `ContractSliceBAdmissionProofTests.Admits_exact_observed_failed_and_no_input_proofs`,
+  with only `ContractSlice=B`, no Scenario/Theory/class trait, and marker
+  `TEST-0210-B-BEHAVIOR-RED-0008`.
+- The typed design exclusively owns exact carrier signatures, three singleton
+  instruction/request fixtures, admission-proof manifest substitutions,
+  receipt framing, exact candidate/instruction/receipt bijections, closed
+  resource/cache state, writer-before-qualifier lifecycle, leaf exclusivity,
+  collision/forgery/staleness/partial negatives, precedence, and one-shot red
+  custody. Green targets are focused `1/1`, B `9/9`, A+B/full `41/41`, and
+  Domain `98/98`.
+- B-ADMISSION is inactive until this synchronized design commit is exact-head
+  hosted green. B-SEALED-CONTEXT, B-CODEC-DERIVATION, B-CONVERGE, parent
+  Scenario, C/D, activation, merge, release, publication, and DoD remain held.
+
+## `B-ADMISSION-01` frozen-design reviews
+
+- Semantic/custody D/RT: `0 Blocking / 0 Important / 0 Minor`; exact manifest
+  substitution, private carriers/factories, instruction/receipt frames,
+  activation reference proof, collision precedence, lifecycle counts, one-shot
+  runner boundary, and no-retry behavior require no correction.
+- Route/content/scope review: `0 Blocking / 0 Important / 0 Minor`; the exact
+  twelve-record cohort, two-test-file/`2,400`-line executable boundary, zero
+  production delta, current B/A+B counts, and every downstream hold agree.
+- Exact-tree publication evidence passed `7/7` without a publication claim;
+  StructureOnly/capacity validation passed with `elapsedMs=446372`. The staged
+  typed-design blob is `598408/1048576` bytes and diff-check is clean.
+- Commit/push and hosted design-head validation remain mandatory before R=0008
+  or source implementation.

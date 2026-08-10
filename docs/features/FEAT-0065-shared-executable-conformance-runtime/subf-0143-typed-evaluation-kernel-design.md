@@ -3,14 +3,14 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted; ContractSlice A merged/exact-main green. B surface, codec activation, all three wire packets, and `B-RESOURCE-01` are exact-head hosted green. Repository-target R=0004 remains diagnostic-only; R=0005, resource R=0006, and cache R=0007 remain accepted and immutable. `B-CACHE-01` is `ReviewedLocalGreen`; B is `8/11`, cumulative A+B is `40/43`. `B-ADMISSION-01` is candidate/inactive pending the exact cache implementation-head hosted gate and its own design freeze. [TEST-0210](test-cases.md#test-0210) remains `Planned`; later B, C/D, activation, and DoD remain held. |
+| Status | Gate 2 accepted; ContractSlice A merged/exact-main green. B surface, codec activation, all three wire packets, `B-RESOURCE-01`, and `B-CACHE-01` are exact-head hosted green. Repository-target R=0004 remains diagnostic-only; R=0005, resource R=0006, and cache R=0007 remain accepted and immutable. B is `8/11`, cumulative A+B is `40/43`; `B-ADMISSION-01` is `FrozenDesign`/inactive pending this exact synchronized design head's hosted gate. [TEST-0210](test-cases.md#test-0210) remains `Planned`; later B, C/D, activation, and DoD remain held. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Test | [TEST-0210](test-cases.md#test-0210) |
 | Gate 3 micro-delivery routing | Historical A delivery remains owned by the [A micro-delivery control plan](subf-0143-micro-delivery-plan.md). Current B design routing is the [ContractSlice B micro-delivery plan](subf-0143-contractslice-b-micro-delivery-plan.md); packet labels refine delivery but activate no executable work. |
 | Exact-main design baseline | Accepted A merge commit [`51623f4d404a95e0f706d72805cf7ddbbbd293b8`](https://github.com/hasanmanzak/meAndAI/commit/51623f4d404a95e0f706d72805cf7ddbbbd293b8), validated by exact-main [run 31304787603](https://github.com/hasanmanzak/meAndAI/actions/runs/31304787603) |
-| Design and Gate 3 authority | Historical A directives and clarifications remain immutable evidence. B surface, codec activation, all three wire packets, and B-RESOURCE are immutable hosted-green predecessors; R=0006 and cache R=0007 remain accepted. B-CACHE is `ReviewedLocalGreen` pending its exact implementation-head hosted gate. B-ADMISSION remains candidate/inactive and owns no implementation authority until that predecessor and a fresh design freeze pass. C/D, final activation, merge, release, and publication remain outside this authority. |
+| Design and Gate 3 authority | Historical A directives and clarifications remain immutable evidence. B surface, codec activation, all three wire packets, B-RESOURCE, and B-CACHE are immutable hosted-green predecessors; R=0006 and cache R=0007 remain accepted. B-ADMISSION is `FrozenDesign`/inactive and owns no implementation authority until this synchronized design head passes exact hosted validation. C/D, final activation, merge, release, and publication remain outside this authority. |
 | Completed predecessor | [SUBF-0153](README.md#subf-0153) / [TEST-0221](test-cases.md#test-0221), merged through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173) and exact-main validated by [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) |
 
 ## Directive and hard boundary
@@ -1234,9 +1234,8 @@ activation, workflow filters, or runtime-efficiency changes. The original B
 design phase had P/R/G `NotApplicable` and an empty executable allowlist.
 Surface, codec activation, all three wires, and B-RESOURCE are now immutable
 hosted-green history. Cache R=0007 is accepted/immutable and B-CACHE is
-`ReviewedLocalGreen` pending its exact implementation-head hosted gate.
-B-ADMISSION remains candidate/inactive pending that predecessor and its own
-design freeze; no later packet is active.
+exact-head hosted green. B-ADMISSION is `FrozenDesign`/inactive pending this
+exact synchronized design head's hosted gate; no later packet is active.
 
 ## Gate 2 outcome
 
@@ -8799,8 +8798,397 @@ return and is `1,063/1,200` lines / `38,102` bytes / SHA-256
 Domain `1/1`, `8/8`, `40/40`, `98/98`, and clean format/diff. Exact-tree
 StructureOnly is green; publication evidence is `7/7` without a publication
 claim; fresh code/test and evidence/scope reviews each closed `0/0/0`.
-Commit/push and hosted green remain before this
-packet becomes immutable hosted history.
+The owning ledger's exact cache implementation identity passed Ubuntu in
+`20m42s` and Windows in `49m17s`; publication verification was skipped.
+B-CACHE is immutable exact-head hosted history.
+
+### Frozen `B-ADMISSION-01` proof-candidate admission contract
+
+`B-ADMISSION-01` starts only from the exact hosted-green cache predecessor
+above. At this design checkpoint B remains `8/11` and cumulative A+B remains
+`40/43`. The executable mutation allowlist is exactly:
+
+- modify
+  `tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ContractSliceBActivationTests.cs`;
+- add
+  `tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ContractSliceBAdmissionProofTests.cs`.
+
+Their combined normalized changed-line count is at most `2,400`; `2,401`
+requires a reviewed redesign before build or red. This admission-only exception
+does not change the general `1,200`-line B ceiling: the packet must close three
+proof leaves, instruction and receipt framing, and the entire bijection/
+lifecycle negative matrix in one test-owned boundary. Production, other retained
+tests, project, package, lock, workflow, Scenario, Policy, C, D,
+sealed-context, and qualified-reference deltas are zero. The design cohort is
+exactly the twelve existing Markdown/memory paths frozen by the B plan; it adds
+no tracked node or unique Markdown relation and retains schema-2 `512` nodes /
+`8,192` relations / `1,048,576` bytes per blob / `8,388,608` aggregate. P is `NotApplicable`.
+R contains the complete test-owned admission mirror and changes only the final
+valid aggregate return to `null!`; G restores the already computed non-null
+aggregate. The existing activation Fact stays green through R and G.
+
+The retained activation file changes only two test seams. Its existing
+`CreateManifest` helper becomes `internal static`. `ContractSliceBActivationProof`
+accepts one optional enumerable of exact `IAdmissionProofCandidate` references,
+materializes it once, rejects null elements/duplicates, and stores a private
+read-only copy; the omitted/default collection is empty. Its existing codec
+proof behavior is byte-semantically unchanged. `Proves(IAdmissionProofCandidate)`
+returns true only for the same allowlisted object reference and false for null,
+an equal-but-distinct object, or every default activation construction. It
+never validates candidate contents itself and therefore grants no public
+receipt authority.
+
+The new Tests-owned declarations are exact:
+
+```csharp
+internal sealed class AdmissionInstructionMirror
+{
+    internal string SlotKey { get; }
+    internal AdmissionProofKind Kind { get; }
+    internal string ContractKey { get; }
+    internal string ContractVersion { get; }
+    internal string MaterialRole { get; }
+    internal AcquisitionRequest Request { get; }
+    internal ExactSha256Digest ManifestDigest { get; }
+    internal ExactSha256Digest InstructionDigest { get; }
+    internal ReadOnlyMemory<byte> CanonicalBytes { get; }
+
+    internal static AdmissionInstructionMirror Create(
+        FinalizedPolicyManifest manifest,
+        string slotKey,
+        AdmissionProofKind kind,
+        string materialRole,
+        AcquisitionRequest request);
+}
+
+internal sealed class ClosedQualificationStateMirror
+{
+    internal ExactSha256Digest InstructionDigest { get; }
+    internal ExactSha256Digest DemandDigest { get; }
+    internal ModelContractIdentity OutputModel { get; }
+    internal EvidenceBinding Binding { get; }
+    internal ComponentArtifactBinding Codec { get; }
+    internal SemanticResourceLocalUsageMirror ClaimedUsage { get; }
+    internal SemanticResourceLocalUsageMirror MeasuredUsage { get; }
+    internal DecodeCacheDispositionMirror CacheDisposition { get; }
+
+    internal static ClosedQualificationStateMirror Create(
+        ExactSha256Digest instructionDigest,
+        ExactSha256Digest demandDigest,
+        ModelContractIdentity outputModel,
+        EvidenceBinding binding,
+        ComponentArtifactBinding codec,
+        SemanticResourceLocalUsageMirror claimedUsage,
+        SemanticResourceLocalUsageMirror measuredUsage,
+        DecodeCacheDispositionMirror cacheDisposition);
+}
+
+internal sealed class ObservedQualificationProofMirror : IObservedQualificationProof
+{
+    public IReadOnlyList<string> SlotKeys { get; }
+    public string ContractKey { get; }
+    public string ContractVersion { get; }
+    public ExactSha256Digest ManifestDigest { get; }
+    public ExactSha256Digest InstructionDigest { get; }
+    public ExactSha256Digest ReceiptDigest { get; }
+    public AcquisitionRequest Request { get; }
+    public ObservedAcquisitionResult Result { get; }
+    public IReadOnlyList<ComponentArtifactBinding> QualifiedCodecs { get; }
+    internal ClosedQualificationStateMirror State { get; }
+    internal ReadOnlyMemory<byte> CanonicalReceiptBytes { get; }
+
+    internal static ObservedQualificationProofMirror Create(
+        FinalizedPolicyManifest manifest,
+        AdmissionInstructionMirror instruction,
+        ObservedAcquisitionResult result,
+        IEnumerable<ComponentArtifactBinding> qualifiedCodecs,
+        ClosedQualificationStateMirror state,
+        ExactSha256Digest? forcedReceiptDigest = null);
+}
+
+internal sealed class FailedAttemptProofMirror : IFailedAttemptProof
+{
+    public IReadOnlyList<string> SlotKeys { get; }
+    public string ContractKey { get; }
+    public string ContractVersion { get; }
+    public ExactSha256Digest ManifestDigest { get; }
+    public ExactSha256Digest InstructionDigest { get; }
+    public ExactSha256Digest ReceiptDigest { get; }
+    public AcquisitionRequest Request { get; }
+    public FailedAcquisitionResult Result { get; }
+    internal ReadOnlyMemory<byte> CanonicalReceiptBytes { get; }
+
+    internal static FailedAttemptProofMirror Create(
+        FinalizedPolicyManifest manifest,
+        AdmissionInstructionMirror instruction,
+        FailedAcquisitionResult result,
+        ExactSha256Digest? forcedReceiptDigest = null);
+}
+
+internal sealed class NoInputRoutingProofMirror : INoInputRoutingProof
+{
+    public IReadOnlyList<string> SlotKeys { get; }
+    public string ContractKey { get; }
+    public string ContractVersion { get; }
+    public ExactSha256Digest ManifestDigest { get; }
+    public ExactSha256Digest InstructionDigest { get; }
+    public ExactSha256Digest ReceiptDigest { get; }
+    public AcquisitionRequest Request { get; }
+    internal ReadOnlyMemory<byte> CanonicalReceiptBytes { get; }
+
+    internal static NoInputRoutingProofMirror Create(
+        FinalizedPolicyManifest manifest,
+        AdmissionInstructionMirror instruction,
+        ExactSha256Digest? forcedReceiptDigest = null);
+}
+
+internal abstract class AdmissionReceiptMirror
+{
+    internal string SlotKey { get; }
+    internal ExactSha256Digest ReceiptDigest { get; }
+    internal ReadOnlyMemory<byte> CanonicalBytes { get; }
+    internal abstract TResult Accept<TResult>(IAdmissionReceiptMirrorVisitor<TResult> visitor);
+}
+
+internal sealed class ObservedAdmissionReceiptMirror : AdmissionReceiptMirror
+{
+    internal ObservedAcquisitionResult Result { get; }
+    internal ClosedQualificationStateMirror State { get; }
+    internal override TResult Accept<TResult>(IAdmissionReceiptMirrorVisitor<TResult> visitor);
+
+    internal static ObservedAdmissionReceiptMirror Create(
+        string slotKey,
+        ExactSha256Digest receiptDigest,
+        ReadOnlyMemory<byte> canonicalBytes,
+        ObservedAcquisitionResult result,
+        ClosedQualificationStateMirror state);
+}
+
+internal sealed class FailedAdmissionReceiptMirror : AdmissionReceiptMirror
+{
+    internal FailedAcquisitionResult Result { get; }
+    internal override TResult Accept<TResult>(IAdmissionReceiptMirrorVisitor<TResult> visitor);
+
+    internal static FailedAdmissionReceiptMirror Create(
+        string slotKey,
+        ExactSha256Digest receiptDigest,
+        ReadOnlyMemory<byte> canonicalBytes,
+        FailedAcquisitionResult result);
+}
+
+internal sealed class NoInputAdmissionReceiptMirror : AdmissionReceiptMirror
+{
+    internal AcquisitionRequest Request { get; }
+    internal override TResult Accept<TResult>(IAdmissionReceiptMirrorVisitor<TResult> visitor);
+
+    internal static NoInputAdmissionReceiptMirror Create(
+        string slotKey,
+        ExactSha256Digest receiptDigest,
+        ReadOnlyMemory<byte> canonicalBytes,
+        AcquisitionRequest request);
+}
+
+internal interface IAdmissionReceiptMirrorVisitor<TResult>
+{
+    TResult VisitObserved(ObservedAcquisitionResult result, ClosedQualificationStateMirror state);
+    TResult VisitFailed(FailedAcquisitionResult result);
+    TResult VisitNoInput(AcquisitionRequest request);
+}
+
+internal sealed class ContractSliceBAdmissionCoordinatorMirror
+{
+    internal IReadOnlyList<AdmissionReceiptMirror> Admit(
+        FinalizedPolicyManifest manifest,
+        IPolicyActivationProof activationProof,
+        IReadOnlyList<AdmissionInstructionMirror> instructions,
+        AcquisitionProofSet candidates,
+        CancellationToken cancellationToken);
+}
+```
+
+All concrete instance constructors are private; the abstract receipt base uses
+one `private protected` constructor, and its leaf `Create` factories above are
+the only construction route. The activation proof constructor appends
+exactly `IEnumerable<IAdmissionProofCandidate>? admissionCandidates = null`
+after its retained `bool provesMirror = true` parameter, materializes it once,
+rejects null elements and duplicate object references with parameter name
+`admissionCandidates`, and stores a read-only copy using reference equality.
+Exact `Create` factories above copy every
+text/list/byte input once, reject null/empty values with exact parameter names,
+and expose only read-only projections. Candidate classes implement exactly one
+public leaf interface; their common properties are the exact retained
+`IAdmissionProofCandidate` properties. The Observed factory additionally takes
+one canonical unique codec-binding list and one private
+`ClosedQualificationStateMirror`; Failed takes one `FailedAcquisitionResult`;
+NoInput has no result or state tail. The optional forced digest is accepted only
+by these Tests-owned negative factories; it never changes canonical receipt
+bytes. A negative-only dual-leaf implementation is confined to this Fact and
+never forms a valid result. Receipt leaves are created only inside `Admit`, use
+private constructors, and retain the independently recomputed canonical bytes.
+
+The fixture starts from `ContractSliceBActivationTests.CreateManifest()` and
+rebuilds only the three admission declarations/component bindings. Their exact
+mapping is:
+
+| Kind/rank | Contract key/version | Exact Tests-owned proof component | Surface / material |
+| --- | --- | --- | --- |
+| Observed / `0` | `protocol.admission.observed` / `1` | `MeAndAI.Protocol.Conformance.Tests.ObservedQualificationProofMirror` | Repository / `protocol.material.repository-tree` |
+| Failed / `1` | `protocol.admission.failed` / `1` | `MeAndAI.Protocol.Conformance.Tests.FailedAttemptProofMirror` | Provider / `protocol.material.governed-text` |
+| NoInput / `2` | `protocol.admission.no-input` / `1` | `MeAndAI.Protocol.Conformance.Tests.NoInputRoutingProofMirror` | Repository / `protocol.material.repository-target-resolution` |
+
+For each row, component key/version are copied exactly from the corresponding
+source admission declaration; only assembly/type become the named Tests-owned
+proof type. The matching same-key old component binding is replaced once and
+the new component is bound to the already present
+`MeAndAI.Protocol.Conformance.Tests.dll` artifact. Contract key/version, kind,
+activation proof, artifact filename/length/digest/order, payload schemas, cache
+budget, every non-admission component, catalog slice, and complete catalog stay
+unchanged. Canonical write plus reparse must preserve the new manifest digest,
+all three declaration/type bindings, and the full component/artifact closure.
+
+The three issued instructions are canonical by SlotKey and each owns exactly
+one request/requirement:
+
+| Slot / leaf | Target and request | Requirement |
+| --- | --- | --- |
+| `protocol.slot.provider-governed-text` / Failed | Provider / ProviderEvent, subject `protocol.test.subject`, source `protocol.test.provider`, target `provider-event-0001`; adapter `protocol.adapter.test` / `1`, source contract `protocol.source.test` / `1` | `protocol.requirement.provider-governed-text`, governed-text schema `1`, Provider |
+| `protocol.slot.repository-target-resolution` / NoInput | Repository / ExactCommit, subject `protocol.test.subject`, source `protocol.test.repository`, target fixture commit: `0123456789abcdef0123456789abcdef01234567`; same adapter/source versions | `protocol.requirement.repository-target-resolution`, repository-target schema `1`, Repository |
+| `protocol.slot.repository-tree` / Observed | the same Repository target/request identities | `protocol.requirement.repository-tree`, repository-tree schema `1`, Repository |
+
+Every requirement retains the manifest slot's exact evidence kind,
+completeness contract, accepted consistency classes, payload schema, and
+material role. Request collections and `AcquisitionProofSet.Create` inputs use
+single-use enumerables and must be enumerated once. Mutating any source array or
+list after construction changes no instruction, candidate, or receipt.
+
+Both instruction and receipt framing use strict UTF-8, no BOM, no trailing
+bytes, unsigned big-endian `u32` counts/lengths, signed big-endian UTC ticks,
+one-byte closed ranks, and lowercase 64-hex digest text. Exact ranks are leaf
+Observed=`0`, Failed=`1`, NoInput=`2`; surface Repository=`0`, Provider=`1`,
+Workflow=`2`, Release=`3`; snapshot ExactCommit=`0`, Candidate=`1`,
+ProviderEvent=`2`, ProviderFullInventory=`3`, CapturedEvidence=`4`; status
+Complete=`0`, Incomplete=`1`, Failed=`2`; cache Produced=`0`, Retained=`1`.
+Joined and every unknown value are unencodable and invalid. Every `text` is
+`u32 byte-length || bytes`; every nullable digest is one byte `0` for absent or
+`1 || lowercase 64-byte hex` for present. The instruction header is exact ASCII
+`protocol.test.admission-instruction/1\n`, followed by SlotKey, manifest digest,
+leaf rank, contract key/version, material role, then the request target fields
+`SubjectIdentity`, `SourceIdentity`, surface, snapshot kind, target identity;
+adapter key/version; source key/version; and the one ordered requirement with
+all accepted-consistency values. SHA-256 of all bytes is InstructionDigest.
+
+The receipt header is exact ASCII `protocol.test.admission-receipt/1\n`,
+followed by the complete length-prefixed instruction frame, singleton SlotKey,
+proof component key/version/assembly/type, artifact filename/signed `i64`
+length/digest, and the
+variant tail. Observed writes status, complete scope target/boundary/timestamps,
+ordered requirement-acquisition count plus each requirement key/status/failure
+pair, ordered binding count plus each full location/payload schema/version/
+digest/requirement-key set, ordered page count plus sequence/nullable cursor
+digests/source-object count, total source-object count, one codec component/
+artifact binding, then closed-state instruction/demand/model/binding, cache
+disposition rank Produced=`0`/Retained=`1`, and claimed plus measured
+`GeneratedBytes`, `LayerDepth`, `LayerNodes`, `AdditionalComplexity`. The
+derived root-reference set must equal the binding-derived set but is not written
+a second time. Failed
+writes Started/Failed UTC ticks and canonical failure requirement/code pairs.
+NoInput writes no variant tail. SHA-256 of the complete bytes is ReceiptDigest;
+it is derived, copied, and never trusted from caller text.
+
+The Observed vector uses a complete exact-snapshot repository-tree context,
+one canonical binding and the manifest repository-tree codec binding. Its
+closed state uses the same InstructionDigest, a deterministic DemandDigest,
+the repository-tree output model/binding, equal claimed/measured local usage
+`(GeneratedBytes=4, LayerDepth=1, LayerNodes=2, AdditionalComplexity=3)`, and
+Produced cache disposition. A second valid vector uses Retained and yields the
+same admitted semantics. Joined is deliberately not admission-stable: a joined
+caller must consume the producer's Produced candidate or a later Retained
+candidate, so a Joined closed state is `AdmissionProofInvalid`. Failed covers
+its complete singleton requirement with
+`protocol.source.unavailable` over fixed UTC interval
+`2026-08-10T00:00:00.0000000Z` through `2026-08-10T00:01:00.0000000Z`.
+NoInput has no acquisition result, failure, codec, resource, or cache state.
+
+`Admit` order is exact: null arguments; cancellation; immutable manifest/
+instruction canonical order and uniqueness; one-time candidate flattening;
+null, exact-one-leaf, object-reference, SlotKey, and InstructionDigest
+uniqueness; candidate/instruction bijection; manifest contract, kind/key/version,
+exact CLR type, component/artifact, allowed surface/material, manifest digest,
+request, activation-proof contract key/version/manifest digest/exact artifact
+list, and `Proves(candidate)` reference result; instruction frame; variant tail; then
+receipt-frame recomputation, supplied-digest collision partition, and digest
+equality. Each successful receipt list follows instruction SlotKey order and is
+privately closed; no caller candidate escapes.
+
+For equal supplied ReceiptDigest values across distinct canonical slots, the
+coordinator first compares the independently recomputed receipt frames. Their
+embedded instruction/SlotKey fields make them unequal, so the pair fails with
+`CatalogIntegrityCode.CacheIdentityCollision`. Same-object, same-slot, or same-
+instruction duplicates have already failed as `AdmissionProofInvalid`. After
+collision closure, any supplied digest unequal to its own SHA-256 frame is
+`AdmissionProofInvalid`. Every other null, missing,
+extra, duplicate, dual/zero leaf, multi/empty/wrong SlotKeys, foreign or stale
+manifest, wrong instruction/request/contract/kind/type/component/artifact/
+surface/material/activation reference, noncanonical order, incomplete Failed
+coverage, Observed result/request/scope/acquisition/binding/page/source/reference
+mismatch, codec-set mismatch, open/partial qualification state,
+claimed/measured resource mismatch, foreign instruction/
+demand/model/binding, or disallowed cache disposition is atomically
+`AdmissionProofInvalid`. No prefix receipt set is returned.
+
+No additional lifecycle class, interface, adapter, or reusable seam is added.
+The Fact uses four local recording delegates over the already test-owned writer,
+qualifier, meter, and cache objects solely to prove the following order/count
+matrix. Source-intent rejection
+calls writer/qualifier/meter/cache zero times and constructs only Failed. Writer
+rejection calls writer once, the later three zero times, and constructs only
+Failed. Successful write followed by qualifier rejection calls writer and
+qualifier once, meter/cache zero times, and constructs only Failed. Only
+successful write, qualification, one exact measured-state closure, and one
+collision-checked cache completion construct Observed. A cache integrity or
+host failure propagates and constructs no candidate. NoInput calls writer,
+qualifier, meter, and cache zero times. Cancellation or timeout propagates
+unchanged, constructs no candidate, admits nothing, and is never cached.
+Admission itself reruns none of writer, qualifier, meter, or cache.
+
+The one direct Fact is
+`MeAndAI.Protocol.Conformance.Tests.ContractSliceBAdmissionProofTests.Admits_exact_observed_failed_and_no_input_proofs`,
+with only `ContractSlice=B`, no Scenario/Theory/class trait, and exact marker
+`TEST-0210-B-BEHAVIOR-RED-0008`. Before calling `Admit`, it assembles each
+expected instruction/receipt vector through an independent Fact-local sequence
+of explicit strict-UTF8 and `BinaryPrimitives` writes that shares no production
+or mirror frame helper, then asserts byte equality and SHA-256 equality. It
+proves three valid leaf receipts, canonical input-order independence, defensive
+copies, exact lifecycle call counts, every failure partition above, no partial
+escape, and unchanged activation behavior.
+Red replaces only the final valid aggregate with `null!`; only that null reaches
+direct `Assert.Fail(marker)`.
+
+The packet-specific red command is exactly:
+
+```text
+dotnet test tests/dotnet/MeAndAI.Protocol.Conformance.Tests/MeAndAI.Protocol.Conformance.Tests.csproj --configuration Release --no-restore --no-build --nologo --verbosity minimal --results-directory "<fresh-root>" --logger "trx;LogFileName=TEST-0210-B-BEHAVIOR-RED-0008.trx" --filter "ContractSlice=B&FullyQualifiedName=MeAndAI.Protocol.Conformance.Tests.ContractSliceBAdmissionProofTests.Admits_exact_observed_failed_and_no_input_proofs"
+```
+
+A fresh external runner specializes the accepted R=0007 custody contract to
+the two exact source paths, combined `2,400`-line ceiling, marker/FQN, fresh
+R=0008 root/report/log paths, exact source/self/HEAD/upstream/branch/status and
+six-lock identities at start/pre-build/pre-test/post-test, warning-as-error
+Release build, fresh DLL/PDB, `--no-build`, child-only
+`VSTEST_CONNECTION_TIMEOUT=300`, monotonic `420000`-ms bound, complete
+`8,388,608`-byte stdout/stderr logs, `1,048,576`-byte atomic report, secure XML,
+native exit `1`, exact one-result TRX, sixteen counters, and zero forbidden
+diagnostics/attachments. `InvocationCommitted` irrevocably consumes R=0008 for
+every process-create, timeout, exit, interruption, artifact, or oracle outcome;
+no changed or unchanged retry exists. Only pre-commit preflight/build failures
+may be corrected under a new reviewed source/runner identity.
+
+Green is focused `1/1`, B `9/9`, A+B/full Conformance `41/41`, Domain `98/98`,
+warning/error-free Release build, format/locks/diff/StructureOnly/publication,
+and fresh code/test plus evidence/scope reviews `0/0/0`. B-SEALED-CONTEXT and
+every later packet remain held until the exact admission implementation head is
+hosted green. This design itself grants no R or implementation authority until
+its synchronized commit is exact-head hosted green.
 
 ## [TEST-0210](test-cases.md#test-0210) expected-red contract
 
@@ -9582,12 +9970,11 @@ ContractSlice A's historical delivery is owned by its
 [micro-delivery control plan](subf-0143-micro-delivery-plan.md). ContractSlice
 B is decomposed by the current
 [B micro-delivery plan](subf-0143-contractslice-b-micro-delivery-plan.md).
-Surface, codec activation, all three wires, and B-RESOURCE are hosted green;
-repository-target R=0004 is diagnostic-only, while canonical R=0005, resource
-R=0006, and cache R=0007 are accepted/immutable. B-CACHE is
-`ReviewedLocalGreen`; B is `8/11`, A+B is `40/43`. B-ADMISSION is
-candidate/inactive pending the exact cache implementation-head hosted gate and
-its own design freeze; later packets remain inactive.
+Surface, codec activation, all three wires, B-RESOURCE, and B-CACHE are hosted
+green; repository-target R=0004 is diagnostic-only, while canonical R=0005,
+resource R=0006, and cache R=0007 are accepted/immutable. B is `8/11`, A+B is
+`40/43`. B-ADMISSION is `FrozenDesign`/inactive pending the exact synchronized
+admission-design head's hosted gate; later packets remain inactive.
 
 B implementation and C/D still require separate future activation, and no
 packet is active merely from this list. No directive here allocates new stable
