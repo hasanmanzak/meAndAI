@@ -3,14 +3,14 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted; ContractSlice A merged/exact-main green. B surface, codec activation, all three wire packets, `B-RESOURCE-01`, `B-CACHE-01`, and `B-ADMISSION-01` are exact-head hosted green. Repository-target R=0004 plus admission R=0008/R=0009/R=0010 remain diagnostics/no-success; R=0005, resource R=0006, cache R=0007, admission R=0011, and sealed-context R=0012 remain accepted and immutable. `B-SEALED-CONTEXT-01` is `ReviewedLocalGreen` with its implementation head hosted pending; B is `10/11`, cumulative A+B is `42/43`. `B-CODEC-DERIVATION-01` is `FrozenDesign`/inactive pending that synchronized head's hosted gate. [TEST-0210](test-cases.md#test-0210) remains `Planned`; B-CONVERGE, C/D, activation, and DoD remain held. |
+| Status | Gate 2 accepted; ContractSlice A merged/exact-main green. B surface, codec activation, all three wire packets, `B-RESOURCE-01`, `B-CACHE-01`, `B-ADMISSION-01`, and `B-SEALED-CONTEXT-01` are exact-head hosted green. Repository-target R=0004, admission R=0008/R=0009/R=0010, and codec-derivation R=0013 remain diagnostics/no-success; R=0005/R=0006/R=0007/R=0011/R=0012 remain accepted and immutable. B is `10/11`, cumulative A+B `42/43`; corrected codec-derivation R=0014 is `FrozenDesign`/inactive pending this synchronized diagnostic/design head's hosted gate. [TEST-0210](test-cases.md#test-0210) remains `Planned`; B-CONVERGE, C/D, activation, and DoD remain held. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Test | [TEST-0210](test-cases.md#test-0210) |
 | Gate 3 micro-delivery routing | Historical A delivery remains owned by the [A micro-delivery control plan](subf-0143-micro-delivery-plan.md). Current B design routing is the [ContractSlice B micro-delivery plan](subf-0143-contractslice-b-micro-delivery-plan.md); packet labels refine delivery but activate no executable work. |
 | Exact-main design baseline | Accepted A merge commit [`51623f4d404a95e0f706d72805cf7ddbbbd293b8`](https://github.com/hasanmanzak/meAndAI/commit/51623f4d404a95e0f706d72805cf7ddbbbd293b8), validated by exact-main [run 31304787603](https://github.com/hasanmanzak/meAndAI/actions/runs/31304787603) |
-| Design and Gate 3 authority | Historical A directives and clarifications remain immutable evidence. B surface, codec activation, all three wire packets, B-RESOURCE, B-CACHE, and B-ADMISSION are immutable hosted-green predecessors; R=0006, cache R=0007, admission R=0011, and sealed-context R=0012 remain accepted, while admission R=0008/R=0009/R=0010 are immutable diagnostics/no-success. B-SEALED-CONTEXT is local green with its implementation head hosted pending; B-CODEC-DERIVATION is `FrozenDesign`/inactive pending this synchronized implementation/design head's hosted validation. B-CONVERGE, C/D, final activation, merge, release, and publication remain outside this authority. |
+| Design and Gate 3 authority | Historical A directives and clarifications remain immutable evidence. B surface, codec activation, all three wire packets, B-RESOURCE, B-CACHE, B-ADMISSION, and B-SEALED-CONTEXT are immutable hosted-green predecessors; R=0006/R=0007/R=0011/R=0012 remain accepted, while admission R=0008/R=0009/R=0010 and codec-derivation R=0013 are immutable diagnostics/no-success. Corrected codec-derivation R=0014 is `FrozenDesign`/inactive pending this synchronized diagnostic/design head's hosted validation. B-CONVERGE, C/D, final activation, merge, release, and publication remain outside this authority. |
 | Completed predecessor | [SUBF-0153](README.md#subf-0153) / [TEST-0221](test-cases.md#test-0221), merged through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173) and exact-main validated by [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) |
 
 ## Directive and hard boundary
@@ -1232,13 +1232,12 @@ provider-neutral capability semantics, shared-root ledgers, staged planning,
 kernel evaluation, real Policy export, the initial real-rule set, Scenario
 activation, workflow filters, or runtime-efficiency changes. The original B
 design phase had P/R/G `NotApplicable` and an empty executable allowlist.
-Surface, codec activation, all three wires, B-RESOURCE, B-CACHE, and B-ADMISSION
-are now immutable hosted-green history. Admission R=0008, R=0009, and R=0010
-are immutable diagnostics/no-success; R=0011 and sealed-context R=0012 are
-accepted/immutable. B-SEALED-CONTEXT is `ReviewedLocalGreen` with its
-implementation head hosted pending. B-CODEC-DERIVATION is `FrozenDesign`/
-inactive pending that synchronized head's hosted validation; no later packet is
-active.
+Surface, codec activation, all three wires, B-RESOURCE, B-CACHE, B-ADMISSION,
+and B-SEALED-CONTEXT are now immutable hosted-green history. Admission R=0008,
+R=0009, R=0010, and codec-derivation R=0013 are immutable diagnostics/no-success;
+R=0011 and sealed-context R=0012 are accepted/immutable. Corrected
+codec-derivation R=0014 is `FrozenDesign`/inactive pending this synchronized
+diagnostic/design head's hosted validation; no later packet is active.
 
 ## Gate 2 outcome
 
@@ -9556,30 +9555,45 @@ ordered result. Mutating the caller frame array after return cannot change it.
 The sole Fact is
 `MeAndAI.Protocol.Conformance.Tests.ContractSliceBQualifiedReferenceTests.Seals_exact_codec_derived_reference_and_location_narrowing`.
 It is one direct non-skipped Fact with only `ContractSlice=B`, no Scenario,
-Theory, class trait, overload, or second method. Marker/TRX stem is
-`TEST-0210-B-BEHAVIOR-RED-0013`. P is `NotApplicable`. R executes all negative
+Theory, class trait, overload, or second method. Corrected marker/TRX stem is
+`TEST-0210-B-BEHAVIOR-RED-0014`. P is `NotApplicable`. R executes all negative
 and deterministic assertions, prepares both valid references, then changes only
 the final nullable `Seal` return to `null!`; only that null reaches direct
 `Assert.Fail(Marker)`. G restores only the prepared read-only result.
 
-Canonical R=0013 follows one warning-free Release `--no-restore` build and one
-exact command:
+R=0013 is an immutable infrastructure diagnostic/no-success. ValidateOnly
+proved exact head/upstream/branch/status, source/runner identities, six locks,
+line budget, and absent artifacts. The sole Execute reached
+`InvocationCommitted`, but VSTest failed before the Fact with
+`SocketException (10055)` while binding its communication socket. Its TRX has
+zero result/definition/entry nodes, all sixteen counters zero, one Error RunInfo,
+and raw marker count zero. The preserved runner/report/TRX/log hashes are owned
+by the B codec evidence ledger; R=0013 is never rerun.
+
+Corrected R=0014 retains the same FQN and semantic null seam, follows one
+warning-free Release `--no-restore` build, and uses one exact command:
 
 ```text
-dotnet test tests/dotnet/MeAndAI.Protocol.Conformance.Tests/MeAndAI.Protocol.Conformance.Tests.csproj --configuration Release --no-restore --no-build --nologo --verbosity minimal --results-directory <fresh-root> --logger trx;LogFileName=TEST-0210-B-BEHAVIOR-RED-0013.trx --filter ContractSlice=B&FullyQualifiedName=MeAndAI.Protocol.Conformance.Tests.ContractSliceBQualifiedReferenceTests.Seals_exact_codec_derived_reference_and_location_narrowing
+dotnet test tests/dotnet/MeAndAI.Protocol.Conformance.Tests/MeAndAI.Protocol.Conformance.Tests.csproj --configuration Release --no-restore --no-build --nologo --verbosity minimal --results-directory <fresh-root> --logger trx;LogFileName=TEST-0210-B-BEHAVIOR-RED-0014.trx --filter ContractSlice=B&FullyQualifiedName=MeAndAI.Protocol.Conformance.Tests.ContractSliceBQualifiedReferenceTests.Seals_exact_codec_derived_reference_and_location_narrowing
 ```
 
-This is the R=0013-scoped replacement of the generic template. Its fresh
+This is the R=0014-scoped replacement of the generic template. Its fresh
 external regular/non-reparse CreateNew runner/report/stdout/stderr paths, exact
 runner bytes/SHA/AST, exact source/head/upstream/branch/full porcelain status at
 start/pre-build/pre-test/post-test, six locks, warning/error-free build,
-fresh DLL/PDB, absent-then-empty result root, process-only
+fresh DLL/PDB, absent-then-empty result root, a single-node/non-reuse build
+(`-m:1 /nr:false` and disabled shared compilation), process-only
 `VSTEST_CONNECTION_TIMEOUT=300`, one child/logger, `420000`-ms monotonic bound,
 complete `8,388,608`-byte log ceilings, `1,048,576`-byte report ceiling, native
 integer exit `1`, secure no-DTD/no-external-resolution XML, and exact one-result
 marker/optional-stack/echo/RunInfo/16-counter/no-diagnostic/no-attachment oracle
 are mandatory. Overflow or truncation is `OracleRejected`.
-`InvocationCommitted` irrevocably consumes R=0013: process-create failure,
+Immediately before commit, no matching dotnet-test/testhost/vstest process may
+exist and sixteen simultaneous loopback ephemeral listeners must open, remain
+held, and dispose successfully. Failure is preflight-only. TRX structural/result
+and infrastructure checks precede marker counting, so zero-result RunInfo
+failure cannot be mislabeled as marker drift.
+`InvocationCommitted` irrevocably consumes R=0014: process-create failure,
 timeout, unexpected exit, interruption/crash, missing/malformed/extra TRX, or
 any oracle rejection is immutable no-success/no-retry. Only a failure before
 that atomic state may be corrected and revalidated without creating R.
@@ -10375,14 +10389,14 @@ ContractSlice A's historical delivery is owned by its
 [micro-delivery control plan](subf-0143-micro-delivery-plan.md). ContractSlice
 B is decomposed by the current
 [B micro-delivery plan](subf-0143-contractslice-b-micro-delivery-plan.md).
-Surface, codec activation, all three wires, B-RESOURCE, B-CACHE, and B-ADMISSION
-are hosted green; repository-target R=0004 is diagnostic-only, while canonical
+Surface, codec activation, all three wires, B-RESOURCE, B-CACHE, B-ADMISSION,
+and B-SEALED-CONTEXT are hosted green; repository-target R=0004 is diagnostic-only, while canonical
 R=0005, resource R=0006, cache R=0007, admission R=0011, and sealed-context
-R=0012 are accepted/immutable. B-SEALED-CONTEXT is `ReviewedLocalGreen` with its
-implementation head hosted pending; B is `10/11`, A+B is `42/43`. Admission
-R=0008/R=0009/R=0010 are immutable diagnostics/no-success.
-B-CODEC-DERIVATION is `FrozenDesign`/inactive pending that synchronized head's
-hosted gate. B-CONVERGE remains inactive.
+R=0012 are accepted/immutable. B is `10/11`, A+B is `42/43`. Admission
+R=0008/R=0009/R=0010 and codec-derivation R=0013 are immutable
+diagnostics/no-success. Corrected codec-derivation R=0014 is `FrozenDesign`/
+inactive pending this synchronized diagnostic/design head's hosted gate.
+B-CONVERGE remains inactive.
 
 B implementation and C/D still require separate future activation, and no
 packet is active merely from this list. No directive here allocates new stable

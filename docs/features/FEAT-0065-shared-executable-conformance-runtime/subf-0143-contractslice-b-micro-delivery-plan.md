@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Gate 2 micro-delivery plan and design freeze |
-| State | B surface, codec, three wire packets, `B-RESOURCE-01`, `B-CACHE-01`, and `B-ADMISSION-01` exact-head hosted green; repository-target R=0004 plus admission R=0008/R=0009/R=0010 diagnostic/no-success, R=0005, resource R=0006, cache R=0007, admission R=0011, and sealed-context R=0012 accepted/immutable; `B-SEALED-CONTEXT-01` `ReviewedLocalGreen` with its implementation head hosted pending; B `10/11`, cumulative A+B `42/43`; `B-CODEC-DERIVATION-01` `FrozenDesign`/inactive pending that synchronized head's hosted gate |
+| State | B surface, codec, three wire packets, `B-RESOURCE-01`, `B-CACHE-01`, `B-ADMISSION-01`, and `B-SEALED-CONTEXT-01` exact-head hosted green; repository-target R=0004, admission R=0008/R=0009/R=0010, and codec-derivation R=0013 diagnostic/no-success, while R=0005/R=0006/R=0007/R=0011/R=0012 are accepted/immutable; B remains `10/11`, cumulative A+B `42/43`; corrected codec-derivation R=0014 is `FrozenDesign`/inactive pending this synchronized diagnostic/design head's hosted gate |
 | Parent | Owning feature and current subfeature |
 | Scenario | [TEST-0210](test-cases.md#test-0210), still `Planned` |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
@@ -101,7 +101,7 @@ semantic packages own one Fact and one immutable BehaviorRed ordinal each.
 | `B-CACHE-01` | Codec-model key bytes, collision closure, single-flight, success/declared-failure retention, deterministic eviction, exact-release/session isolation, no cancellation/host/integrity caching | `TEST-0210-B-BEHAVIOR-RED-0007`; `ContractSliceBDecodeModelCacheTests.Enforces_exact_codec_cache_single_flight_collision_and_eviction` | Focused `1/1`; B `8/8`; A+B `40/40` |
 | `B-ADMISSION-01` | Receipt frame after measured qualification/cache closure, exact instruction/proof bijection, manifest/type/artifact validation, Observed/Failed/NoInput leaf exclusivity, writer-before-qualifier lifecycle, forged/stale/partial rejection; R=0008, R=0009, and R=0010 are immutable diagnostics/no-success | Third-corrected `TEST-0210-B-BEHAVIOR-RED-0011`; `ContractSliceBAdmissionProofTests.Admits_exact_observed_failed_and_no_input_proofs` | Focused `1/1`; B `9/9`; A+B `41/41` |
 | `B-SEALED-CONTEXT-01` | Exact sealed Authority/Manifest/Catalog/slot/scope projection plus ContextProof and Root reference shapes; no raw payload/digest factory and no selector semantics | `TEST-0210-B-BEHAVIOR-RED-0012`; `ContractSliceBSealedContextTests.Seals_exact_context_proof_and_root_references` | Focused `1/1`; B `10/10`; A+B `42/42` |
-| `B-CODEC-DERIVATION-01` | Codec-derived reference frame, manifest component/artifact/model identity, same-or-narrower location, structural comparator, collision and foreign-session rejection; no parser/index derivation | `TEST-0210-B-BEHAVIOR-RED-0013`; `ContractSliceBQualifiedReferenceTests.Seals_exact_codec_derived_reference_and_location_narrowing` | Focused `1/1`; B `11/11`; A+B `43/43` |
+| `B-CODEC-DERIVATION-01` | Codec-derived reference frame, manifest component/artifact/model identity, same-or-narrower location, structural comparator, collision and foreign-session rejection; no parser/index derivation | corrected `TEST-0210-B-BEHAVIOR-RED-0014`; `ContractSliceBQualifiedReferenceTests.Seals_exact_codec_derived_reference_and_location_narrowing`; R=0013 immutable infrastructure diagnostic/no-success | Focused `1/1`; B `11/11`; A+B `43/43` |
 | `B-CONVERGE-01` | Pure cumulative audit of exact source/test/export/friend/trait/lock/project state; P/R/G `NotApplicable` | None; every canonical red remains immutable and is never rerun | B `11/11`; A+B/full Conformance `43/43`; Domain `98/98`; Release build/format/locks/diff/StructureOnly/publication evidence/reviews green |
 
 ### Immutable `B-WIRE-REPOSITORY-TREE-01` hosted-green boundary
@@ -590,8 +590,9 @@ the final sealed-context source is `534` lines, `20,197` bytes / SHA-256
 `D83BB1E5A729F5890F8D2B577209C200802478EDEE6D0068C1D909BAF89F1AC6`;
 combined changed lines are `549/1,200`. Focused/B/full Conformance/Domain are
 `1/1`, `10/10`, `42/42`, and `98/98`; Release build is zero warnings/errors,
-format and diff are clean. B-SEALED-CONTEXT is `ReviewedLocalGreen`; its
-implementation head remains hosted pending. No downstream authority follows.
+format and diff are clean. B-SEALED-CONTEXT is `ReviewedHostedGreen`; its exact
+implementation head passed both stable jobs with publication skipped. No
+downstream authority follows.
 
 ### Frozen `B-CODEC-DERIVATION-01` staging boundary
 
@@ -603,8 +604,10 @@ most `1,200` normalized lines; `1,201` requires reviewed redesign.
 
 The file owns exactly one direct Fact,
 `MeAndAI.Protocol.Conformance.Tests.ContractSliceBQualifiedReferenceTests.Seals_exact_codec_derived_reference_and_location_narrowing`,
-one `ContractSlice=B` trait, no Scenario/Theory/class trait/overload, and marker
-`TEST-0210-B-BEHAVIOR-RED-0013`. P is `NotApplicable`. R implements every
+one `ContractSlice=B` trait, no Scenario/Theory/class trait/overload, and
+corrected marker `TEST-0210-B-BEHAVIOR-RED-0014`. R=0013 is preserved as the
+immutable socket-capacity diagnostic described below. P is `NotApplicable`.
+Corrected R=0014 implements every
 valid and negative assertion but returns `null!` only after both valid derived
 references are fully prepared; only that null reaches `Assert.Fail(Marker)`.
 G restores only the already computed read-only result.
@@ -681,21 +684,36 @@ structurally equal inputs must produce structurally equal output. Mutating the
 caller frame array after sealing cannot affect the result. Every negative vector
 is marker-free and no partial result escapes.
 
-Canonical R=0013 is one exact warning-free Release build followed by exactly:
+R=0013 is an immutable infrastructure diagnostic/no-success. Its sole committed
+child never reached the Fact: VSTest failed to bind its communication socket
+with `SocketException (10055)`, emitted zero result/definition/entry nodes,
+zeroed all sixteen counters, and one infrastructure RunInfo. Marker count was
+zero. The preserved OracleRejected report, TRX, complete logs, runner, source,
+and hashes are owned by the B codec evidence ledger; R=0013 is never rerun.
+
+Corrected R=0014 keeps the same FQN and semantic null seam but uses marker
+`TEST-0210-B-BEHAVIOR-RED-0014`. It is one exact warning-free Release build
+followed by exactly:
 
 ```text
-dotnet test tests/dotnet/MeAndAI.Protocol.Conformance.Tests/MeAndAI.Protocol.Conformance.Tests.csproj --configuration Release --no-restore --no-build --nologo --verbosity minimal --results-directory <fresh-root> --logger trx;LogFileName=TEST-0210-B-BEHAVIOR-RED-0013.trx --filter ContractSlice=B&FullyQualifiedName=MeAndAI.Protocol.Conformance.Tests.ContractSliceBQualifiedReferenceTests.Seals_exact_codec_derived_reference_and_location_narrowing
+dotnet test tests/dotnet/MeAndAI.Protocol.Conformance.Tests/MeAndAI.Protocol.Conformance.Tests.csproj --configuration Release --no-restore --no-build --nologo --verbosity minimal --results-directory <fresh-root> --logger trx;LogFileName=TEST-0210-B-BEHAVIOR-RED-0014.trx --filter ContractSlice=B&FullyQualifiedName=MeAndAI.Protocol.Conformance.Tests.ContractSliceBQualifiedReferenceTests.Seals_exact_codec_derived_reference_and_location_narrowing
 ```
 
 This packet-specific command supersedes the generic red template only for
-R=0013. It retains fresh external CreateNew runner/report/log custody, exact
+R=0014. It retains fresh external CreateNew runner/report/log custody, exact
 source/runner/head/upstream/branch/full-status checks at start/pre-build/pre-test/
-post-test, six lock hashes, warning/error-free build, exact DLL/PDB, process-only
+post-test, six lock hashes, a single-node/non-reuse build (`-m:1 /nr:false` with
+shared compilation disabled), exact DLL/PDB, process-only
 `VSTEST_CONNECTION_TIMEOUT=300`, one child/logger, monotonic `420000`-ms bound,
 complete `8,388,608`-byte stdout/stderr ceilings, `1,048,576`-byte report,
 secure no-DTD/no-external-resolution XML, exact one-result marker/optional-stack/
 echo/RunInfo/16-counter/no-diagnostic/no-attachment oracle, and native exit `1`.
-`InvocationCommitted` irrevocably consumes R=0013; process-create, timeout,
+Immediately before `InvocationCommitted`, the runner must prove no matching
+dotnet-test/testhost/vstest process and successfully open, hold, and dispose
+sixteen simultaneous loopback ephemeral listeners; any failure is preflight
+only. TRX structural/result and infrastructure checks precede marker counting,
+so a zero-result RunInfo cannot be mislabeled as marker drift.
+`InvocationCommitted` irrevocably consumes R=0014; process-create, timeout,
 unexpected exit, interruption/crash, missing/malformed/extra TRX, or oracle
 rejection is immutable no-success/no-retry. Only pre-commit preflight/build
 failure may be corrected and revalidated without creating R.
@@ -706,8 +724,8 @@ publication evidence without publication claim, and two fresh `0/0/0` reviews.
 B-CONVERGE remains P/R/G `NotApplicable`; parent [TEST-0210](test-cases.md#test-0210), final Scenario/
 status/owner and both workflow filters, the runtime-efficiency scenario, C/D,
 activation, merge, release, publication, and DoD remain held. This design grants no R or
-implementation authority until the synchronized B-SEALED implementation plus
-B-CODEC-DERIVATION design commit itself is exact-head hosted green.
+implementation authority until this synchronized R=0013 diagnostic plus
+corrected R=0014 design commit itself is exact-head hosted green.
 
 ## SurfaceRed and BehaviorRed contract
 
@@ -882,9 +900,10 @@ at focused/B/full/Domain `1/1`, `8/8`, `40/40`, and `98/98`, with one
 `1,063/1,200`-line Tests-only file and zero production delta. Admission R=0008,
 R=0009, and R=0010 are immutable diagnostics/no-success; R=0011 and sealed-
 context R=0012 are accepted/immutable. B-ADMISSION is exact-head hosted green;
-B-SEALED-CONTEXT is `ReviewedLocalGreen` with its implementation head hosted
-pending. B is `10/11`, cumulative A+B is `42/43`; B-CODEC-DERIVATION is
-`FrozenDesign`/inactive pending that synchronized head's hosted gate.
+B-SEALED-CONTEXT is exact-head hosted green. B is `10/11`, cumulative A+B is
+`42/43`; codec-derivation R=0013 is immutable diagnostic/no-success and
+corrected R=0014 is `FrozenDesign`/inactive pending this synchronized
+diagnostic/design head's hosted gate.
 B-CONVERGE remains held.
 C/D, final
 activation, feature DoD, release, publication, consumer mutation, authority

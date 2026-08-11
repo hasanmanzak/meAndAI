@@ -16,10 +16,11 @@ hosted green; its owning B wire ledger retains exact implementation/run custody.
 B-RESOURCE R=0006 is accepted, immutable, and exact-head hosted green. Cache
 R=0007 is accepted/immutable and B-CACHE plus B-ADMISSION are exact-head hosted
 green. Admission R=0008, R=0009, and R=0010 are immutable diagnostic/no-success
-attempts; canonical R=0011 and sealed-context R=0012 are accepted/immutable.
-B-SEALED-CONTEXT is `ReviewedLocalGreen` with its implementation head hosted
-pending; B is `10/11`, cumulative A+B is `42/43`. B-CODEC-DERIVATION is
-`FrozenDesign`/inactive pending that synchronized head's hosted gate.
+attempts; canonical R=0011 and sealed-context R=0012 are accepted/immutable,
+and B-SEALED-CONTEXT is exact-head hosted green. Codec-derivation R=0013 is an
+immutable infrastructure diagnostic/no-success. B remains `10/11`, cumulative
+A+B `42/43`; corrected R=0014 is `FrozenDesign`/inactive pending the
+synchronized diagnostic/design head's hosted gate.
 B-CONVERGE remains inactive and the parent scenario remains `Planned`.
 
 Follow the current

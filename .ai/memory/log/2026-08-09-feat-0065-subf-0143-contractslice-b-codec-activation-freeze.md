@@ -2,8 +2,8 @@
 
 | Field | Value |
 | --- | --- |
-| Packet | `B-CODEC-ACTIVATION-01` / `B-WIRE-REPOSITORY-TREE-01` / `B-WIRE-GOVERNED-TEXT-01` / `B-WIRE-REPOSITORY-TARGET-01` / `B-RESOURCE-01` / `B-CACHE-01` / `B-ADMISSION-01` / `B-SEALED-CONTEXT-01` |
-| State | Codec activation, all three wire packets, resource, cache, and admission `ReviewedHostedGreen`; repository-target R=0004 plus admission R=0008/R=0009/R=0010 diagnostic/no-success, R=0005, resource R=0006, cache R=0007, admission R=0011, and sealed-context R=0012 accepted/immutable; B-SEALED-CONTEXT `ReviewedLocalGreen` with its implementation head hosted pending; B `10/11`, A+B `42/43`; B-CODEC-DERIVATION `FrozenDesign`/inactive pending that synchronized head's hosted gate |
+| Packet | `B-CODEC-ACTIVATION-01` / `B-WIRE-REPOSITORY-TREE-01` / `B-WIRE-GOVERNED-TEXT-01` / `B-WIRE-REPOSITORY-TARGET-01` / `B-RESOURCE-01` / `B-CACHE-01` / `B-ADMISSION-01` / `B-SEALED-CONTEXT-01` / `B-CODEC-DERIVATION-01` |
+| State | Codec activation, all three wire packets, resource, cache, admission, and sealed context `ReviewedHostedGreen`; repository-target R=0004, admission R=0008/R=0009/R=0010, and codec-derivation R=0013 diagnostic/no-success, while R=0005/R=0006/R=0007/R=0011/R=0012 are accepted/immutable; B remains `10/11`, A+B `42/43`; corrected codec-derivation R=0014 `FrozenDesign`/inactive pending this synchronized diagnostic/design head's hosted gate |
 | Parent | Owning ContractSlice B micro-delivery plan |
 | Scenario | Parent scenario retained `Planned` |
 | Exact resource implementation | Immutable hosted-green resource identity and run custody remain owned by the resource packet records below |
@@ -921,7 +921,8 @@ once. It is immutable and must never be rerun.
 
 - The typed design is the sole normative owner of the exact Tests-owned frame,
   coordinator signature, structural parent/session/component/artifact/model and
-  same-or-narrower location comparator, collision/order matrix, R=0013 custody,
+  same-or-narrower location comparator, collision/order matrix, R=0013
+  diagnostic custody, corrected R=0014 custody,
   green matrix, and holds. This ledger routes that contract and will retain its
   immutable execution evidence.
 - Executable scope adds only
@@ -930,7 +931,8 @@ once. It is immutable and must never be rerun.
   remain unchanged. The sole Fact/FQN is
   `ContractSliceBQualifiedReferenceTests.Seals_exact_codec_derived_reference_and_location_narrowing`
   with only `ContractSlice=B`, no Scenario/Theory/class trait, and marker
-  `TEST-0210-B-BEHAVIOR-RED-0013`.
+  corrected `TEST-0210-B-BEHAVIOR-RED-0014`; R=0013 is immutable diagnostic
+  history and is never reused.
 - The packet consumes the actual finalized manifest and accepted sealed-context
   projection. It derives exactly one Snapshot-equal and one Repository-narrower
   reference from the manifest-owned repository-tree codec component, artifact,
@@ -938,13 +940,73 @@ once. It is immutable and must never be rerun.
   widening, order/duplicate/collision, selector, parser, and index behavior fail
   closed; no alternate codec, public factory, Policy implementation, or C/D
   surface is introduced.
-- R=0013 inherits the exact one-shot Release `--no-restore --no-build`, fresh
+- Corrected R=0014 inherits the exact one-shot Release `--no-restore --no-build`, fresh
   root/TRX, 300-second VSTest environment, 420000-ms child, 8-MiB log, 1-MiB
   report, source/build/PDB/lock/status, secure TRX/16-counter, and no-retry
-  contract. Green is focused `1/1`, B `11/11`, A+B/full Conformance `43/43`,
+  contract. It additionally requires a single-node/non-reuse build, sixteen
+  simultaneous loopback-listener probes before commit, no matching test
+  process, and structural/infrastructure checks before marker counting. Green
+  is focused `1/1`, B `11/11`, A+B/full Conformance `43/43`,
   Domain `98/98`, then build/format/locks/diff/StructureOnly/publication and two
   reviews `0/0/0`. B-CONVERGE and every activation/downstream scope remain held.
 
 | B-SEALED implementation / B-CODEC design check | Result |
 | --- | --- |
-| Exact-tree local gate | R=0012 immutable and bounded green; publication evidence `7/7` with fresh commit-reference recurrence and no publication claim; StructureOnly green; projected schema-2 graph `364/4143/319/4295288`, typed design `622991/1048576`; code/test and evidence/scope reviews each `0/0/0`; this evidence row requires the same two exact-tree recurrences before commit; R=0013 remains inactive pending exact-head hosted green |
+| Exact-tree local gate | R=0012 immutable and bounded green; publication evidence `7/7` with fresh commit-reference recurrence and no publication claim; StructureOnly green; projected schema-2 graph `364/4143/319/4295288`, typed design `622991/1048576`; code/test and evidence/scope reviews each `0/0/0`; B-SEALED implementation head later passed exact-head hosted green; R=0013 is immutable diagnostic/no-success; corrected R=0014 remains inactive pending this synchronized diagnostic/design head's hosted green |
+
+## B-SEALED hosted closure and immutable codec-derivation R=0013 diagnostic
+
+- Exact B-SEALED implementation/B-CODEC design head
+  [`bde5607a8642ced9de76808b873cb1360ab84284`](https://github.com/hasanmanzak/meAndAI/commit/bde5607a8642ced9de76808b873cb1360ab84284)
+  passed [run 31448778872](https://github.com/hasanmanzak/meAndAI/actions/runs/31448778872): Ubuntu `21m46s`, Windows `46m17s`, publication verification
+  skipped. B-SEALED-CONTEXT is therefore immutable hosted green.
+- The first hardened R=0013 runner candidate was preserved without execution
+  after its `-File` array-binding preflight failed. The next preserved candidate
+  was `35,240` bytes / SHA-256
+  `59C7BD7A9A755B1F8C25AA5EA14C751767C0DAE6193B00B013C23532779F82BF`;
+  its direct ValidateOnly exposed a missing lock-path declaration before build,
+  root, report, or child creation. Neither event created R.
+- The corrected runner
+  `D:\Temp\meandai-test-0210-b-codec-r0013-runner-7a9fd0d487f7427cb0ab2d6355efcdb4.ps1`
+  is `35,648` bytes / SHA-256
+  `2470447AF4658CC9AF97C8138F7914068017240B11F567FE3DDB6EB791044E19`,
+  AST `5,112` tokens / `38` statements / zero errors. ValidateOnly proved exact
+  head/upstream/branch/status, source `30,968` bytes / SHA-256
+  `B2F213F07778DA452E5A22ACE7A84B481BB7036BE6AC485C6DD2DE169EEA2432`,
+  `833/1,200` lines, all six locks, and absent root/report/log paths.
+- The sole canonical R=0013 Execute reached `InvocationCommitted` at
+  `2026-08-11T21:44:13.1394043Z`. It is immutable diagnostic/no-success and is
+  never rerun. Report `568` bytes / SHA-256
+  `7C983AE10D582A3CF7A913EFF59E63F0A656D9080E2DD2C7919A760BE1294A1C`
+  ended `OracleRejected`; complete stdout/stderr are `1,315` / `1,513` bytes at
+  SHA-256 `32AA52D0FBB1BF92E6605517FB9CE4E86E7C4AB4EBF8285FAF10ED8319BB0950` /
+  `668963AFF06768A65B179322E840C3D758B6C2275655BF8D585F57C283FA0F01`.
+- Fresh root
+  `D:\Temp\meandai-test-0210-b-79aeb9c036384744a2984492ea55942b`
+  contains only `TEST-0210-B-BEHAVIOR-RED-0013.trx`, `2,774` bytes / SHA-256
+  `126137B4B5B2F2C68465DCEDD9DEE13734A78F2A81F5247E31EA8EA757410125`.
+  VSTest failed before discovery/execution with `SocketException (10055)` while
+  binding its communication listener. The TRX has zero result/definition/entry
+  nodes, all sixteen counters zero, marker count zero, and one Error RunInfo;
+  no behavior red exists. The runner's marker-count rejection is secondary to
+  this exact infrastructure failure.
+
+## Corrected `B-CODEC-DERIVATION-01` R=0014 freeze
+
+- R=0014 keeps the same direct Fact/FQN, test-only carrier/coordinator contract,
+  two valid references, full negative matrix, line ceiling, and final null-only
+  red seam. Only marker/TRX identity changes to
+  `TEST-0210-B-BEHAVIOR-RED-0014`; no R=0013 artifact/path is reused.
+- A fresh runner must use a single-node/non-reuse warning-free build
+  (`-m:1 /nr:false` and disabled shared compilation), prove no matching
+  dotnet-test/testhost/vstest process, and open/hold/dispose sixteen simultaneous
+  loopback ephemeral listeners immediately before `InvocationCommitted`.
+  Structural/result and infrastructure TRX checks precede marker counting.
+- Any pre-commit capacity/build/static failure is fail-closed and creates no R.
+  Once committed, every process-create/timeout/exit/TRX/oracle outcome consumes
+  R=0014 with no retry. R=0014 remains inactive until this exact twelve-record
+  diagnostic/design cohort is committed, pushed, and exact-head hosted green.
+
+| R=0013 diagnostic / corrected R=0014 design check | Result |
+| --- | --- |
+| Exact-tree local evidence | Publication evidence `7/7` including the fresh commit-reference recurrence, no publication claim; StructureOnly green in `424.695s`; typed design `623922/1048576` normalized UTF-8 bytes; schema-2 graph limits green; D/RT/content/scope reviews `0/0/0`. These recurrences must pass again after this evidence row before commit. |
