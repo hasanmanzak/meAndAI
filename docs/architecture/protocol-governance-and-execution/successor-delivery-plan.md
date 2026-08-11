@@ -6,7 +6,7 @@
 | Parent epic | [EPIC-0002 / issue #163](https://github.com/hasanmanzak/meAndAI/issues/163) |
 | Architecture task | [TASK-0003 / issue #164](https://github.com/hasanmanzak/meAndAI/issues/164) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
-| Current authority | ContractSlice A is merged/exact-main green. B surface, codec, three wires, B-RESOURCE, B-CACHE, B-ADMISSION, and B-SEALED-CONTEXT are exact-head hosted green; R=0006/R=0007/R=0011/R=0012 are accepted/immutable. Admission R=0008/R=0009/R=0010 and codec-derivation R=0013 are immutable diagnostics/no-success. B remains `10/11`, A+B `42/43`; corrected codec-derivation R=0014 is `FrozenDesign`/inactive pending this synchronized diagnostic/design head's hosted gate. B-CONVERGE, C/D, activation, merge/release/publication remain held. |
+| Current authority | ContractSlice A is merged/exact-main green. B surface, codec, three wires, B-RESOURCE, B-CACHE, B-ADMISSION, and B-SEALED-CONTEXT are exact-head hosted green; R=0006/R=0007/R=0011/R=0012 and corrected codec-derivation R=0014 are accepted/immutable. Admission R=0008/R=0009/R=0010 and codec-derivation R=0013 remain immutable diagnostics/no-success. B is `11/11`, A+B `43/43`; corrected codec-derivation R=0014 is local green pending its exact implementation head's hosted gate. B-CONVERGE, C/D, activation, merge/release/publication remain held. |
 
 This plan allocates the accepted architecture to stable delivery records. It
 did not itself authorize implementation. The later

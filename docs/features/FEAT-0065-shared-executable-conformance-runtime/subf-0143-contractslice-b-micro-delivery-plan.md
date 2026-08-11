@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Gate 2 micro-delivery plan and design freeze |
-| State | B surface, codec, three wire packets, `B-RESOURCE-01`, `B-CACHE-01`, `B-ADMISSION-01`, and `B-SEALED-CONTEXT-01` exact-head hosted green; repository-target R=0004, admission R=0008/R=0009/R=0010, and codec-derivation R=0013 diagnostic/no-success, while R=0005/R=0006/R=0007/R=0011/R=0012 are accepted/immutable; B remains `10/11`, cumulative A+B `42/43`; corrected codec-derivation R=0014 is `FrozenDesign`/inactive pending this synchronized diagnostic/design head's hosted gate |
+| State | B surface, codec, three wire packets, `B-RESOURCE-01`, `B-CACHE-01`, `B-ADMISSION-01`, and `B-SEALED-CONTEXT-01` exact-head hosted green; repository-target R=0004, admission R=0008/R=0009/R=0010, and codec-derivation R=0013 diagnostic/no-success, while R=0005/R=0006/R=0007/R=0011/R=0012 and corrected codec-derivation R=0014 are accepted/immutable; B is `11/11`, cumulative A+B `43/43`; corrected R=0014 is local green pending its exact implementation head's hosted gate; `B-CONVERGE-01` remains inactive |
 | Parent | Owning feature and current subfeature |
 | Scenario | [TEST-0210](test-cases.md#test-0210), still `Planned` |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
@@ -101,7 +101,7 @@ semantic packages own one Fact and one immutable BehaviorRed ordinal each.
 | `B-CACHE-01` | Codec-model key bytes, collision closure, single-flight, success/declared-failure retention, deterministic eviction, exact-release/session isolation, no cancellation/host/integrity caching | `TEST-0210-B-BEHAVIOR-RED-0007`; `ContractSliceBDecodeModelCacheTests.Enforces_exact_codec_cache_single_flight_collision_and_eviction` | Focused `1/1`; B `8/8`; A+B `40/40` |
 | `B-ADMISSION-01` | Receipt frame after measured qualification/cache closure, exact instruction/proof bijection, manifest/type/artifact validation, Observed/Failed/NoInput leaf exclusivity, writer-before-qualifier lifecycle, forged/stale/partial rejection; R=0008, R=0009, and R=0010 are immutable diagnostics/no-success | Third-corrected `TEST-0210-B-BEHAVIOR-RED-0011`; `ContractSliceBAdmissionProofTests.Admits_exact_observed_failed_and_no_input_proofs` | Focused `1/1`; B `9/9`; A+B `41/41` |
 | `B-SEALED-CONTEXT-01` | Exact sealed Authority/Manifest/Catalog/slot/scope projection plus ContextProof and Root reference shapes; no raw payload/digest factory and no selector semantics | `TEST-0210-B-BEHAVIOR-RED-0012`; `ContractSliceBSealedContextTests.Seals_exact_context_proof_and_root_references` | Focused `1/1`; B `10/10`; A+B `42/42` |
-| `B-CODEC-DERIVATION-01` | Codec-derived reference frame, manifest component/artifact/model identity, same-or-narrower location, structural comparator, collision and foreign-session rejection; no parser/index derivation | corrected `TEST-0210-B-BEHAVIOR-RED-0014`; `ContractSliceBQualifiedReferenceTests.Seals_exact_codec_derived_reference_and_location_narrowing`; R=0013 immutable infrastructure diagnostic/no-success | Focused `1/1`; B `11/11`; A+B `43/43` |
+| `B-CODEC-DERIVATION-01` | Codec-derived reference frame, manifest component/artifact/model identity, same-or-narrower location, structural comparator, collision and foreign-session rejection; no parser/index derivation | corrected `TEST-0210-B-BEHAVIOR-RED-0014`; `ContractSliceBQualifiedReferenceTests.Seals_exact_codec_derived_reference_and_location_narrowing`; R=0013 immutable infrastructure diagnostic/no-success; R=0014 accepted/immutable and local green | Focused `1/1`; B `11/11`; A+B `43/43` |
 | `B-CONVERGE-01` | Pure cumulative audit of exact source/test/export/friend/trait/lock/project state; P/R/G `NotApplicable` | None; every canonical red remains immutable and is never rerun | B `11/11`; A+B/full Conformance `43/43`; Domain `98/98`; Release build/format/locks/diff/StructureOnly/publication evidence/reviews green |
 
 ### Immutable `B-WIRE-REPOSITORY-TREE-01` hosted-green boundary
@@ -900,11 +900,11 @@ at focused/B/full/Domain `1/1`, `8/8`, `40/40`, and `98/98`, with one
 `1,063/1,200`-line Tests-only file and zero production delta. Admission R=0008,
 R=0009, and R=0010 are immutable diagnostics/no-success; R=0011 and sealed-
 context R=0012 are accepted/immutable. B-ADMISSION is exact-head hosted green;
-B-SEALED-CONTEXT is exact-head hosted green. B is `10/11`, cumulative A+B is
-`42/43`; codec-derivation R=0013 is immutable diagnostic/no-success and
-corrected R=0014 is `FrozenDesign`/inactive pending this synchronized
-diagnostic/design head's hosted gate.
-B-CONVERGE remains held.
+B-SEALED-CONTEXT is exact-head hosted green. B is `11/11`, cumulative A+B is
+`43/43`; codec-derivation R=0013 is immutable diagnostic/no-success and
+corrected R=0014 is accepted/immutable and local green after focused/B/full/
+Domain `1/1`, `11/11`, `43/43`, and `98/98`. Its exact implementation head's
+hosted gate remains pending. B-CONVERGE remains held.
 C/D, final
 activation, feature DoD, release, publication, consumer mutation, authority
 transfer, and PowerShell retirement remain held.

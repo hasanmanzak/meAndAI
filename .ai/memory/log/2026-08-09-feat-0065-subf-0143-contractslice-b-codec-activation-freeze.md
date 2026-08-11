@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Packet | `B-CODEC-ACTIVATION-01` / `B-WIRE-REPOSITORY-TREE-01` / `B-WIRE-GOVERNED-TEXT-01` / `B-WIRE-REPOSITORY-TARGET-01` / `B-RESOURCE-01` / `B-CACHE-01` / `B-ADMISSION-01` / `B-SEALED-CONTEXT-01` / `B-CODEC-DERIVATION-01` |
-| State | Codec activation, all three wire packets, resource, cache, admission, and sealed context `ReviewedHostedGreen`; repository-target R=0004, admission R=0008/R=0009/R=0010, and codec-derivation R=0013 diagnostic/no-success, while R=0005/R=0006/R=0007/R=0011/R=0012 are accepted/immutable; B remains `10/11`, A+B `42/43`; corrected codec-derivation R=0014 `FrozenDesign`/inactive pending this synchronized diagnostic/design head's hosted gate |
+| State | Codec activation, all three wire packets, resource, cache, admission, and sealed context `ReviewedHostedGreen`; repository-target R=0004, admission R=0008/R=0009/R=0010, and codec-derivation R=0013 diagnostic/no-success, while R=0005/R=0006/R=0007/R=0011/R=0012 and corrected codec-derivation R=0014 are accepted/immutable; B is `11/11`, A+B `43/43`; corrected R=0014 is local green pending its exact implementation head's hosted gate; B-CONVERGE inactive |
 | Parent | Owning ContractSlice B micro-delivery plan |
 | Scenario | Parent scenario retained `Planned` |
 | Exact resource implementation | Immutable hosted-green resource identity and run custody remain owned by the resource packet records below |
@@ -952,7 +952,7 @@ once. It is immutable and must never be rerun.
 
 | B-SEALED implementation / B-CODEC design check | Result |
 | --- | --- |
-| Exact-tree local gate | R=0012 immutable and bounded green; publication evidence `7/7` with fresh commit-reference recurrence and no publication claim; StructureOnly green; projected schema-2 graph `364/4143/319/4295288`, typed design `622991/1048576`; code/test and evidence/scope reviews each `0/0/0`; B-SEALED implementation head later passed exact-head hosted green; R=0013 is immutable diagnostic/no-success; corrected R=0014 remains inactive pending this synchronized diagnostic/design head's hosted green |
+| Historical exact-tree local gate | At that design checkpoint R=0012 was immutable and bounded green; publication evidence was `7/7` with fresh commit-reference recurrence and no publication claim; StructureOnly was green; projected schema-2 graph was `364/4143/319/4295288`, typed design `622991/1048576`; code/test and evidence/scope reviews were each `0/0/0`; B-SEALED later passed exact-head hosted green; R=0013 was immutable diagnostic/no-success and corrected R=0014 still awaited its synchronized design head's hosted gate |
 
 ## B-SEALED hosted closure and immutable codec-derivation R=0013 diagnostic
 
@@ -1010,3 +1010,39 @@ once. It is immutable and must never be rerun.
 | R=0013 diagnostic / corrected R=0014 design check | Result |
 | --- | --- |
 | Exact-tree local evidence | Publication evidence `7/7` including the fresh commit-reference recurrence, no publication claim; StructureOnly green in `424.695s`; typed design `623922/1048576` normalized UTF-8 bytes; schema-2 graph limits green; D/RT/content/scope reviews `0/0/0`. These recurrences must pass again after this evidence row before commit. |
+
+## Corrected R=0014 canonical red and bounded local green
+
+- Exact diagnostic/design head
+  [`2cd3ecff2d6c754cdf991e2eeb1ccdd05c230127`](https://github.com/hasanmanzak/meAndAI/commit/2cd3ecff2d6c754cdf991e2eeb1ccdd05c230127)
+  passed [run 31541938533](https://github.com/hasanmanzak/meAndAI/actions/runs/31541938533): Ubuntu `16m18s`, Windows `52m11s`, publication verification skipped.
+- Fresh R=0014 runner
+  `D:\Temp\meandai-test-0210-b-codec-r0014-runner-4d91b872b42f4fd486a3b7d1df8fe2f1.ps1`
+  is `37,763` bytes / SHA-256
+  `0E437E0D6269D4A7691388E9AF9F340587B5C4DD0BDD8ACA08A96241B93532DE`,
+  AST `5,417` tokens / `40` statements / zero errors. ValidateOnly proved exact
+  head/upstream/branch/status, red source `30,968` bytes / SHA-256
+  `18EFEAC3D7A15CE47698280A08183F40B9F7D5C8482B6C401955C1482F2FD80B`,
+  `833/1,200` lines, six locks, no competing test process, sixteen simultaneous
+  loopback listeners, and absent result/report/log paths.
+- The sole Execute accepted canonical R=0014: native exit `1`, runner exit `0`,
+  one exact Failed result/definition/entry, raw marker count two, exact sixteen
+  counters, one marker-free stack, one summary echo, one same-FQN RunInfo, and
+  no attachments/collector data. It is immutable and never reruns.
+- Report is `13,369` bytes / SHA-256
+  `A0497FE5157450A997D4265D08D7A2A361E838D266B54FDADC5D07C697B74F2F`;
+  sole TRX is `4,960` bytes / SHA-256
+  `E823A0F76295E700D4C24CAD7C0FAB40705B21563553387BC56EBCEFB5FAE247`;
+  stdout/stderr are `2,147` / `210` bytes at SHA-256
+  `BE29C57E1AC9A468BF0124D3EE1914E3C2C2E3F99CFE9A3F0CD74FFF2895E51A` /
+  `70136AAD253030AA4DE0DA2E07DD8E6F527949BCA6826AE04A79752CEC657AB7`.
+- Green changed only final `return null!;` to the prepared read-only result.
+  Green source is `30,991` bytes / SHA-256
+  `1510291FB97B442995DA65AFC320BB9FE5C2481A591093007BBCED5040DB2633`;
+  Release build is `0` warning / `0` error; focused/B/full/Domain are `1/1`,
+  `11/11`, `43/43`, `98/98`; format is unchanged. Exact-tree publication
+  evidence passed `7/7` in `286.3s` without publication claim and StructureOnly
+  passed in `431.877s`; schema-2 limits and diff are green. Code/test and
+  evidence/scope reviews are each `0/0/0`. These two recurrences must pass once
+  more after this evidence row; implementation commit/push and exact-head hosted
+  gate remain next. B-CONVERGE and every activation/downstream scope stay held.
