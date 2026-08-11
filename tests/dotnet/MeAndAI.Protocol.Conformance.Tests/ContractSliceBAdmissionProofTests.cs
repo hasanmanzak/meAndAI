@@ -42,7 +42,7 @@ public sealed class ContractSliceBAdmissionProofTests
         Assert.True(aggregate.LifecycleClosed);
     }
 
-    private static AdmissionAggregateMirror? ExecuteContract()
+    internal static AdmissionAggregateMirror? ExecuteContract()
     {
         var manifest = CreateAdmissionManifest();
         var instructions = CreateInstructions(manifest);
@@ -73,10 +73,16 @@ public sealed class ContractSliceBAdmissionProofTests
 
         AssertNegativeMatrix(manifest, instructions, candidates, proof);
 
-        return new AdmissionAggregateMirror(receipts, (1, 1, 1), true);
+        return new AdmissionAggregateMirror(
+            manifest.AuthorityKind,
+            manifest.ManifestDigest,
+            manifest.Slice!.CatalogVersion,
+            receipts,
+            (1, 1, 1),
+            true);
     }
 
-    private static FinalizedPolicyManifest CreateAdmissionManifest()
+    internal static FinalizedPolicyManifest CreateAdmissionManifest()
     {
         var source = ContractSliceBActivationTests.CreateManifest();
         var replacementTypes = new Dictionary<string, Type>(StringComparer.Ordinal)
@@ -1344,6 +1350,9 @@ internal sealed class ContractSliceBAdmissionCoordinatorMirror
 }
 
 internal sealed record AdmissionAggregateMirror(
+    CatalogAuthorityKind AuthorityKind,
+    ExactSha256Digest ManifestDigest,
+    CatalogVersion CatalogVersion,
     IReadOnlyList<AdmissionReceiptMirror> Receipts,
     (int Observed, int Failed, int NoInput) LeafCounts,
     bool LifecycleClosed);

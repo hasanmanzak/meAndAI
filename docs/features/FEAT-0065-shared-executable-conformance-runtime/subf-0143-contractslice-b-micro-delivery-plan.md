@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Gate 2 micro-delivery plan and design freeze |
-| State | B surface, codec, three wire packets, `B-RESOURCE-01`, `B-CACHE-01`, and `B-ADMISSION-01` exact-head hosted green; repository-target R=0004 plus admission R=0008/R=0009/R=0010 diagnostic/no-success, R=0005, resource R=0006, cache R=0007, and admission R=0011 accepted/immutable; B `9/11`, cumulative A+B `41/43`; `B-SEALED-CONTEXT-01` `FrozenDesign`/inactive pending its synchronized design-head hosted gate |
+| State | B surface, codec, three wire packets, `B-RESOURCE-01`, `B-CACHE-01`, and `B-ADMISSION-01` exact-head hosted green; repository-target R=0004 plus admission R=0008/R=0009/R=0010 diagnostic/no-success, R=0005, resource R=0006, cache R=0007, admission R=0011, and sealed-context R=0012 accepted/immutable; `B-SEALED-CONTEXT-01` `ReviewedLocalGreen` with its implementation head hosted pending; B `10/11`, cumulative A+B `42/43`; `B-CODEC-DERIVATION-01` `FrozenDesign`/inactive pending that synchronized head's hosted gate |
 | Parent | Owning feature and current subfeature |
 | Scenario | [TEST-0210](test-cases.md#test-0210), still `Planned` |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
@@ -571,6 +571,144 @@ Conformance `42/42`, Domain `98/98`, warning-free Release build, format, six
 locks, diff, StructureOnly, publication evidence, and two fresh `0/0/0`
 reviews. B-CODEC-DERIVATION and all later scopes remain held.
 
+### Accepted `B-SEALED-CONTEXT-01` red and local green
+
+The corrected design predecessor passed exact-head hosted validation. Canonical
+R=0012 then ran once from its fresh external runner and is accepted/immutable:
+native exit `1`, runner exit `0`, one exact Failed result/definition/entry,
+marker count `2`, total/executed/failed `1/1/1`, all other thirteen counters
+zero, and no attachment/collector data. Its sole TRX is `4,842` bytes / SHA-256
+`24B78DD8AEF0B7D95B7D9FB653A233B333D2EB10DB71893516C00F01D73A98B4`;
+the append-state report SHA-256 is
+`3764392A7E5CDCC3E1A2F7C447067492053D25340C60DE408A765A77A15E3A21`.
+R=0012 is never rerun.
+
+Bounded green removes the marker/null branch and changes no other behavior.
+The retained admission source is `64,871` bytes / SHA-256
+`D6E34E10A121447FE25906451FEAE2623D3B18D0B0AA1CD6EC2C1123C5066E63`;
+the final sealed-context source is `534` lines, `20,197` bytes / SHA-256
+`D83BB1E5A729F5890F8D2B577209C200802478EDEE6D0068C1D909BAF89F1AC6`;
+combined changed lines are `549/1,200`. Focused/B/full Conformance/Domain are
+`1/1`, `10/10`, `42/42`, and `98/98`; Release build is zero warnings/errors,
+format and diff are clean. B-SEALED-CONTEXT is `ReviewedLocalGreen`; its
+implementation head remains hosted pending. No downstream authority follows.
+
+### Frozen `B-CODEC-DERIVATION-01` staging boundary
+
+This final executable B packet adds only
+`tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ContractSliceBQualifiedReferenceTests.cs`.
+It modifies no existing source and has no production, public API, project,
+package, lock, workflow, Policy, Scenario, C, or D delta. The new file is at
+most `1,200` normalized lines; `1,201` requires reviewed redesign.
+
+The file owns exactly one direct Fact,
+`MeAndAI.Protocol.Conformance.Tests.ContractSliceBQualifiedReferenceTests.Seals_exact_codec_derived_reference_and_location_narrowing`,
+one `ContractSlice=B` trait, no Scenario/Theory/class trait/overload, and marker
+`TEST-0210-B-BEHAVIOR-RED-0013`. P is `NotApplicable`. R implements every
+valid and negative assertion but returns `null!` only after both valid derived
+references are fully prepared; only that null reaches `Assert.Fail(Marker)`.
+G restores only the already computed read-only result.
+
+The exact Tests-owned callable surface is:
+
+```csharp
+internal sealed record CodecDerivedReferenceFrameMirror(
+    QualifiedEvidenceReference Parent,
+    ComponentArtifactBinding Codec,
+    ExactSha256Digest ArtifactDigest,
+    ModelContractIdentity OutputModel,
+    string TypedNodeKind,
+    string TypedNodeIdentity,
+    EvidenceLocation Location);
+
+internal static class ContractSliceBCodecDerivedReferenceCoordinatorMirror
+{
+    internal static IReadOnlyList<QualifiedEvidenceReference>? Seal(
+        FinalizedPolicyManifest manifest,
+        SealedContextProjectionMirror context,
+        IReadOnlyList<CodecDerivedReferenceFrameMirror> frames);
+}
+```
+
+There is no alternate codec, adapter, public factory, production coordinator,
+raw payload/digest input, selector, parser, index, capability, cache, resource,
+admission, or kernel seam. `Seal` defensively copies the frame collection and
+uses only the actual finalized manifest plus the accepted sealed projection.
+
+The valid fixture is exact. It rebuilds the admission manifest/aggregate and
+seals the accepted projection. The sole root parent structurally owns exact
+manifest digest, catalog version, slot `protocol.slot.repository-tree`,
+requirement `protocol.requirement.repository-tree`, repository ExactCommit
+scope, qualification-proof digest, root, and Snapshot location. The manifest's
+unique repository-tree schema resolves one codec component binding, its exact
+artifact file and artifact digest, and its exact output-model identity.
+
+Two already ordinal frames are required. Frame zero retains the parent Snapshot
+location and uses typed node kind `protocol.codec-output.repository-tree` plus
+identity `<model-key>@<model-version>`. Frame one narrows to
+`RepositoryEvidenceLocation` at `AGENTS.md`, blob identity equal to the exact
+commit, no line/anchor/property refinement, the same kind, and identity
+`<model-key>@<model-version>#AGENTS.md`. Each output is kind `Derived`, retains
+the exact parent manifest/catalog/slot/requirement/scope/proof/root identities,
+uses its frame location, contains exactly one `QualifiedEvidenceDerivation`
+with the exact codec component/artifact/digest/output model, null output
+capability, exact typed node kind/identity and location, and has null
+ExpectedSelectorParentKind/Selector. The output list is a defensive copy.
+
+Validation precedence is exact:
+
+1. null manifest/context/frame collection is the corresponding
+   `ArgumentNullException`; a null frame element is `ArgumentException` with
+   `ParamName=frames`;
+2. wrong manifest authority/slice/complete-catalog state or any sealed-context
+   authority/digest/catalog/slot/scope inequality is `ManifestInvalid`;
+3. a parent that is not structurally identical to the sole accepted Root,
+   including foreign manifest/catalog/proof/scope/root/location identity, is
+   `ReferenceInvalid`;
+4. codec component/artifact file/artifact digest/output model that is not the
+   unique repository-tree manifest binding is `ReferenceInvalid`;
+5. wrong/empty typed-node values, any location wider than Snapshot or not
+   exactly Snapshot-equal/Repository-narrower under the same scope, and any
+   Repository blob/refinement drift is `ReferenceInvalid`; and
+6. frames must be strictly ordinal by `(TypedNodeKind, TypedNodeIdentity)`;
+   duplicate keys, reordered rows, and same-key unequal rows are collisions and
+   map to `ReferenceInvalid` before any output escapes.
+
+Reference comparison is field-by-field and ordinal across kind, manifest,
+catalog, slot, requirement, scope, proof, root, location, ordered derivations,
+parent-kind and selector; object identity is never authority. Separately rebuilt
+structurally equal inputs must produce structurally equal output. Mutating the
+caller frame array after sealing cannot affect the result. Every negative vector
+is marker-free and no partial result escapes.
+
+Canonical R=0013 is one exact warning-free Release build followed by exactly:
+
+```text
+dotnet test tests/dotnet/MeAndAI.Protocol.Conformance.Tests/MeAndAI.Protocol.Conformance.Tests.csproj --configuration Release --no-restore --no-build --nologo --verbosity minimal --results-directory <fresh-root> --logger trx;LogFileName=TEST-0210-B-BEHAVIOR-RED-0013.trx --filter ContractSlice=B&FullyQualifiedName=MeAndAI.Protocol.Conformance.Tests.ContractSliceBQualifiedReferenceTests.Seals_exact_codec_derived_reference_and_location_narrowing
+```
+
+This packet-specific command supersedes the generic red template only for
+R=0013. It retains fresh external CreateNew runner/report/log custody, exact
+source/runner/head/upstream/branch/full-status checks at start/pre-build/pre-test/
+post-test, six lock hashes, warning/error-free build, exact DLL/PDB, process-only
+`VSTEST_CONNECTION_TIMEOUT=300`, one child/logger, monotonic `420000`-ms bound,
+complete `8,388,608`-byte stdout/stderr ceilings, `1,048,576`-byte report,
+secure no-DTD/no-external-resolution XML, exact one-result marker/optional-stack/
+echo/RunInfo/16-counter/no-diagnostic/no-attachment oracle, and native exit `1`.
+`InvocationCommitted` irrevocably consumes R=0013; process-create, timeout,
+unexpected exit, interruption/crash, missing/malformed/extra TRX, or oracle
+rejection is immutable no-success/no-retry. Only pre-commit preflight/build
+failure may be corrected and revalidated without creating R.
+
+Green is focused `1/1`, B `11/11`, A+B/full Conformance `43/43`, Domain `98/98`,
+warning/error-free Release build, format, six locks, diff, StructureOnly,
+publication evidence without publication claim, and two fresh `0/0/0` reviews.
+B-CONVERGE remains P/R/G `NotApplicable`; parent [TEST-0210](test-cases.md#test-0210), final Scenario/
+status/owner and both workflow filters, the runtime-efficiency scenario, C/D,
+activation, merge, release, publication, and DoD remain held. This design grants no R or
+implementation authority until the synchronized B-SEALED implementation plus
+B-CODEC-DERIVATION design commit itself is exact-head hosted green.
+
 ## SurfaceRed and BehaviorRed contract
 
 `B-SURFACE-01` is the accepted one-diagnostic compile-red exception. The exact
@@ -741,11 +879,13 @@ Conformance/Domain are `1/1`, `7/7`, `39/39`, and `98/98`, and the Tests-only
 source is `1,176/1,200` normalized lines with zero production delta. Cache
 R=0007 is accepted once and never rerun; `B-CACHE-01` is exact-head hosted green
 at focused/B/full/Domain `1/1`, `8/8`, `40/40`, and `98/98`, with one
-`1,063/1,200`-line Tests-only file and zero production delta. B is `9/11`,
-cumulative A+B is `41/43`; admission R=0008, R=0009, and R=0010 are immutable
-diagnostics/no-success, R=0011 is accepted/immutable, and B-ADMISSION is
-exact-head hosted green. B-SEALED-CONTEXT is `FrozenDesign`/inactive pending
-this synchronized design head's hosted gate. Every successor remains held.
+`1,063/1,200`-line Tests-only file and zero production delta. Admission R=0008,
+R=0009, and R=0010 are immutable diagnostics/no-success; R=0011 and sealed-
+context R=0012 are accepted/immutable. B-ADMISSION is exact-head hosted green;
+B-SEALED-CONTEXT is `ReviewedLocalGreen` with its implementation head hosted
+pending. B is `10/11`, cumulative A+B is `42/43`; B-CODEC-DERIVATION is
+`FrozenDesign`/inactive pending that synchronized head's hosted gate.
+B-CONVERGE remains held.
 C/D, final
 activation, feature DoD, release, publication, consumer mutation, authority
 transfer, and PowerShell retirement remain held.

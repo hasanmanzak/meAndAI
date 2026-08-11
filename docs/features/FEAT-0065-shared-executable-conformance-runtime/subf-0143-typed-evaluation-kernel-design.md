@@ -3,14 +3,14 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted; ContractSlice A merged/exact-main green. B surface, codec activation, all three wire packets, `B-RESOURCE-01`, `B-CACHE-01`, and `B-ADMISSION-01` are exact-head hosted green. Repository-target R=0004 plus admission R=0008/R=0009/R=0010 remain diagnostics/no-success; R=0005, resource R=0006, cache R=0007, and admission R=0011 remain accepted and immutable. B is `9/11`, cumulative A+B is `41/43`; `B-SEALED-CONTEXT-01` is `FrozenDesign`/inactive pending its synchronized design-head hosted gate. [TEST-0210](test-cases.md#test-0210) remains `Planned`; later B, C/D, activation, and DoD remain held. |
+| Status | Gate 2 accepted; ContractSlice A merged/exact-main green. B surface, codec activation, all three wire packets, `B-RESOURCE-01`, `B-CACHE-01`, and `B-ADMISSION-01` are exact-head hosted green. Repository-target R=0004 plus admission R=0008/R=0009/R=0010 remain diagnostics/no-success; R=0005, resource R=0006, cache R=0007, admission R=0011, and sealed-context R=0012 remain accepted and immutable. `B-SEALED-CONTEXT-01` is `ReviewedLocalGreen` with its implementation head hosted pending; B is `10/11`, cumulative A+B is `42/43`. `B-CODEC-DERIVATION-01` is `FrozenDesign`/inactive pending that synchronized head's hosted gate. [TEST-0210](test-cases.md#test-0210) remains `Planned`; B-CONVERGE, C/D, activation, and DoD remain held. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Test | [TEST-0210](test-cases.md#test-0210) |
 | Gate 3 micro-delivery routing | Historical A delivery remains owned by the [A micro-delivery control plan](subf-0143-micro-delivery-plan.md). Current B design routing is the [ContractSlice B micro-delivery plan](subf-0143-contractslice-b-micro-delivery-plan.md); packet labels refine delivery but activate no executable work. |
 | Exact-main design baseline | Accepted A merge commit [`51623f4d404a95e0f706d72805cf7ddbbbd293b8`](https://github.com/hasanmanzak/meAndAI/commit/51623f4d404a95e0f706d72805cf7ddbbbd293b8), validated by exact-main [run 31304787603](https://github.com/hasanmanzak/meAndAI/actions/runs/31304787603) |
-| Design and Gate 3 authority | Historical A directives and clarifications remain immutable evidence. B surface, codec activation, all three wire packets, B-RESOURCE, B-CACHE, and B-ADMISSION are immutable hosted-green predecessors; R=0006, cache R=0007, and admission R=0011 remain accepted, while admission R=0008/R=0009/R=0010 are immutable diagnostics/no-success. B-SEALED-CONTEXT is `FrozenDesign`/inactive pending this synchronized design head's hosted validation. C/D, final activation, merge, release, and publication remain outside this authority. |
+| Design and Gate 3 authority | Historical A directives and clarifications remain immutable evidence. B surface, codec activation, all three wire packets, B-RESOURCE, B-CACHE, and B-ADMISSION are immutable hosted-green predecessors; R=0006, cache R=0007, admission R=0011, and sealed-context R=0012 remain accepted, while admission R=0008/R=0009/R=0010 are immutable diagnostics/no-success. B-SEALED-CONTEXT is local green with its implementation head hosted pending; B-CODEC-DERIVATION is `FrozenDesign`/inactive pending this synchronized implementation/design head's hosted validation. B-CONVERGE, C/D, final activation, merge, release, and publication remain outside this authority. |
 | Completed predecessor | [SUBF-0153](README.md#subf-0153) / [TEST-0221](test-cases.md#test-0221), merged through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173) and exact-main validated by [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) |
 
 ## Directive and hard boundary
@@ -1234,9 +1234,11 @@ activation, workflow filters, or runtime-efficiency changes. The original B
 design phase had P/R/G `NotApplicable` and an empty executable allowlist.
 Surface, codec activation, all three wires, B-RESOURCE, B-CACHE, and B-ADMISSION
 are now immutable hosted-green history. Admission R=0008, R=0009, and R=0010
-are immutable diagnostics/no-success; R=0011 is accepted/immutable.
-B-SEALED-CONTEXT is `FrozenDesign`/inactive pending this synchronized design
-head's hosted validation; no later packet is active.
+are immutable diagnostics/no-success; R=0011 and sealed-context R=0012 are
+accepted/immutable. B-SEALED-CONTEXT is `ReviewedLocalGreen` with its
+implementation head hosted pending. B-CODEC-DERIVATION is `FrozenDesign`/
+inactive pending that synchronized head's hosted validation; no later packet is
+active.
 
 ## Gate 2 outcome
 
@@ -9418,9 +9420,180 @@ warning/error-free Release build, format, six locks, diff, StructureOnly,
 publication evidence without publication claim, and fresh code/test plus
 evidence/scope reviews `0/0/0`. B-CODEC-DERIVATION, B-CONVERGE, parent
 [TEST-0210](test-cases.md#test-0210) activation, C/D, the runtime-efficiency
-scenario, merge, release, publication, and DoD remain held. This design grants no red or implementation
-authority until the synchronized design commit itself is exact-head hosted
-green.
+scenario, merge, release, publication, and DoD remain held. At that historical
+freeze checkpoint, no red or implementation authority existed until the exact
+design head became hosted green.
+
+### Accepted `B-SEALED-CONTEXT-01` evidence and local-green closure
+
+The corrected B-SEALED design predecessor passed exact-head hosted validation.
+The sole canonical R=0012 invocation then produced native exit `1`, runner exit
+`0`, and exactly one marker-owned Failed result/definition/entry. Its sole TRX
+is `4,842` bytes / SHA-256
+`24B78DD8AEF0B7D95B7D9FB653A233B333D2EB10DB71893516C00F01D73A98B4`;
+the append-state report SHA-256 is
+`3764392A7E5CDCC3E1A2F7C447067492053D25340C60DE408A765A77A15E3A21`.
+The exact 16-counter, stack/echo/RunInfo, no-attachment, source/runner/build/
+binary/lock/status oracle passed. R=0012 is accepted, immutable, and never
+rerun.
+
+Green removes the marker/null branch and restores only the already computed
+projection. The retained admission source is `64,871` bytes / SHA-256
+`D6E34E10A121447FE25906451FEAE2623D3B18D0B0AA1CD6EC2C1123C5066E63`;
+the final sealed-context source is `534` lines, `20,197` bytes / SHA-256
+`D83BB1E5A729F5890F8D2B577209C200802478EDEE6D0068C1D909BAF89F1AC6`;
+combined changed lines are `549/1,200`. Focused/B/full Conformance/Domain are
+`1/1`, `10/10`, `42/42`, `98/98`; warning/error-free Release build, format and
+diff are green. B-SEALED is `ReviewedLocalGreen`; the exact implementation head
+remains hosted pending and grants no successor execution authority by itself.
+
+### Frozen `B-CODEC-DERIVATION-01` qualified-reference contract
+
+This is the final executable B packet. Its exact mutation allowlist is:
+
+```text
+add tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ContractSliceBQualifiedReferenceTests.cs
+```
+
+No existing file changes. Production, public API, project, package, lock,
+workflow, Policy, Scenario, C, and D deltas are exactly zero. The new file has a
+normal B packet ceiling of `1,200` normalized lines; `1,201` requires reviewed
+redesign.
+
+The Tests-owned callable surface is exact:
+
+```csharp
+internal sealed record CodecDerivedReferenceFrameMirror(
+    QualifiedEvidenceReference Parent,
+    ComponentArtifactBinding Codec,
+    ExactSha256Digest ArtifactDigest,
+    ModelContractIdentity OutputModel,
+    string TypedNodeKind,
+    string TypedNodeIdentity,
+    EvidenceLocation Location);
+
+internal static class ContractSliceBCodecDerivedReferenceCoordinatorMirror
+{
+    internal static IReadOnlyList<QualifiedEvidenceReference>? Seal(
+        FinalizedPolicyManifest manifest,
+        SealedContextProjectionMirror context,
+        IReadOnlyList<CodecDerivedReferenceFrameMirror> frames);
+}
+```
+
+No overload, generic variant, alternate codec/adapter, public factory,
+production coordinator, raw payload/digest seam, selector, parser, index,
+capability, cache, resource, admission, or kernel surface exists. `Seal`
+defensively copies the frame collection and constructs only existing internal
+`QualifiedEvidenceReference` / `QualifiedEvidenceDerivation` carriers.
+
+The exact input session is the structural tuple already carried by the accepted
+root: manifest digest, catalog version, slot, requirement, scope,
+qualification-proof digest, root, and root location. A separately constructed
+but field-equal parent is accepted; object identity is never authority. Any
+inequality in that tuple is a foreign session and is rejected. The manifest
+must be a QualificationSlice with null CompleteCatalog, and the supplied sealed
+context must exactly match authority/digest/catalog, admitted slot and scope.
+
+The canonical repository-tree slot/schema resolves exactly one manifest codec
+component binding. That binding's artifact basename resolves exactly one
+`ArtifactFileBinding`, and the schema's output model is the only accepted model.
+The frame's component, artifact basename, artifact digest and output model must
+be field-equal to those manifest-owned values. Component equality is ordinal
+across key/assembly/type; model equality is ordinal across key/version/
+implementation type; artifact identity is ordinal basename plus exact digest.
+
+The valid frame list contains exactly two rows, already strictly ordinal by
+`(TypedNodeKind, TypedNodeIdentity)`:
+
+| Rank | Typed node kind | Typed node identity | Location |
+| --- | --- | --- | --- |
+| 0 | `protocol.codec-output.repository-tree` | `<model-key>@<model-version>` | the exact parent `SnapshotEvidenceLocation` |
+| 1 | `protocol.codec-output.repository-tree` | `<model-key>@<model-version>#AGENTS.md` | `RepositoryEvidenceLocation` with the same exact scope, path `AGENTS.md`, blob identity equal to the ExactCommit target, and null line/anchor/property |
+
+Snapshot equality and that one Repository refinement are the only
+same-or-narrower forms. A changed scope, Provider/ReleaseAsset location,
+repository path other than `AGENTS.md`, missing/foreign blob, or any refinement
+is widening/drift and fails. The repository factory continues to own lexical
+path/blob validity; this coordinator owns contextual narrowing.
+
+Each output is a `QualifiedEvidenceReferenceKind.Derived` reference. It retains
+the parent's exact manifest/catalog/slot/requirement/scope/proof/root, takes the
+frame location, contains exactly one derivation, and has null
+ExpectedSelectorParentKind and Selector. The derivation contains exact codec
+component, artifact basename/digest, output model, null output capability,
+exact typed-node kind/identity, and the same frame location. Outputs preserve
+input ordinal order and the returned list is read-only/defensively copied.
+
+Validation/error precedence is exact and no partial output escapes:
+
+1. null `manifest`, `context`, or `frames` is its corresponding
+   `ArgumentNullException`; a null frame row is `ArgumentException` with
+   `ParamName=frames`;
+2. wrong manifest authority/slice/complete-catalog state or sealed-context
+   authority/digest/catalog/admitted-slot/scope drift throws
+   `CatalogIntegrityCode.ManifestInvalid`;
+3. a parent not structurally identical to the sole sealed Root, including
+   foreign manifest/catalog/proof/scope/root/location identity or a non-Root,
+   non-empty derivation, parent-kind, or selector field, throws
+   `CatalogIntegrityCode.ReferenceInvalid`;
+4. codec component/artifact/model drift or non-unique/missing manifest
+   resolution throws `ReferenceInvalid`;
+5. null/empty/whitespace or non-exact typed-node values, a widened/drifted
+   location, or a location unequal to its derivation location throws
+   `ReferenceInvalid`; and
+6. non-strict ordinal input, duplicate `(kind,identity)` keys, an exact
+   duplicate, or same-key unequal rows are collisions and throw
+   `ReferenceInvalid` before construction.
+
+The structural comparator covers reference kind, manifest, catalog, slot,
+requirement, scope, proof, root, location, ordered derivations and null parent/
+selector fields; each derivation comparator covers component, artifact,
+artifact digest, model/capability, typed-node kind/identity, and location.
+Repeating `Seal` with separately built field-equal inputs produces a field-equal
+ordered result. Mutating the caller frame array after return cannot change it.
+
+The sole Fact is
+`MeAndAI.Protocol.Conformance.Tests.ContractSliceBQualifiedReferenceTests.Seals_exact_codec_derived_reference_and_location_narrowing`.
+It is one direct non-skipped Fact with only `ContractSlice=B`, no Scenario,
+Theory, class trait, overload, or second method. Marker/TRX stem is
+`TEST-0210-B-BEHAVIOR-RED-0013`. P is `NotApplicable`. R executes all negative
+and deterministic assertions, prepares both valid references, then changes only
+the final nullable `Seal` return to `null!`; only that null reaches direct
+`Assert.Fail(Marker)`. G restores only the prepared read-only result.
+
+Canonical R=0013 follows one warning-free Release `--no-restore` build and one
+exact command:
+
+```text
+dotnet test tests/dotnet/MeAndAI.Protocol.Conformance.Tests/MeAndAI.Protocol.Conformance.Tests.csproj --configuration Release --no-restore --no-build --nologo --verbosity minimal --results-directory <fresh-root> --logger trx;LogFileName=TEST-0210-B-BEHAVIOR-RED-0013.trx --filter ContractSlice=B&FullyQualifiedName=MeAndAI.Protocol.Conformance.Tests.ContractSliceBQualifiedReferenceTests.Seals_exact_codec_derived_reference_and_location_narrowing
+```
+
+This is the R=0013-scoped replacement of the generic template. Its fresh
+external regular/non-reparse CreateNew runner/report/stdout/stderr paths, exact
+runner bytes/SHA/AST, exact source/head/upstream/branch/full porcelain status at
+start/pre-build/pre-test/post-test, six locks, warning/error-free build,
+fresh DLL/PDB, absent-then-empty result root, process-only
+`VSTEST_CONNECTION_TIMEOUT=300`, one child/logger, `420000`-ms monotonic bound,
+complete `8,388,608`-byte log ceilings, `1,048,576`-byte report ceiling, native
+integer exit `1`, secure no-DTD/no-external-resolution XML, and exact one-result
+marker/optional-stack/echo/RunInfo/16-counter/no-diagnostic/no-attachment oracle
+are mandatory. Overflow or truncation is `OracleRejected`.
+`InvocationCommitted` irrevocably consumes R=0013: process-create failure,
+timeout, unexpected exit, interruption/crash, missing/malformed/extra TRX, or
+any oracle rejection is immutable no-success/no-retry. Only a failure before
+that atomic state may be corrected and revalidated without creating R.
+
+Green requires focused `1/1`, B `11/11`, A+B/full Conformance `43/43`, Domain
+`98/98`, warning/error-free Release build, format, six locks, diff,
+StructureOnly, publication evidence without publication claim, and fresh
+code/test plus evidence/scope reviews `0/0/0`. `B-CONVERGE-01` remains a pure
+P/R/G `NotApplicable` cumulative audit. Parent [TEST-0210](test-cases.md#test-0210), final
+Scenario/status/owner and both workflow filters,
+[TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146), C/D,
+activation, merge, release, publication, and DoD remain held. R and
+implementation remain unauthorized until the synchronized B-SEALED
+implementation plus this design commit is exact-head hosted green.
 
 ## [TEST-0210](test-cases.md#test-0210) expected-red contract
 
@@ -10202,13 +10375,14 @@ ContractSlice A's historical delivery is owned by its
 [micro-delivery control plan](subf-0143-micro-delivery-plan.md). ContractSlice
 B is decomposed by the current
 [B micro-delivery plan](subf-0143-contractslice-b-micro-delivery-plan.md).
-Surface, codec activation, all three wires, B-RESOURCE, and B-CACHE are hosted
-green; repository-target R=0004 is diagnostic-only, while canonical R=0005,
-resource R=0006, cache R=0007, and admission R=0011 are accepted/immutable. B
-is `9/11`, A+B is `41/43`. Admission R=0008/R=0009/R=0010 are immutable
-diagnostics/no-success; B-ADMISSION is exact-head hosted green and
-B-SEALED-CONTEXT is `FrozenDesign`/inactive pending this synchronized design
-head's hosted gate. Later packets remain inactive.
+Surface, codec activation, all three wires, B-RESOURCE, B-CACHE, and B-ADMISSION
+are hosted green; repository-target R=0004 is diagnostic-only, while canonical
+R=0005, resource R=0006, cache R=0007, admission R=0011, and sealed-context
+R=0012 are accepted/immutable. B-SEALED-CONTEXT is `ReviewedLocalGreen` with its
+implementation head hosted pending; B is `10/11`, A+B is `42/43`. Admission
+R=0008/R=0009/R=0010 are immutable diagnostics/no-success.
+B-CODEC-DERIVATION is `FrozenDesign`/inactive pending that synchronized head's
+hosted gate. B-CONVERGE remains inactive.
 
 B implementation and C/D still require separate future activation, and no
 packet is active merely from this list. No directive here allocates new stable
