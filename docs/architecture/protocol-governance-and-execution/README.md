@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Architecture design |
-| Status | Accepted architecture; [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143) Gate 2 accepted. ContractSlice A and B are merged/exact-main green; B is `11/11`, cumulative A+B `43/43`. The C Activation cohort is `ExactHeadHostedGreen`; C is `5/11` and current A+B+C is `48/48`. `C-APPLICABILITY-PLAN-01` is `FrozenDesign`/inactive pending its records/design exact-head hosted gate. The parent scenario remains inactive; no activation/DoD is claimed. |
+| Status | Accepted architecture; [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143) Gate 2 accepted. ContractSlice A and B are merged/exact-main green; B is `11/11`, cumulative A+B `43/43`. The C Activation cohort is `ExactHeadHostedGreen`; C is `5/11` and current A+B+C is `48/48`. Applicability R=0006 is diagnostic/no-success; corrected R=0007 is frozen/inactive pending corrected-design hosted green. The parent scenario remains inactive; no activation/DoD is claimed. |
 | Owning epic | [EPIC-0002 / issue #163](https://github.com/hasanmanzak/meAndAI/issues/163) |
 | Owning task | [TASK-0003 / issue #164](https://github.com/hasanmanzak/meAndAI/issues/164) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |

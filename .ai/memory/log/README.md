@@ -12,7 +12,8 @@ exact B merge and hosted-run closure. B remains
 `11/11`, cumulative A+B `43/43`; its accepted reds and immutable diagnostics
 remain owned by the historical B handoff below. The C Activation cohort is
 `ExactHeadHostedGreen`; C is `5/11`, current A+B+C is `48/48`, and
-`C-APPLICABILITY-PLAN-01` is `FrozenDesign`/inactive pending its records/design
+Applicability R=0006 is an immutable runner-oracle diagnostic/no-success;
+corrected R=0007 is `FrozenDesign`/inactive pending its corrected records/design
 exact-head hosted gate.
 The parent scenario remains `Planned`; D and activation are held.
 

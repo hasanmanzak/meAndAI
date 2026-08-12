@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted; ContractSlice A and B merged/exact-main green; B is `11/11`, cumulative A+B `43/43`. The C Activation cohort is `ExactHeadHostedGreen`; C is `5/11`, current A+B+C is `48/48`, and `C-APPLICABILITY-PLAN-01` is `FrozenDesign`/inactive pending its records/design exact-head hosted gate. [TEST-0210](test-cases.md#test-0210) remains `Planned`; D, activation, and DoD remain held. |
+| Status | Gate 2 accepted; ContractSlice A and B merged/exact-main green; B is `11/11`, cumulative A+B `43/43`. The C Activation cohort is `ExactHeadHostedGreen`; C is `5/11`, current A+B+C is `48/48`. Applicability R=0006 is diagnostic/no-success; corrected R=0007 is frozen/inactive pending corrected-design hosted green. [TEST-0210](test-cases.md#test-0210) remains `Planned`; D, activation, and DoD remain held. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
@@ -10774,7 +10774,14 @@ The exact eight-path allowlist and `2,400` normalized changed-line ceiling are
 owned by the C micro-plan. Green is focused `1/1`, C `6/6`, full Conformance
 `49/49`, Domain `98/98`, build/format/diff/locks/structure/reviews/record sync,
 and one separate unpushed `ReviewedLocalGreen` commit. Closure and the cohort
-push remain held.
+push remain held. R=0006 produced the exact behavior-red TRX but its runner
+retained the predecessor producer method name in the `TestMethod.name` oracle,
+so it ended `OracleRejected`; it is immutable diagnostic/no-success and never
+reruns. Corrected R=0007 changes only that predicate. Its fresh runner is
+`42,368` bytes / SHA-256
+`9EA4B00ADCF91B8CE2CB49F6FA9BD24005B5521E15411F996262C72AE67DD19F`,
+AST `6,038` tokens / `0` errors, and remains inactive until this corrected
+records/design head is exact-head hosted green.
 
 The first packet is capped at `52` production paths, three C test paths plus two
 bounded predecessor-test adaptations, and `7,000` normalized changed C# lines.

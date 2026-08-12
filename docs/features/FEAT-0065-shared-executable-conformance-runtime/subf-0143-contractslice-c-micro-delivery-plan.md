@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Gate 2 micro-delivery plan and design freeze |
-| State | Design and Activation cohorts `ExactHeadHostedGreen`; C `5/11`, current A+B+C `48/48`; `C-APPLICABILITY-PLAN-01` `FrozenDesign`/inactive pending this records/design exact-head hosted gate |
+| State | Design and Activation cohorts `ExactHeadHostedGreen`; C `5/11`, current A+B+C `48/48`; applicability R=0006 diagnostic/no-success, corrected R=0007 frozen/inactive pending corrected-design hosted green |
 | Parent | Owning feature and current subfeature |
 | Scenario | [TEST-0210](test-cases.md#test-0210), retained `Planned` |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
@@ -494,9 +494,15 @@ start before that commit. The two-package Applicability cohort receives no push
 until its complete cohort boundary is green.
 
 Fresh packet-design, evidence/scope, and traceability reviews close `0/0/0`.
-The packet remains inactive until this synchronized records/design head is
-exact-head hosted green and the canonical source/runner custody preflight
-closes; no canonical red or implementation is authorized before both gates.
+The first frozen runner attempt R=0006 produced the exact behavior-red TRX but
+was correctly rejected because one stale predecessor method-name oracle caused
+`TRX identity/bijection mismatch.` R=0006 is immutable diagnostic/no-success
+and never reruns. Corrected R=0007 changes only that predicate and freezes at
+`42,368` bytes / SHA-256
+`9EA4B00ADCF91B8CE2CB49F6FA9BD24005B5521E15411F996262C72AE67DD19F`,
+AST `6,038` tokens / `0` errors. It remains inactive until the commit containing
+this correction is exact-head hosted green and its fresh source/runner custody
+preflight closes.
 
 ## Deferred ContractSlice D cohort plan
 

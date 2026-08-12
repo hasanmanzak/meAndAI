@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Scope | ContractSlice C micro-delivery design only |
-| State | Design and Activation cohorts `ExactHeadHostedGreen`; `C-APPLICABILITY-PLAN-01` `FrozenDesign`/inactive pending this records/design exact-head hosted gate |
+| State | Design and Activation cohorts `ExactHeadHostedGreen`; applicability R=0006 immutable oracle diagnostic/no-success; corrected R=0007 `FrozenDesign`/inactive pending corrected records/design exact-head hosted gate |
 | Predecessor | ContractSlice B merged and exact-main hosted green |
 | Design delivery | Exact [`dd8940156408c103edb837f17bc05e6bb25de8c3`](https://github.com/hasanmanzak/meAndAI/commit/dd8940156408c103edb837f17bc05e6bb25de8c3) / [run 31585390450](https://github.com/hasanmanzak/meAndAI/actions/runs/31585390450): Ubuntu `16m07s`, Windows `18m19s`, publication verification skipped |
 | C authority | [Maintainer continuation directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5264403013) |
@@ -318,3 +318,39 @@ export, registration, graph, Domain, Policy, Application, project/package/lock/
 workflow, Scenario/status/owner, D, release, or publication path is admitted.
 Green is focused `1/1`, C `6/6`, full `49/49`, Domain `98/98`, build/format/
 diff/locks/structure/reviews/record sync, and a separate unpushed local commit.
+
+## Applicability runner correction
+
+The packet freeze head
+[`5ce947744f93929c1a12898205176d2bab4416db`](https://github.com/hasanmanzak/meAndAI/commit/5ce947744f93929c1a12898205176d2bab4416db)
+passed [run 31620001459](https://github.com/hasanmanzak/meAndAI/actions/runs/31620001459):
+Ubuntu `22m03s`, Windows `18m48s`, publication skipped, hosted defects `0`.
+Its exact-tree local StructureOnly was `429.462s`; publication evidence passed
+`7/7` in `300.3s` without a publication claim. The local recurrence first
+found two commit-reference occurrences; owner isolation was under two minutes,
+correction plus exact-tree revalidation about twelve minutes, with no
+consistency/traceability loss.
+
+Canonical R=0006 used runner `42,375` bytes / SHA-256
+`2E3813641D6B2597EB43064996C4789215A63D6EB15035590EED1859B2C85566`.
+Its sole child produced exact behavior red, but the runner retained one stale
+predecessor method-name oracle and therefore ended `OracleRejected` with
+`TRX identity/bijection mismatch.` R=0006 is immutable diagnostic/no-success
+and never reruns. Report is `560` bytes / `F8DA79632187AE64583211FD0AB2F2BF94976758A840CE221611ED9852164CA3`;
+TRX is `4,874` bytes / `0C21DD59D979015627CB6F62F954B22B3BDB1E663684D7CDA9B678EFBBC8EFC5`.
+The TRX itself has exact 1/1/1 result/definition/entry identities, Failed
+outcome/summary, exact FQN/class/method, sole marker Message, optional clean
+stack, one marker-free `[FAIL]` RunInfo, exact failed counters, all other
+thirteen counters zero, and no attachments/collector evidence.
+
+Corrected R=0007 changes only that stale method-name predicate. Its fresh
+runner is `42,368` bytes / SHA-256
+`9EA4B00ADCF91B8CE2CB49F6FA9BD24005B5521E15411F996262C72AE67DD19F`,
+PowerShell AST `6,038` tokens / `0` errors. It is inactive until the commit
+containing this exact correction is hosted green; then one fresh root/report/
+log identity and one sole Execute may be admitted. The C source remains the
+same frozen 8-path, `600/2400`-line transient tree.
+
+The corrected-record exact-tree gates are StructureOnly green in `456.596s`
+and publication evidence `7/7` in `316.5s`, with no publication claim. Fresh
+design, evidence/scope, and traceability reviews close `0/0/0`.
