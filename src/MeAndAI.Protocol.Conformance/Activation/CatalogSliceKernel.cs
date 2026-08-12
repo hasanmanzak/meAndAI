@@ -12,9 +12,11 @@ public sealed class CatalogSliceKernel
     public static CatalogSliceKernel Activate(
         FinalizedPolicyManifest manifest,
         PolicyQualificationSliceExport policy,
-        IPolicyActivationProof activationProof) =>
-        throw new CatalogIntegrityException(
-            CatalogIntegrityCode.ActivationProofInvalid);
+        IPolicyActivationProof activationProof)
+    {
+        KernelActivationCore.ValidateSlice(manifest, policy, activationProof);
+        return new CatalogSliceKernel();
+    }
 
     public ApplicabilityPlan PlanApplicability(
         ExecutionProfile diagnosticProfile,

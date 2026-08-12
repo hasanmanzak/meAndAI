@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Gate 2 micro-delivery plan and design freeze |
-| State | Design cohort `ExactHeadHostedGreen`; `C-SURFACE-ACTIVATION-01` `ReviewedLocalGreen`; C `3/11`, current A+B+C `46/46`; `C-REGISTRATION-MISMATCH-01` is the next `FrozenDesign` packet; no intermediate push/hosted claim |
+| State | Design cohort `ExactHeadHostedGreen`; surface and registration-mismatch `ReviewedLocalGreen`; C `4/11`, current A+B+C `47/47`; `C-PRODUCER-PIPELINE-01` is the next `FrozenDesign` packet; no intermediate push/hosted claim |
 | Parent | Owning feature and current subfeature |
 | Scenario | [TEST-0210](test-cases.md#test-0210), retained `Planned` |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
@@ -276,9 +276,30 @@ Before any C# mutation or canonical red:
 - the first packet receives a packet-specific exact path/fixture/runner freeze
   and renewed clean review before its one canonical red.
 
+For `C-REGISTRATION-MISMATCH-01`, the exact predecessor is unpushed local commit
+[`8812b22c7cc8a1785d24376f3e91a20fb0fe6cc0`](https://github.com/hasanmanzak/meAndAI/commit/8812b22c7cc8a1785d24376f3e91a20fb0fe6cc0).
+Its four-path executable allowlist
+is `KernelActivationCore.cs`, `CatalogSliceKernel.cs`, the fixture-only
+adaptation in `ContractSliceCActivationTests.cs`, and the new owning
+`ContractSliceCRegistrationTests.cs`; the cap is two production paths, two test
+paths, and `1,800` normalized changed C# lines. The typed design owns the exact
+six-family declaration/order/multiplicity/generic/projection matrix, proof
+precedence, null-only red seam, and no-kernel failure boundary. No other path or
+later semantic behavior is admitted.
+
 No design-only success changed C from `0/11`; only the reviewed-local-green
 surface packet moves C to `3/11`. It does not activate [TEST-0210](test-cases.md#test-0210),
 or lifts D/Scenario/workflow/DoD/merge/release/publication holds.
+
+`C-REGISTRATION-MISMATCH-01` accepted immutable canonical R=0004 and then
+closed the exact six-family registration/type-token/component projection matrix
+locally. Focused `1/1`, C `4/4`, full Conformance `47/47`, Domain `98/98`,
+warning-free Release build, format/diff, and StructureOnly `429.279s` are green;
+three independent review dimensions closed `0/0/0`. The packet is
+`ReviewedLocalGreen`, has no push/hosted claim, and consumed about `28` minutes
+from first C# mutation through final structural validation. No consistency or
+traceability loss was observed. Producer-pipeline is next only after the
+registration packet's separate local commit.
 
 ## Deferred ContractSlice D cohort plan
 

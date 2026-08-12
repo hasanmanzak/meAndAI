@@ -3,14 +3,14 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted; ContractSlice A and B merged/exact-main green; B is `11/11`, cumulative A+B `43/43`. `C-SURFACE-ACTIVATION-01` is `ReviewedLocalGreen`; C is `3/11`, current A+B+C is `46/46`, and `C-REGISTRATION-MISMATCH-01` is next without an intermediate push/hosted claim. [TEST-0210](test-cases.md#test-0210) remains `Planned`; D, activation, and DoD remain held. |
+| Status | Gate 2 accepted; ContractSlice A and B merged/exact-main green; B is `11/11`, cumulative A+B `43/43`. C surface and registration-mismatch are `ReviewedLocalGreen`; C is `4/11`, current A+B+C is `47/47`, and `C-PRODUCER-PIPELINE-01` is next without an intermediate push/hosted claim. [TEST-0210](test-cases.md#test-0210) remains `Planned`; D, activation, and DoD remain held. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Test | [TEST-0210](test-cases.md#test-0210) |
 | Gate 3 micro-delivery routing | Historical A delivery remains owned by the [A micro-delivery control plan](subf-0143-micro-delivery-plan.md). Current B design routing is the [ContractSlice B micro-delivery plan](subf-0143-contractslice-b-micro-delivery-plan.md); packet labels refine delivery but activate no executable work. |
 | Exact-main design baseline | Accepted A merge commit [`51623f4d404a95e0f706d72805cf7ddbbbd293b8`](https://github.com/hasanmanzak/meAndAI/commit/51623f4d404a95e0f706d72805cf7ddbbbd293b8), validated by exact-main [run 31304787603](https://github.com/hasanmanzak/meAndAI/actions/runs/31304787603) |
-| Design and Gate 3 authority | Historical A/B directives, accepted reds, diagnostics, and hosted evidence remain immutable. The exact [C micro-delivery plan](subf-0143-contractslice-c-micro-delivery-plan.md) is exact-head hosted-green design authority; its surface packet is reviewed local green and registration-mismatch is next. Intermediate C commits are not pushed. D, final activation, merge, release, and publication remain outside this authority. |
+| Design and Gate 3 authority | Historical A/B directives, accepted reds, diagnostics, and hosted evidence remain immutable. The exact [C micro-delivery plan](subf-0143-contractslice-c-micro-delivery-plan.md) is exact-head hosted-green design authority; its surface and registration-mismatch packets are reviewed local green and producer-pipeline is next. Intermediate C commits are not pushed. D, final activation, merge, release, and publication remain outside this authority. |
 | Completed predecessor | [SUBF-0153](README.md#subf-0153) / [TEST-0221](test-cases.md#test-0221), merged through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173) and exact-main validated by [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) |
 
 ## Directive and hard boundary
@@ -10531,6 +10531,63 @@ counter and source/binary/lock custody, and irrevocable ordinal consumption at
 `InvocationCommitted`. No discovery prepass, fallback, retry, or red commit is
 permitted.
 
+### Frozen `C-REGISTRATION-MISMATCH-01` boundary
+
+This packet starts only from local commit
+[`8812b22c7cc8a1785d24376f3e91a20fb0fe6cc0`](https://github.com/hasanmanzak/meAndAI/commit/8812b22c7cc8a1785d24376f3e91a20fb0fe6cc0);
+that surface predecessor is
+`ReviewedLocalGreen` and remains unpushed. The sole Fact is
+`ContractSliceCRegistrationTests.Rejects_registration_mismatch_without_kernel_activation`,
+with only `ContractSlice=C`, no Scenario, and canonical marker
+`TEST-0210-C-BEHAVIOR-RED-0002`. The fully prepared valid
+`CatalogSliceKernel.Activate(...)` call is the sole null semantic seam and the
+only route to `Assert.Fail(marker)`; setup, mismatch, proof, and exception paths
+are marker-free.
+
+The exact executable allowlist modifies only
+`KernelActivationCore.cs`, `CatalogSliceKernel.cs`, and
+`ContractSliceCActivationTests.cs`, and adds only
+`ContractSliceCRegistrationTests.cs`. The predecessor test change exposes its
+Tests-owned fixture factory and immutable carriers internally; it changes no
+Fact, FQN, trait, or assertion. No public surface, project, package, lock,
+workflow, Policy, Application, Domain, producer execution, or later C path may
+change. The packet cap is two production paths, two test paths, and `1,800`
+normalized changed C# lines; first-one-over requires redraw.
+
+The qualification fixture reuses the predecessor's object-identical six-family
+registrations and Tests-owned components, creates one `QualificationSlice`
+manifest/export/proof envelope, and contains no Policy artifact or type. Exact
+validation order is null/authority/catalog/schema/proof identity and artifact
+attestation, then registration comparison. The latter requires each presented
+family to equal its manifest-owned canonical declaration order and multiplicity:
+codecs `3`, parsers `2`, indexes `4`, demand projectors `1`, selectors `3`, and
+evaluators `5`. Every declaration is the same object; each CLR generic argument
+matches the manifest model/capability/component identity; selector resolver and
+schema pairs equal the unique ordinal selector declarations; evaluators map
+one-to-one and in order to the five rules; the public component projection is
+the exact 18-member runtime-type union and every member has one manifest map.
+
+Missing, extra, duplicate, reordered, structurally equal but foreign,
+wrong-generic, or public-projection-drift input throws
+`CatalogIntegrityException(RegistrationMismatch)` before a kernel exists. A
+wrong contract/version/digest/artifact/export proof instead remains the earlier
+`ActivationProofInvalid`; argument-boundary nulls retain their argument
+exceptions. One valid envelope returns a non-null kernel. The mismatch matrix
+tests every family, both order-sensitive edges, foreign declarations,
+wrong-generic model/capability/component identities, exact proof precedence,
+and no leaked kernel. Green requires focused `1/1`, C `4/4`, full Conformance
+`47/47`, Domain `98/98`, warning-free Release build, format/diff/locks, required
+structure, independent review, record sync, and a second unpushed local commit.
+
+That contract is now `ReviewedLocalGreen`. Canonical R=0004 is immutable and
+owned in the C evidence ledger; green proves the exact declaration reference,
+order, multiplicity, mapped CLR identity, selector/evaluator, 18-component,
+proof-precedence, and no-kernel boundaries. Focused `1/1`, C `4/4`, full
+Conformance `47/47`, Domain `98/98`, warning-free Release build, format/diff,
+StructureOnly `429.279s`, and code/evidence/traceability reviews `0/0/0` passed.
+No intermediate push or hosted-green claim is made; producer-pipeline is next
+after the separate registration packet commit.
+
 The first packet is capped at `52` production paths, three C test paths plus two
 bounded predecessor-test adaptations, and `7,000` normalized changed C# lines.
 Every later packet defaults to ten
@@ -10574,8 +10631,9 @@ B-CONVERGE is merged/exact-main green.
 ContractSlice C is decomposed by the current
 [C micro-delivery plan](subf-0143-contractslice-c-micro-delivery-plan.md), whose
 design head is hosted green. `C-SURFACE-ACTIVATION-01` is
-`ReviewedLocalGreen`; C is `3/11`, current A+B+C is `46/46`, and
-`C-REGISTRATION-MISMATCH-01` is next without an intermediate push/hosted claim.
+`ReviewedLocalGreen`; registration-mismatch is also `ReviewedLocalGreen`; C is
+`4/11`, current A+B+C is `47/47`, and `C-PRODUCER-PIPELINE-01` is next without
+an intermediate push/hosted claim.
 
 C implementation and D still require separate packet activation, and no
 packet is active merely from this list. No directive here allocates new stable

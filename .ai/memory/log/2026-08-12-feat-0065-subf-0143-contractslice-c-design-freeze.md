@@ -3,12 +3,12 @@
 | Field | Value |
 | --- | --- |
 | Scope | ContractSlice C micro-delivery design only |
-| State | Design cohort `ExactHeadHostedGreen`; `C-SURFACE-ACTIVATION-01` `ReviewedLocalGreen`; `C-REGISTRATION-MISMATCH-01` next; no intermediate push/hosted claim |
+| State | Design cohort `ExactHeadHostedGreen`; surface and registration-mismatch `ReviewedLocalGreen`; producer-pipeline next; no intermediate push/hosted claim |
 | Predecessor | ContractSlice B merged and exact-main hosted green |
 | Design delivery | Exact [`dd8940156408c103edb837f17bc05e6bb25de8c3`](https://github.com/hasanmanzak/meAndAI/commit/dd8940156408c103edb837f17bc05e6bb25de8c3) / [run 31585390450](https://github.com/hasanmanzak/meAndAI/actions/runs/31585390450): Ubuntu `16m07s`, Windows `18m19s`, publication verification skipped |
 | C authority | [Maintainer continuation directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5264403013) |
 | Normative owner | [Typed C design and micro plan](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-contractslice-c-micro-delivery-plan.md) |
-| Progress | C `3/11`; current A+B+C `46/46`; final A+B+C target `54/54`; Domain `98/98` |
+| Progress | C `4/11`; current A+B+C `47/47`; final A+B+C target `54/54`; Domain `98/98` |
 | Holds | [TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) remains `Planned`; D, Scenario/status/owner, both workflow filters, runtime-efficiency activation, feature DoD, merge, release, and publication remain held |
 
 ## Frozen route
@@ -177,3 +177,49 @@ evidence passed `7/7` in `273.2s` and explicitly made no publication claim.
 Fresh code/test, evidence/scope, and records/traceability review passes each
 closed `0/0/0`. The synchronized tree is authorized for the packet's separate
 local commit only; it is not pushed and carries no cohort hosted-green claim.
+
+## Registration-mismatch pre-red freeze
+
+The next packet starts only from exact unpushed surface commit
+[`8812b22c7cc8a1785d24376f3e91a20fb0fe6cc0`](https://github.com/hasanmanzak/meAndAI/commit/8812b22c7cc8a1785d24376f3e91a20fb0fe6cc0).
+Its sole FQN/marker, four-path
+allowlist, `2/2/1,800` caps, Tests-owned qualification fixture, six-family exact
+declaration/order/multiplicity/generic/projection matrix, proof precedence, and
+no-kernel failure boundary are normatively frozen in the typed design. Fresh
+design, evidence, and traceability review closed `0/0/0`; no red or C# mutation
+preceded that closure.
+
+## Registration-mismatch reviewed-local-green evidence
+
+Canonical `R=0004` is accepted and immutable. The exact external runner is
+`40,988` bytes, SHA-256
+`61903D8DF58E89CAF7074E9D9FA7DB9B3F71512CE8F5F35BFF5C10AAB4E33881`,
+with PowerShell AST `5,875` tokens / `45` top-level statements / `0` errors.
+Its source was `12,855` bytes / SHA-256
+`664A6D5CA3FCEDF84AE137573D8884B1C2DAE077884985F75994390CE5029FB3`.
+ValidateOnly proved exact local HEAD `8812b22c7cc8a1785d24376f3e91a20fb0fe6cc0`,
+upstream design head `dd8940156408c103edb837f17bc05e6bb25de8c3`,
+branch/status, `298/1,800` changed-line custody, six current locks, and absent
+evidence paths. Two earlier outer PowerShell array-binding observations never
+entered a runner or created evidence and are diagnostic-only.
+
+The sole Execute committed one child and accepted native exit `1` / runner exit
+`0` in `2,286ms`. Report `15,303` bytes / SHA-256
+`2B5C75DA79DF43640BBF4249B6A78EDA407CB361106D51DE979341855B7E04E1`
+and TRX `4,894` bytes / SHA-256
+`3C694C596352225F8FE416B80BF1EA73ED0CF3956CC539F132C4D3575B2F53B1`
+prove one Failed result/definition/entry, exact marker message plus summary echo,
+optional marker-free exact-FQN stack, one marker-free RunInfo, exact sixteen
+counters, and no attachment/collector data. R=0004 is never rerun.
+
+Green validates six-family declaration reference/order/multiplicity, mapped CLR
+model/capability/component identities, selector schema/resolver and evaluator
+order, exact 18-member public component closure, proof precedence, and no leaked
+kernel. Release build is `0/0`; focused is `1/1`, C is `4/4`, full Conformance is
+`47/47`, Domain is `98/98`, format and diff-check are clean, and StructureOnly
+passed in `429.279s`. The observed first-C#-mutation through final structural
+validation window was about `28` minutes. Code/test, evidence/scope, and
+records/traceability reviews closed `0/0/0`; consistency/traceability loss was
+not observed. The packet is `ReviewedLocalGreen`, remains unpushed, and grants
+no hosted-green claim. `C-PRODUCER-PIPELINE-01` is next only after this separate
+local commit.

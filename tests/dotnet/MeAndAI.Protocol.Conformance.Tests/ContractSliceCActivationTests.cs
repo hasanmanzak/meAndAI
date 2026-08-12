@@ -95,7 +95,7 @@ public sealed class ContractSliceCActivationTests
             Assert.Same(manifestComponents[component.ComponentKey], component));
     }
 
-    private static CFixture CreateFixture()
+    internal static CFixture CreateFixture()
     {
         var manifest = CreateManifest();
         var registry = manifest.SchemaRegistry;
@@ -222,7 +222,7 @@ public sealed class ContractSliceCActivationTests
             catalog);
     }
 
-    private static FinalizedPolicyManifest CreateSyntheticManifest(
+    internal static FinalizedPolicyManifest CreateSyntheticManifest(
         CatalogAuthorityKind authorityKind,
         string sourceCommit,
         ExactSha256Digest manifestDigest,
@@ -318,9 +318,9 @@ public sealed class ContractSliceCActivationTests
         var tree = Schema(registry, "protocol.repository-tree");
         return
         [
-            CodecRegistration<GovernedTextModelMirror>.Create(
+            CodecRegistration<SourceTextModelMirror>.Create(
                 governed,
-                ModelTypeToken<GovernedTextModelMirror>.Create(governed.OutputModel),
+                ModelTypeToken<SourceTextModelMirror>.Create(governed.OutputModel),
                 new GovernedTextCodecMirror()),
             CodecRegistration<RepositoryTargetModelMirror>.Create(
                 target,
@@ -456,7 +456,7 @@ public sealed class ContractSliceCActivationTests
         ReleaseSchemaRegistry registry,
         string key) => registry.PayloadSchemas.Single(item => item.SchemaKey == key);
 
-    private sealed record CFixture(
+    internal sealed record CFixture(
         FinalizedPolicyManifest Manifest,
         CompletePolicyPackExport Export,
         IReadOnlyList<ICodecRegistration> Codecs,
@@ -507,6 +507,8 @@ internal sealed class NoInputProofComponentMirror;
 internal sealed class ObservedProofComponentMirror;
 
 internal sealed class SourceTextModelMirror : IProtocolSemanticModel;
+internal sealed partial class GovernedTextCodecMirror :
+    ICanonicalPayloadCodec<SourceTextModelMirror>;
 internal sealed class MarkdownDocumentModelMirror : IProtocolSemanticModel;
 internal sealed class RepositoryTargetMarkdownDocumentSetModelMirror :
     IProtocolSemanticModel;
