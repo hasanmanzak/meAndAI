@@ -6,7 +6,8 @@ Date: 2026-08-12
 
 - [FEAT-0071](../../../docs/features/FEAT-0071-repository-knowledge-catalog/README.md)
   is a proposed records-only plan tracked by
-  [issue #182](https://github.com/hasanmanzak/meAndAI/issues/182).
+  [issue #182](https://github.com/hasanmanzak/meAndAI/issues/182) and
+  [draft PR #183](https://github.com/hasanmanzak/meAndAI/pull/183).
 - [DEC-0039](../../../docs/decisions/DEC-0039-repository-knowledge-catalog-and-react-explorer.md)
   is proposed; implementation authority is withheld.
 - The detailed [Repository Knowledge Catalog architecture](../../../docs/architecture/repository-knowledge-catalog/README.md)

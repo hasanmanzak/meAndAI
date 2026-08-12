@@ -6,7 +6,7 @@
 | Status | Proposed records-only plan; implementation not authorized |
 | Target version | 0.21.0 |
 | Issue | [#182](https://github.com/hasanmanzak/meAndAI/issues/182) |
-| Pull request | Not created; this packet remains records-only |
+| Pull request | [#183](https://github.com/hasanmanzak/meAndAI/pull/183) (draft; records-only) |
 | Decision | [DEC-0039](../../decisions/DEC-0039-repository-knowledge-catalog-and-react-explorer.md) |
 | Architecture | [Repository Knowledge Catalog](../../architecture/repository-knowledge-catalog/README.md) |
 | Tests | [TEST-0234](test-cases.md#test-0234), [TEST-0235](test-cases.md#test-0235), [TEST-0236](test-cases.md#test-0236), [TEST-0237](test-cases.md#test-0237), [TEST-0238](test-cases.md#test-0238), [TEST-0239](test-cases.md#test-0239), [TEST-0240](test-cases.md#test-0240), and [TEST-0241](test-cases.md#test-0241) |
