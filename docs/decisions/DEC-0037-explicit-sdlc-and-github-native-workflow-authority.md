@@ -29,35 +29,70 @@ An earlier records proposal on [closed draft PR #151](https://github.com/hasanma
    review state, finding disposition, merge state, release evidence, and
    operational state are separate axes. A value on one axis never implies a
    transition on another.
-3. The target work-item lifecycle is evaluated through `Proposed`, `Planned`,
-   `Ready`, `InProgress`, `NeedsReview`, and `Complete`, with `Blocked` as a
-   resumable interruption and `Cancelled` or `Superseded` as terminal outcomes.
-   Exact names and transition schemas remain proposed until
+3. An actionable work identity is an epic, feature, subfeature, task, bug, or
+   owned finding. An issue, pull request, label, command, workflow run, agent,
+   or project-board card is a tracker, projection, request, actor, or evidence
+   carrier; it is not the work identity itself. Parent and child state never
+   propagates automatically, and dependency or closure propagation requires an
+   explicit contract.
+4. Backlog membership is explicit rather than inferred from an open issue or a
+   label. `Proposed` work is a stable candidate under refinement and may appear
+   in a candidate inventory; `Planned` means the maintainer selected the work
+   into the committed backlog even though Definition of Ready and authority
+   may still be incomplete. `Ready` means Definition of Ready evidence is
+   complete but grants no implementation, repository mutation, provider
+   mutation, merge, or release authority.
+5. The remaining target work-item meanings are: `InProgress` requires both an
+   explicit implementation directive and actual start; `NeedsReview` means the
+   bounded result and evidence await the required review; and `Complete` means
+   the work identity's declared Definition of Done is evidenced. Exact names
+   and transition schemas remain proposed until
    [FEAT-0057](../features/FEAT-0057-explicit-sdlc-backlog-governance/README.md)
    closes design review.
-4. `Ready` means Definition of Ready evidence is complete. It does not grant
-   implementation, repository mutation, provider mutation, merge, or release
-   authority.
-5. GitHub Issues is the live work-item tracker and state store. Protocol and
+6. `Blocked` is a resumable interruption that preserves the prior state,
+   blocker, owner, and re-entry condition. `Cancelled` and `Superseded` are
+   terminal. `Complete` is terminal for the identity's declared scope unless
+   its completion evidence is proven false or invalid and an explicit reopen
+   rationale is recorded. A later bug, maintenance change, recovery, or
+   enhancement normally receives a new linked work identity rather than
+   reopening the completed one.
+7. Work-item completion, merge, immutable publication, and the delivered
+   subject's operational lifecycle are separate. The operational subject, not
+   its delivery work item, moves through proposed `NotOperational`,
+   `Operational`, `Deprecated`, and `Retired` meanings with named subject or
+   version, effective-date, support, migration, and successor evidence where
+   applicable. Maintenance creates linked work and does not automatically
+   change the completed delivery identity.
+8. GitHub Issues is the live work-item tracker and state store. Protocol and
    accepted decision records own lifecycle and workflow semantics;
    repository-native feature, test, risk, idea, architecture, and memory
-   records preserve durable specification and evidence. No second canonical
-   backlog document, database, or service is introduced.
-6. Dependencies determine readiness. Priority expresses maintainer intent but
+   records preserve durable specification and evidence. Issue open/closed
+   state, labels, and optional project metadata are projections and cannot
+   alone advance a lifecycle state. Missing or ambiguous stable identity,
+   missing canonical links, or tracker/record drift fails closed without a
+   transition. No second canonical backlog document, database, or service is
+   introduced.
+9. Dependencies determine readiness. Priority expresses maintainer intent but
    cannot bypass dependencies or authorization. The existing `Blocking`
    finding queue remains a specialized subset with its stricter convergence
    rules.
-7. Ideas remain outside the actionable backlog until promotion. Completion,
-   merge, immutable publication, operation, deprecation, and retirement remain
-   separately evidenced.
-8. New-consumer installation and existing-consumer transition are separate.
-   Consumer-owned issues, labels, forms, records, and project-management
-   configuration are not silently overwritten.
-9. Slash commands, natural-language requests, agents, CLIs, workflows, and
+10. Ideas remain outside the actionable backlog until promotion. Completed,
+    cancelled, and superseded work remains in the lifecycle catalog but not the
+    active backlog.
+11. New-consumer installation and existing-consumer transition are separate.
+    Upstream capability/release work and each consumer adoption, update, or
+    recovery are separately linked work identities under their own repository
+    authority. Upstream completion or publication does not imply consumer
+    adoption; consumer completion does not mutate upstream state. An ordinary
+    compatible pin update creates no consumer product-backlog state unless a
+    reviewed release-declared migration explicitly requires linked consumer
+    work. Consumer-owned issues, labels, forms, records, and project-management
+    configuration are not silently overwritten.
+12. Slash commands, natural-language requests, agents, CLIs, workflows, and
    services may request lifecycle operations only through the thin-host and
    authority boundaries in [DEC-0035](DEC-0035-protocol-owned-governance-and-execution-architecture.md)
    and proposed [DEC-0038](DEC-0038-protocol-owned-workflow-contracts-and-bounded-agent-execution.md).
-10. This proposed decision authorizes records and review only. Protocol text,
+13. This proposed decision authorizes records and review only. Protocol text,
     executable tests, automation, labels, forms, consumers, releases, and
     runtime behavior require later bounded directives.
 

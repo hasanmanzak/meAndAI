@@ -7,7 +7,7 @@
 | Target version | Unassigned; select only after refreshed Gate 1 review |
 | Issue | [Issue #150](https://github.com/hasanmanzak/meAndAI/issues/150) |
 | Parent epic | [EPIC-0003 / issue #179](https://github.com/hasanmanzak/meAndAI/issues/179) |
-| Pull request | Pending; [issue #150](https://github.com/hasanmanzak/meAndAI/issues/150) is the stable authority until a records pull request exists |
+| Pull request | Draft [PR #181](https://github.com/hasanmanzak/meAndAI/pull/181) |
 | Decisions | Proposed [DEC-0037](../../decisions/DEC-0037-explicit-sdlc-and-github-native-workflow-authority.md) |
 | Architecture | [Agentic SDLC Workflow Architecture](../../architecture/agentic-sdlc-workflows/README.md) |
 | Tests | [TEST-0224](test-cases.md#test-0224), [TEST-0225](test-cases.md#test-0225), and [TEST-0226](test-cases.md#test-0226) |
@@ -49,14 +49,19 @@ second manually synchronized backlog.
 ## Scope
 
 - Map discovery, planning, design, implementation, verification, delivery,
-  publication, operation, maintenance, deprecation, and retirement to existing
-  protocol authorities.
-- Define non-linear re-entry through bugs, findings, recurrence, recovery,
-  maintenance, and changed evidence.
-- Define work-item states, entry/exit conditions, transitions, blocking,
-  preserved return state, resumption, cancellation, and supersession.
-- Define feature-index and backlog projections for proposed, planned, ready,
-  active, review, blocked, and terminal records.
+  publication, and the delivered subject's operation, maintenance,
+  deprecation, and retirement to existing protocol authorities.
+- Define non-linear follow-up through bugs, findings, recurrence, recovery,
+  maintenance, and changed evidence, including when a new linked identity is
+  required and when invalid completion evidence permits an explicit reopen.
+- Define the exact meanings, entry/exit conditions, and transitions for
+  proposed, planned, ready, active, review, blocked, completed, cancelled, and
+  superseded work.
+- Separate work identity from issue, pull request, label, command, workflow
+  run, agent, and optional project projection; forbid automatic parent/child
+  state propagation.
+- Define candidate-inventory, committed-backlog, active-work, and lifecycle-
+  catalog projections without making any projection a second authority.
 - Define backlog membership, hierarchy, dependencies, priority, maintainer
   ordering, refinement, stale review, and closure.
 - Keep the existing `Blocking` finding remediation queue as a specialized
@@ -64,7 +69,8 @@ second manually synchronized backlog.
 - Align protocol text, templates, issue forms, labels, adoption guidance, and
   project-neutral structural evidence only in later authorized slices.
 - Define separate new-consumer and existing-consumer transition routes that
-  preserve consumer-owned records and configuration.
+  preserve consumer-owned records and configuration, and keep upstream
+  release work separate from each consumer adoption, update, or recovery.
 
 ## Non-goals
 
@@ -79,8 +85,14 @@ second manually synchronized backlog.
   delivery commitment before promotion.
 - Combining lifecycle, review, finding, merge, publication, and operational
   state into one label.
+- Treating issue open/closed state, labels, or project metadata as lifecycle
+  semantics or sufficient transition evidence.
+- Reopening a completed work identity for an ordinary later bug, maintenance
+  change, recovery, or enhancement.
 - Rewriting completed historical records or overwriting consumer-owned issue
   forms, labels, records, or project-management configuration.
+- Treating upstream completion or publication as consumer adoption, or a
+  compatible pin update as authority to create consumer product-backlog state.
 - Implementing protocol, test, workflow, label, migration, release, or
   consumer changes in this records-only proposal.
 
@@ -119,8 +131,8 @@ second manually synchronized backlog.
 
 | ID | Risk | Owner / response |
 | --- | --- | --- |
-| `RISK-0322` <a name="risk-0322"></a> | Lifecycle, readiness, review, finding, merge, publication, and operation are conflated, producing false completion. | Lifecycle owner / separate axes in proposed [DEC-0037](../../decisions/DEC-0037-explicit-sdlc-and-github-native-workflow-authority.md) and [TEST-0224](test-cases.md#test-0224). |
-| `RISK-0323` <a name="risk-0323"></a> | Labels or forms overwrite consumer-owned customization or imply ordinary pin updates own product backlog state. | Adoption owner / preserve [DEC-0001](../../decisions/DEC-0001-portable-protocol-reference.md), require explicit transition under [DEC-0018](../../decisions/DEC-0018-release-declared-consumer-migrations.md), and prove [TEST-0226](test-cases.md#test-0226). |
+| `RISK-0322` <a name="risk-0322"></a> | Work identity, lifecycle, readiness, review, finding, merge, publication, operation, or parent/child projection is conflated, producing false transition, completion, or reopen. | Lifecycle owner / precise state meanings, separate axes and identities, explicit post-completion work boundary in proposed [DEC-0037](../../decisions/DEC-0037-explicit-sdlc-and-github-native-workflow-authority.md), and [TEST-0224](test-cases.md#test-0224). |
+| `RISK-0323` <a name="risk-0323"></a> | Labels or forms overwrite consumer-owned customization, or upstream release and ordinary pin updates falsely imply consumer adoption/backlog state. | Adoption owner / preserve [DEC-0001](../../decisions/DEC-0001-portable-protocol-reference.md), require explicit transition under [DEC-0018](../../decisions/DEC-0018-release-declared-consumer-migrations.md), and prove [TEST-0226](test-cases.md#test-0226). |
 | `RISK-0324` <a name="risk-0324"></a> | A universal ordering algorithm displaces maintainer judgment or lets priority bypass dependencies. | Backlog owner / dependency-gated readiness, maintainer ordering, and [TEST-0225](test-cases.md#test-0225). |
 | `RISK-0325` <a name="risk-0325"></a> | The protocol becomes a project-management framework rather than a compact quality-control surface. | Maintainers / require demonstrated recurring value, retain optional projections, reject a second canonical backlog, and prove the boundary in [TEST-0225](test-cases.md#test-0225). |
 
@@ -134,9 +146,9 @@ second manually synchronized backlog.
 
 | ID | Slice | Tracking | Tests/run | Self-review/findings | Status |
 | --- | --- | --- | --- | --- | --- |
-| `SUBF-0157` <a name="subf-0157"></a> | SDLC map, separate state axes, non-linear re-entry, operation, deprecation, and retirement | [Issue #150](https://github.com/hasanmanzak/meAndAI/issues/150) | [TEST-0224](test-cases.md#test-0224); planned | Records-scope review `0 Blocking / 0 Important / 0 Minor`; not Gate 5 | Proposed |
-| `SUBF-0158` <a name="subf-0158"></a> | Work-item transitions, blocking/resumption, catalog, backlog membership, dependency, and ordering semantics | [Issue #150](https://github.com/hasanmanzak/meAndAI/issues/150) | [TEST-0225](test-cases.md#test-0225); planned | Records-scope review `0 Blocking / 0 Important / 0 Minor`; not Gate 5 | Proposed |
-| `SUBF-0159` <a name="subf-0159"></a> | GitHub-native tracking state, optional projections, and new/existing consumer transitions | [Issue #150](https://github.com/hasanmanzak/meAndAI/issues/150) | [TEST-0226](test-cases.md#test-0226); planned | Records-scope review `0 Blocking / 0 Important / 0 Minor`; not Gate 5 | Proposed |
+| `SUBF-0157` <a name="subf-0157"></a> | SDLC map, separate work/release/operational axes, completed-work follow-up boundary, deprecation, and retirement | [Issue #150](https://github.com/hasanmanzak/meAndAI/issues/150) | [TEST-0224](test-cases.md#test-0224); planned | Records-scope review `0 Blocking / 0 Important / 0 Minor`; not Gate 5 | Proposed |
+| `SUBF-0158` <a name="subf-0158"></a> | Work identity and state meanings, blocking/resumption, candidate/catalog/backlog membership, dependency, and ordering semantics | [Issue #150](https://github.com/hasanmanzak/meAndAI/issues/150) | [TEST-0225](test-cases.md#test-0225); planned | Records-scope review `0 Blocking / 0 Important / 0 Minor`; not Gate 5 | Proposed |
+| `SUBF-0159` <a name="subf-0159"></a> | GitHub-native tracking and fail-closed projection, plus upstream/new/existing-consumer work boundaries | [Issue #150](https://github.com/hasanmanzak/meAndAI/issues/150) | [TEST-0226](test-cases.md#test-0226); planned | Records-scope review `0 Blocking / 0 Important / 0 Minor`; not Gate 5 | Proposed |
 
 ## Decisions and relationships
 
@@ -148,6 +160,16 @@ second manually synchronized backlog.
 - Historical record: [closed draft PR #151](https://github.com/hasanmanzak/meAndAI/pull/151)
   is evidence only; its obsolete decision, risk, test, and subfeature identity
   allocations are not current authority.
+- Related-work disposition: the
+  [successor delivery plan](../../architecture/agentic-sdlc-workflows/delivery-plan.md#related-work-reconciliation)
+  records that completed
+  [BUG-0045](https://github.com/hasanmanzak/meAndAI/issues/149) /
+  [FEAT-0058](../FEAT-0058-v0156-completed-historical-adoption-issues/README.md)
+  and [FIND-0120 / issue #44](https://github.com/hasanmanzak/meAndAI/issues/44)
+  remain historical evidence, while open
+  [BUG-0036 / issue #139](https://github.com/hasanmanzak/meAndAI/issues/139)
+  remains a separate backlog item. This feature resumes none of those work
+  scopes.
 
 ## Definition of Ready
 
@@ -159,8 +181,9 @@ second manually synchronized backlog.
 - [x] Prior-art and recurrence evidence recorded.
 - [ ] Complete then-current inventory of every lifecycle/status/label/form/
   template/index/automation and consumer projection.
-- [ ] Maintainer acceptance of the state vocabulary, allowed transitions,
-  backlog ordering, and consumer transition choice.
+- [ ] Maintainer acceptance of work-identity, state, backlog-membership,
+  post-completion follow-up, operational-subject, projection-drift, ordering,
+  and consumer-transition semantics.
 - [ ] Target version and executable test owners selected.
 - [ ] Exact expected-red design and validation budget accepted.
 - [ ] Separate explicit implementation directive for one dependency-closed
@@ -170,29 +193,44 @@ second manually synchronized backlog.
 
 1. The SDLC maps discovery through retirement to existing authorities without
    restating their detailed rules.
-2. Non-linear re-entry through bugs, findings, maintenance, recurrence,
-   recovery, and changed evidence is explicit.
-3. Each supported state has one meaning, entry, exit, and allowed transition
-   set.
-4. Selected-but-not-started and Ready-but-not-authorized work are representable.
-5. Blocking preserves blocker, owner, return state, and re-entry condition.
-6. Completion, merge, publication, maintenance, deprecation, and retirement
-   remain separately evidenced.
-7. The feature index is a lifecycle catalog containing non-terminal and
-   completed records.
-8. GitHub Issues is the live work-item tracker and state store; protocol and
+2. `Proposed` is a refinement candidate, `Planned` is maintainer-selected but
+   may be unready and unauthorized, `Ready` proves Definition of Ready without
+   granting authority, and `InProgress` requires authority plus actual start.
+3. Every remaining supported state has one meaning, entry, exit, and allowed
+   transition set; blocking preserves blocker, owner, return state, and
+   re-entry condition.
+4. `Complete` evidences the work identity's Definition of Done but cannot imply
+   merge, publication, operation, deprecation, or retirement.
+5. A later bug, maintenance change, recovery, or enhancement normally creates
+   a new linked work identity; completed work is reopened only when its own
+   completion evidence is proven false or invalid and the rationale is recorded.
+6. The delivered subject's operational state is named and evidenced separately
+   from the work item, merge, and immutable publication.
+7. Epic, feature, subfeature, task, bug, and owned-finding identities remain
+   distinct from issues, pull requests, labels, commands, workflow runs,
+   agents, and project metadata; parent/child state never propagates implicitly.
+8. Candidate inventory, committed backlog, active work, and the lifecycle
+   catalog are distinct; the catalog retains non-terminal and terminal records.
+9. GitHub Issues is the live work-item tracker and state store; protocol and
    accepted decisions own lifecycle/workflow semantics, while repository
    records preserve durable specification and evidence.
-9. No second canonical backlog is introduced; optional projections remain
-   rebuildable.
-10. Actionable epics, features, subfeatures, tasks, bugs, and owned findings
-    can belong to the backlog while ideas remain outside until promotion.
-11. Dependencies gate readiness and priority cannot bypass them.
-12. The existing finding queue remains a specialized stricter subset.
-13. Refinement and stale review do not mandate one planning methodology.
+10. Issue open/closed state, labels, and optional project metadata cannot alone
+    advance lifecycle state; missing or ambiguous identity/link evidence and
+    tracker/record drift fail closed.
+11. No second canonical backlog is introduced; optional projections remain
+    rebuildable.
+12. Ideas remain outside actionable backlog membership until promotion;
+    dependencies gate readiness and priority cannot bypass them.
+13. The existing finding queue remains a specialized stricter subset, while
+    refinement and stale review mandate no planning methodology.
 14. Protocol text, templates, issue forms, labels, adoption guidance, and
     structural evidence use consistent semantics.
-15. New and existing consumer routes are deterministic and preserve ownership.
+15. Upstream capability/release work and each consumer adoption, update, or
+    recovery remain separate linked work identities and authorities; neither
+    side's completion implies the other's state.
+16. New and existing consumer routes are deterministic, preserve ownership,
+    and change ordinary compatible pins without inventing consumer backlog
+    work unless a reviewed release-declared migration requires it.
 
 ## Implementation and verification approach
 
@@ -205,10 +243,13 @@ separate immutable release operation.
 
 ## Self-review
 
-The 2026-08-12 records-only packet received one bounded architecture/link/scope
-fresh-diff review after its corrections: `0 Blocking / 0 Important / 0 Minor`,
-with no accepted residual, external/legacy follow-up, or optional improvement.
-It is not Gate 5 implementation review and completes no subfeature. No finding
+The 2026-08-12 records-only packet, including the prior-delivery
+reconciliation and explicit state/projection/consumer boundaries, received a
+bounded architecture/link/scope fresh-diff review after its corrections:
+`0 Blocking / 0 Important / 0 Minor`, with no accepted residual,
+external/legacy follow-up, or optional improvement. One review observation
+about tracker-versus-authority wording was corrected before closure. This is
+not Gate 5 implementation review and completes no subfeature. No finding
 identity was required.
 
 ## Definition of Done

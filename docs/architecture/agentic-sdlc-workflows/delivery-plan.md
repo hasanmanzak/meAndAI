@@ -4,6 +4,7 @@
 | --- | --- |
 | Status | Proposed planning; no implementation authority |
 | Parent | [EPIC-0003 / issue #179](https://github.com/hasanmanzak/meAndAI/issues/179) |
+| Records review | Draft [PR #181](https://github.com/hasanmanzak/meAndAI/pull/181) |
 | Architecture | [Agentic SDLC Workflow Architecture](README.md) |
 | Lifecycle owner | [FEAT-0057](../../features/FEAT-0057-explicit-sdlc-backlog-governance/README.md) |
 | Execution owner | [FEAT-0070](../../features/FEAT-0070-agentic-sdlc-workflow-capabilities/README.md) |
@@ -22,6 +23,29 @@ Neither feature reopens the accepted executable protocol architecture in
 [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md).
 Provider, release, and authority-transfer effects remain behind its exact
 application plans and grants.
+
+## Related-work reconciliation
+
+The delivery history that produced the explicit SDLC/backlog proposal also
+contained three independently owned remediation lines. This table preserves
+their current canonical disposition so archiving the originating planning
+conversation cannot hide unfinished work or make completed work appear
+pending. It is a traceability boundary, not a new dependency graph or an
+implementation grant.
+
+| Work identity | Canonical state and evidence | Relationship to this program |
+| --- | --- | --- |
+| [FEAT-0057](../../features/FEAT-0057-explicit-sdlc-backlog-governance/README.md) / [issue #150](https://github.com/hasanmanzak/meAndAI/issues/150) | Open current-main re-intake in this records packet; obsolete [draft PR #151](https://github.com/hasanmanzak/meAndAI/pull/151) remains closed and unmerged prior art | The only earlier work line resumed here; future delivery is owned by [SUBF-0157](../../features/FEAT-0057-explicit-sdlc-backlog-governance/README.md#subf-0157) through [SUBF-0159](../../features/FEAT-0057-explicit-sdlc-backlog-governance/README.md#subf-0159) after their entry gates close |
+| [BUG-0045](https://github.com/hasanmanzak/meAndAI/issues/149) / [FEAT-0058](../../features/FEAT-0058-v0156-completed-historical-adoption-issues/README.md) | Complete in closed [issue #149](https://github.com/hasanmanzak/meAndAI/issues/149), merged [PR #152](https://github.com/hasanmanzak/meAndAI/pull/152), and immutable [v0.15.6](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.6) at [`5321f1f1aa5966114c69b46bf6ed9191df109e6b`](https://github.com/hasanmanzak/meAndAI/commit/5321f1f1aa5966114c69b46bf6ed9191df109e6b) | Historical adjacent delivery evidence only; no reimplementation, reopened scope, or remaining action in [EPIC-0003 / issue #179](https://github.com/hasanmanzak/meAndAI/issues/179) |
+| [FIND-0120 / issue #44](https://github.com/hasanmanzak/meAndAI/issues/44) | Complete and closed after the required `main` repository controls were established | Historical external-control evidence only; it is not reopened or owned by [FEAT-0057](../../features/FEAT-0057-explicit-sdlc-backlog-governance/README.md) or [FEAT-0070](../../features/FEAT-0070-agentic-sdlc-workflow-capabilities/README.md) |
+| [BUG-0036 / issue #139](https://github.com/hasanmanzak/meAndAI/issues/139) | Open planned handoff for live GitHub reference validation before merge; its issue remains the live tracker/state store for that separate work identity | Separate backlog item. This records packet does not implement, close, reprioritize, or absorb it; any implementation requires its own refreshed intake and explicit directive |
+
+Only [FEAT-0057](../../features/FEAT-0057-explicit-sdlc-backlog-governance/README.md)
+is resumed by this proposal. If later design work demonstrates a real
+dependency on [BUG-0036 / issue #139](https://github.com/hasanmanzak/meAndAI/issues/139),
+that relationship must be added explicitly from then-current evidence; it
+cannot be inferred from their shared protocol or GitHub-governance subject
+matter.
 
 ## 2. Dependency order
 

@@ -5,6 +5,7 @@
 | Classification | Architecture design |
 | Status | Proposed; records-only review; implementation authority withheld |
 | Parent work | [EPIC-0003 / issue #179](https://github.com/hasanmanzak/meAndAI/issues/179) |
+| Records review | Draft [PR #181](https://github.com/hasanmanzak/meAndAI/pull/181) |
 | Lifecycle feature | [FEAT-0057](../../features/FEAT-0057-explicit-sdlc-backlog-governance/README.md) / [issue #150](https://github.com/hasanmanzak/meAndAI/issues/150) |
 | Execution feature | [FEAT-0070](../../features/FEAT-0070-agentic-sdlc-workflow-capabilities/README.md) / [issue #180](https://github.com/hasanmanzak/meAndAI/issues/180) |
 | Decisions | Proposed [DEC-0037](../../decisions/DEC-0037-explicit-sdlc-and-github-native-workflow-authority.md) and proposed [DEC-0038](../../decisions/DEC-0038-protocol-owned-workflow-contracts-and-bounded-agent-execution.md) |
@@ -53,6 +54,19 @@ This architecture extends but does not replace:
 The proposed names therefore are **Workflow Contract Catalog** and **Execution
 Role Contract Catalog**. They do not create a second semantic capability,
 compiled policy, or grant catalog.
+
+The [successor delivery plan](delivery-plan.md#related-work-reconciliation)
+also reconciles the durable work identities from the earlier SDLC/backlog
+delivery packet. It resumes only
+[FEAT-0057](../../features/FEAT-0057-explicit-sdlc-backlog-governance/README.md),
+retains [BUG-0045](https://github.com/hasanmanzak/meAndAI/issues/149) /
+[FEAT-0058](../../features/FEAT-0058-v0156-completed-historical-adoption-issues/README.md)
+and [FIND-0120 / issue #44](https://github.com/hasanmanzak/meAndAI/issues/44)
+as completed evidence, and leaves
+[BUG-0036 / issue #139](https://github.com/hasanmanzak/meAndAI/issues/139)
+under its own live issue and future authority. Thematic proximity to this
+architecture neither reopens completed work nor silently absorbs a separate
+defect.
 
 ## 3. Conceptual model
 

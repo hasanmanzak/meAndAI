@@ -7,7 +7,7 @@
 | Target version | Unassigned; depends on accepted architecture and predecessor review |
 | Issue | [Issue #180](https://github.com/hasanmanzak/meAndAI/issues/180) |
 | Parent epic | [EPIC-0003 / issue #179](https://github.com/hasanmanzak/meAndAI/issues/179) |
-| Pull request | Pending; [issue #180](https://github.com/hasanmanzak/meAndAI/issues/180) is the stable authority until a records pull request exists |
+| Pull request | Draft [PR #181](https://github.com/hasanmanzak/meAndAI/pull/181) |
 | Decisions | Proposed [DEC-0038](../../decisions/DEC-0038-protocol-owned-workflow-contracts-and-bounded-agent-execution.md) and proposed [DEC-0037](../../decisions/DEC-0037-explicit-sdlc-and-github-native-workflow-authority.md) |
 | Architecture | [Agentic SDLC Workflow Architecture](../../architecture/agentic-sdlc-workflows/README.md) and [delivery plan](../../architecture/agentic-sdlc-workflows/delivery-plan.md) |
 | Originating idea | [IDEA-0001](../../ideas/IDEA-0001-role-based-multi-agent-protocol.md) |
@@ -238,11 +238,11 @@ test-first evidence, focused verification, and fresh-diff review.
 
 ## Self-review
 
-The 2026-08-12 packet received one bounded architecture/link/scope fresh-diff
-review after its corrections: `0 Blocking / 0 Important / 0 Minor`, with no
-accepted residual, external/legacy follow-up, or optional improvement. It is
-not Gate 5 implementation review and completes no subfeature. No finding
-identity was required.
+The 2026-08-12 packet and its current draft-PR linkage received a bounded
+architecture/link/scope fresh-diff review after corrections: `0 Blocking / 0
+Important / 0 Minor`, with no accepted residual, external/legacy follow-up, or
+optional improvement. It is not Gate 5 implementation review and completes no
+subfeature. No finding identity was required.
 
 ## Definition of Done
 
