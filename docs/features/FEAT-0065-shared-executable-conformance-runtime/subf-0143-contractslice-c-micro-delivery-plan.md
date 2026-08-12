@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Gate 2 micro-delivery plan and design freeze |
-| State | Design and Activation cohorts `ExactHeadHostedGreen`; both Applicability packets `ReviewedLocalGreen`, C `7/11`, current A+B+C `50/50`; R=0006/R=0008/R=0009/R=0010 diagnostic/no-success, R=0007/R=0011 accepted/immutable; Applicability cohort push/exact-head hosted gate pending; Evaluation held |
+| State | Design, Activation, and Applicability cohorts `ExactHeadHostedGreen`; C `7/11`, current A+B+C `50/50`; R=0006/R=0008/R=0009/R=0010 diagnostic/no-success, R=0007/R=0011 accepted/immutable; `C-EVALUATION-PLAN-01` `FrozenDesign`/inactive pending this synchronized design head's exact-head hosted gate; parent scenario held |
 | Parent | Owning feature and current subfeature |
 | Scenario | [TEST-0210](test-cases.md#test-0210), retained `Planned` |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
@@ -139,7 +139,7 @@ sequence with a push and Ubuntu/Windows wait after every package.
 | Cohort | Local work and validation | Hosted CI | Hosted defects | Owner identification | Correction and revalidation | Estimated saving vs package-hosted | Consistency/traceability loss |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Activation | `3h10m` measured from the first package commit through the final synchronized exact-tree gate | Ubuntu `22m23s`; Windows `18m57s`; publication skipped | `0` | `NotApplicable` | `NotApplicable` | About `44m46s` of hosted critical-path wait from the two avoided intermediate pushes, using this cohort's `22m23s` longest job as the comparison basis | None observed; the local commit-reference recurrence caught the only record defect before push |
-| Applicability | `NotMeasured` | `NotMeasured` | `NotMeasured` | `NotApplicable` until a defect | `NotApplicable` until a defect | `NotMeasured` | `NotObserved` initially |
+| Applicability | About `63m` active package/validation time | `20m37s` critical hosted duration (`13m46s` Windows) | `0` | `NotApplicable` | `NotApplicable` | About `14-21m` by avoiding a second hosted round | `No`; separate package commits and exact FQN/runner evidence remained intact |
 | Evaluation | `NotMeasured` | `NotMeasured` | `NotMeasured` | `NotApplicable` until a defect | `NotApplicable` until a defect | `NotMeasured` | `NotObserved` initially |
 | Results/closure | `NotMeasured` | `NotMeasured` | `NotMeasured` | `NotApplicable` until a defect | `NotApplicable` until a defect | `NotMeasured` | `NotObserved` initially |
 
@@ -536,8 +536,69 @@ evidence `7/7` in `305.7s` with no publication claim, and `1,052/1,400` plus `42
 Code/evidence/traceability reviews close `0/0/0`; the three diagnostic owners
 were isolated in under four minutes each, corrected/revalidated in about
 `7m/5m/4m`, and caused no consistency or traceability loss. This packet is
-`ReviewedLocalGreen` in its own local commit. The cohort still requires its
-full local boundary, one push, and exact-head hosted green before Evaluation.
+`ReviewedLocalGreen` in its own local commit. The Applicability cohort then
+passed its full local boundary and exact-head hosted run `31635734392` at the
+exact identity owned by the canonical C ledger: Ubuntu `20m37s`, Windows
+`13m46s`, publication skipped, and zero hosted defects.
+
+## Frozen `C-EVALUATION-PLAN-01` packet boundary
+
+The sole Fact/FQN remains
+`MeAndAI.Protocol.Conformance.Tests.ContractSliceCEvaluationPlanTests.Plans_exact_projected_evaluation_round`,
+with only `ContractSlice=C`, no Scenario, and marker
+`TEST-0210-C-BEHAVIOR-RED-0006`. The fixture owns one ready Applicable rule
+whose evaluation slots cover: one already admitted shared repository-tree slot,
+one static repository-governed-text instruction, and one projected repository-
+target slot. The Tests-owned projector deterministically returns three canonical
+items over owners `alpha`, `alpha`, `omega`; planning emits no instruction for
+the admitted slot, one none-demand static instruction, and two owner-sharded
+projected instructions ordered by SlotKey, target, owner, then first ItemId.
+A Tests-owned candidate visitor fixes the three selector tuples before red:
+ItemId `0` is owner `alpha`, CommitObject
+identity of forty `1` digits, path `docs/a.md`, no fragment;
+ItemId `1` is owner `alpha`, TagRoot `v1.0.0`; ItemId `2` is owner `omega`,
+CapturedSnapshotPath capture `capture-1`, path `docs/b.md`, fragment `L1-L2`,
+expected content identity of sixty-four `2` digits. Candidate input permutations
+must reproduce the identical public item order, demand frames, and digests.
+A second empty-projector fixture proves zero projected instruction and no
+external proof/I/O while preserving the ready static instruction. A predecessor
+with unresolved applicability terminalizes that rule and emits no evaluation
+instruction.
+
+R changes only the fully prepared valid `PlanEvaluation(closure)` return to
+`null!`; only that null reaches the marker. Foreign/stale/reused closure,
+cancellation, wrong ordering/digest/round, zero-demand, and unresolved paths are
+marker-free. Canonical R=0012 is authorized only once after this exact freeze
+head is hosted green. Green restores only the semantic result and proves focused `1/1`,
+C `8/8`, full Conformance `51/51`, Domain `98/98`, Release build, format/diff,
+locks, structure, reviews, record sync, and a separate unpushed
+`ReviewedLocalGreen` commit.
+
+The executable allowlist is exact: modify
+`Activation/ConformanceKernel.cs`, `Activation/CatalogSliceKernel.cs`,
+`Planning/ApplicabilityPlanningCore.cs`, `Planning/AcquisitionInstruction.cs`,
+and `ContractSliceCApplicabilityClosureTests.cs`; add
+`Planning/EvaluationPlanningCore.cs` and
+`ContractSliceCEvaluationPlanTests.cs`; modify
+`ContractSliceCProducerPipelineTests.cs` only to make its existing Tests-owned
+projector instance deterministic/configurable. No Abstractions/Domain/Policy/project/
+package/lock/workflow file changes. The normalized cap is `1,900` changed lines,
+with the owning test capped at `650`; `1,901` or `651` requires redraw. The
+packet uses the common fresh external ValidateOnly/Execute runner contract,
+one Release `--no-restore` build, one exact `--no-build` child filtered to the
+FQN, TRX `TEST-0210-C-BEHAVIOR-RED-0006.trx`, `VSTEST_CONNECTION_TIMEOUT=300`,
+a `420s` outer bound, exact native exit `1`, and immutable no-retry authority
+after `InvocationCommitted`.
+
+```text
+dotnet test tests/dotnet/MeAndAI.Protocol.Conformance.Tests/MeAndAI.Protocol.Conformance.Tests.csproj --configuration Release --no-restore --no-build --nologo --verbosity minimal --results-directory "<fresh-root>" --logger "trx;LogFileName=TEST-0210-C-BEHAVIOR-RED-0006.trx" --filter "ContractSlice=C&FullyQualifiedName=MeAndAI.Protocol.Conformance.Tests.ContractSliceCEvaluationPlanTests.Plans_exact_projected_evaluation_round"
+```
+
+This packet-specific argv supersedes the generic red template only for R=0012.
+The design cohort changes exactly the existing twelve C live-route records, no
+new record node, and no product/test/project/lock/workflow path. Fresh design,
+evidence/scope, and traceability reviews plus schema-2 graph validation must be
+`0/0/0` before its focused records commit and single hosted design-gate push.
 
 ## Deferred ContractSlice D cohort plan
 

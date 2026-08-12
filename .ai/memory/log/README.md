@@ -10,12 +10,11 @@ Follow the current
 ContractSlice A and B are merged/exact-main green; the linked C freeze owns the
 exact B merge and hosted-run closure. B remains
 `11/11`, cumulative A+B `43/43`; its accepted reds and immutable diagnostics
-remain owned by the historical B handoff below. The C Activation cohort is
-`ExactHeadHostedGreen`; both Applicability packets are `ReviewedLocalGreen`, C
-is `7/11`, and current A+B+C is `50/50`. R=0006/R=0008/R=0009/R=0010 are
-diagnostics/no-success and R=0007/R=0011 are accepted/immutable. Applicability
-is locally complete with its one push/exact-head hosted gate pending; Evaluation
-remains held.
+remain owned by the historical B handoff below. C Activation and Applicability
+are `ExactHeadHostedGreen`; C is `7/11`, and current A+B+C is `50/50`.
+R=0006/R=0008/R=0009/R=0010 are diagnostics/no-success and R=0007/R=0011 are
+accepted/immutable. Evaluation Plan is `FrozenDesign`/inactive pending its
+synchronized design-head hosted gate.
 The parent scenario remains `Planned`; D and activation are held.
 
 Follow the current

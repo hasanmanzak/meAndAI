@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted; ContractSlice A and B merged/exact-main green; B is `11/11`, cumulative A+B `43/43`. The C Activation cohort is `ExactHeadHostedGreen`; both Applicability packets are `ReviewedLocalGreen`, C is `7/11`, and current A+B+C is `50/50`. R=0007/R=0011 are accepted/immutable; the cohort awaits one push/exact-head hosted gate and Evaluation remains held. [TEST-0210](test-cases.md#test-0210) remains `Planned`; D, activation, and DoD remain held. |
+| Status | Gate 2 accepted; ContractSlice A and B merged/exact-main green; B is `11/11`, cumulative A+B `43/43`. C Activation and Applicability are `ExactHeadHostedGreen`; C is `7/11`, current A+B+C `50/50`. R=0007/R=0011 are accepted/immutable; `C-EVALUATION-PLAN-01` is `FrozenDesign`/inactive pending this synchronized design head's exact-head hosted gate. [TEST-0210](test-cases.md#test-0210) remains `Planned`; D, activation, and DoD remain held. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
@@ -1005,23 +1005,9 @@ per-file caps and cleanup allocation are mapped by basename in the control plan.
 Transition semantics, authenticity/coherence, lifecycle truth, public API,
 project/friend/lock/workflow changes, and kernel activation remain held.
 
-The bounded implementation keeps those ownership seams exact. Canonical R used
-transient source `423` lines at SHA-256
-`3535913224F9413B1201A910BDB5139A34EFB6ABB8148C37591244C0E2DFB002`;
-its sole TRX SHA-256 is
-`DCC53EBC3B095C88E4CDE18AEABFD450286238B9273BC855F7370E01060F5567`,
-with the complete oracle green. Final source is `410` lines at SHA-256
-`3501D655D2B27CBA82008B761D3C674EBE0890E817710C5EB1617BFEE1C9429D`.
-Focused, retained A-COMPLETE, cumulative A, full Conformance, and Domain are
-`1/1`, `1/1`, `29/29`, `29/29`, and `98/98`. Reader/Writer/Catalog gross
-changes are `70/36/14`; production/test/combined are `120/416/536`. Release
-build, format, diff, all six lock fingerprints, and StructureOnly
-(`elapsedMs=419847`) are green; three independent final reviews each closed
-`0/0/0`. The exact correction head passed Ubuntu in `19m00s` and Windows in
-`35m20s`; publication verification was correctly skipped and its instruction
-graph is `351 nodes / 4096 edges`. This records-only synchronization does not claim hosted
-proof for its own delivery head. That distinct freeze-delivery gate later
-closed before transition implementation began.
+The bounded implementation, canonical red/green identities, exact test counts,
+graph result, reviews, and two-stage hosted delivery remain immutable in the
+owning A-PREDECESSOR historical ledger; they grant no current C authority.
 
 ### ReviewedLocalGreen `A-TRANSITION-01` boundary and evidence <a name="a-transition-01-freeze"></a>
 
@@ -10796,8 +10782,9 @@ Complete/Incomplete/Failed outcomes, seals ContextProof references, emits
 NotApplicable/Unresolved terminals, and enforces cancellation/retry atomicity.
 R=0008/R=0009/R=0010 are immutable fixture/reference diagnostics; corrected
 R=0011 is accepted/immutable. Green is focused `1/1`, C `7/7`, full `50/50`,
-Domain `98/98`, and the package is `ReviewedLocalGreen`. The cohort push and
-exact-head hosted gate remain pending; Evaluation is held.
+Domain `98/98`, and the package is `ReviewedLocalGreen`. The two-commit cohort
+then passed exact-head hosted run `31635734392`; Evaluation Plan R=0012 remains
+inactive until its synchronized freeze head is hosted green.
 
 The first packet is capped at `52` production paths, three C test paths plus two
 bounded predecessor-test adaptations, and `7,000` normalized changed C# lines.
@@ -10825,6 +10812,35 @@ specialization/co-report; and repository/provider equivalence plus D-CONVERGE.
 D remains inactive here and must freshly prove required B/C behavior against
 real Policy registrations.
 
+### `C-EVALUATION-PLAN-01` executable freeze
+
+The first Evaluation packet implements only `PlanEvaluation`; Advance and
+Evaluate remain integrity failures. Its one direct Fact is
+`ContractSliceCEvaluationPlanTests.Plans_exact_projected_evaluation_round`, with
+only `ContractSlice=C`, no Scenario, and marker
+`TEST-0210-C-BEHAVIOR-RED-0006`. The complete Tests-owned fixture has one ready
+Applicable rule with an admitted repository-tree slot, a static repository-
+governed-text slot, and the projected repository-target slot. Projector output
+is the canonical ItemId sequence `0..2` with owners `alpha,alpha,omega`; the
+plan reuses the admitted slot, emits one round-0 none-demand static instruction,
+then two round-0 owner shards ordered `alpha` before `omega`. The empty-projector
+variant emits no projected instruction or proof/I/O; an applicability-unresolved
+predecessor terminalizes the rule and emits no evaluation instruction.
+
+`AcquisitionInstruction.CreateEvaluation` derives both frames/digests, accepts
+only canonical contiguous ItemIds and one owner per non-empty shard, and never
+accepts caller digests. Planning snapshots all public projections, binds the
+same session/predecessor stamp, rejects foreign/stale/reused inputs, and commits
+consumption only after a successful non-null result. R replaces only that final
+prepared result with `null!`; every negative is marker-free. The exact eight-
+path executable allowlist and `1,900/650` normalized line caps are owned by the
+C micro-plan; no Abstractions, Domain, Policy, project/package/lock/workflow, or
+held packet surface changes. Green is `1/1`, C `8/8`, full Conformance `51/51`,
+Domain `98/98`, with Release/format/diff/locks/structure/reviews/record sync and
+one unpushed `ReviewedLocalGreen` commit. Canonical red uses the common fresh
+one-shot runner, exact FQN filter, marker TRX, native exit `1`, and consumes its
+identity irrevocably after `InvocationCommitted`.
+
 ## Internal implementation slices
 
 ContractSlice A's historical delivery is owned by its
@@ -10842,9 +10858,9 @@ B-CONVERGE is merged/exact-main green.
 ContractSlice C is decomposed by the current
 [C micro-delivery plan](subf-0143-contractslice-c-micro-delivery-plan.md), whose
 design head is hosted green. The three Activation packets and their exact
-cohort head are hosted green; both Applicability packets are
-`ReviewedLocalGreen`, C is `7/11`, and current A+B+C is `50/50`. Applicability
-awaits its one cohort push/exact-head hosted gate; Evaluation is held.
+cohort head are hosted green; both Applicability packets and their exact cohort
+head are hosted green, C is `7/11`, and current A+B+C is `50/50`.
+`C-EVALUATION-PLAN-01` is frozen/inactive pending its design-head hosted gate.
 
 C implementation and D still require separate packet activation, and no
 packet is active merely from this list. No directive here allocates new stable

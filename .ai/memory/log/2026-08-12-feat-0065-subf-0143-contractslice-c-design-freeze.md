@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Scope | ContractSlice C micro-delivery design only |
-| State | Design and Activation cohorts `ExactHeadHostedGreen`; both Applicability packets `ReviewedLocalGreen`; R=0006/R=0008/R=0009/R=0010 diagnostic/no-success; R=0007/R=0011 accepted/immutable; cohort push/exact-head hosted gate pending; Evaluation held |
+| State | Design, Activation, and Applicability cohorts `ExactHeadHostedGreen`; R=0006/R=0008/R=0009/R=0010 diagnostic/no-success; R=0007/R=0011 accepted/immutable; Evaluation Plan `FrozenDesign`/inactive pending synchronized design-head hosted green |
 | Predecessor | ContractSlice B merged and exact-main hosted green |
 | Design delivery | Exact [`dd8940156408c103edb837f17bc05e6bb25de8c3`](https://github.com/hasanmanzak/meAndAI/commit/dd8940156408c103edb837f17bc05e6bb25de8c3) / [run 31585390450](https://github.com/hasanmanzak/meAndAI/actions/runs/31585390450): Ubuntu `16m07s`, Windows `18m19s`, publication verification skipped |
 | C authority | [Maintainer continuation directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5264403013) |
@@ -391,4 +391,6 @@ active minutes excluding hosted wait. Package-local hosted CI is
 | R=0011 accepted | Runner `42,757` / `251A98B8...297B`, AST `6,131/46/0`; native/runner `1/0`; report `18,169` / `B6C4F18B...E9D2`; TRX `1711DFC8...133D`; exact FQN/marker/result-definition-entry/16-counter/source/lock/binary/root oracles passed once. |
 | Green | Release build `0/0`; focused `1/1`; C `7/7`; full Conformance `50/50`; Domain `98/98`; format/diff/locks green; StructureOnly `452.313s`; publication evidence `7/7` in `305.7s` with no publication claim; budget `1,052/1,400`, test `422/600`. |
 | Isolation/cost | Three fixture/reference defects were independently isolated in under four minutes each and corrected/revalidated in about `7m`, `5m`, and `4m`; first-child through final green was about `23m`, with no consistency or traceability loss. |
-| Cohort route | Package-local hosted CI is `NotApplicable`; no intermediate push. One full Applicability cohort validation, one push, and exact-head hosted green remain before Evaluation. |
+| Cohort route | Package-local hosted CI was `NotApplicable`; the two separate package commits were pushed once. Exact-head run [31635734392](https://github.com/hasanmanzak/meAndAI/actions/runs/31635734392) passed at [a9217602472417f0cb34eeb7a44b46476d688da1](https://github.com/hasanmanzak/meAndAI/commit/a9217602472417f0cb34eeb7a44b46476d688da1): Ubuntu `20m37s`, Windows `13m46s`, publication skipped, hosted defects/isolation/correction `0/NotApplicable/NotApplicable`, estimated one hosted round (`14-21m`) saved, no consistency/traceability loss. |
+| Evaluation freeze | `C-EVALUATION-PLAN-01` is the sole next packet; exact FQN/marker, ready/static/projected/zero-demand/unresolved fixture, eight-path executable allowlist, `1,900/650` caps, and fresh one-shot R custody are normative in the C micro-plan and typed design. |
+| Evaluation design gates | Exact-tree StructureOnly green in `460.558s`; publication evidence `7/7` in `299.7s` with no publication claim; fresh design/evidence/traceability reviews `0/0/0`; R=0012 remains unexecuted. |
