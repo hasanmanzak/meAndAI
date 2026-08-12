@@ -1,0 +1,262 @@
+# [SUBF-0143](README.md#subf-0143) - ContractSlice C Micro-Delivery Plan
+
+| Field | Value |
+| --- | --- |
+| Classification | Gate 2 micro-delivery plan and design freeze |
+| State | `FrozenDesign` / inactive; ContractSlice B is merged and exact-main hosted green; C implementation has not started |
+| Parent | Owning feature and current subfeature |
+| Scenario | [TEST-0210](test-cases.md#test-0210), retained `Planned` |
+| Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
+| Ordered-C authority | [Maintainer continuation directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5264403013) |
+| Accepted predecessor | Merged [PR #177](https://github.com/hasanmanzak/meAndAI/pull/177), exact-main commit [`6ca42f56a48976093692dc4764c464ca185aa964`](https://github.com/hasanmanzak/meAndAI/commit/6ca42f56a48976093692dc4764c464ca185aa964), and [run 31579758253](https://github.com/hasanmanzak/meAndAI/actions/runs/31579758253): Ubuntu `6m22s`, Windows `11m11s`, publication verification skipped |
+| Normative owner | [Typed evaluation kernel design](subf-0143-typed-evaluation-kernel-design.md) |
+| Implementation language | C# only; D, Scenario/workflow activation, release, and publication remain held |
+
+## Authority and non-goals
+
+This plan decomposes only the already accepted ContractSlice C architecture.
+Packet labels are operational delivery labels; they allocate no new stable work
+or test ID and grant no executable authority merely by appearing here.
+
+ContractSlice C owns the first executable export/kernel activation over a
+Tests-owned synthetic complete catalog, the final six registration families,
+provider-neutral producer execution, two-phase applicability/evaluation plans,
+kernel-minted outputs, and deterministic aggregation. It introduces the exact
+eight Abstractions and fifteen Conformance supported types already frozen by
+the typed design, taking the supported public total from `72` through B to
+`95` through C. Domain gains no export.
+
+ContractSlice C does not own the real Policy export or rule implementations,
+Application routing/I/O, live provider integration, Scenario/status/owner or
+workflow activation, runtime-efficiency changes, feature DoD, D, merge,
+release, or publication. ContractSlice D must freshly repeat the relevant B/C
+vectors against the real Policy registrations; no C result is product evidence
+for D.
+
+## Frozen dependency graph
+
+```text
+merged exact-main B
+  -> C-SURFACE-ACTIVATION-01
+  -> C-REGISTRATION-MISMATCH-01
+  -> C-PRODUCER-PIPELINE-01
+  -> C-APPLICABILITY-PLAN-01
+  -> C-APPLICABILITY-CLOSURE-01
+  -> C-EVALUATION-PLAN-01
+  -> C-EVALUATION-ADVANCE-01
+  -> C-INTENT-RESULT-01
+  -> C-AGGREGATION-01
+  -> C-CONVERGE-01
+```
+
+Only one mutating packet may be active. A successor red or implementation is
+held until its predecessor is locally green, independently reviewed, record-
+synchronized, and captured in its own focused local commit. Within one cohort,
+that boundary is named `ReviewedLocalGreen`; intermediate package commits are
+not pushed and carry no hosted-green claim. A packet-specific freeze may refine
+fixtures and exact path allowlists but may not change this topology, Fact
+identity, ownership, or downstream holds without renewed design review.
+
+## Frozen delivery cohorts
+
+| Cohort | Ordered packets | Entry gate | Exit state |
+| --- | --- | --- | --- |
+| Activation | `C-SURFACE-ACTIVATION-01` -> `C-REGISTRATION-MISMATCH-01` -> `C-PRODUCER-PIPELINE-01` | Exact hosted-green design cohort | `ExactHeadHostedGreen` after one cohort push |
+| Applicability | `C-APPLICABILITY-PLAN-01` -> `C-APPLICABILITY-CLOSURE-01` | Activation `ExactHeadHostedGreen` | `ExactHeadHostedGreen` after one cohort push |
+| Evaluation | `C-EVALUATION-PLAN-01` -> `C-EVALUATION-ADVANCE-01` | Applicability `ExactHeadHostedGreen` | `ExactHeadHostedGreen` after one cohort push |
+| Results/closure | `C-INTENT-RESULT-01` -> `C-AGGREGATION-01` -> `C-CONVERGE-01` | Evaluation `ExactHeadHostedGreen` | Slice completion only after final exact-head hosted green |
+
+Each package still owns its canonical expected-red, focused local test, C-
+cumulative test through that package, relevant Release build, diff/format and
+required structural checks, package-local independent review, record sync, and
+one separate focused local commit. The next package in the same cohort may
+start only after those gates close as `ReviewedLocalGreen`. No intermediate
+package commit is pushed.
+
+At a cohort boundary, run the full C cumulative set, combined ContractSlice A
+through the current cohort, full Conformance and Domain tests, relevant Release
+builds, format, locks, API/ownership checks, canonical graph/StructureOnly, the
+applicable publication-evidence suite, and a full cohort diff review. Only a
+green and review-closed cohort pushes its ordered local commit sequence once to
+the current PR branch. Its exact head must pass Ubuntu and Windows, with the
+publication job taking its designed state, before the next cohort activates.
+
+A hosted failure reopens only that cohort. Use its separate package commits to
+identify the owning package, record the identification time, correct that owner,
+repeat the entire local cohort validation, and push a new exact head. Work never
+continues over a failed cohort. `ReviewedLocalGreen` names an intermediate
+package; `ExactHeadHostedGreen` names a pushed cohort; neither name completes C.
+
+## Exact test topology
+
+Every retained C test is one direct non-skipped xUnit `[Fact]` with exactly one
+`ContractSlice=C` trait and no `Scenario` trait. Theory, class-level traits,
+generic/overloaded methods, inherited facts, and a second slice/Scenario value
+are forbidden. The final ordinal LF-terminated inventory contains exactly
+eleven FQNs, `1,262` UTF-8 bytes, and SHA-256
+`5EA65760A6C0E1B7442686EF9306F0075608A0935E48C484432C5106A444C7E5`:
+
+```text
+MeAndAI.Protocol.Conformance.Tests.ContractSliceCActivationTests.Activates_exact_synthetic_registration_graph
+MeAndAI.Protocol.Conformance.Tests.ContractSliceCAggregationTests.Aggregates_exact_catalog_evaluation_and_verdict
+MeAndAI.Protocol.Conformance.Tests.ContractSliceCApplicabilityClosureTests.Closes_applicability_with_exact_terminal_shapes
+MeAndAI.Protocol.Conformance.Tests.ContractSliceCApplicabilityPlanTests.Plans_exact_static_applicability_instructions
+MeAndAI.Protocol.Conformance.Tests.ContractSliceCEvaluationAdvanceTests.Advances_owner_sharded_evaluation_to_closure
+MeAndAI.Protocol.Conformance.Tests.ContractSliceCEvaluationPlanTests.Plans_exact_projected_evaluation_round
+MeAndAI.Protocol.Conformance.Tests.ContractSliceCIntentTests.Mints_exact_intents_findings_and_failures
+MeAndAI.Protocol.Conformance.Tests.ContractSliceCOwnershipTests.Enforces_exact_friend_factory_and_negative_surface
+MeAndAI.Protocol.Conformance.Tests.ContractSliceCProducerPipelineTests.Activates_and_orders_exact_six_family_producer_graph
+MeAndAI.Protocol.Conformance.Tests.ContractSliceCRegistrationTests.Rejects_registration_mismatch_without_kernel_activation
+MeAndAI.Protocol.Conformance.Tests.ContractSliceCStructuralTests.Matches_exact_cumulative_c_public_surface
+```
+
+The first packet owns the Structural, Ownership, and Activation facts. Each
+later semantic packet owns one Fact and one immutable BehaviorRed ordinal.
+`C-CONVERGE-01` is a pure audit and adds no Fact. The final C count is `11/11`;
+cumulative A+B+C/full Conformance becomes `54/54`, while Domain remains `98/98`.
+
+## Packet ledger
+
+| Packet | Frozen contract | Red identity | Required green boundary |
+| --- | --- | --- | --- |
+| `C-SURFACE-ACTIVATION-01` | Exact 23-type C public surface, cumulative supported total `95`, friend/factory/negative surface, final six-list registration identities, Tests-owned synthetic complete export/proof, and non-null `ConformanceKernel` activation over the exact registration graph | Permanent compile SurfaceRed for `IRuleEvaluator`; canonical `TEST-0210-C-BEHAVIOR-RED-0001`; `ContractSliceCActivationTests.Activates_exact_synthetic_registration_graph` | C `3/3`; A+B+C/full `46/46`; Domain `98/98` |
+| `C-REGISTRATION-MISMATCH-01` | Six-family registration/type-token/public-projection bijection; exact missing/extra/duplicate/foreign/wrong-generic/order/proof mismatch classification; failed activation exposes no kernel | `TEST-0210-C-BEHAVIOR-RED-0002`; `ContractSliceCRegistrationTests.Rejects_registration_mismatch_without_kernel_activation` | C `4/4`; full `47/47` |
+| `C-PRODUCER-PIPELINE-01` | Exact codec/parser/index/projector/selector/evaluator activation, Kahn order, per-binding/per-context/per-plan invocation, coalescing, input cardinality, cache/ledger ownership, and zero-input producer shapes | `TEST-0210-C-BEHAVIOR-RED-0003`; `ContractSliceCProducerPipelineTests.Activates_and_orders_exact_six_family_producer_graph` | C `5/5`; full `48/48` |
+| `C-APPLICABILITY-PLAN-01` | Named/slice profile rule selection, target-selector resolution, exact static slot/instruction projection, canonical ordering/digests, no provider route data, and plan/session binding | `TEST-0210-C-BEHAVIOR-RED-0004`; `ContractSliceCApplicabilityPlanTests.Plans_exact_static_applicability_instructions` | C `6/6`; full `49/49` |
+| `C-APPLICABILITY-CLOSURE-01` | Observed/Failed/NoInput admission into exact outcomes, Complete/Incomplete/Failed independence, context-proof sealing, applicability intents, NotApplicable/Unresolved terminal shapes, cancellation and retry atomicity | `TEST-0210-C-BEHAVIOR-RED-0005`; `ContractSliceCApplicabilityClosureTests.Closes_applicability_with_exact_terminal_shapes` | C `7/7`; full `50/50` |
+| `C-EVALUATION-PLAN-01` | Ready Applicable rules, producer-dependent static/projected slots, zero-demand no-I/O path, owner-sharded demand instructions, exact round/order/digest and unresolved predecessor terminalization | `TEST-0210-C-BEHAVIOR-RED-0006`; `ContractSliceCEvaluationPlanTests.Plans_exact_projected_evaluation_round` | C `8/8`; full `51/51` |
+| `C-EVALUATION-ADVANCE-01` | Projected owner-shard admission, aggregate outcome/proof, index invocation, multi-round monotonic session state, terminal closure, replay/collision/cancellation/host-failure behavior | `TEST-0210-C-BEHAVIOR-RED-0007`; `ContractSliceCEvaluationAdvanceTests.Advances_owner_sharded_evaluation_to_closure` | C `9/9`; full `52/52` |
+| `C-INTENT-RESULT-01` | Exact Applicability/Finding/Failure/Evaluation intent factories and validation; kernel-only RuleId/revision/severity/remediation/reference/status minting; Satisfied/Violated/NotApplicable/NotEvaluated closed shapes | `TEST-0210-C-BEHAVIOR-RED-0008`; `ContractSliceCIntentTests.Mints_exact_intents_findings_and_failures` | C `10/10`; full `53/53` |
+| `C-AGGREGATION-01` | Canonical acquisition/evaluation ordering, violation/unresolved flags, slice result without verdict, complete-catalog verdict truth table, exact predecessor/catalog profile projection, no report/enforcement authority | `TEST-0210-C-BEHAVIOR-RED-0009`; `ContractSliceCAggregationTests.Aggregates_exact_catalog_evaluation_and_verdict` | C `11/11`; A+B+C/full `54/54`; Domain `98/98` |
+| `C-CONVERGE-01` | Pure cumulative source/test/export/friend/trait/project/lock/graph audit; P/R/G `NotApplicable`; no executable change | None; all canonical reds remain immutable and are never rerun | C `11/11`; full `54/54`; Domain `98/98`; build/format/diff/StructureOnly/publication evidence/reviews green |
+
+## Cohort measurement ledger
+
+Measurements are filled from retained local and hosted evidence; estimates are
+never promoted to observed facts. The comparison baseline is the same package
+sequence with a push and Ubuntu/Windows wait after every package.
+
+| Cohort | Local work and validation | Hosted CI | Hosted defects | Owner identification | Correction and revalidation | Estimated saving vs package-hosted | Consistency/traceability loss |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Activation | `NotMeasured` | `NotMeasured` | `NotMeasured` | `NotApplicable` until a defect | `NotApplicable` until a defect | `NotMeasured` | `NotObserved` initially |
+| Applicability | `NotMeasured` | `NotMeasured` | `NotMeasured` | `NotApplicable` until a defect | `NotApplicable` until a defect | `NotMeasured` | `NotObserved` initially |
+| Evaluation | `NotMeasured` | `NotMeasured` | `NotMeasured` | `NotApplicable` until a defect | `NotApplicable` until a defect | `NotMeasured` | `NotObserved` initially |
+| Results/closure | `NotMeasured` | `NotMeasured` | `NotMeasured` | `NotApplicable` until a defect | `NotApplicable` until a defect | `NotMeasured` | `NotObserved` initially |
+
+C closure reports elapsed time, isolation cost, estimated saved time, and any
+consistency or traceability loss for these four cohorts separately from D.
+
+## First packet boundary
+
+`C-SURFACE-ACTIVATION-01` introduces the complete C public surface and all
+internal declarations needed for the already-frozen signatures, but exercises
+only exact synthetic complete-export activation. The temporary red seam is the
+fully prepared valid `ConformanceKernel.Activate(...)` path returning `null!`;
+only that semantic null may call direct
+`Assert.Fail("TEST-0210-C-BEHAVIOR-RED-0001")`. Construction, structural,
+ownership, wrong-result, exception, and mismatch assertions are marker-free.
+The next packet, not this red, owns the full mismatch matrix.
+
+The executable allowlist must be frozen before red as an exact path list. It is
+limited to C-owned Abstractions/Conformance declarations and internals, the two
+existing export carriers, and exactly three C test files. It changes no Domain,
+Policy, Application, workflow, project, package, lock, Scenario/status/owner,
+or runtime-efficiency file. The first packet redraw threshold is at most `52`
+production paths, `3` test paths, and `7,000` normalized changed C# lines;
+the first value over any threshold stops for review rather than silently
+raising the budget. Later packets default to at most `10` production paths,
+one new/modified owning test path, and `3,500` normalized changed C# lines;
+packet-specific increases require a pre-red design amendment and exact-head
+hosted gate.
+
+## Canonical expected-red contract
+
+Every BehaviorRed uses one fresh external runner and one fresh external result
+root, a warning/error-free Release `--no-restore` build, exact source/runner/
+lock/DLL/PDB custody, and exactly one child invocation:
+
+```text
+dotnet test tests/dotnet/MeAndAI.Protocol.Conformance.Tests/MeAndAI.Protocol.Conformance.Tests.csproj --configuration Release --no-restore --no-build --nologo --verbosity minimal --results-directory "<fresh-root>" --logger "trx;LogFileName=<marker>.trx" --filter "ContractSlice=C&FullyQualifiedName=<exact-FQN>"
+```
+
+No discovery prepass, second logger, fallback, or retry is allowed. The child
+receives process-scoped `VSTEST_CONNECTION_TIMEOUT=300` and one `420000` ms
+outer monotonic bound. Once `InvocationCommitted` is persisted immediately
+before process creation, that ordinal is consumed even by process-create,
+timeout, interruption, unexpected-exit, TRX, custody, or oracle failure.
+
+Canonical red requires native exit `1`, runner exit `0`, one exact regular TRX,
+one Failed result/definition/entry at the exact FQN, referential ID bijection,
+exact marker-only Message, marker count exactly two with only the permitted
+same-result standard-output echo, at most one permitted marker-free same-FQN
+`[FAIL]` RunInfo, exact sixteen counters with total/executed/failed `1/1/1`
+and every other counter `0`, secure XML parsing, no attachment/collector/
+independent diagnostic, and unchanged source/Git/binary identities. A valid
+red is immutable; green replaces only the predeclared semantic null/absent
+behavior in the same uncommitted red-to-green operation.
+
+## Design and graph cohort
+
+The initial design cohort is exactly these twelve Markdown paths:
+
+```text
+.ai/memory/README.md
+.ai/memory/log/2026-08-12-feat-0065-subf-0143-contractslice-c-design-freeze.md
+.ai/memory/log/README.md
+.ai/memory/project.md
+docs/architecture/protocol-governance-and-execution/README.md
+docs/architecture/protocol-governance-and-execution/successor-delivery-plan.md
+docs/architecture/protocol-governance-and-execution/transition-register.md
+docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md
+docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-contractslice-c-micro-delivery-plan.md
+docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-typed-evaluation-kernel-design.md
+docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md
+docs/features/README.md
+```
+
+It adds exactly two tracked record nodes: this plan and the one C design
+ledger. The ledger remains the sole detailed C routing/evidence handoff and is
+bounded to `100` lines, at most `6` Markdown links, and at most `2` repository-
+relative links. All other status edits are edge-neutral where possible. The
+schema-2 hard ceilings remain `512` nodes, `8,192` relations, `1,048,576` bytes
+per parsed blob, and `8,388,608` aggregate parsed bytes; the exact design tree
+must pass the canonical builder/validator and retain at least `2 KiB` per-blob
+and aggregate headroom before commit.
+
+## Design-delivery gates
+
+Before any C# mutation or canonical red:
+
+- the exact twelve-path design cohort passes diff/stable-ID/link/table/fence
+  checks, publication evidence including the fresh commit-reference recurrence,
+  StructureOnly, graph limits, and independent design/content reviews with
+  `0 Blocking / 0 Important / 0 Minor`;
+- the cohort is committed and pushed from the clean C branch, with the NCrunch
+  user file excluded;
+- that exact design commit passes Ubuntu and Windows hosted validation while
+  publication verification is skipped; and
+- the first packet receives a packet-specific exact path/fixture/runner freeze
+  and renewed clean review before its one canonical red.
+
+No design-only success changes C from `0/11`, activates [TEST-0210](test-cases.md#test-0210),
+or lifts D/Scenario/workflow/DoD/merge/release/publication holds.
+
+## Deferred ContractSlice D cohort plan
+
+D is not activated and no final D package/cohort membership is frozen here.
+Only after C completes its final convergence, record synchronization, merge,
+and exact-main hosted predecessor may a separate D micro-delivery plan use the
+observed C cohort measurements. Its pre-D D/RT and micro-plan review must freeze
+the accepted dependency graph into approximately two-to-four-package cohorts
+while keeping these semantic boundaries separate: real Policy export and
+registration activation; real codec/parser/index/projector infrastructure;
+RULE-0001 plus RULE-0002; RULE-0003 through RULE-0005 with specialization and
+co-report behavior; repository/provider equivalence plus D-CONVERGE. Distinct
+expected-red or ownership boundaries may not be merged for speed.
+
+D must use fresh fixtures and tests against real Policy registrations to repeat
+the accepted B/C behaviors. C results inform delivery estimates only and are
+not D product evidence. D uses the same package-local commit, cohort-local full
+validation, single-push, exact-hosted, failure-reopen, status, and measurement
+rules. Its closure reports cohort timing, isolation, savings, and consistency
+separately, without activating Scenario/workflow/consumer/release scope.

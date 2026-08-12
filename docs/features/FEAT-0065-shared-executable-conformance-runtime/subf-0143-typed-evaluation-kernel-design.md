@@ -3,14 +3,14 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted; ContractSlice A merged/exact-main green. All B implementation packets are exact-head hosted green. Repository-target R=0004, admission R=0008/R=0009/R=0010, and codec-derivation R=0013 remain diagnostics/no-success; R=0005/R=0006/R=0007/R=0011/R=0012 and corrected codec-derivation R=0014 are accepted and immutable. B is `11/11`, cumulative A+B `43/43`; B-CONVERGE pure audit is complete locally with final-sync exact-head hosted pending. [TEST-0210](test-cases.md#test-0210) remains `Planned`; C/D, activation, and DoD remain held. |
+| Status | Gate 2 accepted; ContractSlice A and B merged/exact-main green; B is `11/11`, cumulative A+B `43/43`. ContractSlice C is `FrozenDesign`/inactive at `0/11`, pending its synchronized design head's exact hosted gate; final A+B+C target is `54/54`. [TEST-0210](test-cases.md#test-0210) remains `Planned`; D, activation, and DoD remain held. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Test | [TEST-0210](test-cases.md#test-0210) |
 | Gate 3 micro-delivery routing | Historical A delivery remains owned by the [A micro-delivery control plan](subf-0143-micro-delivery-plan.md). Current B design routing is the [ContractSlice B micro-delivery plan](subf-0143-contractslice-b-micro-delivery-plan.md); packet labels refine delivery but activate no executable work. |
 | Exact-main design baseline | Accepted A merge commit [`51623f4d404a95e0f706d72805cf7ddbbbd293b8`](https://github.com/hasanmanzak/meAndAI/commit/51623f4d404a95e0f706d72805cf7ddbbbd293b8), validated by exact-main [run 31304787603](https://github.com/hasanmanzak/meAndAI/actions/runs/31304787603) |
-| Design and Gate 3 authority | Historical A directives and clarifications remain immutable evidence. All B implementation packets are immutable hosted-green predecessors; R=0006/R=0007/R=0011/R=0012 and corrected codec-derivation R=0014 are accepted, while admission R=0008/R=0009/R=0010 and codec-derivation R=0013 are immutable diagnostics/no-success. B-CONVERGE pure audit is complete locally with final-sync exact-head hosted pending. C/D, final activation, merge, release, and publication remain outside this authority. |
+| Design and Gate 3 authority | Historical A/B directives, accepted reds, diagnostics, and hosted evidence remain immutable. The exact [C micro-delivery plan](subf-0143-contractslice-c-micro-delivery-plan.md) is design authority only and remains inactive until its synchronized exact design head is hosted green. D, final activation, merge, release, and publication remain outside this authority. |
 | Completed predecessor | [SUBF-0153](README.md#subf-0153) / [TEST-0221](test-cases.md#test-0221), merged through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173) and exact-main validated by [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) |
 
 ## Directive and hard boundary
@@ -9620,7 +9620,7 @@ Scenario/status/owner and both workflow filters,
 [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146), C/D,
 activation, merge, release, publication, and DoD remain held. R=0014 is
 immutable and never reruns. Its implementation is exact-head hosted green;
-B-CONVERGE pure audit is complete locally with final-sync hosted pending.
+B-CONVERGE is merged/exact-main green.
 
 ## [TEST-0210](test-cases.md#test-0210) expected-red contract
 
@@ -10396,11 +10396,97 @@ automatically raise the timeout, split or remove coverage, add another
 invocation, or weaken
 [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146).
 
+## Frozen ContractSlice C delivery overlay
+
+ContractSlice B is merged and exact-main hosted green; exact identities and
+durations remain owned by the C handoff. ContractSlice C
+is `FrozenDesign`/inactive: the design cohort and its exact hosted gate precede
+every C# mutation and canonical C red.
+
+The normative C delivery order is:
+
+```text
+C-SURFACE-ACTIVATION-01
+  -> C-REGISTRATION-MISMATCH-01
+  -> C-PRODUCER-PIPELINE-01
+  -> C-APPLICABILITY-PLAN-01
+  -> C-APPLICABILITY-CLOSURE-01
+  -> C-EVALUATION-PLAN-01
+  -> C-EVALUATION-ADVANCE-01
+  -> C-INTENT-RESULT-01
+  -> C-AGGREGATION-01
+  -> C-CONVERGE-01
+```
+
+Delivery preserves that exact dependency order through four C-only cohorts:
+Activation owns the first three packets, Applicability the next two,
+Evaluation the next two, and Results/closure the final three. Inside a cohort,
+each package must close its canonical red, focused and cumulative local gates,
+Release build, diff/format/structure checks, independent review, record sync,
+and focused local commit as `ReviewedLocalGreen`; those commits are not pushed
+individually. The cohort then runs full C cumulative, A-through-cohort, full
+Conformance and Domain, build/format/locks/API/ownership/graph/StructureOnly/
+publication-evidence and full-diff gates, pushes the ordered commit sequence
+once, and becomes `ExactHeadHostedGreen` only after exact-head Ubuntu/Windows
+success. The next cohort remains inactive until that hosted boundary. A hosted
+failure reopens only its cohort and owning package; the entire local cohort gate
+must be repeated before a new exact-head push.
+
+The exact C Fact inventory is the eleven ordinal FQNs owned by the
+[C micro-delivery plan](subf-0143-contractslice-c-micro-delivery-plan.md).
+Structural, Ownership, and Activation belong to the first packet; each later
+semantic packet owns one Fact; convergence is P/R/G `NotApplicable` and adds
+none. Final C is `11/11`, cumulative A+B+C/full Conformance `54/54`, and Domain
+remains `98/98`.
+
+`C-SURFACE-ACTIVATION-01` atomically introduces the already-specified eight
+Abstractions and fifteen Conformance supported types, final six internal
+registration families, and Tests-owned synthetic complete export/proof. The
+only first-red seam is the fully prepared valid
+`ConformanceKernel.Activate(...)` returning `null!`; only that null calls
+`Assert.Fail("TEST-0210-C-BEHAVIOR-RED-0001")`. Its retained exact FQN is
+`MeAndAI.Protocol.Conformance.Tests.ContractSliceCActivationTests.Activates_exact_synthetic_registration_graph`.
+The packet proves exact success only; the next packet owns the exhaustive
+registration-mismatch matrix.
+
+Canonical C reds specialize the universal BehaviorRed contract with Release
+`--no-restore --no-build`, one exact `ContractSlice=C&FullyQualifiedName=...`
+child, process-scoped `VSTEST_CONNECTION_TIMEOUT=300`, a `420000` ms outer
+bound, one exact marker TRX, native exit `1`, runner exit `0`, complete sixteen-
+counter and source/binary/lock custody, and irrevocable ordinal consumption at
+`InvocationCommitted`. No discovery prepass, fallback, retry, or red commit is
+permitted.
+
+The first packet is capped at `52` production paths, three C test paths, and
+`7,000` normalized changed C# lines. Every later packet defaults to ten
+production paths, one owning test path, and `3,500` changed lines. Crossing a
+cap requires a pre-red design amendment; it never silently raises a limit.
+Real Policy, Application routing/I/O, D, Scenario/status/owner, both workflow
+filters, runtime-efficiency activation, feature DoD, merge, release, and
+publication remain outside C authority.
+
+The owning C plan records per-cohort local and hosted durations, hosted defect
+count, owner-identification time, correction/revalidation cost, estimated time
+saved against package-by-package hosted validation, and any consistency or
+traceability loss. C completion still requires final convergence, atomic record
+sync, and exact-head hosted green; `CompletionRecommended` or a local commit is
+insufficient.
+
+After C is merged and exact-main hosted green, a separate D micro plan may use
+those measured delivery results but no C product evidence. Accepted D topology
+must be frozen by pre-D D/RT into roughly two-to-four-package cohorts without
+combining distinct expected-red or ownership boundaries. Separate cohorts must
+retain real Policy export/registration activation; real codec/parser/index/
+projector infrastructure; RULE-0001/0002; RULE-0003/0004/0005 with
+specialization/co-report; and repository/provider equivalence plus D-CONVERGE.
+D remains inactive here and must freshly prove required B/C behavior against
+real Policy registrations.
+
 ## Internal implementation slices
 
 ContractSlice A's historical delivery is owned by its
 [micro-delivery control plan](subf-0143-micro-delivery-plan.md). ContractSlice
-B is decomposed by the current
+B's completed merged delivery is owned by the
 [B micro-delivery plan](subf-0143-contractslice-b-micro-delivery-plan.md).
 Surface, codec activation, all three wires, B-RESOURCE, B-CACHE, B-ADMISSION,
 and B-SEALED-CONTEXT are hosted green; repository-target R=0004 is diagnostic-only, while canonical
@@ -10409,9 +10495,12 @@ R=0012 and corrected codec-derivation R=0014 are accepted/immutable. B is
 `11/11`, A+B is `43/43`. Admission
 R=0008/R=0009/R=0010 and codec-derivation R=0013 are immutable
 diagnostics/no-success. Corrected R=0014 is exact-head hosted green.
-B-CONVERGE pure audit is complete locally with final-sync hosted pending.
+B-CONVERGE is merged/exact-main green.
+ContractSlice C is decomposed by the current
+[C micro-delivery plan](subf-0143-contractslice-c-micro-delivery-plan.md) and is
+`FrozenDesign`/inactive at `0/11` pending its design-head hosted gate.
 
-B implementation and C/D still require separate future activation, and no
+C implementation and D still require separate packet activation, and no
 packet is active merely from this list. No directive here allocates new stable
 IDs; the four independently reviewable internal slices remain ordered:
 
