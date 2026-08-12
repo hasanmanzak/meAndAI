@@ -10,9 +10,10 @@ Follow the current
 ContractSlice A and B are merged/exact-main green; the linked C freeze owns the
 exact B merge and hosted-run closure. B remains
 `11/11`, cumulative A+B `43/43`; its accepted reds and immutable diagnostics
-remain owned by the historical B handoff below. ContractSlice C is
-`FrozenDesign`/inactive at `0/11`, pending this synchronized design head's exact
-hosted gate. The parent scenario remains `Planned`; D and activation are held.
+remain owned by the historical B handoff below. `C-SURFACE-ACTIVATION-01` is
+`ReviewedLocalGreen`; C is `3/11`, current A+B+C is `46/46`, and
+`C-REGISTRATION-MISMATCH-01` is next without an intermediate push/hosted claim.
+The parent scenario remains `Planned`; D and activation are held.
 
 Follow the current
 [instruction-graph capacity handoff](2026-08-09-feat-0069-instruction-graph-capacity.md)

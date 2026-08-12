@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Gate 2 micro-delivery plan and design freeze |
-| State | `FrozenDesign` / inactive; ContractSlice B is merged and exact-main hosted green; C implementation has not started |
+| State | Design cohort `ExactHeadHostedGreen`; `C-SURFACE-ACTIVATION-01` `ReviewedLocalGreen`; C `3/11`, current A+B+C `46/46`; `C-REGISTRATION-MISMATCH-01` is the next `FrozenDesign` packet; no intermediate push/hosted claim |
 | Parent | Owning feature and current subfeature |
 | Scenario | [TEST-0210](test-cases.md#test-0210), retained `Planned` |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
@@ -146,7 +146,7 @@ sequence with a push and Ubuntu/Windows wait after every package.
 C closure reports elapsed time, isolation cost, estimated saved time, and any
 consistency or traceability loss for these four cohorts separately from D.
 
-## First packet boundary
+## Frozen first-packet allowlist and fixture
 
 `C-SURFACE-ACTIVATION-01` introduces the complete C public surface and all
 internal declarations needed for the already-frozen signatures, but exercises
@@ -157,17 +157,55 @@ only that semantic null may call direct
 ownership, wrong-result, exception, and mismatch assertions are marker-free.
 The next packet, not this red, owns the full mismatch matrix.
 
-The executable allowlist must be frozen before red as an exact path list. It is
-limited to C-owned Abstractions/Conformance declarations and internals, the two
-existing export carriers, and exactly three C test files. It changes no Domain,
-Policy, Application, workflow, project, package, lock, Scenario/status/owner,
-or runtime-efficiency file. The first packet redraw threshold is at most `52`
-production paths, `3` test paths, and `7,000` normalized changed C# lines;
-the first value over any threshold stops for review rather than silently
-raising the budget. Later packets default to at most `10` production paths,
-one new/modified owning test path, and `3,500` normalized changed C# lines;
-packet-specific increases require a pre-red design amendment and exact-head
-hosted gate.
+The executable allowlist is exact. It modifies the two existing export carrier
+files; adds eight C public Abstractions files, six internal registration/seam
+files, fifteen C public Conformance files, and one Conformance activation-core
+file; adds exactly `ContractSliceCStructuralTests.cs`,
+`ContractSliceCOwnershipTests.cs`, and `ContractSliceCActivationTests.cs`; and
+modifies `ContractSliceAPublicApiTests.cs` plus
+`ContractSliceBStructuralTests.cs` only to remove predecessor-only C-absence
+assertions while retaining A export internals and B negative ownership. The B
+structural adaptation also turns its exact A+B export equality into a
+successor-safe A+B subset proof, while the new C structural Fact owns exact
+A+B+C equality. The exact path
+inventory is frozen in the typed design. The already-frozen
+compile-only `ContractSliceC.SurfaceRed.cs` exists transiently only for its one
+CS0246 observation and must be absent from the retained tree; it is not a
+fourth C Fact or C ownership surface. No other source or test path may change. Domain,
+Policy, Application, workflow, project, package, lock,
+Scenario/status/owner, and runtime-efficiency files are immutable. The packet
+cap remains at most `52` production paths, exactly `3` new C test paths plus two
+bounded predecessor-test adaptations, and `7,000`
+normalized changed C# lines; the first value over any threshold redraws before
+red. Later packets retain their `10`/`1`/`3,500` defaults.
+
+The synthetic-complete fixture starts from the retained five-rule declaration
+data but creates a complete genesis catalog and canonical manifest whose
+artifacts are exactly Domain, Conformance.Abstractions, Conformance, Markdig,
+and Conformance.Tests. Its twenty-three Policy implementation rows are replaced
+by exact Tests-owned component types; the four capability interfaces retain
+their Abstractions identities. Five Tests-owned model types and eighteen
+object-identical codec/parser/index/projector/selector/evaluator registration
+objects form the exact twenty-seven-row partition. The test asserts the public
+`Components` ordinal union, all six internal list identities/order, proof call
+count, non-null kernel, and catalog projection. It does not test mismatch
+variants or invoke producer behavior; those remain the next two packets.
+
+The pre-red runner is a fresh ignored external PowerShell file with
+`ValidateOnly` and one `Execute` mode, canonical LF plus terminal LF, frozen
+length/SHA/AST, a fresh external result root and atomic JSON report. It binds
+the exact hosted design HEAD, branch/upstream/status allowlist, all allowed
+source lengths/SHA values, six lock hashes, warning-free Release build, DLL/PDB
+identity, and the literal packet-specific command below. Exact Git/status,
+source, runner, locks, and binaries are rechecked at start, pre-build, pre-test,
+and post-test. Complete stdout/stderr logs are CreateNew regular non-reparse
+files capped at `1,048,576` bytes each; overflow or truncation rejects the
+oracle. TRX parsing prohibits DTD and external resolution. `ValidateOnly`
+creates no root/report/log/build/test artifact. Immediately before the sole
+child, `InvocationCommitted` consumes ordinal `0001`; every later process,
+timeout, interruption, exit, custody, TRX, or oracle failure is immutable
+no-success/no-retry. Only pre-commit preflight/build failure may be corrected
+and revalidated under renewed review.
 
 ## Canonical expected-red contract
 
@@ -238,7 +276,8 @@ Before any C# mutation or canonical red:
 - the first packet receives a packet-specific exact path/fixture/runner freeze
   and renewed clean review before its one canonical red.
 
-No design-only success changes C from `0/11`, activates [TEST-0210](test-cases.md#test-0210),
+No design-only success changed C from `0/11`; only the reviewed-local-green
+surface packet moves C to `3/11`. It does not activate [TEST-0210](test-cases.md#test-0210),
 or lifts D/Scenario/workflow/DoD/merge/release/publication holds.
 
 ## Deferred ContractSlice D cohort plan

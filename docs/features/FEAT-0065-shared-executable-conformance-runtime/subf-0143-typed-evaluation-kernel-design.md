@@ -3,14 +3,14 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted; ContractSlice A and B merged/exact-main green; B is `11/11`, cumulative A+B `43/43`. ContractSlice C is `FrozenDesign`/inactive at `0/11`, pending its synchronized design head's exact hosted gate; final A+B+C target is `54/54`. [TEST-0210](test-cases.md#test-0210) remains `Planned`; D, activation, and DoD remain held. |
+| Status | Gate 2 accepted; ContractSlice A and B merged/exact-main green; B is `11/11`, cumulative A+B `43/43`. `C-SURFACE-ACTIVATION-01` is `ReviewedLocalGreen`; C is `3/11`, current A+B+C is `46/46`, and `C-REGISTRATION-MISMATCH-01` is next without an intermediate push/hosted claim. [TEST-0210](test-cases.md#test-0210) remains `Planned`; D, activation, and DoD remain held. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Test | [TEST-0210](test-cases.md#test-0210) |
 | Gate 3 micro-delivery routing | Historical A delivery remains owned by the [A micro-delivery control plan](subf-0143-micro-delivery-plan.md). Current B design routing is the [ContractSlice B micro-delivery plan](subf-0143-contractslice-b-micro-delivery-plan.md); packet labels refine delivery but activate no executable work. |
 | Exact-main design baseline | Accepted A merge commit [`51623f4d404a95e0f706d72805cf7ddbbbd293b8`](https://github.com/hasanmanzak/meAndAI/commit/51623f4d404a95e0f706d72805cf7ddbbbd293b8), validated by exact-main [run 31304787603](https://github.com/hasanmanzak/meAndAI/actions/runs/31304787603) |
-| Design and Gate 3 authority | Historical A/B directives, accepted reds, diagnostics, and hosted evidence remain immutable. The exact [C micro-delivery plan](subf-0143-contractslice-c-micro-delivery-plan.md) is design authority only and remains inactive until its synchronized exact design head is hosted green. D, final activation, merge, release, and publication remain outside this authority. |
+| Design and Gate 3 authority | Historical A/B directives, accepted reds, diagnostics, and hosted evidence remain immutable. The exact [C micro-delivery plan](subf-0143-contractslice-c-micro-delivery-plan.md) is exact-head hosted-green design authority; its surface packet is reviewed local green and registration-mismatch is next. Intermediate C commits are not pushed. D, final activation, merge, release, and publication remain outside this authority. |
 | Completed predecessor | [SUBF-0153](README.md#subf-0153) / [TEST-0221](test-cases.md#test-0221), merged through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173) and exact-main validated by [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) |
 
 ## Directive and hard boundary
@@ -10399,9 +10399,9 @@ invocation, or weaken
 ## Frozen ContractSlice C delivery overlay
 
 ContractSlice B is merged and exact-main hosted green; exact identities and
-durations remain owned by the C handoff. ContractSlice C
-is `FrozenDesign`/inactive: the design cohort and its exact hosted gate precede
-every C# mutation and canonical C red.
+durations remain owned by the C handoff. At the C design checkpoint,
+ContractSlice C was `FrozenDesign`/inactive: that cohort and its exact hosted
+gate preceded every C# mutation and canonical C red.
 
 The normative C delivery order is:
 
@@ -10449,6 +10449,80 @@ only first-red seam is the fully prepared valid
 The packet proves exact success only; the next packet owns the exhaustive
 registration-mismatch matrix.
 
+The first-packet source allowlist is exact:
+
+```text
+src/MeAndAI.Protocol.Conformance.Abstractions/Exports/CompletePolicyPackExport.cs
+src/MeAndAI.Protocol.Conformance.Abstractions/Exports/PolicyQualificationSliceExport.cs
+src/MeAndAI.Protocol.Conformance.Abstractions/Evaluation/ApplicabilityIntent.cs
+src/MeAndAI.Protocol.Conformance.Abstractions/Evaluation/EvaluationFailureIntent.cs
+src/MeAndAI.Protocol.Conformance.Abstractions/Evaluation/EvaluationIntent.cs
+src/MeAndAI.Protocol.Conformance.Abstractions/Evaluation/FindingIntent.cs
+src/MeAndAI.Protocol.Conformance.Abstractions/Evaluation/IRuleEvaluator.cs
+src/MeAndAI.Protocol.Conformance.Abstractions/Evaluation/RuleApplicabilityInput.cs
+src/MeAndAI.Protocol.Conformance.Abstractions/Evaluation/RuleEvaluationInput.cs
+src/MeAndAI.Protocol.Conformance.Abstractions/Tokens/ApplicabilityIntentKind.cs
+src/MeAndAI.Protocol.Conformance.Abstractions/Registration/ProducerRegistrationContracts.cs
+src/MeAndAI.Protocol.Conformance.Abstractions/Registration/ParserRegistration.cs
+src/MeAndAI.Protocol.Conformance.Abstractions/Registration/IndexRegistration.cs
+src/MeAndAI.Protocol.Conformance.Abstractions/Registration/DemandProjectorRegistration.cs
+src/MeAndAI.Protocol.Conformance.Abstractions/Registration/SelectorRegistration.cs
+src/MeAndAI.Protocol.Conformance.Abstractions/Registration/RuleEvaluatorRegistration.cs
+src/MeAndAI.Protocol.Conformance/Activation/CatalogSliceKernel.cs
+src/MeAndAI.Protocol.Conformance/Activation/ConformanceKernel.cs
+src/MeAndAI.Protocol.Conformance/Activation/KernelActivationCore.cs
+src/MeAndAI.Protocol.Conformance/Planning/AcquisitionInstruction.cs
+src/MeAndAI.Protocol.Conformance/Planning/ApplicabilityPlan.cs
+src/MeAndAI.Protocol.Conformance/Planning/ApplicabilityClosure.cs
+src/MeAndAI.Protocol.Conformance/Planning/EvaluationAdvanceResult.cs
+src/MeAndAI.Protocol.Conformance/Evaluation/CatalogSliceEvaluation.cs
+src/MeAndAI.Protocol.Conformance/Evaluation/CompleteCatalogEvaluation.cs
+src/MeAndAI.Protocol.Conformance/Evaluation/RuleEvaluation.cs
+src/MeAndAI.Protocol.Conformance/Evaluation/RuleEvaluationFailure.cs
+src/MeAndAI.Protocol.Conformance/Evaluation/RuleFinding.cs
+src/MeAndAI.Protocol.Conformance/Evidence/SealedAcquisitionAttempt.cs
+src/MeAndAI.Protocol.Conformance/Evidence/SealedAcquisitionOutcome.cs
+tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ContractSliceCStructuralTests.cs
+tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ContractSliceCOwnershipTests.cs
+tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ContractSliceCActivationTests.cs
+tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ContractSliceAPublicApiTests.cs
+tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ContractSliceBStructuralTests.cs
+```
+
+The two retained predecessor paths change only predecessor-only C-absence and
+successor-safe A+B subset assertions while retaining A export internals and B
+negative ownership. Their A/B surface, FQN, and trait authority is otherwise
+immutable, while the C structural Fact owns exact current A+B+C export equality.
+They add no C Fact. No sixth test path or other source path is permitted.
+The six registration
+containers have their final generic identities, declarations, tokens, visitors,
+and object references now. Component-operation interfaces are introduced on
+those same identities as memberless staging seams; only
+`C-PRODUCER-PIPELINE-01` adds their already-accepted final methods and carriers.
+It may not replace an identity, add an adapter, or alter a registration object.
+Public intent factories and later kernel calls expose their final signatures
+but retain marker-free integrity rejection until their owning packets implement
+the accepted behavior. This staging changes no final architecture or ownership.
+The previously frozen compile-only
+`tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ContractSliceC.SurfaceRed.cs`
+is a transient P input only: it produces its exact one CS0246 observation once
+before the surface exists and is removed before retained BehaviorRed source or
+green. It is not a fourth retained test path and never enters a package commit.
+
+The exact fixture derives the retained five-rule declaration data into one
+complete genesis catalog. It maps the twenty-three Policy implementation rows
+to Tests-owned concrete types and preserves the four Abstractions capability
+interfaces, producing the exact twenty-seven registration/type-contract rows.
+Its artifacts are ordinally exactly `Markdig.dll`,
+`MeAndAI.Protocol.Conformance.Abstractions.dll`,
+`MeAndAI.Protocol.Conformance.Tests.dll`,
+`MeAndAI.Protocol.Conformance.dll`, and `MeAndAI.Protocol.Domain.dll`; neither
+Policy nor Application appears. The successful Fact observes the exact three
+codec, two parser, four index, one projector, three selector, and five evaluator
+registration objects in their canonical lists; it asserts the public component
+union and catalog projection object-identically. No mismatch mutation or
+component invocation belongs to this packet.
+
 Canonical C reds specialize the universal BehaviorRed contract with Release
 `--no-restore --no-build`, one exact `ContractSlice=C&FullyQualifiedName=...`
 child, process-scoped `VSTEST_CONNECTION_TIMEOUT=300`, a `420000` ms outer
@@ -10457,8 +10531,9 @@ counter and source/binary/lock custody, and irrevocable ordinal consumption at
 `InvocationCommitted`. No discovery prepass, fallback, retry, or red commit is
 permitted.
 
-The first packet is capped at `52` production paths, three C test paths, and
-`7,000` normalized changed C# lines. Every later packet defaults to ten
+The first packet is capped at `52` production paths, three C test paths plus two
+bounded predecessor-test adaptations, and `7,000` normalized changed C# lines.
+Every later packet defaults to ten
 production paths, one owning test path, and `3,500` changed lines. Crossing a
 cap requires a pre-red design amendment; it never silently raises a limit.
 Real Policy, Application routing/I/O, D, Scenario/status/owner, both workflow
@@ -10497,8 +10572,10 @@ R=0008/R=0009/R=0010 and codec-derivation R=0013 are immutable
 diagnostics/no-success. Corrected R=0014 is exact-head hosted green.
 B-CONVERGE is merged/exact-main green.
 ContractSlice C is decomposed by the current
-[C micro-delivery plan](subf-0143-contractslice-c-micro-delivery-plan.md) and is
-`FrozenDesign`/inactive at `0/11` pending its design-head hosted gate.
+[C micro-delivery plan](subf-0143-contractslice-c-micro-delivery-plan.md), whose
+design head is hosted green. `C-SURFACE-ACTIVATION-01` is
+`ReviewedLocalGreen`; C is `3/11`, current A+B+C is `46/46`, and
+`C-REGISTRATION-MISMATCH-01` is next without an intermediate push/hosted claim.
 
 C implementation and D still require separate packet activation, and no
 packet is active merely from this list. No directive here allocates new stable
