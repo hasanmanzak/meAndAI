@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted; ContractSlice A and B merged/exact-main green; B is `11/11`, cumulative A+B `43/43`. The C Activation cohort is `ExactHeadHostedGreen`; C is `5/11`, current A+B+C is `48/48`. Applicability R=0006 is diagnostic/no-success; corrected R=0007 is frozen/inactive pending corrected-design hosted green. [TEST-0210](test-cases.md#test-0210) remains `Planned`; D, activation, and DoD remain held. |
+| Status | Gate 2 accepted; ContractSlice A and B merged/exact-main green; B is `11/11`, cumulative A+B `43/43`. The C Activation cohort is `ExactHeadHostedGreen`; applicability plan is `ReviewedLocalGreen`, C is `6/11`, and current A+B+C is `49/49`. R=0007 is accepted/immutable; closure is next/`FrozenDesign`, with no cohort push/hosted claim. [TEST-0210](test-cases.md#test-0210) remains `Planned`; D, activation, and DoD remain held. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
@@ -10780,8 +10780,16 @@ so it ended `OracleRejected`; it is immutable diagnostic/no-success and never
 reruns. Corrected R=0007 changes only that predicate. Its fresh runner is
 `42,368` bytes / SHA-256
 `9EA4B00ADCF91B8CE2CB49F6FA9BD24005B5521E15411F996262C72AE67DD19F`,
-AST `6,038` tokens / `0` errors, and remains inactive until this corrected
-records/design head is exact-head hosted green.
+AST `6,038` tokens / `0` errors, and was inactive until the corrected
+records/design head passed exact-head hosted validation.
+
+That corrected head `d251b377...c044` passed exact hosted validation; the sole
+R=0007 was accepted with native/runner exit `1/0`, report SHA-256
+`6DA8C76C...2384`, and TRX SHA-256 `DC1A4426...8250`. The bounded green is
+focused `1/1`, C `6/6`, full Conformance `49/49`, Domain `98/98`, Release
+build `0/0`, clean packet format/diff/locks/StructureOnly, and reviews
+`0/0/0`. The packet is `ReviewedLocalGreen`; closure is next/`FrozenDesign`
+and no Applicability cohort push or hosted claim exists.
 
 The first packet is capped at `52` production paths, three C test paths plus two
 bounded predecessor-test adaptations, and `7,000` normalized changed C# lines.
@@ -10826,7 +10834,8 @@ B-CONVERGE is merged/exact-main green.
 ContractSlice C is decomposed by the current
 [C micro-delivery plan](subf-0143-contractslice-c-micro-delivery-plan.md), whose
 design head is hosted green. The three Activation packets and their exact
-cohort head are hosted green; C is `5/11`, current A+B+C is `48/48`, and
+cohort head are hosted green; applicability plan is `ReviewedLocalGreen`, C is
+`6/11`, current A+B+C is `49/49`, and
 `C-APPLICABILITY-PLAN-01` is the frozen/inactive next packet.
 
 C implementation and D still require separate packet activation, and no

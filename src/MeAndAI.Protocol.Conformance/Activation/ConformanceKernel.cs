@@ -6,27 +6,39 @@ namespace MeAndAI.Protocol.Conformance;
 public sealed class ConformanceKernel
 {
     private readonly CatalogSliceProducerGraph _producerGraph;
+    private readonly KernelPlanningSession _planningSession;
 
     private ConformanceKernel(
         CompleteCatalogSnapshot catalog,
-        CatalogSliceProducerGraph producerGraph)
+        CatalogSliceProducerGraph producerGraph,
+        KernelPlanningSession planningSession)
     {
         Catalog = catalog;
         _producerGraph = producerGraph;
+        _planningSession = planningSession;
     }
 
     public static ConformanceKernel Activate(
         FinalizedPolicyManifest manifest,
         CompletePolicyPackExport policy,
         IPolicyActivationProof activationProof,
-        CompleteCatalogSnapshot? predecessor) =>
-        new(
-            KernelActivationCore.ActivateComplete(
-                manifest,
-                policy,
-                activationProof,
-                predecessor),
-            CatalogSliceProducerGraph.Create(policy));
+        CompleteCatalogSnapshot? predecessor)
+    {
+        var catalog = KernelActivationCore.ActivateComplete(
+            manifest,
+            policy,
+            activationProof,
+            predecessor);
+        var graph = CatalogSliceProducerGraph.Create(policy);
+        return new ConformanceKernel(
+            catalog,
+            graph,
+            new KernelPlanningSession(
+                CatalogAuthorityKind.CompleteProtocolSnapshot,
+                manifest.ManifestDigest,
+                catalog.Rules,
+                graph));
+    }
 
     public CompleteCatalogSnapshot Catalog { get; }
 
@@ -42,13 +54,20 @@ public sealed class ConformanceKernel
             throw new CatalogIntegrityException(CatalogIntegrityCode.PlanStateInvalid);
         }
 
-        return new NamedExecutionProfile(profile.Name, profile.Axes, profile.RuleIds);
+        return new NamedExecutionProfile(
+            profile.Name,
+            profile.Axes,
+            profile.RuleIds,
+            _planningSession);
     }
 
     public ApplicabilityPlan PlanApplicability(
         NamedExecutionProfile profile,
         IEnumerable<AcquisitionTarget> targets) =>
-        throw new CatalogIntegrityException(CatalogIntegrityCode.PlanStateInvalid);
+        ApplicabilityPlanningCore.PlanComplete(
+            _planningSession,
+            profile,
+            targets);
 
     public ApplicabilityClosure CloseApplicability(
         ApplicabilityPlan plan,

@@ -1,3 +1,6 @@
+using System.Buffers.Binary;
+using System.Security.Cryptography;
+using System.Text;
 using MeAndAI.Protocol.Conformance.Abstractions;
 using MeAndAI.Protocol.Domain;
 
@@ -16,7 +19,7 @@ public sealed class AcquisitionInstruction
         Slot = slot;
         Target = target;
         RoundOrdinal = roundOrdinal;
-        DemandItems = demandItems.ToArray();
+        DemandItems = Array.AsReadOnly(demandItems.ToArray());
         DemandDigest = demandDigest;
         InstructionDigest = instructionDigest;
     }
@@ -36,8 +39,27 @@ public sealed class AcquisitionInstruction
     internal static AcquisitionInstruction CreateApplicability(
         ExactSha256Digest manifestDigest,
         EvidenceSlotDeclaration slot,
-        AcquisitionTarget target) =>
-        throw new CatalogIntegrityException(CatalogIntegrityCode.PlanStateInvalid);
+        AcquisitionTarget target)
+    {
+        ArgumentNullException.ThrowIfNull(manifestDigest);
+        ArgumentNullException.ThrowIfNull(slot);
+        ArgumentNullException.ThrowIfNull(target);
+
+        var demandFrame = CreateDemandFrame();
+        var demandDigest = Digest(demandFrame);
+        var instructionFrame = CreateInstructionFrame(
+            manifestDigest,
+            slot,
+            target,
+            demandDigest);
+        return new AcquisitionInstruction(
+            slot,
+            target,
+            0,
+            [],
+            demandDigest,
+            Digest(instructionFrame));
+    }
 
     internal static AcquisitionInstruction CreateEvaluation(
         ExactSha256Digest manifestDigest,
@@ -46,4 +68,51 @@ public sealed class AcquisitionInstruction
         int roundOrdinal,
         IEnumerable<RepositoryTargetResolutionDemandItem> demandItems) =>
         throw new CatalogIntegrityException(CatalogIntegrityCode.PlanStateInvalid);
+
+    private static byte[] CreateDemandFrame()
+    {
+        using var stream = new MemoryStream();
+        stream.Write(Encoding.ASCII.GetBytes("protocol.acquisition-demand/1\n"));
+        stream.WriteByte(0);
+        WriteUInt32(stream, 0);
+        return stream.ToArray();
+    }
+
+    private static byte[] CreateInstructionFrame(
+        ExactSha256Digest manifestDigest,
+        EvidenceSlotDeclaration slot,
+        AcquisitionTarget target,
+        ExactSha256Digest demandDigest)
+    {
+        using var stream = new MemoryStream();
+        stream.Write(Encoding.ASCII.GetBytes("protocol.acquisition-instruction/1\n"));
+        stream.Write(Convert.FromHexString(manifestDigest.Value));
+        stream.WriteByte(0);
+        WriteUInt32(stream, 0);
+        WriteText(stream, slot.SlotKey);
+        WriteText(stream, target.SubjectIdentity);
+        WriteText(stream, target.SourceIdentity);
+        WriteText(stream, target.Surface.Value);
+        WriteText(stream, target.SnapshotKind.Value);
+        WriteText(stream, target.TargetIdentity);
+        stream.Write(Convert.FromHexString(demandDigest.Value));
+        return stream.ToArray();
+    }
+
+    private static void WriteText(Stream stream, string value)
+    {
+        var bytes = new UTF8Encoding(false, true).GetBytes(value);
+        WriteUInt32(stream, checked((uint)bytes.Length));
+        stream.Write(bytes);
+    }
+
+    private static void WriteUInt32(Stream stream, uint value)
+    {
+        Span<byte> bytes = stackalloc byte[sizeof(uint)];
+        BinaryPrimitives.WriteUInt32BigEndian(bytes, value);
+        stream.Write(bytes);
+    }
+
+    private static ExactSha256Digest Digest(byte[] frame) =>
+        ExactSha256Digest.FromHashBytes(SHA256.HashData(frame));
 }

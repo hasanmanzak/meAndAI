@@ -6,10 +6,14 @@ namespace MeAndAI.Protocol.Conformance;
 public sealed class CatalogSliceKernel
 {
     private readonly CatalogSliceProducerGraph _producerGraph;
+    private readonly KernelPlanningSession _planningSession;
 
-    private CatalogSliceKernel(CatalogSliceProducerGraph producerGraph)
+    private CatalogSliceKernel(
+        CatalogSliceProducerGraph producerGraph,
+        KernelPlanningSession planningSession)
     {
         _producerGraph = producerGraph;
+        _planningSession = planningSession;
     }
 
     public static CatalogSliceKernel Activate(
@@ -18,7 +22,14 @@ public sealed class CatalogSliceKernel
         IPolicyActivationProof activationProof)
     {
         KernelActivationCore.ValidateSlice(manifest, policy, activationProof);
-        return new CatalogSliceKernel(CatalogSliceProducerGraph.Create(policy));
+        var graph = CatalogSliceProducerGraph.Create(policy);
+        return new CatalogSliceKernel(
+            graph,
+            new KernelPlanningSession(
+                CatalogAuthorityKind.QualificationSlice,
+                manifest.ManifestDigest,
+                policy.Catalog.Rules,
+                graph));
     }
 
     internal CatalogSliceProducerGraph ProducerGraph => _producerGraph;
@@ -26,7 +37,10 @@ public sealed class CatalogSliceKernel
     public ApplicabilityPlan PlanApplicability(
         ExecutionProfile diagnosticProfile,
         IEnumerable<AcquisitionTarget> targets) =>
-        throw new CatalogIntegrityException(CatalogIntegrityCode.PlanStateInvalid);
+        ApplicabilityPlanningCore.PlanSlice(
+            _planningSession,
+            diagnosticProfile,
+            targets);
 
     public ApplicabilityClosure CloseApplicability(
         ApplicabilityPlan plan,

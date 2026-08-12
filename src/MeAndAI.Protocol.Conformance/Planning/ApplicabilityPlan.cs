@@ -18,10 +18,10 @@ public sealed class ApplicabilityPlan
     {
         AuthorityKind = authorityKind;
         Profile = profile;
-        Targets = targets.ToArray();
-        RuleIds = ruleIds.ToArray();
-        Slots = slots.ToArray();
-        Instructions = instructions.ToArray();
+        Targets = Array.AsReadOnly(targets.ToArray());
+        RuleIds = Array.AsReadOnly(ruleIds.ToArray());
+        Slots = Array.AsReadOnly(slots.ToArray());
+        Instructions = Array.AsReadOnly(instructions.ToArray());
         EvidenceSession = evidenceSession;
     }
 

@@ -3,12 +3,12 @@
 | Field | Value |
 | --- | --- |
 | Scope | ContractSlice C micro-delivery design only |
-| State | Design and Activation cohorts `ExactHeadHostedGreen`; applicability R=0006 immutable oracle diagnostic/no-success; corrected R=0007 `FrozenDesign`/inactive pending corrected records/design exact-head hosted gate |
+| State | Design and Activation cohorts `ExactHeadHostedGreen`; R=0006 diagnostic/no-success; R=0007 accepted/immutable; `C-APPLICABILITY-PLAN-01` `ReviewedLocalGreen`; closure next/`FrozenDesign`; no Applicability cohort push/hosted claim |
 | Predecessor | ContractSlice B merged and exact-main hosted green |
 | Design delivery | Exact [`dd8940156408c103edb837f17bc05e6bb25de8c3`](https://github.com/hasanmanzak/meAndAI/commit/dd8940156408c103edb837f17bc05e6bb25de8c3) / [run 31585390450](https://github.com/hasanmanzak/meAndAI/actions/runs/31585390450): Ubuntu `16m07s`, Windows `18m19s`, publication verification skipped |
 | C authority | [Maintainer continuation directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5264403013) |
 | Normative owner | [Typed C design and micro plan](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-contractslice-c-micro-delivery-plan.md) |
-| Progress | C `5/11`; current A+B+C `48/48`; final A+B+C target `54/54`; Domain `98/98` |
+| Progress | C `6/11`; current A+B+C `49/49`; final A+B+C target `54/54`; Domain `98/98` |
 | Holds | [TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) remains `Planned`; D, Scenario/status/owner, both workflow filters, runtime-efficiency activation, feature DoD, merge, release, and publication remain held |
 
 ## Frozen route
@@ -354,3 +354,29 @@ same frozen 8-path, `600/2400`-line transient tree.
 The corrected-record exact-tree gates are StructureOnly green in `456.596s`
 and publication evidence `7/7` in `316.5s`, with no publication claim. Fresh
 design, evidence/scope, and traceability reviews close `0/0/0`.
+
+## `C-APPLICABILITY-PLAN-01` reviewed-local-green evidence
+
+The corrected records head
+[`d251b37758804441b08aa289e990af96ce65c044`](https://github.com/hasanmanzak/meAndAI/commit/d251b37758804441b08aa289e990af96ce65c044)
+passed [run 31625400349](https://github.com/hasanmanzak/meAndAI/actions/runs/31625400349):
+Ubuntu `17m33s`, Windows `18m57s`, publication skipped, hosted defects `0`.
+
+R=0007 was then accepted exactly once. Runner identity is `42,368` bytes /
+SHA-256 `9EA4B00ADCF91B8CE2CB49F6FA9BD24005B5521E15411F996262C72AE67DD19F`;
+report is `19,915` bytes / `6DA8C76C491B0D0B12FE12124FFB7051944AF13747283C6905A9F645B9FB2384`;
+TRX is `4,874` bytes / `DC1A442637DD40B3BCFCF8B49E07377F4C1EC020A27E8E74FF4B4C78D4F08250`.
+Native/runner exits are `1/0`; exact result/definition/entry, marker, optional
+stack/echo/RunInfo, sixteen counters, locks, source, DLL/PDB, and no-attachment
+oracles all passed. R=0007 is immutable and never reruns.
+
+Green is Release build `0/0`, focused `1/1`, C `6/6`, full Conformance
+`49/49`, Domain `98/98`, exact packet format/diff/locks and StructureOnly
+green, with code/evidence/traceability reviews `0/0/0`; the line budget is
+`604/2400`. The first green focused run exposed one test-fixture-only negative
+that varied an unowned SourceIdentity. The owner was isolated in under four
+minutes; switching the fixture to the frozen SubjectIdentity mismatch and
+revalidating cost about three minutes, with no consistency or traceability
+loss. Local implementation plus red/green validation consumed about forty
+active minutes excluding hosted wait. Package-local hosted CI is
+`NotApplicable` by the cohort model; no intermediate push occurred.

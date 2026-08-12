@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Gate 2 micro-delivery plan and design freeze |
-| State | Design and Activation cohorts `ExactHeadHostedGreen`; C `5/11`, current A+B+C `48/48`; applicability R=0006 diagnostic/no-success, corrected R=0007 frozen/inactive pending corrected-design hosted green |
+| State | Design and Activation cohorts `ExactHeadHostedGreen`; applicability plan `ReviewedLocalGreen`, C `6/11`, current A+B+C `49/49`; R=0006 diagnostic/no-success, R=0007 accepted/immutable; closure next/`FrozenDesign`; no cohort push/hosted claim |
 | Parent | Owning feature and current subfeature |
 | Scenario | [TEST-0210](test-cases.md#test-0210), retained `Planned` |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
@@ -500,9 +500,14 @@ was correctly rejected because one stale predecessor method-name oracle caused
 and never reruns. Corrected R=0007 changes only that predicate and freezes at
 `42,368` bytes / SHA-256
 `9EA4B00ADCF91B8CE2CB49F6FA9BD24005B5521E15411F996262C72AE67DD19F`,
-AST `6,038` tokens / `0` errors. It remains inactive until the commit containing
-this correction is exact-head hosted green and its fresh source/runner custody
-preflight closes.
+AST `6,038` tokens / `0` errors. Corrected head `d251b377...c044` passed exact
+hosted validation and the sole R=0007 was accepted with report SHA-256
+`6DA8C76C...2384` and TRX SHA-256 `DC1A4426...8250`; native/runner exits were
+`1/0`. Green is focused `1/1`, C `6/6`, full Conformance `49/49`, Domain
+`98/98`, Release build `0/0`, format/diff/locks/StructureOnly and reviews
+green. The packet is `ReviewedLocalGreen` in this separate local commit;
+closure is next/`FrozenDesign`, and the Applicability cohort has not been
+pushed or claimed hosted green.
 
 ## Deferred ContractSlice D cohort plan
 

@@ -316,7 +316,7 @@ The lifecycle records-only freeze head is exact-hosted-green: Ubuntu passed in
 `20m44s`, Windows in `46m51s`, and publication verification was correctly
 skipped. The exact lifecycle implementation identity recorded in the canonical
 handoff passed Ubuntu in `19m36s` and Windows in `36m02s`; publication verification was
-correctly skipped. ContractSlice A and B are merged/exact-main green; exact B closure evidence remains owned by the current C handoff and immutable B history. B is `11/11`, cumulative A+B `43/43`. The C Activation cohort is `ExactHeadHostedGreen`; C is `5/11`, current A+B+C is `48/48`, and final A+B+C remains `54/54`. Applicability R=0006 is an immutable runner-oracle diagnostic/no-success; corrected R=0007 is `FrozenDesign`/inactive pending its corrected records/design exact-head hosted gate. The parent scenario, D, and final activation remain held.
+correctly skipped. ContractSlice A and B are merged/exact-main green; exact B closure evidence remains owned by the current C handoff and immutable B history. B is `11/11`, cumulative A+B `43/43`. The C Activation cohort is `ExactHeadHostedGreen`; `C-APPLICABILITY-PLAN-01` is `ReviewedLocalGreen`, C is `6/11`, current A+B+C is `49/49`, and final A+B+C remains `54/54`. R=0006 is diagnostic/no-success and R=0007 is accepted/immutable; `C-APPLICABILITY-CLOSURE-01` is next/`FrozenDesign` and no Applicability cohort push or hosted claim exists. The parent scenario, D, and final activation remain held.
 The exact record-delivery closure reached the full `4096/4096` instruction-graph
 budget. Ubuntu passed in `19m52s`; Windows reached its exact 45-minute job
 ceiling after every emitted suite result was successful. The bounded correction

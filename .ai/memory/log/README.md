@@ -11,10 +11,10 @@ ContractSlice A and B are merged/exact-main green; the linked C freeze owns the
 exact B merge and hosted-run closure. B remains
 `11/11`, cumulative A+B `43/43`; its accepted reds and immutable diagnostics
 remain owned by the historical B handoff below. The C Activation cohort is
-`ExactHeadHostedGreen`; C is `5/11`, current A+B+C is `48/48`, and
-Applicability R=0006 is an immutable runner-oracle diagnostic/no-success;
-corrected R=0007 is `FrozenDesign`/inactive pending its corrected records/design
-exact-head hosted gate.
+`ExactHeadHostedGreen`; `C-APPLICABILITY-PLAN-01` is `ReviewedLocalGreen`, C is
+`6/11`, and current A+B+C is `49/49`. R=0006 is diagnostic/no-success and
+R=0007 is accepted/immutable; `C-APPLICABILITY-CLOSURE-01` is next/
+`FrozenDesign`. No Applicability cohort push or hosted claim exists.
 The parent scenario remains `Planned`; D and activation are held.
 
 Follow the current

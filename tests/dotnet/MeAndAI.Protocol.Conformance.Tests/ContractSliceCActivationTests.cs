@@ -131,6 +131,39 @@ public sealed class ContractSliceCActivationTests
             evaluators);
     }
 
+    internal static CSliceFixture CreateSliceFixture()
+    {
+        var fixture = CreateFixture();
+        var slice = CatalogSliceDeclaration.Create(
+            "protocol.catalog-slice.synthetic-applicability-plan",
+            "1",
+            fixture.Export.Catalog.ProtocolVersion,
+            fixture.Export.Catalog.CatalogVersion,
+            fixture.Export.Catalog.Rules);
+        var manifest = CreateSyntheticManifest(
+            CatalogAuthorityKind.QualificationSlice,
+            fixture.Manifest.SourceCommit,
+            fixture.Manifest.ManifestDigest,
+            fixture.Manifest.SchemaRegistry,
+            fixture.Manifest.ActivationProofContract,
+            fixture.Manifest.ArtifactFiles,
+            fixture.Manifest.Components,
+            slice,
+            completeCatalog: null);
+        var export = PolicyQualificationSliceExport.Create(
+            "protocol.policy-pack.synthetic-applicability-plan",
+            "1",
+            slice,
+            manifest.SchemaRegistry,
+            fixture.Codecs,
+            fixture.Parsers,
+            fixture.Indexes,
+            fixture.Projectors,
+            fixture.Selectors,
+            fixture.Evaluators);
+        return new CSliceFixture(manifest, export);
+    }
+
     private static FinalizedPolicyManifest BindExportComponents(
         FinalizedPolicyManifest manifest,
         CompletePolicyPackExport export)
@@ -465,6 +498,10 @@ public sealed class ContractSliceCActivationTests
         IReadOnlyList<IDemandProjectorRegistration> Projectors,
         IReadOnlyList<ISelectorRegistration> Selectors,
         IReadOnlyList<RuleEvaluatorRegistration> Evaluators);
+
+    internal sealed record CSliceFixture(
+        FinalizedPolicyManifest Manifest,
+        PolicyQualificationSliceExport Export);
 }
 
 internal sealed class ContractSliceCActivationProof : IPolicyActivationProof
