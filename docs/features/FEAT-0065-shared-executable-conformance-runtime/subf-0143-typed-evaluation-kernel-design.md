@@ -3,14 +3,14 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted; ContractSlice A and B merged/exact-main green; B is `11/11`, cumulative A+B `43/43`. C Activation and Applicability are `ExactHeadHostedGreen`; C is `7/11`, current A+B+C `50/50`. R=0007/R=0011 are accepted/immutable; `C-EVALUATION-PLAN-01` is `FrozenDesign`/inactive pending this synchronized design head's exact-head hosted gate. [TEST-0210](test-cases.md#test-0210) remains `Planned`; D, activation, and DoD remain held. |
+| Status | Gate 2 accepted; ContractSlice A and B merged/exact-main green; B is `11/11`, cumulative A+B `43/43`. C Activation and Applicability are `ExactHeadHostedGreen`; C is `7/11`, current A+B+C `50/50`. R=0007/R=0011 are accepted/immutable; Evaluation design is hosted green, R=0012 is diagnostic/no-success, and corrected R=0013 is `FrozenDesign`/inactive pending this synchronized correction head's exact-head hosted gate. [TEST-0210](test-cases.md#test-0210) remains `Planned`; D, activation, and DoD remain held. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Test | [TEST-0210](test-cases.md#test-0210) |
 | Gate 3 micro-delivery routing | Historical A delivery remains owned by the [A micro-delivery control plan](subf-0143-micro-delivery-plan.md). Current B design routing is the [ContractSlice B micro-delivery plan](subf-0143-contractslice-b-micro-delivery-plan.md); packet labels refine delivery but activate no executable work. |
 | Exact-main design baseline | Accepted A merge commit [`51623f4d404a95e0f706d72805cf7ddbbbd293b8`](https://github.com/hasanmanzak/meAndAI/commit/51623f4d404a95e0f706d72805cf7ddbbbd293b8), validated by exact-main [run 31304787603](https://github.com/hasanmanzak/meAndAI/actions/runs/31304787603) |
-| Design and Gate 3 authority | Historical A/B directives, accepted reds, diagnostics, and hosted evidence remain immutable. The exact [C micro-delivery plan](subf-0143-contractslice-c-micro-delivery-plan.md) is exact-head hosted-green design authority; its three Activation packets are immutable separate commits and the complete cohort is `ExactHeadHostedGreen`. Applicability is the only next C cohort. D, final activation, merge, release, and publication remain outside this authority. |
+| Design and Gate 3 authority | Historical A/B directives, accepted reds, diagnostics, and hosted evidence remain immutable. The exact [C micro-delivery plan](subf-0143-contractslice-c-micro-delivery-plan.md) is exact-head hosted-green design authority; Activation and Applicability are `ExactHeadHostedGreen`. Evaluation design is hosted green; diagnostic R=0012 is immutable and corrected R=0013 remains inactive until its synchronized correction head is hosted green. D, final activation, merge, release, and publication remain outside this authority. |
 | Completed predecessor | [SUBF-0153](README.md#subf-0153) / [TEST-0221](test-cases.md#test-0221), merged through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173) and exact-main validated by [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) |
 
 ## Directive and hard boundary
@@ -10783,8 +10783,9 @@ NotApplicable/Unresolved terminals, and enforces cancellation/retry atomicity.
 R=0008/R=0009/R=0010 are immutable fixture/reference diagnostics; corrected
 R=0011 is accepted/immutable. Green is focused `1/1`, C `7/7`, full `50/50`,
 Domain `98/98`, and the package is `ReviewedLocalGreen`. The two-commit cohort
-then passed exact-head hosted run `31635734392`; Evaluation Plan R=0012 remains
-inactive until its synchronized freeze head is hosted green.
+then passed exact-head hosted run `31635734392`. At that cohort checkpoint,
+Evaluation Plan R=0012 was inactive until its synchronized freeze head became
+hosted green.
 
 The first packet is capped at `52` production paths, three C test paths plus two
 bounded predecessor-test adaptations, and `7,000` normalized changed C# lines.
@@ -10841,6 +10842,17 @@ one unpushed `ReviewedLocalGreen` commit. Canonical red uses the common fresh
 one-shot runner, exact FQN filter, marker TRX, native exit `1`, and consumes its
 identity irrevocably after `InvocationCommitted`.
 
+Diagnostic R=0012 passed ValidateOnly and executed exactly once, but its sole
+Failed TRX returned `EvaluationClosure` before the marker because the retained
+fixture had copied all three evaluation slots into applicability. Raw marker
+count was `0`; R=0012 is immutable `OracleRejected`/no-success/no-retry. The
+bounded correction changes only fixture readiness: applicability retains the
+already admitted repository-tree slot, while governed-text and projected-target
+slots remain evaluation-ready. Corrected R=0013 retains the same FQN, marker,
+semantic null seam, argv, allowlist, caps, and oracle, but requires a distinct
+fresh runner/report/root after its synchronized correction head is exact-head
+hosted green.
+
 ## Internal implementation slices
 
 ContractSlice A's historical delivery is owned by its
@@ -10860,7 +10872,8 @@ ContractSlice C is decomposed by the current
 design head is hosted green. The three Activation packets and their exact
 cohort head are hosted green; both Applicability packets and their exact cohort
 head are hosted green, C is `7/11`, and current A+B+C is `50/50`.
-`C-EVALUATION-PLAN-01` is frozen/inactive pending its design-head hosted gate.
+Evaluation design is hosted green. R=0012 is immutable diagnostic/no-success;
+corrected R=0013 is frozen/inactive pending its correction-head hosted gate.
 
 C implementation and D still require separate packet activation, and no
 packet is active merely from this list. No directive here allocates new stable

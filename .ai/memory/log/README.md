@@ -12,9 +12,10 @@ exact B merge and hosted-run closure. B remains
 `11/11`, cumulative A+B `43/43`; its accepted reds and immutable diagnostics
 remain owned by the historical B handoff below. C Activation and Applicability
 are `ExactHeadHostedGreen`; C is `7/11`, and current A+B+C is `50/50`.
-R=0006/R=0008/R=0009/R=0010 are diagnostics/no-success and R=0007/R=0011 are
-accepted/immutable. Evaluation Plan is `FrozenDesign`/inactive pending its
-synchronized design-head hosted gate.
+R=0006/R=0008/R=0009/R=0010/R=0012 are diagnostics/no-success and
+R=0007/R=0011 are accepted/immutable. The Evaluation design head is hosted
+green; corrected R=0013 is `FrozenDesign`/inactive pending its synchronized
+correction head's exact-hosted gate.
 The parent scenario remains `Planned`; D and activation are held.
 
 Follow the current
