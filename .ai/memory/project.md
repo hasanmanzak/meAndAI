@@ -155,7 +155,7 @@ Last verified: **2026-08-10**
   Ubuntu in `20m44s` and Windows in `46m51s`; publication verification was
   correctly skipped. The exact lifecycle implementation identity recorded in
   the canonical handoff passed Ubuntu in `19m36s` and Windows in `36m02s`; publication verification was
-  correctly skipped. ContractSlice A is merged/exact-main green. B surface, codec, three wire packets, B-RESOURCE, B-CACHE, B-ADMISSION, and B-SEALED-CONTEXT are exact-head hosted green; R=0005/R=0006/R=0007/R=0011/R=0012 and corrected codec-derivation R=0014 remain accepted/immutable. Repository-target R=0004, admission R=0008/R=0009/R=0010, and codec-derivation R=0013 remain immutable diagnostics/no-success. B is `11/11`, cumulative A+B `43/43`; corrected R=0014 is local green pending its exact implementation head's hosted gate. The parent scenario, B-CONVERGE, C/D, and final activation remain held. Follow the current [canonical log index](log/README.md). The
+  correctly skipped. ContractSlice A is merged/exact-main green. All B implementation packets are exact-head hosted green; R=0005/R=0006/R=0007/R=0011/R=0012 and corrected codec-derivation R=0014 remain accepted/immutable. Repository-target R=0004, admission R=0008/R=0009/R=0010, and codec-derivation R=0013 remain immutable diagnostics/no-success. B is `11/11`, cumulative A+B `43/43`; B-CONVERGE pure audit is complete locally with final-sync exact-head hosted pending. The parent scenario, C/D, and final activation remain held. Follow the current [canonical log index](log/README.md). The
   predecessor-manifest exact-head hosted-green handoff indexed there is
   immutable history; the admission-proof reviewed-local-green handoff,
   the selector reviewed-local-green handoff in the canonical log index,
