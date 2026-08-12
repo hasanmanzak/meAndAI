@@ -227,6 +227,14 @@
             TestIds = @('TEST-0217', 'TEST-0218', 'TEST-0219')
         }
         @{
+            Evidence = 'PlannedDocumentation'
+            Owner = 'docs/features/FEAT-0071-repository-knowledge-catalog/test-cases.md'
+            TestIds = @(
+                'TEST-0234', 'TEST-0235', 'TEST-0236', 'TEST-0237',
+                'TEST-0238', 'TEST-0239', 'TEST-0240', 'TEST-0241'
+            )
+        }
+        @{
             Evidence = 'GitHubActionsSemantic'
             Owner = '.github/workflows/protocol-tests.yml'
             TestIds = @('TEST-0067', 'TEST-0075', 'TEST-0124', 'TEST-0160')
