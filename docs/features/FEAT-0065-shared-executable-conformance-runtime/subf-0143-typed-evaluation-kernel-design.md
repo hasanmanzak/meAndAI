@@ -3,14 +3,14 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted; ContractSlice A and B merged/exact-main green; B is `11/11`, cumulative A+B `43/43`. C surface and registration-mismatch are `ReviewedLocalGreen`; C is `4/11`, current A+B+C is `47/47`, and `C-PRODUCER-PIPELINE-01` is next without an intermediate push/hosted claim. [TEST-0210](test-cases.md#test-0210) remains `Planned`; D, activation, and DoD remain held. |
+| Status | Gate 2 accepted; ContractSlice A and B merged/exact-main green; B is `11/11`, cumulative A+B `43/43`. All three C Activation-cohort packets are `ReviewedLocalGreen`; C is `5/11`, current A+B+C is `48/48`, and the locally complete cohort awaits one push plus exact-head hosted validation. [TEST-0210](test-cases.md#test-0210) remains `Planned`; D, activation, and DoD remain held. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Test | [TEST-0210](test-cases.md#test-0210) |
 | Gate 3 micro-delivery routing | Historical A delivery remains owned by the [A micro-delivery control plan](subf-0143-micro-delivery-plan.md). Current B design routing is the [ContractSlice B micro-delivery plan](subf-0143-contractslice-b-micro-delivery-plan.md); packet labels refine delivery but activate no executable work. |
 | Exact-main design baseline | Accepted A merge commit [`51623f4d404a95e0f706d72805cf7ddbbbd293b8`](https://github.com/hasanmanzak/meAndAI/commit/51623f4d404a95e0f706d72805cf7ddbbbd293b8), validated by exact-main [run 31304787603](https://github.com/hasanmanzak/meAndAI/actions/runs/31304787603) |
-| Design and Gate 3 authority | Historical A/B directives, accepted reds, diagnostics, and hosted evidence remain immutable. The exact [C micro-delivery plan](subf-0143-contractslice-c-micro-delivery-plan.md) is exact-head hosted-green design authority; its surface and registration-mismatch packets are reviewed local green and producer-pipeline is next. Intermediate C commits are not pushed. D, final activation, merge, release, and publication remain outside this authority. |
+| Design and Gate 3 authority | Historical A/B directives, accepted reds, diagnostics, and hosted evidence remain immutable. The exact [C micro-delivery plan](subf-0143-contractslice-c-micro-delivery-plan.md) is exact-head hosted-green design authority; its three Activation packets are reviewed local green in separate commits. The locally complete cohort is not pushed and has no hosted claim yet. D, final activation, merge, release, and publication remain outside this authority. |
 | Completed predecessor | [SUBF-0153](README.md#subf-0153) / [TEST-0221](test-cases.md#test-0221), merged through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173) and exact-main validated by [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) |
 
 ## Directive and hard boundary
@@ -3276,7 +3276,7 @@ internal sealed class TypedInputReader
         IReadOnlyDictionary<string, QualifiedEvidenceHandle> contextProofs,
         IExpectedReferenceLookup expectedReferences,
         IEnumerable<RepositoryTargetResolutionDemandItem> demandItems,
-        IReadOnlyDictionary<int, QualifiedEvidenceHandle> demandReferences);
+        IEnumerable<DemandReferenceAuthorityBinding> demandBindings);
     internal SealedModelHandle<TModel> RequireModel<TModel>(
         ModelTypeToken<TModel> expected)
         where TModel : class, IProtocolSemanticModel;
@@ -10585,8 +10585,97 @@ order, multiplicity, mapped CLR identity, selector/evaluator, 18-component,
 proof-precedence, and no-kernel boundaries. Focused `1/1`, C `4/4`, full
 Conformance `47/47`, Domain `98/98`, warning-free Release build, format/diff,
 StructureOnly `429.279s`, and code/evidence/traceability reviews `0/0/0` passed.
-No intermediate push or hosted-green claim is made; producer-pipeline is next
-after the separate registration packet commit.
+At that registration checkpoint no intermediate push or hosted-green claim was
+made; producer-pipeline was next after the separate registration packet commit.
+
+### Frozen `C-PRODUCER-PIPELINE-01` activation graph contract
+
+This packet preserves the final internal declarations already frozen in the
+canonical producer/resource sections above. It adds their callable members on
+the same registered component objects and introduces only the internal carrier,
+handle, intent, allowance, ledger, and activation-graph implementations needed
+by those exact signatures. No alternate adapter, object/dynamic dispatch,
+reflection, service lookup, provider DTO, I/O, Policy implementation, cache
+authority, plan state, or evaluator result is introduced.
+
+The final operation interfaces retain fail-closed `NotSupportedException`
+default bodies solely so predecessor negative-registration fixture types outside
+this packet's test allowlist remain compile-valid. Those defaults are never
+canonical graph components or an alternate execution seam. Every one of the
+exact eighteen registered fixture objects supplies its own packet-local final
+operation implementation; before later behavior packets own semantic products,
+those methods expose only argument validation and marker-free closed rejection
+or empty-result intent shapes. The owning Fact proves the concrete operations
+are callable on the same registered objects and never reaches a default body.
+
+The exact source allowlist is the twelve paths listed by the C micro-plan: six
+Abstractions registration/contract files, four Conformance activation files,
+the retained activation fixture, and one new producer-pipeline Fact. The cap is
+exactly `10` production/Abstractions paths, two C test paths, and `3,500` normalized
+changed C# lines. Domain, Policy, Application, project/package/lock/workflow,
+Scenario/status/owner, runtime-efficiency, D, merge/release/publication, and all
+later C packet paths remain immutable.
+
+Activation validates exactly `18` object-identical registrations with family
+cardinality codec/parser/index/projector/selector/evaluator `3/2/4/1/3/5`.
+The producer DAG itself is exactly the already accepted ten Schema/Parser/
+Index/Projector nodes; selector/evaluator rows are attached activation maps and
+are not DAG nodes. Every parser/index binder input list is structurally equal to
+its declaration, including order and minimum/maximum counts. Dependencies are
+the accepted model/capability/projector-slot edges; Kahn readiness uses the
+existing component key/version, declaration key/version, then
+`Schema < Parser < Index < Projector` ordering.
+
+The two roots are governed-text Schema and repository-tree Schema. The exact
+ordered DAG is governed-text Schema, repository-tree Schema, repository-tree
+Index, Markdown Parser, protocol-record Index, governed-reference Index,
+repository-target-resolution-demand Projector, repository-target-resolution
+Schema, repository-target-Markdown Parser, and repository-target-resolution
+Index. A missing, duplicate, foreign, cyclic, cardinality-invalid, unreachable,
+or unbound edge is `RegistrationMismatch` and exposes no graph/kernel.
+
+`CatalogSliceProducerGraph` owns the ordered ten-node projection plus the exact
+six object-identical registration lists. Both `CatalogSliceKernel` and
+`ConformanceKernel` retain one non-null graph created from their validated
+export; neither recomputes or replaces registration objects. The internal test
+projection exposes immutable node family/key/version/component/input/scope
+metadata only, never `object`, dynamic dispatch, mutable collections, or a
+second execution authority.
+
+Invocation expansion remains exactly the accepted architecture: one codec per
+admitted binding and none for a zero-binding context; one parser per matching
+sealed model/binding; `PerContext` indexes once per exact slot/target/context,
+including the empty protocol-record capability case; `PerPlan` indexes once
+over the canonical unique union; the projector once over its coalesced
+capability union; selectors by exact declared key/parent; evaluators only after
+all declared inputs. Aliases sharing identical handles schedule once, out-of-
+range ready input is `PlanStateInvalid`, and a failed/no-input predecessor
+suppresses its dependent invocation. Resource claims stay producer-local;
+allowance comparison, immutable ledger construction, and sealed handle
+ownership remain Conformance-only.
+
+The sole Fact and marker are
+`ContractSliceCProducerPipelineTests.Activates_and_orders_exact_six_family_producer_graph`
+and `TEST-0210-C-BEHAVIOR-RED-0003`, with only `ContractSlice=C` and no
+Scenario. Canonical R=0005 has the complete source/fixture/oracle present and
+changes only the synthetic complete `ConformanceKernel` graph result to
+`null!`; only that null calls the marker. Green changes only that semantic seam
+and wires the identical graph state into both kernel variants. It requires
+focused `1/1`, C `5/5`, full Conformance `48/48`, Domain `98/98`, build/format/diff/locks/
+structure/reviews/record sync, and closes in a third separate unpushed local
+commit. The Activation cohort is pushed only after its full local cohort gate;
+the Applicability cohort remains held until exact-head hosted green.
+
+Canonical R=0005 is accepted and immutable; it is never rerun. The fresh
+`41,565`-byte runner has SHA-256 `CD92BAD1...D82169B`, its `18,126`-byte report
+has SHA-256 `5563029B...E4E992`, and the sole `4,908`-byte TRX has SHA-256
+`2E55C738...34AF2`. Native/runner exits are `1/0`; one Failed
+result/definition/entry owns marker count `2`, exact failed `1/1/1` counters,
+all other thirteen counters zero, and no attachment/collector evidence. Green
+is focused `1/1`, C `5/5`, full Conformance `48/48`, Domain `98/98`, build
+`0/0`, clean format/diff, StructureOnly green in `434.832s`, and
+code/evidence/traceability reviews `0/0/0`. Producer-pipeline is
+`ReviewedLocalGreen`; no push or hosted claim is made here.
 
 The first packet is capped at `52` production paths, three C test paths plus two
 bounded predecessor-test adaptations, and `7,000` normalized changed C# lines.
@@ -10631,9 +10720,9 @@ B-CONVERGE is merged/exact-main green.
 ContractSlice C is decomposed by the current
 [C micro-delivery plan](subf-0143-contractslice-c-micro-delivery-plan.md), whose
 design head is hosted green. `C-SURFACE-ACTIVATION-01` is
-`ReviewedLocalGreen`; registration-mismatch is also `ReviewedLocalGreen`; C is
-`4/11`, current A+B+C is `47/47`, and `C-PRODUCER-PIPELINE-01` is next without
-an intermediate push/hosted claim.
+`ReviewedLocalGreen`; registration-mismatch and producer-pipeline are also
+`ReviewedLocalGreen`; C is `5/11`, current A+B+C is `48/48`, and the locally
+complete Activation cohort awaits one push plus its exact-head hosted gate.
 
 C implementation and D still require separate packet activation, and no
 packet is active merely from this list. No directive here allocates new stable

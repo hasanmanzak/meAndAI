@@ -6,7 +6,7 @@
 | Parent epic | [EPIC-0002 / issue #163](https://github.com/hasanmanzak/meAndAI/issues/163) |
 | Architecture task | [TASK-0003 / issue #164](https://github.com/hasanmanzak/meAndAI/issues/164) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
-| Current authority | ContractSlice A and B are merged/exact-main green, with B `11/11` and A+B `43/43`. C surface and registration-mismatch are `ReviewedLocalGreen`; C is `4/11` and current A+B+C is `47/47`. `C-PRODUCER-PIPELINE-01` is next; no intermediate C push or hosted claim exists. D, activation, merge/release/publication remain held. |
+| Current authority | ContractSlice A and B are merged/exact-main green, with B `11/11` and A+B `43/43`. All three C Activation-cohort packets are `ReviewedLocalGreen`; C is `5/11` and current A+B+C is `48/48`. The locally complete cohort remains unpushed and exact-head hosted-pending. D, activation, merge/release/publication remain held. |
 
 This plan allocates the accepted architecture to stable delivery records. It
 did not itself authorize implementation. The later

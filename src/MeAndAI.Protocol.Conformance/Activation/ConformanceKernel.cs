@@ -5,20 +5,32 @@ namespace MeAndAI.Protocol.Conformance;
 
 public sealed class ConformanceKernel
 {
-    private ConformanceKernel(CompleteCatalogSnapshot catalog) => Catalog = catalog;
+    private readonly CatalogSliceProducerGraph _producerGraph;
+
+    private ConformanceKernel(
+        CompleteCatalogSnapshot catalog,
+        CatalogSliceProducerGraph producerGraph)
+    {
+        Catalog = catalog;
+        _producerGraph = producerGraph;
+    }
 
     public static ConformanceKernel Activate(
         FinalizedPolicyManifest manifest,
         CompletePolicyPackExport policy,
         IPolicyActivationProof activationProof,
         CompleteCatalogSnapshot? predecessor) =>
-        new(KernelActivationCore.ActivateComplete(
-            manifest,
-            policy,
-            activationProof,
-            predecessor));
+        new(
+            KernelActivationCore.ActivateComplete(
+                manifest,
+                policy,
+                activationProof,
+                predecessor),
+            CatalogSliceProducerGraph.Create(policy));
 
     public CompleteCatalogSnapshot Catalog { get; }
+
+    internal CatalogSliceProducerGraph ProducerGraph => _producerGraph;
 
     public NamedExecutionProfile ResolveNamedProfile(string name)
     {

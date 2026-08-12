@@ -5,8 +5,11 @@ namespace MeAndAI.Protocol.Conformance;
 
 public sealed class CatalogSliceKernel
 {
-    private CatalogSliceKernel()
+    private readonly CatalogSliceProducerGraph _producerGraph;
+
+    private CatalogSliceKernel(CatalogSliceProducerGraph producerGraph)
     {
+        _producerGraph = producerGraph;
     }
 
     public static CatalogSliceKernel Activate(
@@ -15,8 +18,10 @@ public sealed class CatalogSliceKernel
         IPolicyActivationProof activationProof)
     {
         KernelActivationCore.ValidateSlice(manifest, policy, activationProof);
-        return new CatalogSliceKernel();
+        return new CatalogSliceKernel(CatalogSliceProducerGraph.Create(policy));
     }
+
+    internal CatalogSliceProducerGraph ProducerGraph => _producerGraph;
 
     public ApplicabilityPlan PlanApplicability(
         ExecutionProfile diagnosticProfile,

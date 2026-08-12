@@ -316,7 +316,7 @@ The lifecycle records-only freeze head is exact-hosted-green: Ubuntu passed in
 `20m44s`, Windows in `46m51s`, and publication verification was correctly
 skipped. The exact lifecycle implementation identity recorded in the canonical
 handoff passed Ubuntu in `19m36s` and Windows in `36m02s`; publication verification was
-correctly skipped. ContractSlice A and B are merged/exact-main green; exact B closure evidence remains owned by the current C handoff and immutable B history. B is `11/11`, cumulative A+B `43/43`. `C-SURFACE-ACTIVATION-01` and `C-REGISTRATION-MISMATCH-01` are `ReviewedLocalGreen`; C is `4/11`, current A+B+C is `47/47`, and final A+B+C remains `54/54`. `C-PRODUCER-PIPELINE-01` is next without an intermediate push/hosted claim. The parent scenario, D, and final activation remain held.
+correctly skipped. ContractSlice A and B are merged/exact-main green; exact B closure evidence remains owned by the current C handoff and immutable B history. B is `11/11`, cumulative A+B `43/43`. All three Activation-cohort packets are `ReviewedLocalGreen`; C is `5/11`, current A+B+C is `48/48`, and final A+B+C remains `54/54`. The Activation cohort is locally complete; its one push and exact-head hosted gate remain pending. The parent scenario, D, and final activation remain held.
 The exact record-delivery closure reached the full `4096/4096` instruction-graph
 budget. Ubuntu passed in `19m52s`; Windows reached its exact 45-minute job
 ceiling after every emitted suite result was successful. The bounded correction

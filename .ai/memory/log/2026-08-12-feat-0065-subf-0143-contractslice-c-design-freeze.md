@@ -3,12 +3,12 @@
 | Field | Value |
 | --- | --- |
 | Scope | ContractSlice C micro-delivery design only |
-| State | Design cohort `ExactHeadHostedGreen`; surface and registration-mismatch `ReviewedLocalGreen`; producer-pipeline next; no intermediate push/hosted claim |
+| State | Design cohort `ExactHeadHostedGreen`; all three Activation-cohort packets `ReviewedLocalGreen`; cohort locally complete, one push/exact-head hosted gate pending |
 | Predecessor | ContractSlice B merged and exact-main hosted green |
 | Design delivery | Exact [`dd8940156408c103edb837f17bc05e6bb25de8c3`](https://github.com/hasanmanzak/meAndAI/commit/dd8940156408c103edb837f17bc05e6bb25de8c3) / [run 31585390450](https://github.com/hasanmanzak/meAndAI/actions/runs/31585390450): Ubuntu `16m07s`, Windows `18m19s`, publication verification skipped |
 | C authority | [Maintainer continuation directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5264403013) |
 | Normative owner | [Typed C design and micro plan](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-contractslice-c-micro-delivery-plan.md) |
-| Progress | C `4/11`; current A+B+C `47/47`; final A+B+C target `54/54`; Domain `98/98` |
+| Progress | C `5/11`; current A+B+C `48/48`; final A+B+C target `54/54`; Domain `98/98` |
 | Holds | [TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) remains `Planned`; D, Scenario/status/owner, both workflow filters, runtime-efficiency activation, feature DoD, merge, release, and publication remain held |
 
 ## Frozen route
@@ -197,8 +197,8 @@ Canonical `R=0004` is accepted and immutable. The exact external runner is
 with PowerShell AST `5,875` tokens / `45` top-level statements / `0` errors.
 Its source was `12,855` bytes / SHA-256
 `664A6D5CA3FCEDF84AE137573D8884B1C2DAE077884985F75994390CE5029FB3`.
-ValidateOnly proved exact local HEAD `8812b22c7cc8a1785d24376f3e91a20fb0fe6cc0`,
-upstream design head `dd8940156408c103edb837f17bc05e6bb25de8c3`,
+ValidateOnly proved the same exact local surface commit and upstream design head
+linked above,
 branch/status, `298/1,800` changed-line custody, six current locks, and absent
 evidence paths. Two earlier outer PowerShell array-binding observations never
 entered a runner or created evidence and are diagnostic-only.
@@ -223,3 +223,59 @@ records/traceability reviews closed `0/0/0`; consistency/traceability loss was
 not observed. The packet is `ReviewedLocalGreen`, remains unpushed, and grants
 no hosted-green claim. `C-PRODUCER-PIPELINE-01` is next only after this separate
 local commit.
+
+## Frozen producer-pipeline packet
+
+The exact predecessor was the separate local registration commit. Producer
+pipeline is now `ReviewedLocalGreen` in its own third unpushed local commit.
+Its sole Fact/FQN is
+`MeAndAI.Protocol.Conformance.Tests.ContractSliceCProducerPipelineTests.Activates_and_orders_exact_six_family_producer_graph`;
+it has only `ContractSlice=C`, no Scenario, and marker
+`TEST-0210-C-BEHAVIOR-RED-0003`. Canonical R=0005 owns only the fully prepared
+valid kernel producer-graph null seam and is never rerun after invocation.
+
+The normative design and micro-plan own the exact twelve-path executable
+allowlist, exactly `10` production/Abstractions plus two-test-path boundary, `3,500`
+changed-line cap, final same-object callable interfaces/carriers, exact
+`3/2/4/1/3/5` six-family activation closure, exact ten-node producer DAG and
+Kahn ordering, per-binding/per-context/per-plan expansion, coalescing,
+cardinality, zero-input shapes, and Conformance-owned allowance/ledger
+boundary. Selector/evaluator registrations are activation maps, not producer
+DAG nodes. Both kernel variants retain the same non-null graph and original
+registration objects. Policy/Application/Domain/project/package/lock/
+workflow/Scenario/D/downstream activation remains immutable. Green is
+`1/1`, C `5/5`, full `48/48`, Domain `98/98`, build/format/diff/locks/
+StructureOnly/reviews/record sync, and a third unpushed local commit. Only the
+complete Activation cohort may later receive one push and an exact-head hosted
+gate.
+
+The operation interfaces' fail-closed `NotSupportedException` defaults retain
+only allowlist-excluded predecessor negative-fixture compilation. They are not
+an execution seam: all eighteen canonical registered mirrors override the
+same-object final operations, and the owning Fact proves no default executes.
+
+Canonical R=0005 is accepted and immutable; it is never rerun. The fresh
+external runner is `41,565` bytes at SHA-256
+`CD92BAD16A2797A48C182D2F7DF7B2CDD96491D86EEB888D25263D32DD82169B`.
+Its report is `18,126` bytes at SHA-256
+`5563029BDC157FE24C2591B80A3065F1CF925AC30E2CC1030BFF2452A8E4E992`;
+the sole `4,908`-byte TRX is SHA-256
+`2E55C738BC4DA030569013DD1247484C2AAD72E49C89ED92CFB6BAD8E6A34AF2`.
+The exact child exited `1`, the runner exited `0`, and the TRX owns one Failed
+result/definition/entry, marker count `2`, exact failed `1/1/1` counters with
+the other thirteen zero, one optional standard stack/stdout/run-info shape, and
+no attachment/collector evidence. Green is build `0/0`, focused `1/1`, C
+`5/5`, full Conformance `48/48`, Domain `98/98`, format/diff clean,
+StructureOnly green in `434.832s`, and code/evidence/traceability review
+`0/0/0`. The packet is `ReviewedLocalGreen`; no push or hosted claim is made
+here.
+
+The Activation pre-push publication recurrence rejected two unlinked commit
+references in this ledger. The owner was isolated in `4m01s`; the edge-neutral
+wording correction and package-commit amendment took less than three additional
+minutes. No hosted defect occurred, no source changed, and the complete cohort
+gate repeated on the amended exact tree. StructureOnly passed in `449.389s`,
+publication evidence passed `7/7` in `294.077s` without a publication claim,
+and the canonical graph was `359/4162/321/4553078`; full C was `5/5`, combined
+A+B+C and Conformance were `48/48`, Domain was `98/98`, API/ownership was
+`11/11`, and Release build/format/locks/diff were clean.

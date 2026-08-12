@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Gate 2 micro-delivery plan and design freeze |
-| State | Design cohort `ExactHeadHostedGreen`; surface and registration-mismatch `ReviewedLocalGreen`; C `4/11`, current A+B+C `47/47`; `C-PRODUCER-PIPELINE-01` is the next `FrozenDesign` packet; no intermediate push/hosted claim |
+| State | Design cohort `ExactHeadHostedGreen`; all three Activation-cohort packets `ReviewedLocalGreen`; C `5/11`, current A+B+C `48/48`; cohort locally complete, one push/exact-head hosted gate pending |
 | Parent | Owning feature and current subfeature |
 | Scenario | [TEST-0210](test-cases.md#test-0210), retained `Planned` |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
@@ -138,13 +138,22 @@ sequence with a push and Ubuntu/Windows wait after every package.
 
 | Cohort | Local work and validation | Hosted CI | Hosted defects | Owner identification | Correction and revalidation | Estimated saving vs package-hosted | Consistency/traceability loss |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Activation | `NotMeasured` | `NotMeasured` | `NotMeasured` | `NotApplicable` until a defect | `NotApplicable` until a defect | `NotMeasured` | `NotObserved` initially |
+| Activation | `3h10m` measured from the first package commit through the final synchronized exact-tree gate | Pending the single cohort push | Pending | `NotApplicable` unless hosted finds a defect | `NotApplicable` unless hosted finds a defect | About `36m38s` of hosted critical-path wait from the two avoided intermediate pushes, using the design cohort's `18m19s` longest job as the comparison basis | None observed; the local commit-reference recurrence caught the only record defect before push |
 | Applicability | `NotMeasured` | `NotMeasured` | `NotMeasured` | `NotApplicable` until a defect | `NotApplicable` until a defect | `NotMeasured` | `NotObserved` initially |
 | Evaluation | `NotMeasured` | `NotMeasured` | `NotMeasured` | `NotApplicable` until a defect | `NotApplicable` until a defect | `NotMeasured` | `NotObserved` initially |
 | Results/closure | `NotMeasured` | `NotMeasured` | `NotMeasured` | `NotApplicable` until a defect | `NotApplicable` until a defect | `NotMeasured` | `NotObserved` initially |
 
 C closure reports elapsed time, isolation cost, estimated saved time, and any
 consistency or traceability loss for these four cohorts separately from D.
+
+The Activation pre-push publication recurrence found two unlinked commit
+references in the producer packet's owning ledger. The exact owner was isolated
+in `4m01s`; the wording-only correction and package-commit amendment took less
+than three additional minutes. This was a local validation defect, not a hosted
+defect, and the full cohort validation recurs on the amended exact tree.
+The amended tree passed StructureOnly in `449.389s`, publication evidence
+`7/7` in `294.077s` without a publication claim, and the canonical graph at
+`359/4162/321/4553078` under schema-2 ceilings.
 
 ## Frozen first-packet allowlist and fixture
 
@@ -202,7 +211,8 @@ and post-test. Complete stdout/stderr logs are CreateNew regular non-reparse
 files capped at `1,048,576` bytes each; overflow or truncation rejects the
 oracle. TRX parsing prohibits DTD and external resolution. `ValidateOnly`
 creates no root/report/log/build/test artifact. Immediately before the sole
-child, `InvocationCommitted` consumes ordinal `0001`; every later process,
+child, `InvocationCommitted` consumes the current packet's frozen canonical R
+ordinal; every later process,
 timeout, interruption, exit, custody, TRX, or oracle failure is immutable
 no-success/no-retry. Only pre-commit preflight/build failure may be corrected
 and revalidated under renewed review.
@@ -254,8 +264,10 @@ docs/features/README.md
 
 It adds exactly two tracked record nodes: this plan and the one C design
 ledger. The ledger remains the sole detailed C routing/evidence handoff and is
-bounded to `100` lines, at most `6` Markdown links, and at most `2` repository-
-relative links. All other status edits are edge-neutral where possible. The
+bounded to `400` lines, at most `16` Markdown links, and at most `4` repository-
+relative links. These C-only ceilings accommodate immutable per-package and
+per-cohort evidence without changing any general protocol limit. All other
+status edits are edge-neutral where possible. The
 schema-2 hard ceilings remain `512` nodes, `8,192` relations, `1,048,576` bytes
 per parsed blob, and `8,388,608` aggregate parsed bytes; the exact design tree
 must pass the canonical builder/validator and retain at least `2 KiB` per-blob
@@ -300,6 +312,95 @@ three independent review dimensions closed `0/0/0`. The packet is
 from first C# mutation through final structural validation. No consistency or
 traceability loss was observed. Producer-pipeline is next only after the
 registration packet's separate local commit.
+
+### Frozen `C-PRODUCER-PIPELINE-01` packet boundary
+
+Retained negative registration fixtures outside this packet's two-test-path
+allowlist compile only through the final operation interfaces' fail-closed
+`NotSupportedException` defaults. The exact eighteen canonical fixture objects
+override those operations on the same registered identities; this packet's Fact
+proves those concrete operations are callable and no default is executable.
+
+The predecessor is the separate local registration commit; it remains
+unpushed and carries no hosted claim. The sole Fact is
+`ContractSliceCProducerPipelineTests.Activates_and_orders_exact_six_family_producer_graph`,
+with only `ContractSlice=C`, no Scenario, and marker
+`TEST-0210-C-BEHAVIOR-RED-0003`. Canonical R=0005 replaces only the fully
+prepared valid kernel producer graph with `null!`; only that null reaches the
+marker. Unexpected construction, activation, component, invocation, resource,
+or assertion failures remain marker-free.
+
+The packet adds the final callable members and already accepted carrier shapes
+to the existing codec/parser/index/projector/selector identities; it creates no
+adapter, direction-specific registration, second scheduler, Policy component,
+provider route, or I/O seam. Activation owns all `3/2/4/1/3/5` registration
+rows and the exact ten-node Schema/Parser/Index/Projector producer DAG; selectors
+and evaluators are validated activation rows, not DAG nodes. The graph owns
+declaration/binder/type closure, deterministic Kahn order,
+per-binding/per-context/per-plan expansion, alias coalescing, declared
+cardinality, the zero-binding/zero-input cases, and Conformance-owned resource
+allowance/ledger handles. Later applicability/evaluation packets own live plan
+state, provider admission, retries, evaluation rounds, and result minting.
+
+The exact executable allowlist is:
+
+```text
+src/MeAndAI.Protocol.Conformance.Abstractions/Registration/CodecRegistration.cs
+src/MeAndAI.Protocol.Conformance.Abstractions/Registration/ProducerRegistrationContracts.cs
+src/MeAndAI.Protocol.Conformance.Abstractions/Registration/SemanticResourceContracts.cs
+src/MeAndAI.Protocol.Conformance.Abstractions/Registration/ProducerHandleContracts.cs
+src/MeAndAI.Protocol.Conformance.Abstractions/Registration/CanonicalPayloadWriteContracts.cs
+src/MeAndAI.Protocol.Conformance.Abstractions/Registration/ProducerIntentContracts.cs
+src/MeAndAI.Protocol.Conformance/Activation/CatalogSliceProducerGraph.cs
+src/MeAndAI.Protocol.Conformance/Activation/KernelActivationCore.cs
+src/MeAndAI.Protocol.Conformance/Activation/CatalogSliceKernel.cs
+src/MeAndAI.Protocol.Conformance/Activation/ConformanceKernel.cs
+tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ContractSliceCActivationTests.cs
+tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ContractSliceCProducerPipelineTests.cs
+```
+
+The first two, activation core/both kernels, and retained activation test are
+modified rather than replaced; the five new contract/runtime files group only
+the accepted final internal declarations. Exactly `10` production/Abstractions
+paths, exactly the retained activation test plus one new C test, and at most
+`3,500` normalized changed C# lines are permitted. The first extra path or line
+redraws before red. Domain, Policy, Application, projects, packages, locks,
+workflows, Scenario/status/owner, runtime efficiency, D, merge, release, and
+publication are immutable.
+
+The packet-specific child command specializes the generic canonical-red
+template exactly as follows:
+
+```text
+dotnet test tests/dotnet/MeAndAI.Protocol.Conformance.Tests/MeAndAI.Protocol.Conformance.Tests.csproj --configuration Release --no-restore --no-build --nologo --verbosity minimal --results-directory "<fresh-root>" --logger "trx;LogFileName=TEST-0210-C-BEHAVIOR-RED-0003.trx" --filter "ContractSlice=C&FullyQualifiedName=MeAndAI.Protocol.Conformance.Tests.ContractSliceCProducerPipelineTests.Activates_and_orders_exact_six_family_producer_graph"
+```
+
+One new fresh external runner specializes the common custody contract to the
+exact twelve-path source allowlist, current HEAD/upstream/branch/status, six
+locks, warning-free build, fresh DLL/PDB, one fresh result root, one child, and
+canonical R=0005. The fully prepared valid seam is the synthetic complete
+`ConformanceKernel` producer graph; the slice kernel receives the same graph
+state in green. `InvocationCommitted` irrevocably consumes R=0005 for process-
+create, timeout, interruption, unexpected exit, missing/malformed/extra TRX,
+custody, or oracle failure; no changed or unchanged retry is permitted.
+
+Green requires focused `1/1`, C `5/5`, full Conformance `48/48`, Domain
+`98/98`, warning/error-free Release build, format/diff/locks, required
+structure, package-local code/evidence/traceability reviews, record sync, and a
+third separate unpushed local commit. The Activation cohort then runs its full
+cohort boundary and is pushed once; applicability cannot activate before that
+exact head is Ubuntu/Windows hosted green.
+
+Canonical producer R=0005 is accepted/immutable and never rerun. Its fresh
+runner is `41,565` bytes/SHA-256 `CD92BAD1...D82169B`; the report is `18,126`
+bytes/SHA-256 `5563029B...E4E992`, and the sole `4,908`-byte TRX is SHA-256
+`2E55C738...34AF2`. Native/runner exits are `1/0`; the one Failed
+result/definition/entry has marker count `2`, exact failed counters, all other
+thirteen counters zero, and no attachment/collector evidence. Green is focused
+`1/1`, C `5/5`, full Conformance `48/48`, Domain `98/98`, build `0/0`, clean
+format/diff, StructureOnly green in `434.832s`, and
+code/evidence/traceability reviews `0/0/0`. The packet is
+`ReviewedLocalGreen`; the cohort remains unpushed and has no hosted claim.
 
 ## Deferred ContractSlice D cohort plan
 

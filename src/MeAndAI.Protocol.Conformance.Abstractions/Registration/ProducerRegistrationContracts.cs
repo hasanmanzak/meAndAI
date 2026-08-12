@@ -3,20 +3,74 @@ namespace MeAndAI.Protocol.Conformance.Abstractions;
 internal interface IComponentInput;
 
 internal interface IComponentInputBinder<TInput>
-    where TInput : class, IComponentInput;
-
-internal interface ISemanticModelParser<TInput, TOutput>
     where TInput : class, IComponentInput
-    where TOutput : class, IProtocolSemanticModel;
+{
+    IReadOnlyList<ComponentInputDeclaration> Inputs =>
+        Array.Empty<ComponentInputDeclaration>();
 
-internal interface IContextIndexer<TInput, TCapability>
+    TInput Bind(TypedInputReader reader) =>
+        throw new NotSupportedException("The registered binder does not implement binding.");
+}
+
+internal interface ISemanticModelParser<TInput, TOutput> :
+    ISemanticResourceMeter<SemanticModelInput<TInput>, TOutput>
     where TInput : class, IComponentInput
-    where TCapability : class, IEvidenceCapability;
+    where TOutput : class, IProtocolSemanticModel
+{
+    SemanticModelIntent<TOutput> Parse(
+        SemanticModelInput<TInput> input,
+        CancellationToken cancellationToken) =>
+        throw new NotSupportedException("The registered parser does not implement parsing.");
 
-internal interface IAcquisitionDemandProjector<TCapability>
-    where TCapability : class, IEvidenceCapability;
+    SemanticResourceLocalUsage ISemanticResourceMeter<SemanticModelInput<TInput>, TOutput>.MeasureLocal(
+        SemanticModelInput<TInput> input,
+        TOutput value,
+        CancellationToken cancellationToken) =>
+        throw new NotSupportedException("The registered parser does not implement resource metering.");
+}
 
-internal interface IExpectedSelectorResolver;
+internal interface IContextIndexer<TInput, TCapability> :
+    ISemanticResourceMeter<ContextIndexInput<TInput>, TCapability>
+    where TInput : class, IComponentInput
+    where TCapability : class, IEvidenceCapability
+{
+    CapabilityIntent<TCapability> Build(
+        ContextIndexInput<TInput> input,
+        CancellationToken cancellationToken) =>
+        throw new NotSupportedException("The registered indexer does not implement indexing.");
+
+    SemanticResourceLocalUsage ISemanticResourceMeter<ContextIndexInput<TInput>, TCapability>.MeasureLocal(
+        ContextIndexInput<TInput> input,
+        TCapability value,
+        CancellationToken cancellationToken) =>
+        throw new NotSupportedException("The registered indexer does not implement resource metering.");
+}
+
+internal interface IAcquisitionDemandProjector<TCapability> :
+    ISemanticResourceMeter<
+        DemandProjectionInput<TCapability>,
+        IReadOnlyList<RepositoryTargetResolutionDemandCandidate>>
+    where TCapability : class, IEvidenceCapability
+{
+    DemandProjectionIntent Project(
+        DemandProjectionInput<TCapability> input,
+        CancellationToken cancellationToken) =>
+        throw new NotSupportedException("The registered projector does not implement projection.");
+
+    SemanticResourceLocalUsage ISemanticResourceMeter<
+        DemandProjectionInput<TCapability>,
+        IReadOnlyList<RepositoryTargetResolutionDemandCandidate>>.MeasureLocal(
+            DemandProjectionInput<TCapability> input,
+            IReadOnlyList<RepositoryTargetResolutionDemandCandidate> value,
+            CancellationToken cancellationToken) =>
+        throw new NotSupportedException("The registered projector does not implement resource metering.");
+}
+
+internal interface IExpectedSelectorResolver
+{
+    SelectorIntent Resolve(ExpectedSelectorInput input) =>
+        throw new NotSupportedException("The registered selector does not implement resolution.");
+}
 
 internal interface IRuleInputAccess
 {

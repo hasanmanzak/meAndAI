@@ -343,13 +343,13 @@ public sealed class ContractSliceCActivationTests
         [
             ParserRegistration<SourceTextInputMirror, MarkdownDocumentModelMirror>.Create(
                 markdown,
-                new ComponentInputBinderMirror<SourceTextInputMirror>(),
+                new ComponentInputBinderMirror<SourceTextInputMirror>(markdown.Inputs),
                 ModelTypeToken<MarkdownDocumentModelMirror>.Create(markdown.OutputModel),
                 new MarkdownParserMirror()),
             ParserRegistration<RepositoryTargetInputMirror,
                 RepositoryTargetMarkdownDocumentSetModelMirror>.Create(
                     target,
-                    new ComponentInputBinderMirror<RepositoryTargetInputMirror>(),
+                    new ComponentInputBinderMirror<RepositoryTargetInputMirror>(target.Inputs),
                     ModelTypeToken<RepositoryTargetMarkdownDocumentSetModelMirror>.Create(
                         target.OutputModel),
                     new RepositoryTargetMarkdownParserMirror()),
@@ -386,7 +386,7 @@ public sealed class ContractSliceCActivationTests
         var declaration = registry.Indexes.Single(item => item.IndexKey == key);
         return IndexRegistration<IndexInputMirror, TCapability>.Create(
             declaration,
-            new ComponentInputBinderMirror<IndexInputMirror>(),
+            new ComponentInputBinderMirror<IndexInputMirror>(declaration.Inputs),
             CapabilityTypeToken<TCapability>.Create(declaration.OutputCapability),
             indexer);
     }
@@ -506,41 +506,63 @@ internal sealed class FailedProofComponentMirror;
 internal sealed class NoInputProofComponentMirror;
 internal sealed class ObservedProofComponentMirror;
 
-internal sealed class SourceTextModelMirror : IProtocolSemanticModel;
+internal sealed partial class SourceTextModelMirror : IProtocolSemanticModel;
 internal sealed partial class GovernedTextCodecMirror :
     ICanonicalPayloadCodec<SourceTextModelMirror>;
-internal sealed class MarkdownDocumentModelMirror : IProtocolSemanticModel;
-internal sealed class RepositoryTargetMarkdownDocumentSetModelMirror :
+internal sealed partial class MarkdownDocumentModelMirror : IProtocolSemanticModel;
+internal sealed partial class RepositoryTargetMarkdownDocumentSetModelMirror :
     IProtocolSemanticModel;
 
-internal sealed class SourceTextInputMirror : IComponentInput;
-internal sealed class RepositoryTargetInputMirror : IComponentInput;
-internal sealed class IndexInputMirror : IComponentInput;
-internal sealed class ComponentInputBinderMirror<TInput> :
+internal sealed partial class SourceTextInputMirror : IComponentInput;
+internal sealed partial class RepositoryTargetInputMirror : IComponentInput;
+internal sealed partial class IndexInputMirror : IComponentInput;
+internal sealed partial class ComponentInputBinderMirror<TInput> :
     IComponentInputBinder<TInput>
-    where TInput : class, IComponentInput;
+    where TInput : class, IComponentInput
+{
+    private readonly IReadOnlyList<ComponentInputDeclaration> _inputs;
 
-internal sealed class MarkdownParserMirror :
+    internal ComponentInputBinderMirror()
+        : this(Array.Empty<ComponentInputDeclaration>())
+    {
+    }
+
+    internal ComponentInputBinderMirror(IEnumerable<ComponentInputDeclaration> inputs)
+    {
+        ArgumentNullException.ThrowIfNull(inputs);
+        _inputs = Array.AsReadOnly(inputs.ToArray());
+    }
+
+    public IReadOnlyList<ComponentInputDeclaration> Inputs => _inputs;
+
+    public TInput Bind(TypedInputReader reader)
+    {
+        ArgumentNullException.ThrowIfNull(reader);
+        return Activator.CreateInstance<TInput>();
+    }
+}
+
+internal sealed partial class MarkdownParserMirror :
     ISemanticModelParser<SourceTextInputMirror, MarkdownDocumentModelMirror>;
-internal sealed class RepositoryTargetMarkdownParserMirror :
+internal sealed partial class RepositoryTargetMarkdownParserMirror :
     ISemanticModelParser<RepositoryTargetInputMirror,
         RepositoryTargetMarkdownDocumentSetModelMirror>;
 
-internal sealed class GovernedReferenceIndexMirror :
+internal sealed partial class GovernedReferenceIndexMirror :
     IContextIndexer<IndexInputMirror, IGovernedReferenceIndex>;
-internal sealed class ProtocolRecordIndexMirror :
+internal sealed partial class ProtocolRecordIndexMirror :
     IContextIndexer<IndexInputMirror, IProtocolRecordIndex>;
-internal sealed class RepositoryTargetIndexMirror :
+internal sealed partial class RepositoryTargetIndexMirror :
     IContextIndexer<IndexInputMirror, IRepositoryTargetResolutionIndex>;
-internal sealed class RepositoryTreeIndexMirror :
+internal sealed partial class RepositoryTreeIndexMirror :
     IContextIndexer<IndexInputMirror, IRepositoryTree>;
 
-internal sealed class RepositoryTargetProjectorMirror :
+internal sealed partial class RepositoryTargetProjectorMirror :
     IAcquisitionDemandProjector<IGovernedReferenceIndex>;
 
-internal sealed class DecisionRecordSelectorMirror : IExpectedSelectorResolver;
-internal sealed class FeatureReadmeSelectorMirror : IExpectedSelectorResolver;
-internal sealed class FeatureTestCasesSelectorMirror : IExpectedSelectorResolver;
+internal sealed partial class DecisionRecordSelectorMirror : IExpectedSelectorResolver;
+internal sealed partial class FeatureReadmeSelectorMirror : IExpectedSelectorResolver;
+internal sealed partial class FeatureTestCasesSelectorMirror : IExpectedSelectorResolver;
 
 internal abstract class RuleEvaluatorMirror : IRuleEvaluator
 {
