@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Gate 2 micro-delivery plan and design freeze |
-| State | Design and Activation cohorts `ExactHeadHostedGreen`; applicability plan `ReviewedLocalGreen`, C `6/11`, current A+B+C `49/49`; R=0006 diagnostic/no-success, R=0007 accepted/immutable; closure next/`FrozenDesign`; no cohort push/hosted claim |
+| State | Design and Activation cohorts `ExactHeadHostedGreen`; both Applicability packets `ReviewedLocalGreen`, C `7/11`, current A+B+C `50/50`; R=0006/R=0008/R=0009/R=0010 diagnostic/no-success, R=0007/R=0011 accepted/immutable; Applicability cohort push/exact-head hosted gate pending; Evaluation held |
 | Parent | Owning feature and current subfeature |
 | Scenario | [TEST-0210](test-cases.md#test-0210), retained `Planned` |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
@@ -505,9 +505,39 @@ hosted validation and the sole R=0007 was accepted with report SHA-256
 `6DA8C76C...2384` and TRX SHA-256 `DC1A4426...8250`; native/runner exits were
 `1/0`. Green is focused `1/1`, C `6/6`, full Conformance `49/49`, Domain
 `98/98`, Release build `0/0`, format/diff/locks/StructureOnly and reviews
-green. The packet is `ReviewedLocalGreen` in this separate local commit;
-closure is next/`FrozenDesign`, and the Applicability cohort has not been
-pushed or claimed hosted green.
+green. The packet is `ReviewedLocalGreen` in its separate local commit. At that
+packet checkpoint closure was next/`FrozenDesign`, and the Applicability cohort
+had not been pushed or claimed hosted green.
+
+### `C-APPLICABILITY-CLOSURE-01` reviewed-local-green boundary
+
+The packet changes exactly the two kernel delegations, the existing planning
+session, one new closure core, one bounded activation-fixture adaptation, and
+one owning closure Fact. It admits Observed/Failed/NoInput outcomes, independent
+Complete/Incomplete/Failed acquisition status, sealed ContextProof references,
+NotApplicable/Unresolved terminals, cancellation retry, and single-success
+atomicity without activating evaluation rounds, real Policy, provider I/O, or
+any held Scenario/workflow surface. Its normalized cap is `1,400` changed lines
+with the owning test capped at `600`.
+
+R=0008 stopped marker-free at fixture component registration mismatch; R=0009
+stopped marker-free when the provider-profile fixture omitted repository-tree;
+R=0010 stopped marker-free at admission-proof component reference closure.
+Each is immutable diagnostic/no-success/no-retry. Corrected R=0011 is the sole
+accepted expected-red: runner `42,757` bytes / SHA-256
+`251A98B8C9BC86C812C0B30F4B5CC27DB0282BE5A2C2C63BBFEB70B45B2A297B`,
+AST `6,131/46/0`, native/runner `1/0`, report SHA-256
+`B6C4F18B345C60C13C0B5A45B5147A240F6FAC8B3BCBEC9FA2D9746564F1E9D2`,
+and TRX SHA-256
+`1711DFC8F13036B38696EBCF1FF61CD748CF4AE458E93A6699D3E1CACBA8133D`.
+Green is Release build `0/0`, focused `1/1`, C `7/7`, full Conformance `50/50`,
+Domain `98/98`, format/diff/locks green, StructureOnly `452.313s`, publication
+evidence `7/7` in `305.7s` with no publication claim, and `1,052/1,400` plus `422/600`.
+Code/evidence/traceability reviews close `0/0/0`; the three diagnostic owners
+were isolated in under four minutes each, corrected/revalidated in about
+`7m/5m/4m`, and caused no consistency or traceability loss. This packet is
+`ReviewedLocalGreen` in its own local commit. The cohort still requires its
+full local boundary, one push, and exact-head hosted green before Evaluation.
 
 ## Deferred ContractSlice D cohort plan
 

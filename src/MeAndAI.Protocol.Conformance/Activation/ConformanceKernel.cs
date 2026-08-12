@@ -34,8 +34,11 @@ public sealed class ConformanceKernel
             catalog,
             graph,
             new KernelPlanningSession(
+                manifest,
+                activationProof,
                 CatalogAuthorityKind.CompleteProtocolSnapshot,
                 manifest.ManifestDigest,
+                catalog.CatalogVersion,
                 catalog.Rules,
                 graph));
     }
@@ -73,7 +76,11 @@ public sealed class ConformanceKernel
         ApplicabilityPlan plan,
         AcquisitionProofSet proofs,
         CancellationToken cancellationToken = default) =>
-        throw new CatalogIntegrityException(CatalogIntegrityCode.PlanStateInvalid);
+        ApplicabilityClosureCore.Close(
+            _planningSession,
+            plan,
+            proofs,
+            cancellationToken);
 
     public EvaluationAdvanceResult PlanEvaluation(
         ApplicabilityClosure closure,

@@ -26,8 +26,11 @@ public sealed class CatalogSliceKernel
         return new CatalogSliceKernel(
             graph,
             new KernelPlanningSession(
+                manifest,
+                activationProof,
                 CatalogAuthorityKind.QualificationSlice,
                 manifest.ManifestDigest,
+                policy.Catalog.CatalogVersion,
                 policy.Catalog.Rules,
                 graph));
     }
@@ -46,7 +49,11 @@ public sealed class CatalogSliceKernel
         ApplicabilityPlan plan,
         AcquisitionProofSet proofs,
         CancellationToken cancellationToken = default) =>
-        throw new CatalogIntegrityException(CatalogIntegrityCode.PlanStateInvalid);
+        ApplicabilityClosureCore.Close(
+            _planningSession,
+            plan,
+            proofs,
+            cancellationToken);
 
     public EvaluationAdvanceResult PlanEvaluation(
         ApplicabilityClosure closure,

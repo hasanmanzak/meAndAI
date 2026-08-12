@@ -3,12 +3,12 @@
 | Field | Value |
 | --- | --- |
 | Scope | ContractSlice C micro-delivery design only |
-| State | Design and Activation cohorts `ExactHeadHostedGreen`; R=0006 diagnostic/no-success; R=0007 accepted/immutable; `C-APPLICABILITY-PLAN-01` `ReviewedLocalGreen`; closure next/`FrozenDesign`; no Applicability cohort push/hosted claim |
+| State | Design and Activation cohorts `ExactHeadHostedGreen`; both Applicability packets `ReviewedLocalGreen`; R=0006/R=0008/R=0009/R=0010 diagnostic/no-success; R=0007/R=0011 accepted/immutable; cohort push/exact-head hosted gate pending; Evaluation held |
 | Predecessor | ContractSlice B merged and exact-main hosted green |
 | Design delivery | Exact [`dd8940156408c103edb837f17bc05e6bb25de8c3`](https://github.com/hasanmanzak/meAndAI/commit/dd8940156408c103edb837f17bc05e6bb25de8c3) / [run 31585390450](https://github.com/hasanmanzak/meAndAI/actions/runs/31585390450): Ubuntu `16m07s`, Windows `18m19s`, publication verification skipped |
 | C authority | [Maintainer continuation directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5264403013) |
 | Normative owner | [Typed C design and micro plan](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-contractslice-c-micro-delivery-plan.md) |
-| Progress | C `6/11`; current A+B+C `49/49`; final A+B+C target `54/54`; Domain `98/98` |
+| Progress | C `7/11`; current A+B+C `50/50`; final A+B+C target `54/54`; Domain `98/98` |
 | Holds | [TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) remains `Planned`; D, Scenario/status/owner, both workflow filters, runtime-efficiency activation, feature DoD, merge, release, and publication remain held |
 
 ## Frozen route
@@ -380,3 +380,15 @@ revalidating cost about three minutes, with no consistency or traceability
 loss. Local implementation plus red/green validation consumed about forty
 active minutes excluding hosted wait. Package-local hosted CI is
 `NotApplicable` by the cohort model; no intermediate push occurred.
+
+## `C-APPLICABILITY-CLOSURE-01` reviewed-local-green evidence
+
+| Evidence | Exact result |
+| --- | --- |
+| R=0008 diagnostic | Runner `42,757` / `2E4DF420...A91D1`; report `568` / `49C4341C...3FDDB`; TRX `7,001` / `908614A2...03EB8`; activation stopped at `registration-mismatch`; immutable no-success/no-retry. |
+| R=0009 diagnostic | Runner `42,757` / `2E23D833...A91D1`; report `568` / `EB5458DD...7A738`; TRX `6,322` / `BF73AA87...519C`; fixture plan omitted the repository-tree slot; immutable no-success/no-retry. |
+| R=0010 diagnostic | Runner `42,757` / `B8BA2BF2...CEE0`; report `568` / `C75A26D8...1EAF`; TRX `7,999` / `A2EB4240...590F`; admission proof component reference was not closed; immutable no-success/no-retry. |
+| R=0011 accepted | Runner `42,757` / `251A98B8...297B`, AST `6,131/46/0`; native/runner `1/0`; report `18,169` / `B6C4F18B...E9D2`; TRX `1711DFC8...133D`; exact FQN/marker/result-definition-entry/16-counter/source/lock/binary/root oracles passed once. |
+| Green | Release build `0/0`; focused `1/1`; C `7/7`; full Conformance `50/50`; Domain `98/98`; format/diff/locks green; StructureOnly `452.313s`; publication evidence `7/7` in `305.7s` with no publication claim; budget `1,052/1,400`, test `422/600`. |
+| Isolation/cost | Three fixture/reference defects were independently isolated in under four minutes each and corrected/revalidated in about `7m`, `5m`, and `4m`; first-child through final green was about `23m`, with no consistency or traceability loss. |
+| Cohort route | Package-local hosted CI is `NotApplicable`; no intermediate push. One full Applicability cohort validation, one push, and exact-head hosted green remain before Evaluation. |

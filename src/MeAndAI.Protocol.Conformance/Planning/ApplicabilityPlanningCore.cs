@@ -5,16 +5,30 @@ namespace MeAndAI.Protocol.Conformance;
 
 internal sealed class KernelPlanningSession : IPlanBoundEvidenceSession
 {
+    private readonly object _stateGate = new();
+    private readonly HashSet<ApplicabilityPlan> _closing =
+        new(ReferenceEqualityComparer.Instance);
+    private readonly HashSet<ApplicabilityPlan> _closed =
+        new(ReferenceEqualityComparer.Instance);
+
     internal KernelPlanningSession(
+        FinalizedPolicyManifest manifest,
+        IPolicyActivationProof activationProof,
         CatalogAuthorityKind authorityKind,
         ExactSha256Digest manifestDigest,
+        CatalogVersion catalogVersion,
         IEnumerable<RuleDeclaration> rules,
         CatalogSliceProducerGraph producerGraph)
     {
+        Manifest = manifest ?? throw new ArgumentNullException(nameof(manifest));
+        ActivationProof = activationProof ??
+            throw new ArgumentNullException(nameof(activationProof));
         AuthorityKind = authorityKind ??
             throw new ArgumentNullException(nameof(authorityKind));
         ManifestDigest = manifestDigest ??
             throw new ArgumentNullException(nameof(manifestDigest));
+        CatalogVersion = catalogVersion ??
+            throw new ArgumentNullException(nameof(catalogVersion));
         ArgumentNullException.ThrowIfNull(rules);
         Rules = Array.AsReadOnly(rules.ToArray());
         ProducerGraph = producerGraph ??
@@ -25,9 +39,44 @@ internal sealed class KernelPlanningSession : IPlanBoundEvidenceSession
 
     internal ExactSha256Digest ManifestDigest { get; }
 
+    internal FinalizedPolicyManifest Manifest { get; }
+
+    internal IPolicyActivationProof ActivationProof { get; }
+
+    internal CatalogVersion CatalogVersion { get; }
+
     internal IReadOnlyList<RuleDeclaration> Rules { get; }
 
     internal CatalogSliceProducerGraph ProducerGraph { get; }
+
+    internal void BeginClose(ApplicabilityPlan plan)
+    {
+        lock (_stateGate)
+        {
+            if (_closed.Contains(plan) || !_closing.Add(plan))
+            {
+                throw new CatalogIntegrityException(
+                    CatalogIntegrityCode.PlanStateInvalid);
+            }
+        }
+    }
+
+    internal void CompleteClose(ApplicabilityPlan plan)
+    {
+        lock (_stateGate)
+        {
+            _closing.Remove(plan);
+            _closed.Add(plan);
+        }
+    }
+
+    internal void AbandonClose(ApplicabilityPlan plan)
+    {
+        lock (_stateGate)
+        {
+            _closing.Remove(plan);
+        }
+    }
 }
 
 internal static class ApplicabilityPlanningCore

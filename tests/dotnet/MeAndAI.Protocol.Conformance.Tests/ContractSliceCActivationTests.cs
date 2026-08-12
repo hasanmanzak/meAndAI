@@ -164,7 +164,7 @@ public sealed class ContractSliceCActivationTests
         return new CSliceFixture(manifest, export);
     }
 
-    private static FinalizedPolicyManifest BindExportComponents(
+    internal static FinalizedPolicyManifest BindExportComponents(
         FinalizedPolicyManifest manifest,
         CompletePolicyPackExport export)
     {
@@ -195,6 +195,26 @@ public sealed class ContractSliceCActivationTests
     private static FinalizedPolicyManifest CreateManifest()
     {
         var source = ContractSliceAFullManifestGraphTests.CreateManifest();
+        var registry = ReleaseSchemaRegistry.Create(
+            source.SchemaRegistry.PayloadSchemas,
+            source.SchemaRegistry.Parsers,
+            source.SchemaRegistry.Indexes,
+            source.SchemaRegistry.DemandProjectors,
+            source.SchemaRegistry.AdmissionProofContracts.Select(contract =>
+                AdmissionProofContractDeclaration.Create(
+                    contract.ContractKey,
+                    contract.ContractVersion,
+                    contract.Kind,
+                    ComponentTypeIdentity.Create(
+                        contract.ProofComponent.ComponentKey,
+                        contract.ProofComponent.ComponentVersion,
+                        typeof(ContractSliceCActivationTests).Assembly
+                            .GetName().Name!,
+                        ReplacementType(contract.ProofComponent.ComponentKey)
+                            .FullName!),
+                    contract.Surfaces,
+                    contract.MaterialRoles)),
+            source.SchemaRegistry.CacheBudget);
         var rules = source.Slice!.Rules;
         var profile = NamedProfileDeclaration.Create(
             ProfileName,
@@ -228,8 +248,19 @@ public sealed class ContractSliceCActivationTests
             .ToArray();
         var testAssembly = typeof(ContractSliceCActivationTests)
             .Assembly.GetName().Name!;
+        var proofComponents = registry.AdmissionProofContracts.ToDictionary(
+            contract => contract.ProofComponent.ComponentKey,
+            contract => contract.ProofComponent,
+            StringComparer.Ordinal);
         var components = source.Components
             .Select(binding => ReplaceComponent(binding, testAssembly))
+            .Select(binding => proofComponents.TryGetValue(
+                    binding.Component.ComponentKey,
+                    out var proofComponent)
+                ? ComponentArtifactBinding.Create(
+                    proofComponent,
+                    binding.ArtifactFileName)
+                : binding)
             .OrderBy(
                 binding => binding.Component.ComponentKey,
                 StringComparer.Ordinal)
@@ -247,7 +278,7 @@ public sealed class ContractSliceCActivationTests
             CatalogAuthorityKind.CompleteProtocolSnapshot,
             source.SourceCommit,
             ExactSha256Digest.FromHashBytes(digestBytes),
-            source.SchemaRegistry,
+            registry,
             source.ActivationProofContract,
             artifacts,
             components,
@@ -308,9 +339,9 @@ public sealed class ContractSliceCActivationTests
     {
         "protocol.activation-proof.release-envelope" =>
             typeof(ContractSliceCActivationProof),
-        "protocol.admission-proof.failed" => typeof(FailedProofComponentMirror),
-        "protocol.admission-proof.no-input" => typeof(NoInputProofComponentMirror),
-        "protocol.admission-proof.observed" => typeof(ObservedProofComponentMirror),
+        "protocol.admission-proof.failed" => typeof(CFailedAttemptProof),
+        "protocol.admission-proof.no-input" => typeof(CNoInputRoutingProof),
+        "protocol.admission-proof.observed" => typeof(CObservedQualificationProof),
         "protocol.codec.governed-text" => typeof(GovernedTextCodecMirror),
         "protocol.codec.repository-target-resolution" =>
             typeof(RepositoryTargetCodecMirror),
@@ -508,13 +539,26 @@ internal sealed class ContractSliceCActivationProof : IPolicyActivationProof
 {
     private readonly FinalizedPolicyManifest _manifest;
     private readonly CompletePolicyPackExport _policy;
+    private readonly IReadOnlyList<IAdmissionProofCandidate> _candidates;
 
     internal ContractSliceCActivationProof(
         FinalizedPolicyManifest manifest,
-        CompletePolicyPackExport policy)
+        CompletePolicyPackExport policy,
+        IEnumerable<IAdmissionProofCandidate>? candidates = null)
     {
         _manifest = manifest;
         _policy = policy;
+        var values = candidates?.ToArray() ?? [];
+        if (values.Any(candidate => candidate is null) ||
+            values.Distinct(ReferenceEqualityComparer.Instance).Count() !=
+                values.Length)
+        {
+            throw new ArgumentException(
+                "Admission candidates must be distinct non-null references.",
+                nameof(candidates));
+        }
+
+        _candidates = Array.AsReadOnly(values);
     }
 
     public string ContractKey => _manifest.ActivationProofContract.ContractKey;
@@ -536,12 +580,10 @@ internal sealed class ContractSliceCActivationProof : IPolicyActivationProof
         return ReferenceEquals(policy, _policy);
     }
 
-    public bool Proves(IAdmissionProofCandidate candidate) => false;
+    public bool Proves(IAdmissionProofCandidate candidate) =>
+        candidate is not null &&
+        _candidates.Any(item => ReferenceEquals(item, candidate));
 }
-
-internal sealed class FailedProofComponentMirror;
-internal sealed class NoInputProofComponentMirror;
-internal sealed class ObservedProofComponentMirror;
 
 internal sealed partial class SourceTextModelMirror : IProtocolSemanticModel;
 internal sealed partial class GovernedTextCodecMirror :
@@ -603,17 +645,59 @@ internal sealed partial class FeatureTestCasesSelectorMirror : IExpectedSelector
 
 internal abstract class RuleEvaluatorMirror : IRuleEvaluator
 {
+    private readonly Func<RuleApplicabilityInput, ApplicabilityIntent> _applicability;
+
+    protected RuleEvaluatorMirror(
+        Func<RuleApplicabilityInput, ApplicabilityIntent>? applicability = null)
+    {
+        _applicability = applicability ??
+            (_ => ApplicabilityIntent.Applicable([]));
+    }
+
     public ApplicabilityIntent EvaluateApplicability(
         RuleApplicabilityInput input,
-        CancellationToken cancellationToken) => ApplicabilityIntent.Applicable([]);
+        CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        return _applicability(input);
+    }
 
     public EvaluationIntent Evaluate(
         RuleEvaluationInput input,
         CancellationToken cancellationToken) => EvaluationIntent.Create([], []);
 }
 
-internal sealed class Rule0001EvaluatorMirror : RuleEvaluatorMirror;
-internal sealed class Rule0002EvaluatorMirror : RuleEvaluatorMirror;
-internal sealed class Rule0003EvaluatorMirror : RuleEvaluatorMirror;
-internal sealed class Rule0004EvaluatorMirror : RuleEvaluatorMirror;
-internal sealed class Rule0005EvaluatorMirror : RuleEvaluatorMirror;
+internal sealed class Rule0001EvaluatorMirror : RuleEvaluatorMirror
+{
+    internal Rule0001EvaluatorMirror(
+        Func<RuleApplicabilityInput, ApplicabilityIntent>? applicability = null)
+        : base(applicability) { }
+}
+
+internal sealed class Rule0002EvaluatorMirror : RuleEvaluatorMirror
+{
+    internal Rule0002EvaluatorMirror(
+        Func<RuleApplicabilityInput, ApplicabilityIntent>? applicability = null)
+        : base(applicability) { }
+}
+
+internal sealed class Rule0003EvaluatorMirror : RuleEvaluatorMirror
+{
+    internal Rule0003EvaluatorMirror(
+        Func<RuleApplicabilityInput, ApplicabilityIntent>? applicability = null)
+        : base(applicability) { }
+}
+
+internal sealed class Rule0004EvaluatorMirror : RuleEvaluatorMirror
+{
+    internal Rule0004EvaluatorMirror(
+        Func<RuleApplicabilityInput, ApplicabilityIntent>? applicability = null)
+        : base(applicability) { }
+}
+
+internal sealed class Rule0005EvaluatorMirror : RuleEvaluatorMirror
+{
+    internal Rule0005EvaluatorMirror(
+        Func<RuleApplicabilityInput, ApplicabilityIntent>? applicability = null)
+        : base(applicability) { }
+}
