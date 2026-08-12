@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Delivery control for [SUBF-0143](README.md#subf-0143); operational labels below are not new protocol IDs |
-| Status | Historical ContractSlice A delivery is complete, merged, and exact-main hosted green; [TEST-0210](test-cases.md#test-0210) remains `Planned`. Current ContractSlice B design is owned by its separate plan; no activation/DoD. |
+| Status | Historical ContractSlice A delivery is complete/merged/exact-main green; `B-SURFACE-01` is local green at B `2/11` and A+B `34/43`, hosted pending, under the separate B plan. [TEST-0210](test-cases.md#test-0210) remains `Planned`; no activation/DoD. |
 | Parent scenario | [TEST-0210](test-cases.md#test-0210), always `ContractSlice=A` until A closes |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Canonical design | [Typed evaluation kernel design](subf-0143-typed-evaluation-kernel-design.md) |

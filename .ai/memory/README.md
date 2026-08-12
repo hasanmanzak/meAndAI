@@ -1,14 +1,16 @@
 # Project-local AI Memory
 
 Scope: **this `meAndAI` repository only**<br>
-Last reviewed: **2026-08-09**<br>
+Last reviewed: **2026-08-10**<br>
 Protocol version: **0.16.0**<br>
 Latest immutable release before this unmerged development: **0.16.0**
 
 The bounded-capacity delivery is complete through
 [FEAT-0069](../../docs/features/FEAT-0069-instruction-graph-capacity/README.md):
-the prospective `v0.17.0` schema-2 profile selects `8192` edges and `8388608`
-aggregate parsed bytes while every target through `v0.16.0` remains immutable.
+the prospective `v0.17.0` schema-2 profile selects `8192` edges, `1048576`
+bytes per parsed blob, and `8388608` aggregate parsed bytes while every target
+through `v0.16.0` remains immutable. The bounded per-blob amendment is
+exact-head hosted green; release and publication remain separate.
 Focused graph, quick-adoption profile, StructureOnly, and publication-evidence
 gates plus merged exact-main Ubuntu/Windows validation are green; canonical
 details remain in the
@@ -314,7 +316,7 @@ The lifecycle records-only freeze head is exact-hosted-green: Ubuntu passed in
 `20m44s`, Windows in `46m51s`, and publication verification was correctly
 skipped. The exact lifecycle implementation identity recorded in the canonical
 handoff passed Ubuntu in `19m36s` and Windows in `36m02s`; publication verification was
-correctly skipped. ContractSlice A is merged and exact-main hosted green. ContractSlice B is `FrozenDesign`/inactive pending its design delivery's exact-head hosted-green gate and a separate implementation directive; the parent scenario, C/D, and final activation remain held.
+correctly skipped. ContractSlice A is merged/exact-main green. All B implementation packets are exact-head hosted green; R=0005/R=0006/R=0007/R=0011/R=0012 and corrected codec-derivation R=0014 are accepted and immutable. Repository-target R=0004, admission R=0008/R=0009/R=0010, and codec-derivation R=0013 remain immutable diagnostics/no-success. B is `11/11`, cumulative A+B `43/43`; B-CONVERGE pure audit is complete locally with final-sync exact-head hosted pending. The parent scenario, C/D, and final activation remain held.
 The exact record-delivery closure reached the full `4096/4096` instruction-graph
 budget. Ubuntu passed in `19m52s`; Windows reached its exact 45-minute job
 ceiling after every emitted suite result was successful. The bounded correction

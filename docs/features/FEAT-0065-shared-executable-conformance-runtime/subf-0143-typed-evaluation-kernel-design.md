@@ -3,14 +3,14 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted; ContractSlice A merged and exact-main hosted green. ContractSlice B is `FrozenDesign`/inactive pending this design delivery's exact-head hosted-green gate and a separate implementation directive; [TEST-0210](test-cases.md#test-0210) remains `Planned`; C/D, final activation, and DoD remain held. |
+| Status | Gate 2 accepted; ContractSlice A merged/exact-main green. All B implementation packets are exact-head hosted green. Repository-target R=0004, admission R=0008/R=0009/R=0010, and codec-derivation R=0013 remain diagnostics/no-success; R=0005/R=0006/R=0007/R=0011/R=0012 and corrected codec-derivation R=0014 are accepted and immutable. B is `11/11`, cumulative A+B `43/43`; B-CONVERGE pure audit is complete locally with final-sync exact-head hosted pending. [TEST-0210](test-cases.md#test-0210) remains `Planned`; C/D, activation, and DoD remain held. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Test | [TEST-0210](test-cases.md#test-0210) |
 | Gate 3 micro-delivery routing | Historical A delivery remains owned by the [A micro-delivery control plan](subf-0143-micro-delivery-plan.md). Current B design routing is the [ContractSlice B micro-delivery plan](subf-0143-contractslice-b-micro-delivery-plan.md); packet labels refine delivery but activate no executable work. |
 | Exact-main design baseline | Accepted A merge commit [`51623f4d404a95e0f706d72805cf7ddbbbd293b8`](https://github.com/hasanmanzak/meAndAI/commit/51623f4d404a95e0f706d72805cf7ddbbbd293b8), validated by exact-main [run 31304787603](https://github.com/hasanmanzak/meAndAI/actions/runs/31304787603) |
-| Design and Gate 3 authority | Historical A directives and clarifications remain immutable evidence. The current [ContractSlice B design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5230762350) authorizes only the B micro-delivery plan, design freeze, reviews, record synchronization, commit/push, draft PR, and hosted-check correction. It authorizes no B red, test, C# implementation, or executable-surface change; C/D, final activation, merge, release, and publication remain outside that authority. |
+| Design and Gate 3 authority | Historical A directives and clarifications remain immutable evidence. All B implementation packets are immutable hosted-green predecessors; R=0006/R=0007/R=0011/R=0012 and corrected codec-derivation R=0014 are accepted, while admission R=0008/R=0009/R=0010 and codec-derivation R=0013 are immutable diagnostics/no-success. B-CONVERGE pure audit is complete locally with final-sync exact-head hosted pending. C/D, final activation, merge, release, and publication remain outside this authority. |
 | Completed predecessor | [SUBF-0153](README.md#subf-0153) / [TEST-0221](test-cases.md#test-0221), merged through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173) and exact-main validated by [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) |
 
 ## Directive and hard boundary
@@ -26,74 +26,19 @@ release binding, provider-neutral typed model, admission, cache, applicability,
 evaluator, finding, evaluation, and aggregation handoff required by the
 accepted [SUBF-0153](README.md#subf-0153) design.
 
-The current
+The historical
 [ContractSlice B design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5230762350)
-authorizes only the linked B micro-delivery plan and the normative B freeze in
-this record. It does not authorize SurfaceRed, BehaviorRed, a test/source/
-project/package/lock/workflow change, or any C# implementation. Those actions
-remain inactive until this exact design cohort is committed, pushed, exact-head
-hosted green, accepted through review, and followed by a separate maintainer
-implementation directive naming the first active packet.
+authorized only the linked B micro-delivery plan and normative B freeze. That
+predecessor authority activated no executable work. After its accepted
+exact-main delivery, later packet authority closed the surface and codec
+activation predecessors. The current ordered-B maintainer directive names the
+remaining B sequence without bypassing any packet's dependency, design,
+expected-red, review, or hosted gate.
 
-The append-only
-[BehaviorRed evidence clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139945054)
-changes only the standard-TRX evidence oracle: the failed-result message is the
-exact proof node, one run-summary adapter echo is tolerated, and assertion type
-comes from reviewed source plus the immutable xUnit lock. It changes no test,
-marker, product topology, or implementation authority. Every observation made
-before its applicable clarification remains diagnostic. The fresh post-
-synchronization same-FQN run recorded below is the canonical first A
-BehaviorRed.
-
-The later append-only
-[RunInfo clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5140224849)
-likewise changes evidence wording only. It distinguishes at most one locked-
-adapter, marker-free same-FQN `[FAIL]` bookkeeping node from an independent or
-contradictory diagnostic. The run observed before that distinction remains
-diagnostic and cannot be promoted retroactively.
-
-The 2026-08-01 append-only
-[FIND-0443](README.md#find-0443) [assertion-stack clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5150679793)
-also changes evidence wording only. It aligns the packet-level oracle with this
-design's accepted same-result, marker-free standard assertion `StackTrace` and
-requires a fresh post-synchronization 0003 invocation. The exposing run and the
-later `9a39...` run remain diagnostic: the latter satisfied the technical TRX
-shape but preceded complete repository index synchronization. A renewed full-
-record/source review and another fresh same-marker/FQN/ordinal invocation were
-required before bounded green authority.
-
-The third 0003 observation at
-`D:\Temp\meandai-test-0210-a-c96f8fa926734506b50d17637e4e2dbe\TEST-0210-A-BEHAVIOR-RED-0003.trx`,
-SHA-256 `F4190734BC91DB6879DCCC92633BBCB6DF4B9400A8CD4D47A7C6DF9030358C3A`,
-used a previously nonexistent directory that was empty immediately before its
-single invocation. With `VSTEST_CONNECTION_TIMEOUT` unset, the default
-90-second testhost connection timeout aborted before discovery. The TRX has no
-`UnitTestResult`, all 16 counters are zero, and one infrastructure
-`RunInfo outcome="Error"` names PID `211000`; it is invalid red and remains a
-third diagnostic observation under the existing environment-failure clause.
-
-This observation changes no design semantic and does not broaden the
-BehaviorRed result oracle. It amended only the packet-specific execution
-envelope after renewed record/source review: one new nonexistent-and-empty GUID
-directory, one otherwise identical exact-FQN-filtered `dotnet test` invocation,
-one TRX logger, `--no-restore`, `--no-build`, child-process
-`VSTEST_CONNECTION_TIMEOUT=300`, and an exact 420-second outer timeout. Neither
-timeout could be raised automatically and no automatic retry was permitted. A
-second infrastructure failure would have blocked the packet rather than
-changing the oracle or source.
-
-That one bounded replacement invocation produced canonical 0003 R at
-`D:\Temp\meandai-test-0210-a-96ff2a5352c141f78f8bebbfc0f957f0\TEST-0210-A-BEHAVIOR-RED-0003.trx`,
-SHA-256 `4B7B8398362E23B9364BBB7C11C4A538BA984B3474A52F2D95567CB340545FDE`.
-Its sole exact-FQN result is Failed with the exact marker message, one permitted
-nonempty marker-free standard assertion stack, one permitted byte-identical
-echo, and one exact marker-free same-FQN `[FAIL]` RunInfo. The Failed summary
-has all 16 exact counters: `total=1`, `executed=1`, and `failed=1`, with every
-other counter zero. No attachment or independent diagnostic exists. The parent
-`VSTEST_CONNECTION_TIMEOUT` remained unset after the child completed. This R
-changes neither the reviewed source nor the existing BehaviorRed oracle; all
-three earlier observations remain diagnostic. The bounded green below now
-establishes packet-local `ReviewedLocalGreen`.
+Historical A message/echo, RunInfo, assertion-stack, bounded-timeout
+diagnostics, and the accepted 0003 red remain owned by their packet evidence
+ledgers. They add no current B authority; the bounded-green record below keeps
+only the retained outcome needed by this design.
 
 ### `A-SCHEMA-SLOT-01` bounded-green evidence
 
@@ -1227,92 +1172,12 @@ Conformance are `32/32`, Domain is `98/98`, production remains `0`, and fresh
 code/test plus evidence/scope reviews each closed `0/0/0`. At that packet
 checkpoint, progress was `19/20` (`95%`); any future production need still reopens D/RT.
 
-### Exact-head hosted-green `A-COMPLETE-PROFILE-01` closure
+### Historical `A-COMPLETE-PROFILE-01` closure
 
-The A-COMPLETE design-only predecessor builds on the recorded A-FULL delivery
-and is exact hosted-green through run `30844428072`. Gate 3 is
-active. Its corrected exact Fact/FQN is
-`MeAndAI.Protocol.Conformance.Tests.ContractSliceACompleteCatalogProfileTests.Enforces_exact_provider_profile_genesis_catalog_inventory_digest_and_added_transitions`,
-with expected-red marker/TRX stem `TEST-0210-A-BEHAVIOR-RED-0013`, one Fact,
-only `ContractSlice=A`, and no Scenario.
-
-The discovered marker `0012` / exact FQN
-`MeAndAI.Protocol.Conformance.Tests.ContractSliceACompleteCatalogProfileTests.Enforces_exact_genesis_catalog_inventory_digest_profile_and_added_transitions`
-used `Repository + Provider` profile surfaces.
-That contradicts the frozen Provider-only axis because surface intersection
-would resolve all five rules while the fixture lists only `RULE-0003` through
-`RULE-0005`. Its TRX SHA-256
-`950F15AA946EF42E1549EF7C356E6EDF7E5F1227285FA0A39511C51E43B4CB62`
-and source SHA-256
-`2129E819F0313FE4C9AF09613B16C2F7772EACB60DEBCA21C6DDE550CFA00701`
-are retained only as an invalid diagnostic attempt. The identity is never
-retried or promoted. Green stopped, its partial mutation was removed, and the
-packet returned to D/RT. The corrected source uses only `Provider`. Renewed
-D/RT and source review closed `0/0/0`; Release build passed with zero
-warnings/errors. Its single accepted canonical R is
-`D:\Temp\meandai-test-0210-a-3f6e8a12c4b7490db2561e978a34f0cd\TEST-0210-A-BEHAVIOR-RED-0013.trx`,
-SHA-256 `34CD24791964B8602240E3B1CA31CC570E18ABA911A5E9343C4018402C724C7C`,
-with source SHA-256
-`7239A20F27B488B750E0AE29CF2B50DAA162EF283F8CFBF05736C19DEF474644`.
-The independent oracle audit closed `0/0/0`; R is never rerun. Bounded
-implementation subsequently became packet-local `ReviewedLocalGreen` without
-rerunning R.
-
-P changes only internal compile seams. `ParsedCanonicalManifest` carries
-nullable `Slice` plus optional trailing nullable `CompleteCatalog`; the parsed
-Writer guard checks `slice is null || manifest.CompleteCatalog is not null`
-before any dereference and retains the current exact qualification-only
-`InvalidOperationException` message. The A-FULL fixture factory becomes
-internal. Public API, friend grants, complete serialization, parsing, and
-runtime behavior remain unchanged in P.
-
-Canonical R builds every factory value outside the guard, derives its graph from
-the A-FULL fixture, and replaces only the authority/union with exact
-`CompleteProtocolSnapshot`, `Slice=null`, and a valid genesis
-`CompleteCatalog`. It then invokes only the parsed Writer. Reader and Finalized
-projection do not enter R; only the frozen exception type/message may emit the
-single marker.
-
-Green adds the complete branch without weakening the exact-one union. The root
-encodes exactly one of `slice` or `completeCatalog`; shared rules still feed the
-existing schema/slot/component closure. The complete body has ordered
-`predecessor`, `completeInventoryDigest`, `baselineProfileName`, `rules`,
-`transitions`, and `namedProfiles`. The Reader reconstructs the same declaration,
-compares the serialized inventory digest to the independently derived digest,
-and `FinalizedPolicyManifest` retains the selected union arm. Writer -> Reader
--> Writer bytes and manifest digest must be identical.
-
-This packet admits only Genesis catalog version `1` at protocol `0.17.0`, the
-five current revision-1 rules, and one Added transition per rule with the exact
-ContractSlice A Gate 3 directive authority already frozen earlier in this
-record.
-The inventory frame is exactly `104` bytes and hashes to
-`c013e4b9937f225163f58e41b893600b87d88faf6340678a79242041443f8af3`.
-The sole baseline/named profile
-`protocol.profile.consumer-provider-exact-commit-conformance-audit` has axes
-Consumer, Conformance, ExactCommit, Provider, and Audit; exact compatibility is
-role/operation/snapshot equality plus surface intersection, ignores enforcement
-phase, and resolves only `RULE-0003`, `RULE-0004`, and `RULE-0005`.
-
-The retained negative boundary is both/neither union arms, inventory digest
-inequality, compatible profile omission/addition, and missing/extra/non-Added
-transition rows. Existing predecessor wire serialization/parsing and its
-version/digest semantics, other transition kinds,
-cross-version lifecycle, exhaustive malformed-wire coverage, resource bounds,
-kernel/export/registration, final activation, and B/C/D remain later. Source is
-limited to Reader, Writer, Finalized manifest, `CompleteCatalogDeclaration`, the
-new test, and the A-FULL helper visibility seam. Hard caps are `430` production,
-`240` test, and `680` combined, with mandatory redesign at `700`. Expected green
-is focused `1/1`, cumulative/Conformance `28/28`, and Domain `98/98`. Release
-build is `0/0`, format/diff are green, production is `+283/-37`, test is
-`+162/-1`, and combined additions are `445`. The initial code review's
-Existing-predecessor finding was corrected without adding Existing semantics;
-renewed code and evidence reviews closed `0/0/0`. Progress remains `15/20`
-(`75%`). Exact-head hosted validation is green at the implementation identity
-recorded in the canonical owning finding; Windows
-passed in `44m13s`, Ubuntu in `11m50s`, and publication verification was
-correctly skipped. This closes only A-COMPLETE packet evidence; no full-A
-completion, final activation, B/C/D, or DoD is claimed.
+The corrected A complete-profile directive, its invalid diagnostic, single
+canonical red, bounded C# green, reviews, and exact-head hosted evidence remain
+immutable in the owning historical ledger. It closed only that completed A
+packet and granted no later-slice authority.
 
 That corrected directive still does **not** authorize:
 
@@ -1350,18 +1215,30 @@ will be exactly `11` direct Facts with only `ContractSlice=B`, no `Scenario`,
 and ordinal LF-terminated FQN digest
 `FAA35F542B1C88DFD228920CB437A9F38C220591726F1ACCA3D756603DAD62AB`.
 
+Public export-total ownership advances with the active slice. The retained A
+PublicApi Fact preserves its exact FQN, direct Fact/trait, and A-owned
+type/member/friend/negative-surface snapshot, but proves those 48 exports by
+exact containment rather than claiming that the growing assemblies contain no
+later-slice exports. The B PublicApi Fact is the sole exact cumulative-total
+owner at `72`. C and D must repeat the same predecessor-containment/current-
+total transition; no retained predecessor Fact may become stale when a later
+public surface is added.
+
 B owns codec activation, the three persistent protocol wires, Tests-only
 private proof admission, the decode/model cache, codec-local four-counter
 resource accounting, sealed ContextProof/Root shapes, and codec-derived
 reference narrowing. It does not own parser/index/projector/selector or
 provider-neutral capability semantics, shared-root ledgers, staged planning,
 kernel evaluation, real Policy export, the initial real-rule set, Scenario
-activation, workflow filters, or runtime-efficiency changes. The design phase
-has P/R/G `NotApplicable`, an
-empty executable allowlist, and no B implementation authority. Global B
-activation remains forbidden until this design delivery is reviewed, committed,
-pushed, exact-head hosted green, accepted, and followed by a separate
-maintainer implementation directive.
+activation, workflow filters, or runtime-efficiency changes. The original B
+design phase had P/R/G `NotApplicable` and an empty executable allowlist.
+Surface, codec activation, all three wires, B-RESOURCE, B-CACHE, B-ADMISSION,
+and B-SEALED-CONTEXT are now immutable hosted-green history. Admission R=0008,
+R=0009, R=0010, and codec-derivation R=0013 are immutable diagnostics/no-success;
+R=0011, sealed-context R=0012, and corrected codec-derivation R=0014 are
+accepted/immutable and their implementation packets are exact-head hosted
+green. B-CONVERGE is complete locally with final-sync hosted pending; no later
+packet is active.
 
 ## Gate 2 outcome
 
@@ -4336,7 +4213,740 @@ artifact/component preconditions without constructing an executable export or
 calling an activation-proof overload. ContractSlice B
 introduces only the final internal model-token plus codec-registration/visitor
 subset needed by its test mirror; it does not yet add an export registration
-list or six-list export factory. Its complete Tests-only causal surface is:
+list or six-list export factory.
+
+`B-CODEC-ACTIVATION-01` stages only the identity-bearing prefix of that final
+subset. `ICanonicalPayloadCodec<TModel>` is initially a constrained, memberless
+internal interface so one object-identical component owns the future paired
+writer and qualifier without introducing their successor-owned inputs, intents,
+or resource meter early. Later packets may only add the exact final `Write`,
+`Qualify`, and meter members already frozen above; they may not replace this
+identity, add a direction-specific registration, or introduce an adapter.
+
+`B-WIRE-REPOSITORY-TREE-01` deliberately keeps that generic interface
+memberless. [TEST-0210](test-cases.md#test-0210) extends the already registered
+Tests-owned `RepositoryTreeCodecMirror` and `RepositoryTreeModelMirror` as the
+same partial identities, adding one closed `WriteRepositoryTree` /
+`QualifyRepositoryTree` mirror core and closed Written/Rejected plus
+Qualified/Rejected leaves in the repository-tree Fact file. This is
+qualification-fixture staging, not a second codec architecture: no alternate
+interface, adapter, static encoder, service lookup, public or production type is
+introduced. After all three wire cores and the later resource carriers exist,
+the final generic methods may delegate on these same mirror objects. Real
+manifest-bound Policy implementations remain ContractSlice D work.
+
+The packet-local signatures are exact:
+
+```csharp
+internal sealed class RepositoryTreePayloadEntryMirror
+{
+    internal string RepositoryRelativePath { get; }
+    internal RepositoryEntryKind Kind { get; }
+    internal static RepositoryTreePayloadEntryMirror Create(
+        string repositoryRelativePath,
+        RepositoryEntryKind kind);
+}
+
+internal sealed partial class RepositoryTreeModelMirror
+{
+    internal EvidenceScope Scope { get; }
+    internal SnapshotEvidenceLocation Location { get; }
+    internal IReadOnlyList<RepositoryTreePayloadEntryMirror> Entries { get; }
+    internal static RepositoryTreeModelMirror Create(
+        EvidenceScope scope,
+        SnapshotEvidenceLocation location,
+        IEnumerable<RepositoryTreePayloadEntryMirror> entries);
+}
+
+internal abstract class RepositoryTreeWriteMirrorResult
+{
+    private RepositoryTreeWriteMirrorResult();
+    internal static RepositoryTreeWriteMirrorResult Written(
+        CanonicalEvidencePayload payload);
+    internal static RepositoryTreeWriteMirrorResult Rejected(
+        string failureCode);
+    internal abstract TResult Accept<TResult>(
+        IRepositoryTreeWriteMirrorResultVisitor<TResult> visitor);
+}
+
+internal interface IRepositoryTreeWriteMirrorResultVisitor<TResult>
+{
+    TResult VisitWritten(CanonicalEvidencePayload payload);
+    TResult VisitRejected(string failureCode);
+}
+
+internal abstract class RepositoryTreeQualificationMirrorResult
+{
+    private RepositoryTreeQualificationMirrorResult();
+    internal static RepositoryTreeQualificationMirrorResult Qualified(
+        RepositoryTreeModelMirror model);
+    internal static RepositoryTreeQualificationMirrorResult Rejected(
+        string failureCode);
+    internal abstract TResult Accept<TResult>(
+        IRepositoryTreeQualificationMirrorResultVisitor<TResult> visitor);
+}
+
+internal interface IRepositoryTreeQualificationMirrorResultVisitor<TResult>
+{
+    TResult VisitQualified(RepositoryTreeModelMirror model);
+    TResult VisitRejected(string failureCode);
+}
+
+internal sealed partial class RepositoryTreeCodecMirror
+{
+    internal RepositoryTreeWriteMirrorResult WriteRepositoryTree(
+        EvidenceScope scope,
+        SnapshotEvidenceLocation location,
+        IReadOnlyList<RepositoryTreePayloadEntryMirror> entries,
+        CancellationToken cancellationToken);
+    internal RepositoryTreeQualificationMirrorResult QualifyRepositoryTree(
+        EvidenceBinding binding,
+        CancellationToken cancellationToken);
+}
+```
+
+Written carries one `CanonicalEvidencePayload`; Qualified carries one
+`RepositoryTreeModelMirror` retaining the decoded scope, Snapshot location, and
+ordinal immutable entry copy. Each Rejected leaf carries exactly one declared
+codec failure code. Null arguments remain argument failures and cancellation is
+out of band; neither is a semantic rejection. Each abstract result has exactly
+two private nested sealed leaves, named `WrittenCase`/`RejectedCase` and
+`QualifiedCase`/`RejectedCase`; callers observe them only through `Accept`.
+Every factory materializes once and retains a defensive read-only copy. Writer
+input is never sorted: it must already be unique and strictly increasing by
+`StringComparer.Ordinal`; a duplicate or out-of-order row is rejected.
+`RepositoryTreePayloadEntryMirror.Create` rejects only null path/kind and
+otherwise preserves the supplied path text byte-for-byte so the writer remains
+the sole path-grammar owner. `RepositoryTreeModelMirror.Create` rejects null
+scope/location/entries and null entry elements, requires the Snapshot
+location's scope to equal the supplied scope, then stores one defensive copy;
+the qualifier calls it only after the complete wire has passed every oracle.
+A null writer-list element throws `ArgumentException` with `ParamName=entries`
+before semantic row validation. A structurally valid writer `scope` unequal to
+`location.Scope` returns Rejected with
+`protocol.codec.embedded-identity-mismatch`.
+
+The repository-tree core implements the exact persistent frame below, the
+`257`-byte golden SHA-256
+`C5A8CB268E42C8A8C532A42C86ECDB0200B4C75186364B6399AD1AE5A40AE97F`,
+and the `197`-byte empty-tree SHA-256
+`BD2C4A254E295AE63E3EC7B610B7A6E88FC345E5D4DBD99C9AFFB61397E98676`.
+The canonical semantic fixture is:
+
+| Field | Exact value |
+| --- | --- |
+| Target subject / source / surface | `repo` / `git` / `repository` |
+| Target snapshot / identity | `exact-commit` / fixture commit: `0123456789abcdef0123456789abcdef01234567` |
+| Boundary snapshot / identity | `exact-commit` / fixture commit: `0123456789abcdef0123456789abcdef01234567` |
+| Started / completed UTC ticks | `0` / `1` |
+| Location | Snapshot, rank `3`, reusing the exact scope |
+| Entry 1 | `AGENTS.md` / File / kind byte `1` |
+| Entry 2 | `docs` / Directory / kind byte `0` |
+| Entry 3 | `links/latest` / SymbolicLink / kind byte `2` |
+| Entry 4 | `vendor/protocol` / GitLink / kind byte `3` |
+
+The four-entry canonical Base64 is
+`cHJvdG9jb2wucmVwb3NpdG9yeS10cmVlLzEKAAAABHJlcG8AAAADZ2l0AAAACnJlcG9zaXRvcnkAAAAMZXhhY3QtY29tbWl0AAAAKDAxMjM0NTY3ODlhYmNkZWYwMTIzNDU2Nzg5YWJjZGVmMDEyMzQ1NjcAAAAMZXhhY3QtY29tbWl0AAAAKDAxMjM0NTY3ODlhYmNkZWYwMTIzNDU2Nzg5YWJjZGVmMDEyMzQ1NjcAAAAAAAAAAAAAAAAAAAABAwAAAAQAAAAJQUdFTlRTLm1kAQAAAARkb2NzAAAAAAxsaW5rcy9sYXRlc3QCAAAAD3ZlbmRvci9wcm90b2NvbAM=`.
+The empty-tree Base64 uses the same fixture and is
+`cHJvdG9jb2wucmVwb3NpdG9yeS10cmVlLzEKAAAABHJlcG8AAAADZ2l0AAAACnJlcG9zaXRvcnkAAAAMZXhhY3QtY29tbWl0AAAAKDAxMjM0NTY3ODlhYmNkZWYwMTIzNDU2Nzg5YWJjZGVmMDEyMzQ1NjcAAAAMZXhhY3QtY29tbWl0AAAAKDAxMjM0NTY3ODlhYmNkZWYwMTIzNDU2Nzg5YWJjZGVmMDEyMzQ1NjcAAAAAAAAAAAAAAAAAAAABAwAAAAA=`.
+
+It permits at most `200,000` entries, `16,777,216` aggregate strict-UTF-8 path
+bytes before retention, and `16,777,216` payload bytes. Count equality is
+reachable with `e000000` through `e199999` File rows and must succeed; adding
+`e200000` rejects before encoding. Payload equality is reachable with exactly
+`4,091` ordinal `p000000/`-style File rows: the first `4,090` paths are padded
+to `4,096` UTF-8 bytes and the last to `3,924`, making the `197`-byte empty
+frame plus five framing bytes per row exactly `16,777,216`; extending the last
+path by one byte rejects. Aggregate path-byte equality is algebraically
+dominated because its nonzero framing makes the payload exceed its ceiling: it
+passes the path counter then rejects on payload size; path first-one-over stops
+before framing or retention. These are wire-local fail-closed bounds;
+four-counter ledger equality, dominated, and unreachable accounting remain
+wholly owned by `B-RESOURCE-01`.
+
+Failure precedence is exact: hard size/count first-one-over is
+`protocol.codec.resource-limit-exceeded`; a known non-Repository surface or
+non-Snapshot location is `protocol.codec.payload-location-mismatch`; a valid
+embedded identity unequal to the enclosing binding is
+`protocol.codec.embedded-identity-mismatch`; and malformed header/rank/kind,
+UTF-8, length/count, EOF, trailing bytes, path grammar, duplication, or ordering
+is `protocol.codec.invalid-repository-tree`. The executable allowlist is only
+the retained activation test's partial-identity edit plus the new repository-
+tree test/core file, with no production delta and a `1,200` normalized-line hard
+cap. Canonical R is the exact FQN/marker/one-shot TRX route owned by the B plan
+and current memory handoff; it cannot execute before the synchronized design
+head is hosted green.
+
+The mandatory malformed matrix is exact: wrong or mutated ASCII header;
+BOM/invalid/overlong/surrogate UTF-8; premature EOF at every primitive;
+declared text length or entry count overflow/mismatch; trailing byte; unknown
+surface, location rank, or kind byte `4`; structurally valid known-but-
+disallowed surface/location; structurally valid embedded scope/location unequal
+to the enclosing binding; and empty, leading-slash, trailing-slash, backslash,
+empty-segment, dot-segment, dot-dot-segment, drive-form, duplicate, and non-
+ordinal paths. Writer tests construct invalid path text through the permissive
+entry carrier and exercise count/path/payload first-one-over in that order;
+unknown kind and malformed primitive cases are qualifier-only byte mutations.
+Schema key/version mismatch belongs to invalid-repository-tree before any
+embedded identity comparison. Count equality and payload equality are green as
+specified above; aggregate path-byte equality is the declared dominated
+resource rejection, while its first-one-over rejects before framing/retention.
+
+Writer order is: null arguments, cancellation, known source surface/location,
+source scope/location equality, one-time entry materialization and count,
+per-row path/kind/order plus aggregate path bytes, computed payload size, then
+encoding. Qualifier order is: null argument, cancellation, payload byte ceiling,
+exact schema key/version, strict grammar and primitive bounds, entry count,
+known embedded surface/location, row grammar/order/kind/path bytes, trailing-
+byte closure, enclosing binding surface/location, then embedded-versus-
+enclosing identity equality. Schema metadata mismatch, an unknown surface/rank,
+or any construction failure in the decoded scope is invalid-repository-tree;
+known-but-disallowed surface/rank is payload-location-mismatch. Only a fully
+parsed valid embedded identity can reach embedded-identity-mismatch.
+
+### Immutable hosted-green `B-WIRE-GOVERNED-TEXT-01` staging contract
+
+The repository-tree implementation is immutable exact-head hosted-green
+predecessor evidence. Governed text reuses the same Tests-owned same-object
+mirror topology: only `GovernedTextModelMirror` and `GovernedTextCodecMirror`
+become `partial`, and the new governed-text test file adds the following
+packet-local core. The memberless generic codec interface remains unchanged;
+there is no production codec, adapter, second encoder, resource meter, cache,
+admission path, project, package, lock, workflow, friend, or public API delta.
+
+```csharp
+internal sealed partial class GovernedTextModelMirror
+{
+    internal EvidenceScope Scope { get; }
+    internal EvidenceLocation Location { get; }
+    internal ReadOnlyMemory<byte> Body { get; }
+    internal static GovernedTextModelMirror Create(
+        EvidenceScope scope,
+        EvidenceLocation location,
+        ReadOnlyMemory<byte> body);
+}
+
+internal abstract class GovernedTextWriteMirrorResult
+{
+    private GovernedTextWriteMirrorResult();
+    internal static GovernedTextWriteMirrorResult Written(
+        CanonicalEvidencePayload payload);
+    internal static GovernedTextWriteMirrorResult Rejected(
+        string failureCode);
+    internal abstract TResult Accept<TResult>(
+        IGovernedTextWriteMirrorResultVisitor<TResult> visitor);
+}
+
+internal interface IGovernedTextWriteMirrorResultVisitor<TResult>
+{
+    TResult VisitWritten(CanonicalEvidencePayload payload);
+    TResult VisitRejected(string failureCode);
+}
+
+internal abstract class GovernedTextQualificationMirrorResult
+{
+    private GovernedTextQualificationMirrorResult();
+    internal static GovernedTextQualificationMirrorResult Qualified(
+        GovernedTextModelMirror model);
+    internal static GovernedTextQualificationMirrorResult Rejected(
+        string failureCode);
+    internal abstract TResult Accept<TResult>(
+        IGovernedTextQualificationMirrorResultVisitor<TResult> visitor);
+}
+
+internal interface IGovernedTextQualificationMirrorResultVisitor<TResult>
+{
+    TResult VisitQualified(GovernedTextModelMirror model);
+    TResult VisitRejected(string failureCode);
+}
+
+internal sealed partial class GovernedTextCodecMirror
+{
+    internal GovernedTextWriteMirrorResult WriteGovernedText(
+        EvidenceScope scope,
+        EvidenceLocation location,
+        ReadOnlyMemory<byte> body,
+        CancellationToken cancellationToken);
+    internal GovernedTextQualificationMirrorResult QualifyGovernedText(
+        EvidenceBinding binding,
+        CancellationToken cancellationToken);
+}
+```
+
+Written carries exactly one `CanonicalEvidencePayload`; Qualified carries one
+`GovernedTextModelMirror` retaining the decoded scope, exact Repository or
+Provider location, and one defensive body-byte copy. Rejected carries exactly
+one declared codec failure code. The result types have only private nested
+`WrittenCase`/`RejectedCase` and `QualifiedCase`/`RejectedCase` leaves and are
+observable only through their visitors. Null scope/location/binding arguments
+remain argument failures; cancellation is checked before semantic work and is
+out of band. `ReadOnlyMemory<byte>` is copied once before retention, and later
+source-array mutation cannot alter the payload or qualified model.
+`GovernedTextModelMirror.Create` rejects null scope/location, requires exact
+`scope.Equals(location.Scope)`, copies body bytes once, and is called by the
+qualifier only after every wire oracle passes.
+
+The exact Repository fixture is:
+
+| Field | Exact value |
+| --- | --- |
+| Target subject / source / surface | `repo` / `git` / `repository` |
+| Target snapshot / identity | `exact-commit` / fixture commit: `0123456789abcdef0123456789abcdef01234567` |
+| Boundary snapshot / identity | `exact-commit` / the same 40-hex identity |
+| Started / completed UTC ticks | `0` / `1` |
+| Location | Repository rank `0`; path `docs/body.text`; blob identity the same 40-hex value; line/anchor/property null |
+| Body | exact UTF-8 bytes for `alpha\nβ\n`: `61 6C 70 68 61 0A CE B2 0A` |
+
+Its canonical payload is `270` bytes with SHA-256
+`93261D439E5D04624BC1F832077CEB9BBD2CA7B83B1CF7EEE0EA679553CECDAA`:
+
+```text
+cHJvdG9jb2wuZ292ZXJuZWQtdGV4dC8xCgAAAARyZXBvAAAAA2dpdAAAAApyZXBvc2l0b3J5AAAADGV4YWN0LWNvbW1pdAAAACgwMTIzNDU2Nzg5YWJjZGVmMDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3AAAADGV4YWN0LWNvbW1pdAAAACgwMTIzNDU2Nzg5YWJjZGVmMDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3AAAAAAAAAAAAAAAAAAAAAQAAAAAOZG9jcy9ib2R5LnRleHQBAAAAKDAxMjM0NTY3ODlhYmNkZWYwMTIzNDU2Nzg5YWJjZGVmMDEyMzQ1NjcAAAAAAAAJYWxwaGEKzrIK
+```
+
+The same Repository fixture with an empty body is valid, exactly `261` bytes,
+and has SHA-256
+`89DD683B71FD99D048642D63412F66E8CA358C36F32491337F86EC8E7810452F`:
+
+```text
+cHJvdG9jb2wuZ292ZXJuZWQtdGV4dC8xCgAAAARyZXBvAAAAA2dpdAAAAApyZXBvc2l0b3J5AAAADGV4YWN0LWNvbW1pdAAAACgwMTIzNDU2Nzg5YWJjZGVmMDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3AAAADGV4YWN0LWNvbW1pdAAAACgwMTIzNDU2Nzg5YWJjZGVmMDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3AAAAAAAAAAAAAAAAAAAAAQAAAAAOZG9jcy9ib2R5LnRleHQBAAAAKDAxMjM0NTY3ODlhYmNkZWYwMTIzNDU2Nzg5YWJjZGVmMDEyMzQ1NjcAAAAAAAAA
+```
+
+The exact Provider fixture is:
+
+| Field | Exact value |
+| --- | --- |
+| Target subject / source / surface | `provider` / `github` / `provider` |
+| Target snapshot / identity | `provider-event` / `event-42` |
+| Boundary snapshot / identity | `provider-event` / `0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef` |
+| Started / completed UTC ticks | `0` / `1` |
+| Location | Provider rank `1`; service `github`; object type `provider.issue`; stable object `object42`; version `version-7`; field `body`; line/fragment null |
+| Body | exact ASCII bytes for `provider body\n` |
+
+Its canonical payload is `274` bytes with SHA-256
+`D75DBDC44A92B21AADF730B6E5D65A992E74C8847F613DC7D378CA1F6B104F5E`:
+
+```text
+cHJvdG9jb2wuZ292ZXJuZWQtdGV4dC8xCgAAAAhwcm92aWRlcgAAAAZnaXRodWIAAAAIcHJvdmlkZXIAAAAOcHJvdmlkZXItZXZlbnQAAAAIZXZlbnQtNDIAAAAOcHJvdmlkZXItZXZlbnQAAABAMDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWYwMTIzNDU2Nzg5YWJjZGVmMDEyMzQ1Njc4OWFiY2RlZgAAAAAAAAAAAAAAAAAAAAEBAAAABmdpdGh1YgAAAA5wcm92aWRlci5pc3N1ZQAAAAhvYmplY3Q0MgAAAAl2ZXJzaW9uLTcBAAAABGJvZHkAAAAAAA5wcm92aWRlciBib2R5Cg==
+```
+
+The source-body and complete-payload ceilings are independently
+`4,194,304` bytes. Repository payload equality is reachable with the exact
+`261`-byte empty frame plus `4,194,043` ASCII `x` body bytes and must succeed;
+one more body byte rejects as `protocol.codec.resource-limit-exceeded`.
+Source-body equality at `4,194,304` passes the pre-copy body counter but is
+algebraically dominated by nonzero framing and therefore rejects on complete
+payload size. Body first-one-over rejects before UTF-8 inspection, copying, or
+framing. These are wire-local checks only; multi-binding retention and the
+four-counter ledger remain owned by later packets.
+
+Writer precedence is exact: null arguments, cancellation, source-body first-
+one-over, known Repository/Provider location leaf and tail matrix, supplied
+scope versus `location.Scope` equality, UTF-8/BOM validation, computed payload
+size, one defensive copy, then encoding. Qualifier precedence is null argument,
+cancellation, canonical-payload byte ceiling, exact schema key/version, strict
+header/primitive/optional framing, embedded scope and location construction,
+body UTF-8/BOM validation, trailing-byte closure, known embedded and enclosing
+Repository/Provider matrix, then embedded-versus-enclosing identity equality.
+
+Any malformed UTF-8 sequence in a scope/location text or body is
+`protocol.codec.invalid-utf8`. A leading UTF-8 BOM anywhere, wrong header,
+schema key/version mismatch, premature EOF, declared length mismatch/overflow,
+invalid optional flag, invalid known-leaf field grammar, unknown surface,
+snapshot, or rank, or a trailing byte is
+`protocol.codec.noncanonical-encoding`. A structurally valid Repository leaf
+with non-null line/anchor/property, a structurally valid Provider leaf with
+null field or non-null line/fragment, Workflow surface, or ReleaseAsset/
+Snapshot rank is `protocol.codec.payload-location-mismatch`. Only a fully valid
+allowed Repository or Provider embedded scope/location unequal to the supplied
+writer scope or enclosing binding may return
+`protocol.codec.embedded-identity-mismatch`. These outcomes are mutually
+exclusive; writer and qualifier tests cover both allowed leaves, every tail
+condition, every primitive EOF, BOM and invalid/overlong/surrogate UTF-8,
+optional flags `0/1/2`, schema/header mutation, declared body mismatch,
+trailing bytes, size equality/first-one-over, defensive copying, empty body,
+and byte-exact round trips without newline or Unicode normalization.
+
+The executable allowlist is exactly a partial-identity-only modification to
+`ContractSliceBActivationTests.cs` plus one new
+`ContractSliceBGovernedTextCodecTests.cs`; production, public surface, project,
+package, lock, workflow, Policy, resource, cache, admission, and later-wire
+surfaces are immutable. The normalized two-test-file delta is at most `1,200`;
+`1,201` or more requires renewed design review. The test is one direct,
+non-skipped Fact at
+`MeAndAI.Protocol.Conformance.Tests.ContractSliceBGovernedTextCodecTests.Round_trips_exact_governed_text_wire`,
+with exactly one `ContractSlice=B` trait, no Scenario/Theory/class trait or
+overload, and marker `TEST-0210-B-BEHAVIOR-RED-0003`. Its red temporarily makes
+only the fully prepared valid Repository `WriteGovernedText` semantic return
+`null!`; only that null may call direct `Assert.Fail(marker)`. Every setup,
+exception, wrong non-null result, negative, and qualifier assertion is marker-
+free. Green is focused `1/1`, cumulative B `5/5`, and cumulative A+B/full
+Conformance `37/37`, while Domain remains `98/98`.
+
+Canonical R uses one fresh external CreateNew runner matching
+`D:\Temp\meandai-test-0210-b-governed-text-r0003-runner-<32-lowercase-hex-guid>.ps1`,
+fresh report/log siblings, and a different fresh result root. It inherits the
+repository-tree runner's exact source/Git/lock/build/DLL/PDB/hash, `8,388,608`-
+byte complete-log, `1,048,576`-byte report, process-scoped
+`VSTEST_CONNECTION_TIMEOUT=300`, `420000`-ms monotonic, secure-TRX, atomic
+`InvocationCommitted`, and immutable no-retry contracts, specialized to these
+two source files, the `1,200`-line ceiling, marker/FQN, and this exact command:
+
+```text
+dotnet test tests/dotnet/MeAndAI.Protocol.Conformance.Tests/MeAndAI.Protocol.Conformance.Tests.csproj --configuration Release --no-restore --no-build --nologo --verbosity minimal --results-directory "<fresh-root>" --logger "trx;LogFileName=TEST-0210-B-BEHAVIOR-RED-0003.trx" --filter "ContractSlice=B&FullyQualifiedName=MeAndAI.Protocol.Conformance.Tests.ContractSliceBGovernedTextCodecTests.Round_trips_exact_governed_text_wire"
+```
+
+No runner may be materialized and no canonical red may start until the exact
+commit containing this twelve-record freeze is pushed and exact-head hosted
+green. The accepted repository-tree red is immutable and is never rerun.
+
+### Frozen-design `B-WIRE-REPOSITORY-TARGET-01` staging contract
+
+The governed-text implementation is immutable exact-head hosted-green
+predecessor evidence. Repository-target reuses the same Tests-owned,
+same-object topology: only the retained `RepositoryTargetModelMirror` and
+`RepositoryTargetCodecMirror` declarations become `partial`, and one new test
+file supplies the packet-local core below. The memberless generic codec
+interface remains unchanged. No production codec, adapter, alternate encoder,
+resource meter, cache, admission path, index/capability semantics, project,
+package, lock, workflow, friend, or public API is activated.
+
+```csharp
+internal sealed partial class RepositoryTargetModelMirror
+{
+    internal EvidenceScope Scope { get; }
+    internal SnapshotEvidenceLocation Location { get; }
+    internal ExactSha256Digest DemandDigest { get; }
+    internal IReadOnlyList<RepositoryTargetResolutionDemandItem> DemandItems { get; }
+    internal IReadOnlyList<RepositoryTargetRowMirror> Rows { get; }
+    internal IReadOnlyList<RepositoryTargetContentMirror> Contents { get; }
+    internal static RepositoryTargetModelMirror Create(
+        EvidenceScope scope,
+        SnapshotEvidenceLocation location,
+        ExactSha256Digest demandDigest,
+        IEnumerable<RepositoryTargetResolutionDemandItem> demandItems,
+        IEnumerable<RepositoryTargetRowMirror> rows,
+        IEnumerable<RepositoryTargetContentMirror> contents);
+}
+
+internal abstract class RepositoryTargetContentMirror
+{
+    private RepositoryTargetContentMirror();
+    internal static RepositoryTargetContentMirror CommitObject(
+        string owningRepositoryIdentity,
+        string commitObjectId,
+        string normalizedRepositoryRelativePath,
+        string observedBlobObjectId,
+        ReadOnlyMemory<byte> bytes);
+    internal static RepositoryTargetContentMirror CapturedSnapshotPath(
+        string owningRepositoryIdentity,
+        string capturedSnapshotIdentity,
+        string normalizedRepositoryRelativePath,
+        string observedContentIdentity,
+        ReadOnlyMemory<byte> bytes);
+    internal abstract TResult Accept<TResult>(
+        IRepositoryTargetContentMirrorVisitor<TResult> visitor);
+}
+
+internal interface IRepositoryTargetContentMirrorVisitor<TResult>
+{
+    TResult VisitCommitObject(
+        string owner, string commit, string path, string blob,
+        ReadOnlyMemory<byte> bytes);
+    TResult VisitCapturedSnapshotPath(
+        string owner, string capture, string path, string contentIdentity,
+        ReadOnlyMemory<byte> bytes);
+}
+
+internal abstract class RepositoryTargetRowMirror
+{
+    private RepositoryTargetRowMirror();
+    internal RepositoryTargetResolutionDemandItem DemandItem { get; }
+    internal static RepositoryTargetRowMirror MissingCommit(
+        RepositoryTargetResolutionDemandItem demandItem);
+    internal static RepositoryTargetRowMirror PresentCommit(
+        RepositoryTargetResolutionDemandItem demandItem,
+        string observedOwner, string observedType, string observedIdentity);
+    internal static RepositoryTargetRowMirror PresentCommitMissingPath(
+        RepositoryTargetResolutionDemandItem demandItem,
+        string observedOwner, string observedType, string observedIdentity);
+    internal static RepositoryTargetRowMirror PresentCommitPath(
+        RepositoryTargetResolutionDemandItem demandItem,
+        string observedOwner, string observedType, string observedIdentity,
+        string observedPath, string observedPathType,
+        string observedPathIdentity, RepositoryTargetContentMirror? content);
+    internal static RepositoryTargetRowMirror MissingTag(
+        RepositoryTargetResolutionDemandItem demandItem);
+    internal static RepositoryTargetRowMirror PresentTag(
+        RepositoryTargetResolutionDemandItem demandItem,
+        string observedOwner, string observedRefName,
+        string observedRefType, string observedRefIdentity,
+        string observedPeeledType, string observedPeeledIdentity);
+    internal static RepositoryTargetRowMirror MissingCapturedPath(
+        RepositoryTargetResolutionDemandItem demandItem);
+    internal static RepositoryTargetRowMirror PresentCapturedPath(
+        RepositoryTargetResolutionDemandItem demandItem,
+        string observedOwner, string observedCapture, string observedPath,
+        string observedEntryKind, string observedContentIdentity,
+        RepositoryTargetContentMirror content);
+    internal abstract TResult Accept<TResult>(
+        IRepositoryTargetRowMirrorVisitor<TResult> visitor);
+}
+
+internal interface IRepositoryTargetRowMirrorVisitor<TResult>
+{
+    TResult VisitMissingCommit(RepositoryTargetResolutionDemandItem demand);
+    TResult VisitPresentCommit(
+        RepositoryTargetResolutionDemandItem demand,
+        string owner, string type, string identity);
+    TResult VisitPresentCommitMissingPath(
+        RepositoryTargetResolutionDemandItem demand,
+        string owner, string type, string identity);
+    TResult VisitPresentCommitPath(
+        RepositoryTargetResolutionDemandItem demand,
+        string owner, string type, string identity,
+        string path, string pathType, string pathIdentity,
+        RepositoryTargetContentMirror? content);
+    TResult VisitMissingTag(RepositoryTargetResolutionDemandItem demand);
+    TResult VisitPresentTag(
+        RepositoryTargetResolutionDemandItem demand,
+        string owner, string refName, string refType, string refIdentity,
+        string peeledType, string peeledIdentity);
+    TResult VisitMissingCapturedPath(
+        RepositoryTargetResolutionDemandItem demand);
+    TResult VisitPresentCapturedPath(
+        RepositoryTargetResolutionDemandItem demand,
+        string owner, string capture, string path, string entryKind,
+        string contentIdentity, RepositoryTargetContentMirror content);
+}
+
+internal abstract class RepositoryTargetWriteMirrorResult
+{
+    private RepositoryTargetWriteMirrorResult();
+    internal static RepositoryTargetWriteMirrorResult Written(
+        CanonicalEvidencePayload payload);
+    internal static RepositoryTargetWriteMirrorResult Rejected(
+        string failureCode);
+    internal abstract TResult Accept<TResult>(
+        IRepositoryTargetWriteMirrorResultVisitor<TResult> visitor);
+}
+
+internal interface IRepositoryTargetWriteMirrorResultVisitor<TResult>
+{
+    TResult VisitWritten(CanonicalEvidencePayload payload);
+    TResult VisitRejected(string failureCode);
+}
+
+internal abstract class RepositoryTargetQualificationMirrorResult
+{
+    private RepositoryTargetQualificationMirrorResult();
+    internal static RepositoryTargetQualificationMirrorResult Qualified(
+        RepositoryTargetModelMirror model);
+    internal static RepositoryTargetQualificationMirrorResult Rejected(
+        string failureCode);
+    internal abstract TResult Accept<TResult>(
+        IRepositoryTargetQualificationMirrorResultVisitor<TResult> visitor);
+}
+
+internal interface IRepositoryTargetQualificationMirrorResultVisitor<TResult>
+{
+    TResult VisitQualified(RepositoryTargetModelMirror model);
+    TResult VisitRejected(string failureCode);
+}
+
+internal sealed partial class RepositoryTargetCodecMirror
+{
+    internal RepositoryTargetWriteMirrorResult WriteRepositoryTargetResolution(
+        EvidenceScope scope,
+        SnapshotEvidenceLocation location,
+        ExactSha256Digest demandDigest,
+        IReadOnlyList<RepositoryTargetResolutionDemandItem> demandItems,
+        IReadOnlyList<RepositoryTargetRowMirror> rows,
+        IReadOnlyList<RepositoryTargetContentMirror> contents,
+        CancellationToken cancellationToken);
+    internal RepositoryTargetQualificationMirrorResult
+        QualifyRepositoryTargetResolution(
+            EvidenceBinding binding,
+            ExactSha256Digest expectedDemandDigest,
+            IReadOnlyList<RepositoryTargetResolutionDemandItem> expectedDemandItems,
+            CancellationToken cancellationToken);
+}
+```
+
+Each abstract carrier has only the private sealed leaves implied by its factory
+list; no public constructor, catch-all row, mutable property, direction-specific
+adapter, or second codec exists. Written and Qualified carry exactly one
+payload/model; Rejected carries exactly one declared code. Every list and every
+content byte sequence is copied once before retention. Input order is
+authoritative and must already be canonical; the writer never sorts or repairs
+rows, demand items, or content. Null list arguments are
+`ArgumentNullException`; a null element is `ArgumentException` with exact
+`ParamName` equal to `demandItems`, `rows`, or `contents` before semantic
+validation. Cancellation is checked before semantic work and remains out of
+band.
+
+Demand list/row list are non-empty, counts are equal, every demand has the same
+non-empty canonical owner, and ItemIds are non-negative and strictly increasing.
+A CommitObject demand
+without a path permits only MissingCommit or PresentCommit; one with a path
+permits only MissingCommit, PresentCommitMissingPath, or PresentCommitPath. A
+TagRoot permits only MissingTag/PresentTag and a CapturedSnapshotPath permits
+only MissingCapturedPath/PresentCapturedPath. PresentCommitPath may omit its
+content only when the requested fragment is null; PresentCapturedPath and every
+fragment-bearing present path require content. Writer rows reference the exact
+demand object at the same ordinal and content carriers by object identity;
+every referenced content object occurs exactly once in the contents list and no
+unreferenced content is accepted.
+
+The exact valid fixture uses one Repository/Snapshot scope with subject `repo`
+and source `git`. Fixture commit SHA: `0123456789abcdef0123456789abcdef01234567`;
+snapshot/boundary kind `exact-commit`, ticks `0/1`, and one owner shard
+`https://github.com/owner/repo`. Its exact demand rows are:
+
+| Item | Selector and requested tuple | Qualified row | Content |
+| --- | --- | --- | --- |
+| `0` | Fixture commit SHA: `0123456789abcdef0123456789abcdef01234567`, path `docs/README.md`, fragment `intro` | Present commit/path; exact owner; type `commit`; exact commit; exact path; type `blob`; fixture blob OID: `1e0981f10f35ca8f594fec2a03f11df5a7299098` | ordinal `0`; exact bytes `# Intro\n`; SHA-256 digest: `2A8A06BBB4A42EEE60F35E2C6EACB1C3BBE0F8748817D1547A59692784B53C33` |
+| `1` | Tag `v1` | Present tag; exact owner/ref `refs/tags/v1`; type `tag`; ref identity forty `1` digits; peeled type `commit`; exact fixture commit | none |
+| `2` | Test vector: `abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789`, path `src/file.txt`, fragment `L1` | Present captured path; exact owner/capture/path; entry kind `file`; SHA-256 digest: `c73b73af8851e9e91bc6b4dc12e7dace0a2bfb931c1d0b8b36ef367319f58cd1` | ordinal `1`; exact bytes `line\n`; same SHA-256 identity |
+
+The exact canonical demand frame is `318` bytes with SHA-256
+`9DF61AC4D5F82C5FDA121B05319B16399580FC0A8D28B4AC62D1879D24899CBA`:
+
+```text
+cHJvdG9jb2wuYWNxdWlzaXRpb24tZGVtYW5kLzEKAQAAAAMAAAAAAAAAHWh0dHBzOi8vZ2l0aHViLmNvbS9vd25lci9yZXBvAAAAACgwMTIzNDU2Nzg5YWJjZGVmMDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3AQAAAA5kb2NzL1JFQURNRS5tZAEAAAAFaW50cm8AAAABAAAAHWh0dHBzOi8vZ2l0aHViLmNvbS9vd25lci9yZXBvAQAAAAJ2MQAAAAIAAAAdaHR0cHM6Ly9naXRodWIuY29tL293bmVyL3JlcG8CAAAAQGFiY2RlZjAxMjM0NTY3ODlhYmNkZWYwMTIzNDU2Nzg5YWJjZGVmMDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODkAAAAMc3JjL2ZpbGUudHh0AAAAAkwx
+```
+
+The exact canonical payload is `1,465` bytes with SHA-256
+`936D99ECDDC7332999B2641787BF160A1D126F27DAEB4F54BE1EBC8F426EE6F0`:
+
+```text
+cHJvdG9jb2wucmVwb3NpdG9yeS10YXJnZXQtcmVzb2x1dGlvbi8xCgAAAARyZXBvAAAAA2dpdAAAAApyZXBvc2l0b3J5AAAADGV4YWN0LWNvbW1pdAAAACgwMTIzNDU2Nzg5YWJjZGVmMDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3AAAADGV4YWN0LWNvbW1pdAAAACgwMTIzNDU2Nzg5YWJjZGVmMDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3AAAAAAAAAAAAAAAAAAAAAQOd9hrE1fgsX9oSGwUxmxY5lYD8Co0otKxi0YedJImcugAAAAMAAAAAAAAAHWh0dHBzOi8vZ2l0aHViLmNvbS9vd25lci9yZXBvAAAAACgwMTIzNDU2Nzg5YWJjZGVmMDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3AQAAAA5kb2NzL1JFQURNRS5tZAEAAAAFaW50cm8BAAAAHWh0dHBzOi8vZ2l0aHViLmNvbS9vd25lci9yZXBvAAAABmNvbW1pdAAAACgwMTIzNDU2Nzg5YWJjZGVmMDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3AQAAAA5kb2NzL1JFQURNRS5tZAAAAARibG9iAAAAKDFlMDk4MWYxMGYzNWNhOGY1OTRmZWMyYTAzZjExZGY1YTcyOTkwOTgBAAAAAAAAAAEAAAAdaHR0cHM6Ly9naXRodWIuY29tL293bmVyL3JlcG8BAAAAAnYxAQAAAB1odHRwczovL2dpdGh1Yi5jb20vb3duZXIvcmVwbwAAAAxyZWZzL3RhZ3MvdjEAAAADdGFnAAAAKDExMTExMTExMTExMTExMTExMTExMTExMTExMTExMTExMTExMTExMTEAAAAGY29tbWl0AAAAKDAxMjM0NTY3ODlhYmNkZWYwMTIzNDU2Nzg5YWJjZGVmMDEyMzQ1NjcAAAACAAAAHWh0dHBzOi8vZ2l0aHViLmNvbS9vd25lci9yZXBvAgAAAEBhYmNkZWYwMTIzNDU2Nzg5YWJjZGVmMDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWYwMTIzNDU2Nzg5AAAADHNyYy9maWxlLnR4dAAAAAJMMQEAAAAdaHR0cHM6Ly9naXRodWIuY29tL293bmVyL3JlcG8AAABAYWJjZGVmMDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWYwMTIzNDU2Nzg5YWJjZGVmMDEyMzQ1Njc4OQAAAAxzcmMvZmlsZS50eHQAAAAEZmlsZQAAAEBjNzNiNzNhZjg4NTFlOWU5MWJjNmI0ZGMxMmU3ZGFjZTBhMmJmYjkzMWMxZDBiOGIzNmVmMzY3MzE5ZjU4Y2QxAAAAAQAAAAIAAAAAAAAAAB1odHRwczovL2dpdGh1Yi5jb20vb3duZXIvcmVwbwAAACgwMTIzNDU2Nzg5YWJjZGVmMDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3AAAADmRvY3MvUkVBRE1FLm1kAAAAKDFlMDk4MWYxMGYzNWNhOGY1OTRmZWMyYTAzZjExZGY1YTcyOTkwOTgAAAAIKooGu7SkLu5g814sbqyxw7vg+HSIF9FUellpJ4S1PDMjIEludHJvCgAAAAEBAAAAHWh0dHBzOi8vZ2l0aHViLmNvbS9vd25lci9yZXBvAAAAQGFiY2RlZjAxMjM0NTY3ODlhYmNkZWYwMTIzNDU2Nzg5YWJjZGVmMDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODkAAAAMc3JjL2ZpbGUudHh0AAAAQGM3M2I3M2FmODg1MWU5ZTkxYmM2YjRkYzEyZTdkYWNlMGEyYmZiOTMxYzFkMGI4YjM2ZWYzNjczMTlmNThjZDEAAAAFxztzr4hR6ekbxrTcEufazgor+5McHQuLNu82cxn1jNFsaW5lCg==
+```
+
+The writer recomputes the exact demand frame and digest before payload
+retention; the qualifier recomputes it from the caller-supplied expected demand
+and requires exact digest, row echo, and canonical byte equality. ItemIds are
+strictly increasing but need not be contiguous across a one-owner shard. Row
+count equals demand count and rows retain exact demand order. Contents are
+ordinal `0..N-1`, CommitObject keys precede CapturedSnapshotPath keys, then key
+fields compare ordinally. Every content row is referenced; a fragment-bearing
+present path references exactly one content; a path-only commit may reference
+none. No row/content repair, normalization, sorting, or deduplication occurs.
+
+Validation precedence is exact. Argument/null/cancellation boundaries occur
+first. The writer then checks row count, content count, aggregate strict-UTF-8
+row-text bytes, per-content bytes, aggregate unique-content bytes, Repository/
+Snapshot scope/location shape and equality, selector closure and one-owner
+demand order, demand digest, row bijection/variant fields, content ordinal/key/
+reference closure, commit-blob or capture SHA self-consistency, combined
+payload size, defensive copies, and encoding. The qualifier checks complete
+payload size, schema key/version, header and primitive framing, embedded scope/
+location construction, demand digest and expected-item equality, row/content
+grammar/order/reference closure, self-consistency, trailing-byte closure,
+enclosing Repository/Snapshot shape, and embedded-versus-enclosing identity.
+
+The exact failure partition is mutually exclusive:
+
+- any hard first-one-over or checked-arithmetic overflow is
+  `protocol.codec.resource-limit-exceeded`;
+- a structurally valid known non-Repository surface or non-Snapshot location is
+  `protocol.codec.payload-location-mismatch`;
+- a fully valid embedded scope/location unequal to the supplied writer scope
+  or enclosing binding is `protocol.codec.embedded-identity-mismatch`; and
+- wrong schema/header, invalid UTF-8 or selector/optional/outcome/owner-kind
+  byte, EOF/length/count mismatch, row echo/order/duplicate/missing/extra,
+  content ordinal/key/order/reference defect, trailing byte, invalid owner/tag/
+  path/fragment/object identity grammar, or self-inconsistent Git-blob/capture
+  content is `protocol.codec.invalid-repository-target-resolution`.
+
+The semantic `Unresolved`, `WrongRepository`, `WrongTarget`, `WrongObject`,
+`MissingFragment`, `WrongFragment`, and `Exact` capability outcomes remain held
+for the later repository-target index. This packet only persists and qualifies
+closed wire variants; it does not classify a final target view.
+
+Wire-local ceilings are exactly `50,000` rows, `64` referenced unique content
+objects, `16,777,216` aggregate strict-UTF-8 row-text bytes, `1,048,576` bytes
+per content, `16,777,216` aggregate unique-content bytes, and `33,554,432`
+complete payload bytes. Deterministic test constructors prove each reachable
+equality and first-one-over in that order, keeping all earlier counters below
+their ceilings; count equality uses increasing zero-padded selector identities,
+content equality uses canonical small keys, and the payload constructor adjusts
+its final valid ASCII path/content filler without crossing an earlier limit.
+First-one-over stops before retention/copy. These checks do not activate the
+later four-counter resource ledger or plan-global multi-owner aggregate.
+The row-text counter includes every serialized strict-UTF-8 demand echo,
+observed row field, and content-key text occurrence after scope/location and
+before raw content bytes; invalid UTF-16 input fails as invalid-repository-
+target-resolution at that gate rather than being replaced or counted.
+
+The malformed matrix mutates every header/digest/primitive boundary; every
+selector/optional/outcome/owner-kind tag; strict UTF-8 and path/tag/fragment/
+identity grammar; missing/extra/duplicate/reordered row; demand echo and digest;
+content ordinal/key/digest/length/bytes; unreferenced or multiply conflicting
+content; path-only versus required-fragment content; Git SHA-1 blob framing for
+40-hex commits; captured SHA-256 content; trailing bytes; and all six equality/
+one-over constructors. Source-array mutation after writer/model construction
+must not alter retained payload, rows, or contents.
+
+The executable allowlist is exactly a partial-identity-only modification to
+`ContractSliceBActivationTests.cs` plus one new
+`ContractSliceBRepositoryTargetCodecTests.cs`. Production, public surface,
+project, package, lock, workflow, Policy, resource, cache, admission, index,
+capability, and later-wire surfaces are immutable. This packet receives a
+reviewed complexity redraw to at most `3,200` normalized two-test-file lines;
+`3,201` requires renewed design. The default `1,200` ceiling remains unchanged
+for later packets unless separately reviewed.
+
+The test is one direct non-skipped Fact at
+`MeAndAI.Protocol.Conformance.Tests.ContractSliceBRepositoryTargetCodecTests.Round_trips_exact_repository_target_resolution_wire`,
+with exactly one `ContractSlice=B` trait, no Scenario/Theory/class trait or
+overload, and marker `TEST-0210-B-BEHAVIOR-RED-0005`. Its red temporarily makes
+only the fully prepared valid `WriteRepositoryTargetResolution` semantic
+return `null!`; only that null calls direct `Assert.Fail(marker)`. Setup,
+exceptions, wrong non-null results, negative vectors, and qualifier assertions
+remain marker-free. Green is focused `1/1`, cumulative B `6/6`, A+B/full
+Conformance `38/38`, and Domain `98/98`.
+
+R=0004 is immutable `OracleRejected/NoCanonicalRed` evidence. Its exact
+37,198-byte runner SHA-256 is
+`8A5E3FD7C580F57C429DA89996D5A073A3E416E9D31BCD985BF99E04E3879192`;
+report/TRX SHA-256 values are
+`0D300970B537A0265DC3E39732333ED63385D82D8EC038EA40262ABACD1493F8` and
+`CC5D494F1154113A9735935F5238711520C5E5F1C9292D60F931CFF4AA5E993D`.
+The child returned native `1`, but the stale fixture digest ended in
+`...2C17...` while the actual frozen frame SHA-256 ends in `...2C5F...`;
+therefore writer preparation returned a marker-free rejection, the later
+digest assertion failed, raw marker count was `0`, and R=0004 is never rerun.
+
+Corrected R=0005 changes only the source `DemandDigest` constant to exact
+`9df61ac4d5f82c5fda121b05319b16399580fc0a8d28b4ac62d1879d24899cba`
+and the marker from `0004` to `0005`; the valid writer's `null!` staging and
+every other source/design byte remain semantically unchanged. Canonical R=0005
+uses one fresh external CreateNew runner matching
+`D:\Temp\meandai-test-0210-b-repository-target-r0005-runner-<32-lowercase-hex-guid>.ps1`,
+fresh report/log siblings, and a different fresh result root. It inherits the
+governed-text runner's exact source/Git/lock/build/DLL/PDB/hash, `8,388,608`-
+byte complete-log, `1,048,576`-byte report, process-scoped
+`VSTEST_CONNECTION_TIMEOUT=300`, `420000`-ms monotonic, secure-TRX, atomic
+`InvocationCommitted`, and immutable no-retry contracts, specialized to these
+two source files, the `3,200`-line ceiling, marker/FQN, and this exact command:
+
+```text
+dotnet test tests/dotnet/MeAndAI.Protocol.Conformance.Tests/MeAndAI.Protocol.Conformance.Tests.csproj --configuration Release --no-restore --no-build --nologo --verbosity minimal --results-directory "<fresh-root>" --logger "trx;LogFileName=TEST-0210-B-BEHAVIOR-RED-0005.trx" --filter "ContractSlice=B&FullyQualifiedName=MeAndAI.Protocol.Conformance.Tests.ContractSliceBRepositoryTargetCodecTests.Round_trips_exact_repository_target_resolution_wire"
+```
+
+The exact twelve-record design cohort added no tracked node and validated
+under schema-2 ceilings `512` nodes / `8,192` relations / `1,048,576` bytes per
+parsed blob / `8,388,608` aggregate bytes. Its exact correction head passed both
+stable hosted jobs before R=0005. R=0001..0003 remain immutable; R=0004 is
+immutable diagnostic-only; none is ever rerun. Canonical R=0005 was accepted
+once (native exit `1`, runner exit `0`, report SHA-256
+`513677E6D4BB7552455E1DB3CDAA986384C6EA441B002F0718293633B0522EB7`,
+TRX SHA-256 `64D22B48825F0128D48FBB9FA500C4358B4321D2D804F7C46999B779EAA39F6C`).
+The bounded green is `1/1`, `6/6`, `38/38`, and `98/98` at `2,849/3,200`
+normalized lines, with zero production delta; its implementation head is hosted pending.
+
+The complete Tests-only causal surface is:
 
 ```csharp
 internal interface IContractSliceBActivationProofState
@@ -7684,6 +8294,1334 @@ The full sibling inventory is:
 | preserved [TEST-0195](../FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0195) | `Distinct historical WIP`; collapsed repository/report/CLI model is not reused |
 | [TEST-0191](../FEAT-0059-csharp-operational-foundation/test-cases.md#test-0191) and [TEST-0192](../FEAT-0059-csharp-operational-foundation/test-cases.md#test-0192) | `Distinct foundation`; portable runtime/process foundations are not catalog behavior |
 
+### Frozen `B-RESOURCE-01` codec-local ledger contract
+
+The repository-target implementation is exact-head hosted green and the owning
+B wire ledger retains exact commit/run custody; R=0004 remains diagnostic-only
+and canonical R=0005 remains immutable. At the resource design checkpoint B was `6/11`, cumulative A+B was `38/43`. The resource packet is a
+Tests-owned conformance mirror of the already accepted production contract. It
+adds only
+`tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ContractSliceBResourceLedgerTests.cs`,
+changes no retained file, production/interface/project/package/lock/workflow,
+and may contain at most `1,200` normalized lines. It does not activate cache,
+admission, sealed-context, qualified-reference, Policy, C/D, Scenario, or
+workflow behavior.
+
+The test-owned declarations are exact:
+
+```csharp
+internal sealed class SemanticResourceUsageMirror
+{
+    internal long Bytes { get; }
+    internal int MaxDepth { get; }
+    internal long Nodes { get; }
+    internal long Complexity { get; }
+    internal static SemanticResourceUsageMirror Create(
+        long bytes, int maxDepth, long nodes, long complexity);
+}
+
+internal sealed class SemanticResourceLocalUsageMirror
+{
+    internal long GeneratedBytes { get; }
+    internal int LayerDepth { get; }
+    internal long LayerNodes { get; }
+    internal long AdditionalComplexity { get; }
+    internal static SemanticResourceLocalUsageMirror Create(
+        long generatedBytes, int layerDepth, long layerNodes,
+        long additionalComplexity);
+}
+
+internal sealed class SemanticResourceBudgetMirror
+{
+    internal long MaximumBytes { get; }
+    internal int MaximumDepth { get; }
+    internal long MaximumNodes { get; }
+    internal long MaximumComplexity { get; }
+    internal static SemanticResourceBudgetMirror Create(
+        long maximumBytes, int maximumDepth, long maximumNodes,
+        long maximumComplexity);
+}
+
+internal sealed class SemanticResourceAllowanceMirror
+{
+    internal SemanticResourceBudgetMirror AggregateBudget { get; }
+    internal SemanticResourceUsageMirror SelectedBaseline { get; }
+    internal static SemanticResourceAllowanceMirror Create(
+        SemanticResourceBudgetMirror aggregateBudget,
+        SemanticResourceUsageMirror selectedBaseline);
+    internal ResourceFitMirror FitLocal(
+        SemanticResourceLocalUsageMirror localUsage);
+}
+
+internal enum ResourceCounterMirror { None, Bytes, MaxDepth, Nodes, Complexity }
+
+internal sealed class ResourceFitMirror
+{
+    internal bool Fits { get; }
+    internal ResourceCounterMirror FirstExceeded { get; }
+    internal SemanticResourceUsageMirror? Aggregate { get; }
+}
+
+internal sealed class SemanticResourceContributionMirror
+{
+    internal int KindRank { get; }
+    internal string RowKey { get; }
+    internal SemanticResourceUsageMirror Usage { get; }
+    internal static SemanticResourceContributionMirror Payload(
+        string rowKey, long bytes);
+    internal static SemanticResourceContributionMirror GeneratedBytes(
+        string rowKey, long bytes);
+    internal static SemanticResourceContributionMirror Layer(
+        string rowKey, int depth, long nodes);
+    internal static SemanticResourceContributionMirror ComplexityTerm(
+        string rowKey, long amount);
+}
+
+internal sealed class SemanticResourceLedgerMirror
+{
+    internal IReadOnlyList<SemanticResourceContributionMirror> Contributions { get; }
+    internal SemanticResourceUsageMirror Usage { get; }
+    internal static SemanticResourceLedgerMirror Create(
+        IEnumerable<SemanticResourceContributionMirror> contributions);
+}
+
+internal sealed class RepositoryTargetResourceInputMirror
+{
+    internal SemanticResourceAllowanceMirror Allowance { get; }
+    internal SemanticResourceContributionMirror SelectedPayload { get; }
+    internal static RepositoryTargetResourceInputMirror Create(
+        SemanticResourceAllowanceMirror allowance,
+        SemanticResourceContributionMirror selectedPayload);
+}
+
+internal sealed class RepositoryTargetResourceShapeMirror
+{
+    internal int LayerDepth { get; }
+    internal long LayerNodes { get; }
+    internal string InvocationDigest { get; }
+    internal static RepositoryTargetResourceShapeMirror Create(
+        int layerDepth, long layerNodes, string invocationDigest);
+}
+
+internal interface ISemanticResourceMeterMirror<TInput, TValue>
+{
+    SemanticResourceLocalUsageMirror MeasureLocal(
+        TInput input, TValue value, CancellationToken cancellationToken);
+}
+
+internal enum ResourceFailureMirror
+{
+    ProducerRejected,
+    RegistrationMismatch,
+    IntentInvalid
+}
+
+internal abstract class ResourceProducerIntentMirror<TValue>
+{
+    private ResourceProducerIntentMirror();
+    internal static ResourceProducerIntentMirror<TValue> Produced(
+        TValue value, SemanticResourceLocalUsageMirror claimedLocalUsage);
+    internal static ResourceProducerIntentMirror<TValue> Rejected(
+        ResourceFailureMirror failure);
+    internal abstract TResult Accept<TResult>(
+        IResourceProducerIntentMirrorVisitor<TValue, TResult> visitor);
+}
+
+internal interface IResourceProducerIntentMirrorVisitor<TValue, TResult>
+{
+    TResult VisitProduced(
+        TValue value, SemanticResourceLocalUsageMirror claimedLocalUsage);
+    TResult VisitRejected(ResourceFailureMirror failure);
+}
+
+internal abstract class ResourceQualificationMirrorResult
+{
+    private ResourceQualificationMirrorResult();
+    internal static ResourceQualificationMirrorResult Qualified(
+        SemanticResourceLocalUsageMirror measuredLocalUsage,
+        SemanticResourceLedgerMirror ledger);
+    internal static ResourceQualificationMirrorResult Rejected(
+        ResourceFailureMirror failure);
+    internal abstract TResult Accept<TResult>(
+        IResourceQualificationMirrorVisitor<TResult> visitor);
+}
+
+internal interface IResourceQualificationMirrorVisitor<TResult>
+{
+    TResult VisitQualified(
+        SemanticResourceLocalUsageMirror measuredLocalUsage,
+        SemanticResourceLedgerMirror ledger);
+    TResult VisitRejected(ResourceFailureMirror failure);
+}
+
+internal sealed class RepositoryTargetResourceCoordinatorMirror
+{
+    internal ResourceQualificationMirrorResult Qualify(
+        RepositoryTargetResourceInputMirror input,
+        ResourceProducerIntentMirror<RepositoryTargetResourceShapeMirror> intent,
+        ISemanticResourceMeterMirror<RepositoryTargetResourceInputMirror,
+            RepositoryTargetResourceShapeMirror>? meter,
+        CancellationToken cancellationToken);
+}
+
+internal sealed class ResourceLedgerCollisionMirrorException : Exception
+{
+    internal string RowKey { get; }
+    internal ResourceLedgerCollisionMirrorException(string rowKey);
+}
+```
+
+Every factory has a private instance constructor and defensively copies input.
+Each abstract union owns exactly its two private nested sealed leaves; factories
+construct those leaves and `Accept` dispatches only to the correspondingly
+named visitor member. The collision exception copies its nonempty ordinal key
+and has exact message `Conflicting resource row: <rowKey>.`.
+Null top-level arguments fail with the exact argument name. Negative scalar,
+empty/non-64-uppercase-hex digest, inconsistent `(depth=0,nodes>0)` or
+`(depth>0,nodes=0)`, and depth outside `0..4` fail at construction before any
+meter call. `RepositoryTargetResourceShapeMirror.Create(5, ...)` is the exact
+schema-unreachable vector and is never described as budget exhaustion.
+`RepositoryTargetResourceInputMirror.Create` accepts only a rank-0 payload row
+whose one-row ledger usage is field-for-field equal to `SelectedBaseline`; a
+wrong rank or baseline mismatch is `ArgumentException` with parameter
+`selectedPayload`, also before metering.
+
+Contribution ranks are payload `0`, generated bytes `1`, semantic layer `2`,
+and additional complexity `3`. Payload/generated rows require positive Bytes
+and contribute no depth/nodes; layer rows require positive depth and nodes and
+contribute no bytes; complexity rows require positive Complexity. Zero
+generated-byte and zero complexity terms are omitted. Ledger input is copied,
+ordinal-sorted by rank then key, and must contain unique canonical keys. Exact-
+equal duplicates collapse to one; the same key with unequal rank or usage throws
+only `ResourceLedgerCollisionMirrorException` carrying that key. The coordinator
+maps exactly that exception to `IntentInvalid`; it does not swallow any other
+exception. Checked sums derive `Bytes = rank0 + rank1`, `MaxDepth = max
+rank2 depth`, `Nodes = sum rank2 nodes`, and `Complexity = Bytes + Nodes + rank3`.
+
+`FitLocal` uses checked 64-bit arithmetic and exactly these formulas:
+
+```text
+Bytes      = SelectedBaseline.Bytes      + local.GeneratedBytes
+MaxDepth   = max(SelectedBaseline.MaxDepth, local.LayerDepth)
+Nodes      = SelectedBaseline.Nodes      + local.LayerNodes
+Complexity = SelectedBaseline.Complexity + local.GeneratedBytes
+           + local.LayerNodes + local.AdditionalComplexity
+```
+
+It accepts equality and returns the aggregate; overflow is non-fit. First
+exceeded order is exactly Bytes, MaxDepth, Nodes, Complexity. The canonical
+budget is `(33554432,64,500000,34054432)`. Boundary vectors use arithmetic-only
+fixtures without allocating proportional data: byte equality and first one-
+over, node equality and first one-over, complexity equality and first one-over,
+the legal repository-target depth `4`, first illegal depth `5` before metering,
+and a combined node-plus-complexity one-over whose deterministic first failure
+is Nodes. No impossible depth-64 repository-target success is fabricated.
+
+The golden payload row key is
+`0|protocol.repository-target-resolution|1|936D99ECDDC7332999B2641787BF160A1D126F27DAEB4F54BE1EBC8F426EE6F0`;
+the codec layer key is
+`2|protocol.codec.repository-target-resolution|1|0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF`.
+Selected payload usage is `(1465,0,0,1465)` and independently measured local
+usage is `(0,4,61,0)`. Qualified output contains exactly payload then layer and
+aggregate `(1465,4,61,1526)`.
+
+Qualification order is fail-closed: argument boundaries; cancellation;
+producer intent. A rejected producer is propagated and never metered. A missing
+meter returns `RegistrationMismatch`. A produced value is metered exactly once
+with the same input/value/token; cancellation and any other meter exception
+propagate unchanged. Claimed/measured inequality, invalid/overflowing ledger,
+collision, or over-budget success returns `IntentInvalid` and no ledger escapes.
+Only a completely valid result is Qualified. Meter output cannot inspect or
+echo the claim. No cache entry, handle, admission, plan, outcome, or later
+packet object is created here.
+
+The one direct Fact is
+`MeAndAI.Protocol.Conformance.Tests.ContractSliceBResourceLedgerTests.Enforces_exact_codec_local_four_counter_ledger`,
+with only `ContractSlice=B`, no Scenario/Theory/class trait, and exact marker
+`TEST-0210-B-BEHAVIOR-RED-0006`. Red replaces only the final valid coordinator
+result with `null!`; only that null reaches direct `Assert.Fail(marker)`. The
+packet-specific canonical invocation is exactly:
+
+```text
+dotnet test tests/dotnet/MeAndAI.Protocol.Conformance.Tests/MeAndAI.Protocol.Conformance.Tests.csproj --configuration Release --no-restore --no-build --nologo --verbosity minimal --results-directory "<fresh-root>" --logger "trx;LogFileName=TEST-0210-B-BEHAVIOR-RED-0006.trx" --filter "ContractSlice=B&FullyQualifiedName=MeAndAI.Protocol.Conformance.Tests.ContractSliceBResourceLedgerTests.Enforces_exact_codec_local_four_counter_ledger"
+```
+
+One fresh external runner specializes the prior fail-closed custody contract to
+that sole new source: exact hosted design HEAD/upstream/branch/status, source and
+runner identities at four gates, six locks, warning-as-error Release build,
+fresh DLL/PDB, `--no-build`, fresh one-file root, child-only timeout `300`, outer
+`420000` ms, complete `8,388,608`-byte logs, `1,048,576`-byte report, secure XML,
+native exit `1`, exact result/definition/entry/FQN/marker/sixteen counters, and no
+forbidden diagnostics/attachments. `InvocationCommitted` irrevocably consumes
+R=0006 for every outcome; no changed or unchanged retry exists. Green is focused
+`1/1`, B `7/7`, A+B/full Conformance `39/39`, Domain `98/98`, and all retained
+build/format/locks/diff/StructureOnly/publication/review gates. That exact
+twelve-record design head passed hosted validation before canonical R=0006.
+
+Canonical R=0006 was accepted once with native exit `1` and runner exit `0`;
+report SHA-256 is `44A095FDE501917EE56823CE5BABBCF95AB83EE53E7A1ACA430B2614C5DD6A0E`
+and TRX SHA-256 is `EC2AF7C6ECC03F039F2DEAC0258D34DCD07ACBAC5FBC6CC68E2B2644087E7518`.
+Bounded green changes only the valid-success return, remains `1,176/1,200`
+lines with zero production delta, and passes `1/1`, `7/7`, `39/39`, and `98/98`.
+The resource packet is immutable `ReviewedHostedGreen`; its exact implementation
+and hosted-run identities are owned by the canonical B ledger. Ubuntu passed in
+`15m52s` and Windows in `49m31s`, while publication verification was correctly
+skipped. Every B-CACHE/downstream hold remained through that gate.
+
+### Frozen `B-CACHE-01` codec-model cache contract
+
+`B-CACHE-01` starts only from the exact hosted-green resource predecessor above.
+At this design checkpoint B is `7/11` and cumulative A+B is `39/43`. The packet
+adds only
+`tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ContractSliceBDecodeModelCacheTests.cs`,
+changes no retained source/test file and no production, interface, project,
+package, lock, workflow, Scenario, admission, sealed-context, reference, Policy,
+C, or D surface. The new file may contain at most `1,200` normalized lines;
+`1,201` requires a reviewed redraw before build or red. The design cohort remains
+the same twelve Markdown/memory paths, adds no tracked node, and must preserve at
+least `2,048` bytes of typed-design per-blob headroom under schema 2.
+P is `NotApplicable`: no retained compile seam is required. R adds the complete
+new test-owned cache mirror with only its final valid aggregate result set to
+`null!`; G changes only that final return to the already computed non-null
+aggregate. No intermediate source identity is deliverable.
+
+The Tests-owned cache mirror receives already validated codec-model canonical
+key bytes; it does not duplicate writer, qualifier, resource-meter, or admission
+semantics. Its exact declarations are:
+
+```csharp
+internal sealed class CodecModelCacheKeyMirror : IComparable<CodecModelCacheKeyMirror>
+{
+    internal string ReleaseIdentity { get; }
+    internal ReadOnlyMemory<byte> CanonicalBytes { get; }
+    internal ReadOnlyMemory<byte> Digest { get; }
+    internal static CodecModelCacheKeyMirror Create(
+        string releaseIdentity, ReadOnlyMemory<byte> canonicalBytes);
+    internal static CodecModelCacheKeyMirror CreateCollisionProbe(
+        string releaseIdentity, ReadOnlyMemory<byte> canonicalBytes,
+        ReadOnlyMemory<byte> forcedDigest);
+    public int CompareTo(CodecModelCacheKeyMirror? other);
+}
+
+internal sealed class DecodeModelValueMirror
+{
+    internal string Identity { get; }
+    internal ReadOnlyMemory<byte> CanonicalBytes { get; }
+    internal static DecodeModelValueMirror Create(
+        string identity, ReadOnlyMemory<byte> canonicalBytes);
+}
+
+internal sealed class DeclaredDecodeFailureMirror
+{
+    internal string Code { get; }
+    internal ReadOnlyMemory<byte> CanonicalBytes { get; }
+    internal static DeclaredDecodeFailureMirror Create(
+        string code, ReadOnlyMemory<byte> canonicalBytes);
+}
+
+internal abstract class DecodeAttemptMirror
+{
+    private DecodeAttemptMirror();
+    internal static DecodeAttemptMirror Succeeded(DecodeModelValueMirror value);
+    internal static DecodeAttemptMirror DeclaredFailure(
+        DeclaredDecodeFailureMirror failure);
+    internal abstract TResult Accept<TResult>(IDecodeAttemptMirrorVisitor<TResult> visitor);
+}
+
+internal interface IDecodeAttemptMirrorVisitor<TResult>
+{
+    TResult VisitSucceeded(DecodeModelValueMirror value);
+    TResult VisitDeclaredFailure(DeclaredDecodeFailureMirror failure);
+}
+
+internal enum DecodeCacheDispositionMirror { Produced, Joined, Retained }
+
+internal sealed class DecodeCacheResultMirror
+{
+    internal DecodeAttemptMirror Attempt { get; }
+    internal DecodeCacheDispositionMirror Disposition { get; }
+}
+
+internal sealed class DecodeModelCacheMirror
+{
+    internal static DecodeModelCacheMirror Create(
+        string releaseIdentity, string sessionIdentity,
+        int maximumEntries, long maximumCanonicalBytes,
+        int maximumConcurrentAttempts);
+    internal Task<DecodeCacheResultMirror> GetOrAddAsync(
+        CodecModelCacheKeyMirror key,
+        Func<CancellationToken, Task<DecodeAttemptMirror>> attempt,
+        CancellationToken cancellationToken);
+}
+
+internal sealed class DecodeCacheIntegrityMirrorException : Exception
+{
+    internal string Code { get; }
+    internal DecodeCacheIntegrityMirrorException(string code);
+}
+```
+
+Every carrier has a private instance constructor, copies all text/bytes, rejects
+null/empty identity and empty canonical bytes, and exposes no mutable array.
+`Create` computes SHA-256 over exact key bytes. `CreateCollisionProbe` is the sole
+test-only cryptographic-collision seam; it requires an exact 32-byte digest and
+is used only to prove unequal-byte collision rejection. Ordering is unsigned
+lexicographic canonical bytes, then shorter equal prefix first. The cache copies
+its release/session identities, requires nonnegative retention count/bytes and a
+positive concurrency ceiling, and owns no real `SessionCacheBudget` instance.
+Exact null parameter names are `releaseIdentity`, `sessionIdentity`,
+`canonicalBytes`, `forcedDigest`, `key`, and `attempt`. `GetOrAddAsync` order is
+argument boundaries, pre-cancellation, release identity, digest/byte collision,
+existing retained/in-flight lookup, then new queue registration. A producer that
+returns null throws `InvalidOperationException` with exact message
+`Decode attempt returned null.`, is removed, and is not cached.
+Negative `maximumEntries`/`maximumCanonicalBytes` and nonpositive
+`maximumConcurrentAttempts` throw `ArgumentOutOfRangeException` with that exact
+parameter name before any cache state exists.
+
+The three deterministic fixture keys are opaque, already validated upstream
+cache-key frames; this packet intentionally does not reimplement key grammar.
+Each is exactly `89` bytes. A/B/C Base64 and SHA-256 identities are respectively:
+
+```text
+A cHJvdG9jb2wuY2FjaGUta2V5LmZyYW1lLnYxCgBxdWFsaWZpY2F0aW9uLXNsaWNlfG1hbmlmZXN0fDF8cmVwb3NpdG9yeS10cmVlfGluc3RydWN0aW9uLUE=
+  3966ED0A5CD736B311F695A3746090A405345C47E8584888C7201D13F7583959
+B cHJvdG9jb2wuY2FjaGUta2V5LmZyYW1lLnYxCgBxdWFsaWZpY2F0aW9uLXNsaWNlfG1hbmlmZXN0fDF8cmVwb3NpdG9yeS10cmVlfGluc3RydWN0aW9uLUI=
+  585852BDC1A3395DFC01611685BCDB7337C1AD6377142CAD63F946EADBF9A842
+C cHJvdG9jb2wuY2FjaGUta2V5LmZyYW1lLnYxCgBxdWFsaWZpY2F0aW9uLXNsaWNlfG1hbmlmZXN0fDF8cmVwb3NpdG9yeS10cmVlfGluc3RydWN0aW9uLUM=
+  AC7CB7EF1168A6590480B247EA91A1F75CC7F5CCE7B57F95F293B7410E7F94C4
+```
+
+They begin with the exact schema header and codec-model rank, share the frozen
+release/schema/model fixture, differ only in the final discriminator, and sort
+A < B < C. The collision probe uses B bytes with A's digest. A different release
+identity or cache session uses a distinct cache and must invoke a fresh attempt;
+passing a foreign-release key to an existing cache throws
+`DecodeCacheIntegrityMirrorException` code
+`protocol.cache.release-identity-mismatch` before registration.
+
+The exact cache release identity is `qualification-slice|manifest|1` and session
+identity is `session-01`; isolation probes use
+`qualification-slice|manifest-foreign|1` and `session-02`. Successful model
+identities are `model-a`, `model-b`, and `model-c`; declared failure is
+`protocol.codec.invalid-repository-tree`. Canonical result/failure byte arrays
+are deterministic repeated-byte fixtures whose lengths are chosen explicitly by
+each boundary vector; their content is independently asserted before use.
+
+For one cache, digest is the primary candidate bucket, but reuse additionally
+requires exact release, byte length, and byte equality. Unequal bytes under one
+digest throw only `protocol.cache.key-collision`, with exact message
+`Conflicting decode cache key bytes.`, invoke no producer, publish no entry, and
+are never cached. An exact queued or running key joins the same Task; the
+producer is invoked once. A lock-held dispatcher sorts pending new keys by
+canonical bytes and starts at most `maximumConcurrentAttempts`; joining callers
+do not consume another slot. In-flight entries are never eviction candidates.
+The owner receives `Produced`, callers attached before completion receive
+`Joined`, and a later retained reuse receives `Retained`; all observe the same
+immutable `DecodeAttemptMirror` instance. A producer delegate supplied on a
+join or retained call is never invoked.
+
+The single-flight schedule uses asynchronous run continuations and explicit
+gates, never sleeps. Three A callers attach before the owner gate releases and
+prove one invocation plus `Produced/Joined/Joined`. With concurrency `1`, A is
+held running while C then B are queued; after A releases the observed start
+order is exactly A, B, C. Cancellation of the owner or a thrown timeout/host
+exception is observed by all joiners, removes the entry, and a later success
+invokes exactly once again.
+
+Only `Succeeded` and `DeclaredFailure` completions are retainable. Success cost
+is exact model canonical-byte length; declared-failure cost is its exact failure
+frame length. Cancellation, `TimeoutException`, any other unexpected exception,
+and cache-integrity failure remove the in-flight entry, propagate unchanged,
+and leave no retained entry; the next call is a fresh attempt. The first caller's
+token owns the shared attempt. A pre-cancelled token fails before registration;
+joiners observe the shared result and cannot substitute a different producer.
+
+After each cacheable completion, the retained set plus that completion is sorted
+by exact key bytes and greedily retained while both count and checked byte-cost
+ceilings fit. Iteration continues after an oversized entry. Thus a later lower
+key may evict a higher retained key, while an evicted/rejected higher key can
+never become eligible after additional lower keys arrive. Count or byte ceiling
+zero disables retention without disabling single-flight. Equality at both
+ceilings succeeds; the first count or byte over rejects only the crossing entry.
+Eviction changes reuse/invocation counts only, never returned semantic bytes.
+
+Exact retention vectors are allocation-small. With count `2`/bytes `10`, A cost
+`4` plus B cost `6` reaches both equalities and both retain; C cost `1` is the
+first crossing entry and is produced but not retained. Starting with B/C cost
+`5` each retains both; subsequently producing A cost `5` deterministically keeps
+A/B and evicts C. B cost `11` is skipped as oversized while later C cost `4`
+retains, proving iteration continues. Count `0` or bytes `0` produces twice for
+two sequential calls. Checked cost overflow rejects retention and throws
+`DecodeCacheIntegrityMirrorException` code
+`protocol.cache.retention-cost-overflow`; it never wraps or evicts an unrelated
+valid entry.
+
+The one direct Fact is
+`MeAndAI.Protocol.Conformance.Tests.ContractSliceBDecodeModelCacheTests.Enforces_exact_codec_cache_single_flight_collision_and_eviction`,
+with only `ContractSlice=B`, no Scenario/Theory/class trait, and exact marker
+`TEST-0210-B-BEHAVIOR-RED-0007`. It proves exact A/B/C key ordering, byte-equal
+retained hit, forced collision, same-key concurrent single-flight, concurrency ceiling,
+success and declared-failure retention, cancellation/timeout/host/integrity
+non-retention, release/session isolation, zero retention, count/byte equality,
+first-one-over, oversized-entry continuation, and deterministic low-key
+eviction. Red replaces only the final valid aggregate outcome with `null!`; only
+that null reaches direct `Assert.Fail(marker)`.
+
+The packet-specific red command is exactly:
+
+```text
+dotnet test tests/dotnet/MeAndAI.Protocol.Conformance.Tests/MeAndAI.Protocol.Conformance.Tests.csproj --configuration Release --no-restore --no-build --nologo --verbosity minimal --results-directory "<fresh-root>" --logger "trx;LogFileName=TEST-0210-B-BEHAVIOR-RED-0007.trx" --filter "ContractSlice=B&FullyQualifiedName=MeAndAI.Protocol.Conformance.Tests.ContractSliceBDecodeModelCacheTests.Enforces_exact_codec_cache_single_flight_collision_and_eviction"
+```
+
+One fresh external runner specializes the accepted R=0006 custody contract to
+the sole new source and marker. It binds exact hosted design HEAD/upstream/
+branch/status, source and self identities at start/pre-build/pre-test/post-test,
+the six locks, warning-as-error Release build, fresh DLL/PDB, child-only timeout
+`300`, monotonic outer bound `420000` ms, complete `8,388,608`-byte stdout/stderr
+logs, `1,048,576`-byte report, secure XML, native exit `1`, exact one-result TRX,
+sixteen counters, and zero forbidden diagnostics/attachments.
+`InvocationCommitted` irrevocably consumes R=0007 for every outcome; no changed
+or unchanged retry exists. Green is focused `1/1`, B `8/8`, A+B/full
+Conformance `40/40`, Domain `98/98`, plus build/format/locks/diff/StructureOnly/
+publication and two fresh `0/0/0` reviews. B-ADMISSION and every later packet
+remain held until the exact cache implementation head is hosted green.
+
+The exact design head passed Ubuntu in `20m54s` and Windows in `47m35s`, with
+publication verification skipped. After one compile-only diagnostic and one
+ValidateOnly runner-shape diagnostic, neither of which started the canonical
+child, fresh runner identity `35,007` bytes / SHA-256 `5967E18E...FEA0AC`
+accepted the sole R=0007: native/runner exit `1/0`, report SHA-256
+`3B380FBB...9D3291`, and TRX SHA-256 `514CCAE6...FBFE52`. The red source was
+`1,063/1,200` lines / SHA-256 `999B4E84...EDB9E`; the TRX sealed one exact
+Failed result/definition/entry, all sixteen counters, and zero forbidden
+attachments/collector data. Bounded green changes only the final aggregate
+return and is `1,063/1,200` lines / `38,102` bytes / SHA-256
+`41F3FC40...4717E4`, with zero production delta, build `0/0`, focused/B/full/
+Domain `1/1`, `8/8`, `40/40`, `98/98`, and clean format/diff. Exact-tree
+StructureOnly is green; publication evidence is `7/7` without a publication
+claim; fresh code/test and evidence/scope reviews each closed `0/0/0`.
+The owning ledger's exact cache implementation identity passed Ubuntu in
+`20m42s` and Windows in `49m17s`; publication verification was skipped.
+B-CACHE is immutable exact-head hosted history.
+
+### Reviewed-local-green `B-ADMISSION-01` proof-candidate admission contract
+
+`B-ADMISSION-01` started only from the exact hosted-green cache predecessor
+above. At its design checkpoint B remained `8/11` and cumulative A+B remained
+`40/43`; accepted R=0011 and bounded green now move them to `9/11` and `41/43`.
+The executable mutation allowlist is exactly:
+
+- modify
+  `tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ContractSliceBActivationTests.cs`;
+- add
+  `tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ContractSliceBAdmissionProofTests.cs`.
+
+Their combined normalized changed-line count is at most `2,400`; `2,401`
+requires a reviewed redesign before build or red. This admission-only exception
+does not change the general `1,200`-line B ceiling: the packet must close three
+proof leaves, instruction and receipt framing, and the entire bijection/
+lifecycle negative matrix in one test-owned boundary. Production, other retained
+tests, project, package, lock, workflow, Scenario, Policy, C, D,
+sealed-context, and qualified-reference deltas are zero. The design cohort is
+exactly the twelve existing Markdown/memory paths frozen by the B plan; it adds
+no tracked node or unique Markdown relation and retains schema-2 `512` nodes /
+`8,192` relations / `1,048,576` bytes per blob / `8,388,608` aggregate. P is `NotApplicable`.
+R contains the complete test-owned admission mirror and changes only the final
+valid aggregate return to `null!`; G restores the already computed non-null
+aggregate. The existing activation Fact stays green through R and G.
+
+The retained activation file changes only two test seams. Its existing
+`CreateManifest` helper becomes `internal static`. `ContractSliceBActivationProof`
+accepts one optional enumerable of exact `IAdmissionProofCandidate` references,
+materializes it once, rejects null elements/duplicates, and stores a private
+read-only copy; the omitted/default collection is empty. Its existing codec
+proof behavior is byte-semantically unchanged. `Proves(IAdmissionProofCandidate)`
+returns true only for the same allowlisted object reference and false for null,
+an equal-but-distinct object, or every default activation construction. It
+never validates candidate contents itself and therefore grants no public
+receipt authority.
+
+The new Tests-owned declarations are exact:
+
+```csharp
+internal sealed class AdmissionInstructionMirror
+{
+    internal string SlotKey { get; }
+    internal AdmissionProofKind Kind { get; }
+    internal string ContractKey { get; }
+    internal string ContractVersion { get; }
+    internal string MaterialRole { get; }
+    internal AcquisitionRequest Request { get; }
+    internal ExactSha256Digest ManifestDigest { get; }
+    internal ExactSha256Digest InstructionDigest { get; }
+    internal ReadOnlyMemory<byte> CanonicalBytes { get; }
+
+    internal static AdmissionInstructionMirror Create(
+        FinalizedPolicyManifest manifest,
+        string slotKey,
+        AdmissionProofKind kind,
+        string materialRole,
+        AcquisitionRequest request);
+}
+
+internal sealed class ClosedQualificationStateMirror
+{
+    internal ExactSha256Digest InstructionDigest { get; }
+    internal ExactSha256Digest DemandDigest { get; }
+    internal ModelContractIdentity OutputModel { get; }
+    internal EvidenceBinding Binding { get; }
+    internal ComponentArtifactBinding Codec { get; }
+    internal SemanticResourceLocalUsageMirror ClaimedUsage { get; }
+    internal SemanticResourceLocalUsageMirror MeasuredUsage { get; }
+    internal DecodeCacheDispositionMirror CacheDisposition { get; }
+
+    internal static ClosedQualificationStateMirror Create(
+        ExactSha256Digest instructionDigest,
+        ExactSha256Digest demandDigest,
+        ModelContractIdentity outputModel,
+        EvidenceBinding binding,
+        ComponentArtifactBinding codec,
+        SemanticResourceLocalUsageMirror claimedUsage,
+        SemanticResourceLocalUsageMirror measuredUsage,
+        DecodeCacheDispositionMirror cacheDisposition);
+}
+
+internal sealed class ObservedQualificationProofMirror : IObservedQualificationProof
+{
+    public IReadOnlyList<string> SlotKeys { get; }
+    public string ContractKey { get; }
+    public string ContractVersion { get; }
+    public ExactSha256Digest ManifestDigest { get; }
+    public ExactSha256Digest InstructionDigest { get; }
+    public ExactSha256Digest ReceiptDigest { get; }
+    public AcquisitionRequest Request { get; }
+    public ObservedAcquisitionResult Result { get; }
+    public IReadOnlyList<ComponentArtifactBinding> QualifiedCodecs { get; }
+    internal ClosedQualificationStateMirror State { get; }
+    internal ReadOnlyMemory<byte> CanonicalReceiptBytes { get; }
+
+    internal static ObservedQualificationProofMirror Create(
+        FinalizedPolicyManifest manifest,
+        AdmissionInstructionMirror instruction,
+        ObservedAcquisitionResult result,
+        IEnumerable<ComponentArtifactBinding> qualifiedCodecs,
+        ClosedQualificationStateMirror state,
+        ExactSha256Digest? forcedReceiptDigest = null);
+}
+
+internal sealed class FailedAttemptProofMirror : IFailedAttemptProof
+{
+    public IReadOnlyList<string> SlotKeys { get; }
+    public string ContractKey { get; }
+    public string ContractVersion { get; }
+    public ExactSha256Digest ManifestDigest { get; }
+    public ExactSha256Digest InstructionDigest { get; }
+    public ExactSha256Digest ReceiptDigest { get; }
+    public AcquisitionRequest Request { get; }
+    public FailedAcquisitionResult Result { get; }
+    internal ReadOnlyMemory<byte> CanonicalReceiptBytes { get; }
+
+    internal static FailedAttemptProofMirror Create(
+        FinalizedPolicyManifest manifest,
+        AdmissionInstructionMirror instruction,
+        FailedAcquisitionResult result,
+        ExactSha256Digest? forcedReceiptDigest = null);
+}
+
+internal sealed class NoInputRoutingProofMirror : INoInputRoutingProof
+{
+    public IReadOnlyList<string> SlotKeys { get; }
+    public string ContractKey { get; }
+    public string ContractVersion { get; }
+    public ExactSha256Digest ManifestDigest { get; }
+    public ExactSha256Digest InstructionDigest { get; }
+    public ExactSha256Digest ReceiptDigest { get; }
+    public AcquisitionRequest Request { get; }
+    internal ReadOnlyMemory<byte> CanonicalReceiptBytes { get; }
+
+    internal static NoInputRoutingProofMirror Create(
+        FinalizedPolicyManifest manifest,
+        AdmissionInstructionMirror instruction,
+        ExactSha256Digest? forcedReceiptDigest = null);
+}
+
+internal abstract class AdmissionReceiptMirror
+{
+    internal string SlotKey { get; }
+    internal ExactSha256Digest ReceiptDigest { get; }
+    internal ReadOnlyMemory<byte> CanonicalBytes { get; }
+    internal abstract TResult Accept<TResult>(IAdmissionReceiptMirrorVisitor<TResult> visitor);
+}
+
+internal sealed class ObservedAdmissionReceiptMirror : AdmissionReceiptMirror
+{
+    internal ObservedAcquisitionResult Result { get; }
+    internal ClosedQualificationStateMirror State { get; }
+    internal override TResult Accept<TResult>(IAdmissionReceiptMirrorVisitor<TResult> visitor);
+
+    internal static ObservedAdmissionReceiptMirror Create(
+        string slotKey,
+        ExactSha256Digest receiptDigest,
+        ReadOnlyMemory<byte> canonicalBytes,
+        ObservedAcquisitionResult result,
+        ClosedQualificationStateMirror state);
+}
+
+internal sealed class FailedAdmissionReceiptMirror : AdmissionReceiptMirror
+{
+    internal FailedAcquisitionResult Result { get; }
+    internal override TResult Accept<TResult>(IAdmissionReceiptMirrorVisitor<TResult> visitor);
+
+    internal static FailedAdmissionReceiptMirror Create(
+        string slotKey,
+        ExactSha256Digest receiptDigest,
+        ReadOnlyMemory<byte> canonicalBytes,
+        FailedAcquisitionResult result);
+}
+
+internal sealed class NoInputAdmissionReceiptMirror : AdmissionReceiptMirror
+{
+    internal AcquisitionRequest Request { get; }
+    internal override TResult Accept<TResult>(IAdmissionReceiptMirrorVisitor<TResult> visitor);
+
+    internal static NoInputAdmissionReceiptMirror Create(
+        string slotKey,
+        ExactSha256Digest receiptDigest,
+        ReadOnlyMemory<byte> canonicalBytes,
+        AcquisitionRequest request);
+}
+
+internal interface IAdmissionReceiptMirrorVisitor<TResult>
+{
+    TResult VisitObserved(ObservedAcquisitionResult result, ClosedQualificationStateMirror state);
+    TResult VisitFailed(FailedAcquisitionResult result);
+    TResult VisitNoInput(AcquisitionRequest request);
+}
+
+internal sealed class ContractSliceBAdmissionCoordinatorMirror
+{
+    internal IReadOnlyList<AdmissionReceiptMirror> Admit(
+        FinalizedPolicyManifest manifest,
+        IPolicyActivationProof activationProof,
+        IReadOnlyList<AdmissionInstructionMirror> instructions,
+        AcquisitionProofSet candidates,
+        CancellationToken cancellationToken);
+}
+```
+
+All concrete instance constructors are private; the abstract receipt base uses
+one `private protected` constructor, and its leaf `Create` factories above are
+the only construction route. The activation proof constructor appends
+exactly `IEnumerable<IAdmissionProofCandidate>? admissionCandidates = null`
+after its retained `bool provesMirror = true` parameter, materializes it once,
+rejects null elements and duplicate object references with parameter name
+`admissionCandidates`, and stores a read-only copy using reference equality.
+Exact `Create` factories above copy every
+text/list/byte input once, reject null/empty values with exact parameter names,
+and expose only read-only projections. Candidate classes implement exactly one
+public leaf interface; their common properties are the exact retained
+`IAdmissionProofCandidate` properties. The Observed factory additionally takes
+one canonical unique codec-binding list and one private
+`ClosedQualificationStateMirror`; Failed takes one `FailedAcquisitionResult`;
+NoInput has no result or state tail. The optional forced digest is accepted only
+by these Tests-owned negative factories; it never changes canonical receipt
+bytes. A negative-only dual-leaf implementation is confined to this Fact and
+never forms a valid result. Receipt leaves are created only inside `Admit`, use
+private constructors, and retain the independently recomputed canonical bytes.
+
+The fixture starts from `ContractSliceBActivationTests.CreateManifest()` and
+rebuilds only the three admission declarations/component bindings. Their exact
+mapping is:
+
+| Kind/rank | Contract key/version | Exact Tests-owned proof component | Surface / material |
+| --- | --- | --- | --- |
+| Observed / `0` | `protocol.admission.observed` / `1` | `MeAndAI.Protocol.Conformance.Tests.ObservedQualificationProofMirror` | Repository / `protocol.material.repository-tree` |
+| Failed / `1` | `protocol.admission.failed` / `1` | `MeAndAI.Protocol.Conformance.Tests.FailedAttemptProofMirror` | Provider / `protocol.material.governed-text` |
+| NoInput / `2` | `protocol.admission.no-input` / `1` | `MeAndAI.Protocol.Conformance.Tests.NoInputRoutingProofMirror` | Repository / `protocol.material.repository-target-resolution` |
+
+For each row, component key/version are copied exactly from the corresponding
+source admission declaration; only assembly/type become the named Tests-owned
+proof type. The matching same-key old component binding is replaced once and
+the new component is bound to the already present
+`MeAndAI.Protocol.Conformance.Tests.dll` artifact. After those replacements the
+source `MeAndAI.Protocol.Application.dll` artifact has no remaining component:
+its exact row must be removed, while every other artifact filename/length/
+digest/order remains byte-identical. Contract key/version, kind, activation
+proof, payload schemas, cache budget, every non-admission component, catalog
+slice, and complete catalog stay unchanged. Canonical write plus reparse must
+preserve the new manifest digest, all three declaration/type bindings, and the
+complete no-unbound-artifact component/artifact closure.
+
+The three issued instructions are canonical by SlotKey and each owns exactly
+one request/requirement:
+
+| Slot / leaf | Target and request | Requirement |
+| --- | --- | --- |
+| `protocol.slot.provider-governed-text` / Failed | Provider / ProviderEvent, subject `protocol.test.subject`, source `protocol.test.provider`, target `provider-event-0001`; adapter `protocol.adapter.test` / `1`, source contract `protocol.source.test` / `1` | `protocol.requirement.provider-governed-text`, governed-text schema `1`, Provider |
+| `protocol.slot.repository-target-resolution` / NoInput | Repository / ExactCommit, subject `protocol.test.subject`, source `protocol.test.repository`, target fixture commit: `0123456789abcdef0123456789abcdef01234567`; same adapter/source versions | `protocol.requirement.repository-target-resolution`, repository-target schema `1`, Repository |
+| `protocol.slot.repository-tree` / Observed | the same Repository target/request identities | `protocol.requirement.repository-tree`, repository-tree schema `1`, Repository |
+
+Every requirement retains the manifest slot's exact evidence kind,
+completeness contract, accepted consistency classes, payload schema, and
+material role. Request collections and `AcquisitionProofSet.Create` inputs use
+single-use enumerables and must be enumerated once. Mutating any source array or
+list after construction changes no instruction, candidate, or receipt.
+
+Both instruction and receipt framing use strict UTF-8, no BOM, no trailing
+bytes, unsigned big-endian `u32` counts/lengths, signed big-endian UTC ticks,
+one-byte closed ranks, and lowercase 64-hex digest text. Exact ranks are leaf
+Observed=`0`, Failed=`1`, NoInput=`2`; surface Repository=`0`, Provider=`1`,
+Workflow=`2`, Release=`3`; snapshot ExactCommit=`0`, Candidate=`1`,
+ProviderEvent=`2`, ProviderFullInventory=`3`, CapturedEvidence=`4`; status
+Complete=`0`, Incomplete=`1`, Failed=`2`; cache Produced=`0`, Retained=`1`.
+Joined and every unknown value are unencodable and invalid. Every `text` is
+`u32 byte-length || bytes`; every nullable digest is one byte `0` for absent or
+`1 || lowercase 64-byte hex` for present. The instruction header is exact ASCII
+`protocol.test.admission-instruction/1\n`, followed by SlotKey, manifest digest,
+leaf rank, contract key/version, material role, then the request target fields
+`SubjectIdentity`, `SourceIdentity`, surface, snapshot kind, target identity;
+adapter key/version; source key/version; and the one ordered requirement with
+all accepted-consistency values. SHA-256 of all bytes is InstructionDigest.
+
+The receipt header is exact ASCII `protocol.test.admission-receipt/1\n`,
+followed by the complete length-prefixed instruction frame, singleton SlotKey,
+proof component key/version/assembly/type, artifact filename/signed `i64`
+length/digest, and the
+variant tail. Observed writes status, complete scope target/boundary/timestamps,
+ordered requirement-acquisition count plus each requirement key/status/failure
+pair, ordered binding count plus each full location/payload schema/version/
+digest/requirement-key set, ordered page count plus sequence/nullable cursor
+digests/source-object count, total source-object count, one codec component/
+artifact binding, then closed-state instruction/demand/model/binding, cache
+disposition rank Produced=`0`/Retained=`1`, and claimed plus measured
+`GeneratedBytes`, `LayerDepth`, `LayerNodes`, `AdditionalComplexity`. The
+derived root-reference set must equal the binding-derived set but is not written
+a second time. Failed
+writes Started/Failed UTC ticks and canonical failure requirement/code pairs.
+NoInput writes no variant tail. SHA-256 of the complete bytes is ReceiptDigest;
+it is derived, copied, and never trusted from caller text.
+
+The Observed vector uses a complete exact-snapshot repository-tree context,
+one canonical binding and the manifest repository-tree codec binding. Its
+closed state uses the same InstructionDigest, a deterministic DemandDigest,
+the repository-tree output model/binding, equal claimed/measured local usage
+`(GeneratedBytes=4, LayerDepth=1, LayerNodes=2, AdditionalComplexity=3)`, and
+Produced cache disposition. A second valid vector uses Retained and yields the
+same admitted semantics. Joined is deliberately not admission-stable: a joined
+caller must consume the producer's Produced candidate or a later Retained
+candidate, so a Joined closed state is `AdmissionProofInvalid`. Failed covers
+its complete singleton requirement with
+`protocol.source.unavailable` over fixed UTC interval
+`2026-08-10T00:00:00.0000000Z` through `2026-08-10T00:01:00.0000000Z`.
+NoInput has no acquisition result, failure, codec, resource, or cache state.
+
+`Admit` order is exact: null arguments; cancellation; immutable manifest/
+instruction canonical order and uniqueness; one-time candidate flattening;
+null, exact-one-leaf, object-reference, SlotKey, and InstructionDigest
+uniqueness; candidate/instruction bijection; manifest contract, kind/key/version,
+exact CLR type, component/artifact, allowed surface/material, manifest digest,
+request, activation-proof contract key/version/manifest digest/exact artifact
+list, and `Proves(candidate)` reference result; instruction frame; variant tail; then
+receipt-frame recomputation, supplied-digest collision partition, and digest
+equality. Each successful receipt list follows instruction SlotKey order and is
+privately closed; no caller candidate escapes.
+
+For equal supplied ReceiptDigest values across distinct canonical slots, the
+coordinator first compares the independently recomputed receipt frames. Their
+embedded instruction/SlotKey fields make them unequal, so the pair fails with
+`CatalogIntegrityCode.CacheIdentityCollision`. Same-object, same-slot, or same-
+instruction duplicates have already failed as `AdmissionProofInvalid`. After
+collision closure, any supplied digest unequal to its own SHA-256 frame is
+`AdmissionProofInvalid`. Every other null, missing,
+extra, duplicate, dual/zero leaf, multi/empty/wrong SlotKeys, foreign or stale
+manifest, wrong instruction/request/contract/kind/type/component/artifact/
+surface/material/activation reference, noncanonical order, incomplete Failed
+coverage, Observed result/request/scope/acquisition/binding/page/source/reference
+mismatch, codec-set mismatch, open/partial qualification state,
+claimed/measured resource mismatch, foreign instruction/
+demand/model/binding, or disallowed cache disposition is atomically
+`AdmissionProofInvalid`. No prefix receipt set is returned.
+
+No additional lifecycle class, interface, adapter, or reusable seam is added.
+The Fact uses four local recording delegates over the already test-owned writer,
+qualifier, meter, and cache objects solely to prove the following order/count
+matrix. Source-intent rejection
+calls writer/qualifier/meter/cache zero times and constructs only Failed. Writer
+rejection calls writer once, the later three zero times, and constructs only
+Failed. Successful write followed by qualifier rejection calls writer and
+qualifier once, meter/cache zero times, and constructs only Failed. Only
+successful write, qualification, one exact measured-state closure, and one
+collision-checked cache completion construct Observed. A cache integrity or
+host failure propagates and constructs no candidate. NoInput calls writer,
+qualifier, meter, and cache zero times. Cancellation or timeout propagates
+unchanged, constructs no candidate, admits nothing, and is never cached.
+Admission itself reruns none of writer, qualifier, meter, or cache.
+
+The one direct Fact is
+`MeAndAI.Protocol.Conformance.Tests.ContractSliceBAdmissionProofTests.Admits_exact_observed_failed_and_no_input_proofs`,
+with only `ContractSlice=B`, no Scenario/Theory/class trait, and corrected exact
+marker `TEST-0210-B-BEHAVIOR-RED-0011`. Before calling `Admit`, it assembles each
+expected instruction/receipt vector through an independent Fact-local sequence
+of explicit strict-UTF8 and `BinaryPrimitives` writes that shares no production
+or mirror frame helper, then asserts byte equality and SHA-256 equality. It
+proves three valid leaf receipts, canonical input-order independence, defensive
+copies, exact lifecycle call counts, every failure partition above, no partial
+escape, and unchanged activation behavior.
+Red replaces only the final valid aggregate with `null!`; only that null reaches
+direct `Assert.Fail(marker)`.
+
+R=0008 is immutable diagnostic/no-success and is never rerun. The sole
+committed child built with zero warnings/errors, selected the exact Fact, and
+failed before the marker at `CreateAdmissionManifest` because the first design
+retained the now-unbound `MeAndAI.Protocol.Application.dll` artifact. The exact
+error was `System.FormatException: The manifest artifactFiles array must be
+fully bound.` Its one-result TRX was `8,057` bytes with SHA-256
+`A03E01BB075E75CA16B78D5A71C36DE18A4782A00BA0B86C61147757080F564A`;
+raw marker count was `0`, so the runner correctly ended `OracleRejected`.
+Report SHA-256 was
+`81A6867573F55C4AB053A742A676DF67DA052E6B1389E7FB341BCB6FD12BA778`.
+That failed attempt contributes no expected-red or green evidence.
+
+R=0009 is also immutable diagnostic/no-success and is never rerun. The owning
+ledger's exact linked first-correction design head/run passed Ubuntu `21m06s`,
+Windows `50m29s`, with publication verification skipped. The sole committed
+child rebuilt warning-free and
+selected the exact Fact, but `CreateInstructions` called `Rules.Single()` on
+the exact five-rule catalog and failed before the marker with
+`System.InvalidOperationException: Sequence contains more than one element`.
+Its sole TRX was `6,588` bytes / SHA-256
+`CE7F41C8E07180DB5437B8EBA238E392E7070991D62BE6EBCBED9048E705A299`;
+report/stdout/stderr were `575` / `2,878` / `196` bytes at SHA-256
+`4C465CB3CB41F3B80282755551EC5678A6BFAB10A51722888F8B09B362BFD9C5` /
+`0CED23BCD36169539D28B0DC509BD3C58E9BFD541E594B62E4CF079FC7280079` /
+`DEF57F2B782F8E9BD59E6FD711410E10C460E911C416CB9CF2D47E00ABE6CE13`.
+The TRX has one Failed result/definition/entry, exact `1/1/1` total/executed/
+failed counters, raw marker count `0`, and exact stack ownership at
+`CreateInstructions`; the runner correctly ended `OracleRejected`.
+
+R=0010 is a third immutable diagnostic/no-success and is never rerun. The
+owning ledger's exact linked second-correction design head and run passed
+hosted validation (Ubuntu `21m14s`, Windows
+`43m27s`, publication verification skipped). The sole committed child rebuilt
+warning-free and selected the exact Fact, but the Joined-state negative vector
+reached `AdmissionMirrorFrame.WriteObserved`. The existing frame switch encoded
+only Produced/Retained and threw marker-free `System.InvalidOperationException:
+Operation is not valid due to the current state of the object.` before the
+coordinator could reject Joined. The one-result TRX was `8,395` bytes / SHA-256
+`584BC5F27E66E38659E052791C5B01D10720AD3BE87A1E0A97FC43E45F83FEC2`,
+had exact `1/1/1` total/executed/failed counters and raw marker count `0`, and
+the runner ended `OracleRejected`. The owning ledger retains exact runner,
+root, report, and log custody.
+
+The retained second correction changes only the slot-selection fixture.
+`RequireCanonicalSlot(manifest, slotKey, expectedOccurrences)` flattens the
+catalog rules in their canonical manifest order, filters by exact ordinal
+SlotKey, requires Provider governed-text=`3`, repository-target=`3`, and
+repository-tree=`2`, and retains the first declaration only after every later
+occurrence equals it in `Requirement`, `ProfileSurfaces`, `MaterialRole`,
+`TargetSelectorKey`, and the ordered `Capabilities` sequence. Missing, extra,
+or semantically unequal repeated declarations fail marker-free before any
+instruction or candidate is constructed. No dictionary collapse, manifest
+mutation, new carrier, admission behavior change, or line-cap exception is
+permitted. Third-corrected R=0011 additionally maps only the test-owned receipt
+frame's `DecodeCacheDispositionMirror.Joined` to byte rank `2`; Produced stays
+`0`, Retained stays `1`, and every unknown value remains unencodable. Rank `2`
+is deterministic invalid-candidate identity only: the coordinator must still
+reject Joined as `AdmissionProofInvalid`, and no admitted semantics change.
+The final valid aggregate remains `null!` for R and is exactly
+`new AdmissionAggregateMirror(receipts, (1, 1, 1), true)` for G.
+
+The packet-specific red command is exactly:
+
+```text
+dotnet test tests/dotnet/MeAndAI.Protocol.Conformance.Tests/MeAndAI.Protocol.Conformance.Tests.csproj --configuration Release --no-restore --no-build --nologo --verbosity minimal --results-directory "<fresh-root>" --logger "trx;LogFileName=TEST-0210-B-BEHAVIOR-RED-0011.trx" --filter "ContractSlice=B&FullyQualifiedName=MeAndAI.Protocol.Conformance.Tests.ContractSliceBAdmissionProofTests.Admits_exact_observed_failed_and_no_input_proofs"
+```
+
+A fresh external runner specializes the accepted R=0007 custody contract to
+the two exact source paths, combined `2,400`-line ceiling, marker/FQN, fresh
+R=0011 root/report/log paths, exact source/self/HEAD/upstream/branch/status and
+six-lock identities at start/pre-build/pre-test/post-test, warning-as-error
+Release build, fresh DLL/PDB, `--no-build`, child-only
+`VSTEST_CONNECTION_TIMEOUT=300`, monotonic `420000`-ms bound, complete
+`8,388,608`-byte stdout/stderr logs, `1,048,576`-byte atomic report, secure XML,
+native exit `1`, exact one-result TRX, sixteen counters, and zero forbidden
+diagnostics/attachments. The exact error Message is marker-only; the same
+result's StdOut may contain zero or one byte-identical marker echo, and the TRX
+may contain zero or one marker-free same-FQN `[FAIL]` RunInfo. Raw marker count
+is therefore exactly one or two; no other marker or diagnostic is accepted.
+`InvocationCommitted` irrevocably consumes R=0011 for
+every process-create, timeout, exit, interruption, artifact, or oracle outcome;
+no changed or unchanged retry exists. Only pre-commit preflight/build failures
+may be corrected under a new reviewed source/runner identity.
+
+Green is focused `1/1`, B `9/9`, A+B/full Conformance `41/41`, Domain `98/98`,
+warning/error-free Release build, format/locks/diff/StructureOnly/publication,
+and fresh code/test plus evidence/scope reviews `0/0/0`. At that design
+checkpoint, B-SEALED-CONTEXT and every later packet remained held until the
+exact admission implementation head became hosted green. The immutable evidence
+below closes that predecessor gate; this historical admission design granted no
+successor R or implementation authority by itself.
+
+R=0011 is accepted/immutable under the exact one-shot custody in the owning
+ledger. It proves the direct Fact, marker-only assertion path, exact
+result/definition/entry identity, sixteen counters, source/runner/lock/build/
+DLL/PDB closure, native exit `1`, runner exit `0`, and no forbidden diagnostic
+or attachment. Bounded green changes only the final aggregate return and passes
+focused `1/1`, B `9/9`, full Conformance `41/41`, Domain `98/98`, warning-free
+Release build, format/diff, publication `7/7` without publication claim, and
+StructureOnly. Code/test and evidence/scope reviews are each `0/0/0`.
+B-ADMISSION then passed exact-head hosted validation: Ubuntu `20m17s`, Windows
+`42m17s`, with publication verification skipped. It is immutable hosted-green
+history and opens only the following design freeze.
+
+### Frozen `B-SEALED-CONTEXT-01` ContextProof/Root contract
+
+The packet reuses the already admitted, lifecycle-closed Tests-owned aggregate
+without reopening admission. Its executable allowlist is exactly:
+
+```text
+modify tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ContractSliceBAdmissionProofTests.cs
+add    tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ContractSliceBSealedContextTests.cs
+```
+
+The retained file changes `ExecuteContract` and `CreateAdmissionManifest` from
+`private static` to `internal static`; prepends `CatalogAuthorityKind
+AuthorityKind`, `ExactSha256Digest ManifestDigest`, and `CatalogVersion
+CatalogVersion` to the Tests-owned `AdmissionAggregateMirror`; and populates
+those three fields from the admitted manifest in its sole successful aggregate
+return. Its Fact, marker R=0011, fixture, canonical frames, candidates,
+receipts, negative matrix, and every existing assertion remain byte-
+semantically unchanged. The identity extension is successor-owned, introduces
+no second aggregate, and is the only detached manifest-authority carrier. The
+new file plus these retained-file edits are at most `1,200` normalized changed
+lines; `1,201` requires a new reviewed design. Production, public API, project,
+package, lock, workflow, Policy, Scenario, C, and D deltas are zero.
+
+The new file declares exactly this Tests-owned mint surface:
+
+```csharp
+internal sealed record SealedContextProjectionMirror(
+    SealedEvaluationContext Context,
+    QualifiedEvidenceReference ContextProof,
+    IReadOnlyList<QualifiedEvidenceReference> Roots);
+
+internal static class ContractSliceBSealedContextCoordinatorMirror
+{
+    internal static SealedContextProjectionMirror? Seal(
+        FinalizedPolicyManifest manifest,
+        AdmissionAggregateMirror aggregate);
+}
+```
+
+There is no overload, generic variant, adapter, second aggregate, production
+coordinator, public constructor/factory, raw-byte parameter, caller-supplied
+digest, selector, or derivation seam. The coordinator uses the existing
+assembly-internal constructors of the actual public `SealedEvaluationContext`
+and `QualifiedEvidenceReference` carriers. The projection record copies its
+root list; both product carriers retain their existing defensive copies.
+
+The valid fixture is rebuilt twice from the same canonical A manifest graph:
+`CreateAdmissionManifest()` supplies the exact finalized manifest, while
+`ExecuteContract()` supplies the exact accepted aggregate. Their manifest
+identities must be structurally and digest equal; object identity is not
+required. The aggregate's frozen leading identity fields are exactly
+`manifest.AuthorityKind`, `manifest.ManifestDigest`, and
+`manifest.Slice!.CatalogVersion`; `Seal` compares all three before inspecting
+any receipt. The manifest has `CatalogAuthorityKind.QualificationSlice`, a
+non-null `CatalogSliceDeclaration`, null complete catalog, and catalog version
+`1`. The aggregate has lifecycle closed, leaf counts `(1,1,1)`, and these exact
+ordinal receipts:
+
+```text
+protocol.slot.provider-governed-text        Failed
+protocol.slot.repository-target-resolution NoInput
+protocol.slot.repository-tree              Observed
+```
+
+Failed and NoInput remain safe acquisition-attempt evidence but are not
+admitted, add no scope, and mint no reference. Only the complete Observed
+repository-tree receipt is eligible. Its slot occurs exactly twice in the
+manifest rules with semantically equal declarations; the canonical declaration
+owns requirement `protocol.requirement.repository-tree`. Its context has one
+Complete requirement acquisition, one binding, no page, one source object, one
+root, exact Repository/ExactCommit scope at the synthetic commit value: `0123456789abcdef0123456789abcdef01234567`,
+and the privately retained
+qualification binding equal to that context binding.
+
+The resulting `SealedEvaluationContext` is exact:
+
+- authority, manifest digest, and catalog version equal the finalized manifest;
+- admitted slot keys are exactly `protocol.slot.repository-tree`;
+- scopes contain exactly the one structural Observed scope;
+- both lists are ordinal, unique, read-only defensive copies; and
+- no payload bytes, context digest, proof candidate, receipt bytes, request,
+  binding, cache/resource state, or failure object is exposed.
+
+The ContextProof `QualifiedEvidenceReference` has kind `ContextProof`, exact
+manifest/catalog/slot/requirement/scope, and
+`QualificationProofDigest == ObservedAdmissionReceiptMirror.ReceiptDigest`.
+Its Root, Location, ExpectedSelectorParentKind, and Selector are null and its
+Derivations list is empty. Exactly one Root reference is minted from the one
+accepted `RootEvidenceReference`; it retains the same top-level identities and
+proof digest, has kind `Root`, exact structural Root and `Root.Location`, empty
+Derivations, and null parent/selector. Neither reference can be widened into a
+Derived or ExpectedSelector row in this packet.
+
+Validation and error precedence are closed:
+
+1. null manifest/aggregate or null collection element is the corresponding
+   argument-boundary exception;
+2. wrong authority, missing/wrong slice/complete-catalog state, catalog version,
+   or any manifest-to-aggregate authority/digest/version inequality is
+   `CatalogIntegrityCode.ManifestInvalid`;
+3. open lifecycle, wrong leaf counts, null/duplicate/non-ordinal receipts,
+   wrong receipt leaf partition, receipt-byte/digest drift, unknown/foreign
+   slot, or failed/no-input admission is `AdmissionProofInvalid`; and
+4. Observed request/slot/requirement/status/context/binding/root/qualification
+   mismatch is `AdmissionProofInvalid`.
+
+All negative vectors are marker-free and no partial context/reference set
+escapes. Reordered input is rejected rather than silently sorted; accepted
+output is already canonical. Input arrays/lists are mutated after sealing to
+prove defensive copies. Equality is structural and ordinal; reference object
+identity is never authority.
+The coordinator accepts no caller-supplied reference, derivation, parent, or
+selector. Its ContextProof/Root null-empty/exact-location shapes are therefore
+positive output postconditions, not a synthetic `ReferenceInvalid` negative
+seam. Malformed/foreign-session derived-reference rejection remains exclusively
+owned by `B-CODEC-DERIVATION-01`, whose reference frame carries that identity;
+this packet neither invents nor infers a session value.
+
+The sole Fact is
+`MeAndAI.Protocol.Conformance.Tests.ContractSliceBSealedContextTests.Seals_exact_context_proof_and_root_references`.
+It is one direct non-skipped Fact with only `ContractSlice=B`, no Scenario,
+Theory, class trait, overload, or second method. The canonical marker/TRX stem is
+`TEST-0210-B-BEHAVIOR-RED-0012`. P is `NotApplicable`. R completes every valid
+and negative assertion, then only the fully prepared valid `Seal` return is
+`null!`; only that null reaches `Assert.Fail(Marker)`. G changes only the final
+return to the already computed `SealedContextProjectionMirror`.
+
+Canonical R is one exact Release `--no-restore --no-build --nologo --verbosity
+minimal` test command with a fresh result root, exactly one R=0012 TRX logger,
+and filter
+`ContractSlice=B&FullyQualifiedName=MeAndAI.Protocol.Conformance.Tests.ContractSliceBSealedContextTests.Seals_exact_context_proof_and_root_references`.
+The packet retains process-scoped `VSTEST_CONNECTION_TIMEOUT=300`, monotonic
+`420000`-ms child custody, complete stdout/stderr `8,388,608`-byte ceilings,
+report `1,048,576`-byte ceiling, exact source/runner/build/PDB/lock/status
+binding, and secure one-result TRX/16-counter/no-attachment oracle.
+`InvocationCommitted` irrevocably consumes R=0012; no process-create, timeout,
+exit, interruption, root/TRX, source/binary, or oracle failure may be retried.
+Only pre-commit preflight/build failures may be corrected under a newly reviewed
+identity without creating R.
+
+Green is focused `1/1`, B `10/10`, A+B/full Conformance `42/42`, Domain `98/98`,
+warning/error-free Release build, format, six locks, diff, StructureOnly,
+publication evidence without publication claim, and fresh code/test plus
+evidence/scope reviews `0/0/0`. B-CODEC-DERIVATION, B-CONVERGE, parent
+[TEST-0210](test-cases.md#test-0210) activation, C/D, the runtime-efficiency
+scenario, merge, release, publication, and DoD remain held. At that historical
+freeze checkpoint, no red or implementation authority existed until the exact
+design head became hosted green.
+
+### Accepted `B-SEALED-CONTEXT-01` evidence and local-green closure
+
+The corrected B-SEALED design predecessor passed exact-head hosted validation.
+The sole canonical R=0012 invocation then produced native exit `1`, runner exit
+`0`, and exactly one marker-owned Failed result/definition/entry. Its sole TRX
+is `4,842` bytes / SHA-256
+`24B78DD8AEF0B7D95B7D9FB653A233B333D2EB10DB71893516C00F01D73A98B4`;
+the append-state report SHA-256 is
+`3764392A7E5CDCC3E1A2F7C447067492053D25340C60DE408A765A77A15E3A21`.
+The exact 16-counter, stack/echo/RunInfo, no-attachment, source/runner/build/
+binary/lock/status oracle passed. R=0012 is accepted, immutable, and never
+rerun.
+
+Green removes the marker/null branch and restores only the already computed
+projection. The retained admission source is `64,871` bytes / SHA-256
+`D6E34E10A121447FE25906451FEAE2623D3B18D0B0AA1CD6EC2C1123C5066E63`;
+the final sealed-context source is `534` lines, `20,197` bytes / SHA-256
+`D83BB1E5A729F5890F8D2B577209C200802478EDEE6D0068C1D909BAF89F1AC6`;
+combined changed lines are `549/1,200`. Focused/B/full Conformance/Domain are
+`1/1`, `10/10`, `42/42`, `98/98`; warning/error-free Release build, format and
+diff are green. B-SEALED is `ReviewedLocalGreen`; the exact implementation head
+remains hosted pending and grants no successor execution authority by itself.
+
+### Frozen `B-CODEC-DERIVATION-01` qualified-reference contract
+
+This is the final executable B packet. Its exact mutation allowlist is:
+
+```text
+add tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ContractSliceBQualifiedReferenceTests.cs
+```
+
+No existing file changes. Production, public API, project, package, lock,
+workflow, Policy, Scenario, C, and D deltas are exactly zero. The new file has a
+normal B packet ceiling of `1,200` normalized lines; `1,201` requires reviewed
+redesign.
+
+The Tests-owned callable surface is exact:
+
+```csharp
+internal sealed record CodecDerivedReferenceFrameMirror(
+    QualifiedEvidenceReference Parent,
+    ComponentArtifactBinding Codec,
+    ExactSha256Digest ArtifactDigest,
+    ModelContractIdentity OutputModel,
+    string TypedNodeKind,
+    string TypedNodeIdentity,
+    EvidenceLocation Location);
+
+internal static class ContractSliceBCodecDerivedReferenceCoordinatorMirror
+{
+    internal static IReadOnlyList<QualifiedEvidenceReference>? Seal(
+        FinalizedPolicyManifest manifest,
+        SealedContextProjectionMirror context,
+        IReadOnlyList<CodecDerivedReferenceFrameMirror> frames);
+}
+```
+
+No overload, generic variant, alternate codec/adapter, public factory,
+production coordinator, raw payload/digest seam, selector, parser, index,
+capability, cache, resource, admission, or kernel surface exists. `Seal`
+defensively copies the frame collection and constructs only existing internal
+`QualifiedEvidenceReference` / `QualifiedEvidenceDerivation` carriers.
+
+The exact input session is the structural tuple already carried by the accepted
+root: manifest digest, catalog version, slot, requirement, scope,
+qualification-proof digest, root, and root location. A separately constructed
+but field-equal parent is accepted; object identity is never authority. Any
+inequality in that tuple is a foreign session and is rejected. The manifest
+must be a QualificationSlice with null CompleteCatalog, and the supplied sealed
+context must exactly match authority/digest/catalog, admitted slot and scope.
+
+The canonical repository-tree slot/schema resolves exactly one manifest codec
+component binding. That binding's artifact basename resolves exactly one
+`ArtifactFileBinding`, and the schema's output model is the only accepted model.
+The frame's component, artifact basename, artifact digest and output model must
+be field-equal to those manifest-owned values. Component equality is ordinal
+across key/assembly/type; model equality is ordinal across key/version/
+implementation type; artifact identity is ordinal basename plus exact digest.
+
+The valid frame list contains exactly two rows, already strictly ordinal by
+`(TypedNodeKind, TypedNodeIdentity)`:
+
+| Rank | Typed node kind | Typed node identity | Location |
+| --- | --- | --- | --- |
+| 0 | `protocol.codec-output.repository-tree` | `<model-key>@<model-version>` | the exact parent `SnapshotEvidenceLocation` |
+| 1 | `protocol.codec-output.repository-tree` | `<model-key>@<model-version>#AGENTS.md` | `RepositoryEvidenceLocation` with the same exact scope, path `AGENTS.md`, blob identity equal to the ExactCommit target, and null line/anchor/property |
+
+Snapshot equality and that one Repository refinement are the only
+same-or-narrower forms. A changed scope, Provider/ReleaseAsset location,
+repository path other than `AGENTS.md`, missing/foreign blob, or any refinement
+is widening/drift and fails. The repository factory continues to own lexical
+path/blob validity; this coordinator owns contextual narrowing.
+
+Each output is a `QualifiedEvidenceReferenceKind.Derived` reference. It retains
+the parent's exact manifest/catalog/slot/requirement/scope/proof/root, takes the
+frame location, contains exactly one derivation, and has null
+ExpectedSelectorParentKind and Selector. The derivation contains exact codec
+component, artifact basename/digest, output model, null output capability,
+exact typed-node kind/identity, and the same frame location. Outputs preserve
+input ordinal order and the returned list is read-only/defensively copied.
+
+Validation/error precedence is exact and no partial output escapes:
+
+1. null `manifest`, `context`, or `frames` is its corresponding
+   `ArgumentNullException`; a null frame row is `ArgumentException` with
+   `ParamName=frames`;
+2. wrong manifest authority/slice/complete-catalog state or sealed-context
+   authority/digest/catalog/admitted-slot/scope drift throws
+   `CatalogIntegrityCode.ManifestInvalid`;
+3. a parent not structurally identical to the sole sealed Root, including
+   foreign manifest/catalog/proof/scope/root/location identity or a non-Root,
+   non-empty derivation, parent-kind, or selector field, throws
+   `CatalogIntegrityCode.ReferenceInvalid`;
+4. codec component/artifact/model drift or non-unique/missing manifest
+   resolution throws `ReferenceInvalid`;
+5. null/empty/whitespace or non-exact typed-node values, a widened/drifted
+   location, or a location unequal to its derivation location throws
+   `ReferenceInvalid`; and
+6. non-strict ordinal input, duplicate `(kind,identity)` keys, an exact
+   duplicate, or same-key unequal rows are collisions and throw
+   `ReferenceInvalid` before construction.
+
+The structural comparator covers reference kind, manifest, catalog, slot,
+requirement, scope, proof, root, location, ordered derivations and null parent/
+selector fields; each derivation comparator covers component, artifact,
+artifact digest, model/capability, typed-node kind/identity, and location.
+Repeating `Seal` with separately built field-equal inputs produces a field-equal
+ordered result. Mutating the caller frame array after return cannot change it.
+
+The sole Fact is
+`MeAndAI.Protocol.Conformance.Tests.ContractSliceBQualifiedReferenceTests.Seals_exact_codec_derived_reference_and_location_narrowing`.
+It is one direct non-skipped Fact with only `ContractSlice=B`, no Scenario,
+Theory, class trait, overload, or second method. Corrected marker/TRX stem is
+`TEST-0210-B-BEHAVIOR-RED-0014`. P is `NotApplicable`. R executes all negative
+and deterministic assertions, prepares both valid references, then changes only
+the final nullable `Seal` return to `null!`; only that null reaches direct
+`Assert.Fail(Marker)`. G restores only the prepared read-only result.
+
+R=0013 is an immutable infrastructure diagnostic/no-success. ValidateOnly
+proved exact head/upstream/branch/status, source/runner identities, six locks,
+line budget, and absent artifacts. The sole Execute reached
+`InvocationCommitted`, but VSTest failed before the Fact with
+`SocketException (10055)` while binding its communication socket. Its TRX has
+zero result/definition/entry nodes, all sixteen counters zero, one Error RunInfo,
+and raw marker count zero. The preserved runner/report/TRX/log hashes are owned
+by the B codec evidence ledger; R=0013 is never rerun.
+
+Corrected R=0014 retains the same FQN and semantic null seam, follows one
+warning-free Release `--no-restore` build, and uses one exact command:
+
+```text
+dotnet test tests/dotnet/MeAndAI.Protocol.Conformance.Tests/MeAndAI.Protocol.Conformance.Tests.csproj --configuration Release --no-restore --no-build --nologo --verbosity minimal --results-directory <fresh-root> --logger trx;LogFileName=TEST-0210-B-BEHAVIOR-RED-0014.trx --filter ContractSlice=B&FullyQualifiedName=MeAndAI.Protocol.Conformance.Tests.ContractSliceBQualifiedReferenceTests.Seals_exact_codec_derived_reference_and_location_narrowing
+```
+
+This is the R=0014-scoped replacement of the generic template. Its fresh
+external regular/non-reparse CreateNew runner/report/stdout/stderr paths, exact
+runner bytes/SHA/AST, exact source/head/upstream/branch/full porcelain status at
+start/pre-build/pre-test/post-test, six locks, warning/error-free build,
+fresh DLL/PDB, absent-then-empty result root, a single-node/non-reuse build
+(`-m:1 /nr:false` and disabled shared compilation), process-only
+`VSTEST_CONNECTION_TIMEOUT=300`, one child/logger, `420000`-ms monotonic bound,
+complete `8,388,608`-byte log ceilings, `1,048,576`-byte report ceiling, native
+integer exit `1`, secure no-DTD/no-external-resolution XML, and exact one-result
+marker/optional-stack/echo/RunInfo/16-counter/no-diagnostic/no-attachment oracle
+are mandatory. Overflow or truncation is `OracleRejected`.
+Immediately before commit, no matching dotnet-test/testhost/vstest process may
+exist and sixteen simultaneous loopback ephemeral listeners must open, remain
+held, and dispose successfully. Failure is preflight-only. TRX structural/result
+and infrastructure checks precede marker counting, so zero-result RunInfo
+failure cannot be mislabeled as marker drift.
+`InvocationCommitted` irrevocably consumes R=0014: process-create failure,
+timeout, unexpected exit, interruption/crash, missing/malformed/extra TRX, or
+any oracle rejection is immutable no-success/no-retry. Only a failure before
+that atomic state may be corrected and revalidated without creating R.
+
+The synchronized R=0014 design head passed exact-head Ubuntu/Windows hosted
+validation before execution. The fresh `37,763`-byte runner, SHA-256
+`0E437E0D6269D4A7691388E9AF9F340587B5C4DD0BDD8ACA08A96241B93532DE`,
+parsed at `5,417` tokens / `40` statements / zero errors. ValidateOnly closed
+all static, source, lock, socket, process, and absent-path predicates. The sole
+Execute then accepted canonical R=0014 with native exit `1`, runner exit `0`,
+one exact Failed result/definition/entry, marker count two, and exact counters.
+The owning codec ledger retains the report/TRX/log paths and hashes. Green
+changed only the final `null!` return to the prepared read-only result; Release
+build was `0/0`, focused/B/full/Domain were `1/1`, `11/11`, `43/43`, and
+`98/98`, and format was unchanged.
+
+Green requires focused `1/1`, B `11/11`, A+B/full Conformance `43/43`, Domain
+`98/98`, warning/error-free Release build, format, six locks, diff,
+StructureOnly, publication evidence without publication claim, and fresh
+code/test plus evidence/scope reviews `0/0/0`. `B-CONVERGE-01` remains a pure
+P/R/G `NotApplicable` cumulative audit. Parent [TEST-0210](test-cases.md#test-0210), final
+Scenario/status/owner and both workflow filters,
+[TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146), C/D,
+activation, merge, release, publication, and DoD remain held. R=0014 is
+immutable and never reruns. Its implementation is exact-head hosted green;
+B-CONVERGE pure audit is complete locally with final-sync hosted pending.
+
 ## [TEST-0210](test-cases.md#test-0210) expected-red contract
 
 [TEST-0210](test-cases.md#test-0210) is project-neutral, table-driven, and
@@ -8463,8 +10401,15 @@ invocation, or weaken
 ContractSlice A's historical delivery is owned by its
 [micro-delivery control plan](subf-0143-micro-delivery-plan.md). ContractSlice
 B is decomposed by the current
-[B micro-delivery plan](subf-0143-contractslice-b-micro-delivery-plan.md), which
-is `FrozenDesign` but activates no test or implementation.
+[B micro-delivery plan](subf-0143-contractslice-b-micro-delivery-plan.md).
+Surface, codec activation, all three wires, B-RESOURCE, B-CACHE, B-ADMISSION,
+and B-SEALED-CONTEXT are hosted green; repository-target R=0004 is diagnostic-only, while canonical
+R=0005, resource R=0006, cache R=0007, admission R=0011, and sealed-context
+R=0012 and corrected codec-derivation R=0014 are accepted/immutable. B is
+`11/11`, A+B is `43/43`. Admission
+R=0008/R=0009/R=0010 and codec-derivation R=0013 are immutable
+diagnostics/no-success. Corrected R=0014 is exact-head hosted green.
+B-CONVERGE pure audit is complete locally with final-sync hosted pending.
 
 B implementation and C/D still require separate future activation, and no
 packet is active merely from this list. No directive here allocates new stable

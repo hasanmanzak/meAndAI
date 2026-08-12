@@ -1,6 +1,6 @@
 # Project Snapshot
 
-Last verified: **2026-08-09**
+Last verified: **2026-08-10**
 
 ## Verified facts
 
@@ -9,8 +9,12 @@ Last verified: **2026-08-09**
   [`854bc97056d9e3250ab4c6caa7558825904466e8`](https://github.com/hasanmanzak/meAndAI/commit/854bc97056d9e3250ab4c6caa7558825904466e8)
   reached `4096/4096` edges and `4192113/4194304` parsed bytes after canonical
   compaction. [DEC-0036](../../docs/decisions/DEC-0036-prospective-instruction-graph-capacity.md)
-  therefore freezes the prospective `v0.17.0` profile at `8192` edges and
-  `8388608` aggregate parsed bytes while preserving every earlier target.
+  therefore freezes the prospective `v0.17.0` profile at `8192` edges,
+  `1048576` bytes per parsed blob, and `8388608` aggregate parsed bytes while
+  preserving every earlier target. A bounded pre-failure amendment is
+  exact-head hosted green after the ContractSlice B typed-design blob crossed
+  the former per-blob ceiling and its first complete wire draft crossed a
+  packet-local line threshold; release and publication remain separate.
   [TEST-0223](../../docs/features/FEAT-0069-instruction-graph-capacity/test-cases.md#test-0223)
   has immutable expected-red plus focused graph, quick-adoption profile,
   StructureOnly, publication-evidence, and exact-main Ubuntu/Windows greens;
@@ -151,7 +155,7 @@ Last verified: **2026-08-09**
   Ubuntu in `20m44s` and Windows in `46m51s`; publication verification was
   correctly skipped. The exact lifecycle implementation identity recorded in
   the canonical handoff passed Ubuntu in `19m36s` and Windows in `36m02s`; publication verification was
-  correctly skipped. ContractSlice A is merged and exact-main hosted green. ContractSlice B is `FrozenDesign`/inactive pending its design delivery's exact-head hosted-green gate and a separate implementation directive; the parent scenario, C/D, and final activation remain held. Follow the current [canonical log index](log/README.md). The
+  correctly skipped. ContractSlice A is merged/exact-main green. All B implementation packets are exact-head hosted green; R=0005/R=0006/R=0007/R=0011/R=0012 and corrected codec-derivation R=0014 remain accepted/immutable. Repository-target R=0004, admission R=0008/R=0009/R=0010, and codec-derivation R=0013 remain immutable diagnostics/no-success. B is `11/11`, cumulative A+B `43/43`; B-CONVERGE pure audit is complete locally with final-sync exact-head hosted pending. The parent scenario, C/D, and final activation remain held. Follow the current [canonical log index](log/README.md). The
   predecessor-manifest exact-head hosted-green handoff indexed there is
   immutable history; the admission-proof reviewed-local-green handoff,
   the selector reviewed-local-green handoff in the canonical log index,

@@ -314,7 +314,7 @@ if ($schema1PolicyContract.Schema -ne 1 -or
     $schema2PriorPolicyContract.Schema -ne 2 -or
     $schema2PriorPolicyContract.MaximumBlobBytes -ne 524288 -or
     $schema2PolicyContract.Schema -ne 2 -or
-    $schema2PolicyContract.MaximumBlobBytes -ne 524288) {
+    $schema2PolicyContract.MaximumBlobBytes -ne 1048576) {
     throw 'TEST-0153 immutable schema-1 and candidate schema-2 policy probes were not exact.'
 }
 

@@ -6,16 +6,29 @@ and follow its canonical links.
 ## Current continuation
 
 Follow the current
-[ContractSlice B design-freeze handoff](2026-08-09-feat-0065-subf-0143-contractslice-b-design-freeze.md).
-ContractSlice A is merged and exact-main hosted green; B is `FrozenDesign` and
-inactive pending this design delivery's exact-head hosted-green gate and a
-separate implementation directive. The parent scenario remains `Planned`.
+[ContractSlice B codec-activation and wire handoff](2026-08-09-feat-0065-subf-0143-contractslice-b-codec-activation-freeze.md).
+ContractSlice A is merged/exact-main green; `B-SURFACE-01` and
+`B-CODEC-ACTIVATION-01` plus `B-WIRE-REPOSITORY-TREE-01` are exact-head hosted
+green. `B-WIRE-GOVERNED-TEXT-01` is exact-head hosted green;
+Repository-target R=0004 is an immutable oracle-rejected diagnostic with no
+canonical red. Canonical R=0005 is accepted and repository-target is exact-head
+hosted green; its owning B wire ledger retains exact implementation/run custody.
+B-RESOURCE R=0006 is accepted, immutable, and exact-head hosted green. Cache
+R=0007 is accepted/immutable and B-CACHE plus B-ADMISSION are exact-head hosted
+green. Admission R=0008, R=0009, and R=0010 are immutable diagnostic/no-success
+attempts; canonical R=0011 and sealed-context R=0012 are accepted/immutable,
+  and B-SEALED-CONTEXT is exact-head hosted green. Codec-derivation R=0013 is an
+  immutable infrastructure diagnostic/no-success; corrected R=0014 is accepted,
+  immutable, and exact-head hosted green. B is `11/11`, cumulative A+B `43/43`;
+  B-CONVERGE pure audit is complete locally with final-sync exact-head hosted
+  pending. The parent scenario remains `Planned`.
 
 Follow the current
 [instruction-graph capacity handoff](2026-08-09-feat-0069-instruction-graph-capacity.md)
 for the prospective `v0.17.0` profile and immutable prior-target boundary.
-Merged exact-main Ubuntu/Windows validation is green; release and publication
-remain separate.
+The original edge/aggregate delivery has merged exact-main Ubuntu/Windows
+green. Its bounded per-blob/B-WIRE-budget amendment is exact-head hosted green;
+release and publication remain separate.
 
 Follow the current
 [ContractSlice A V1/V2/V3 diagnostics and fully-green V4 convergence handoff](2026-08-08-feat-0065-subf-0143-contractslice-a-converge.md),
@@ -390,6 +403,8 @@ conversations while disallowing force pushes and deletion.
 
 ## History
 
+- [2026-08-09 - ContractSlice B codec activation and wire packets](2026-08-09-feat-0065-subf-0143-contractslice-b-codec-activation-freeze.md)
+- [2026-08-09 - ContractSlice B structural surface](2026-08-09-feat-0065-subf-0143-contractslice-b-surface-freeze.md)
 - [2026-08-09 - ContractSlice B design freeze](2026-08-09-feat-0065-subf-0143-contractslice-b-design-freeze.md)
 - [2026-08-07 - ContractSlice A lifecycle ReviewedLocalGreen](2026-08-07-feat-0065-subf-0143-contractslice-a-lifecycle-green.md)
 - [2026-08-07 - ContractSlice A lifecycle FrozenDesign](2026-08-07-feat-0065-subf-0143-contractslice-a-lifecycle-freeze.md)
