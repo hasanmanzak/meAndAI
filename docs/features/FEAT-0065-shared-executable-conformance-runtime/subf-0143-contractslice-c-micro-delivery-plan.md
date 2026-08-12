@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Gate 2 micro-delivery plan and design freeze |
-| State | Design cohort `ExactHeadHostedGreen`; all three Activation-cohort packets `ReviewedLocalGreen`; C `5/11`, current A+B+C `48/48`; cohort locally complete, one push/exact-head hosted gate pending |
+| State | Design and Activation cohorts `ExactHeadHostedGreen`; C `5/11`, current A+B+C `48/48`; `C-APPLICABILITY-PLAN-01` `FrozenDesign`/inactive pending this records/design exact-head hosted gate |
 | Parent | Owning feature and current subfeature |
 | Scenario | [TEST-0210](test-cases.md#test-0210), retained `Planned` |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
@@ -138,7 +138,7 @@ sequence with a push and Ubuntu/Windows wait after every package.
 
 | Cohort | Local work and validation | Hosted CI | Hosted defects | Owner identification | Correction and revalidation | Estimated saving vs package-hosted | Consistency/traceability loss |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Activation | `3h10m` measured from the first package commit through the final synchronized exact-tree gate | Pending the single cohort push | Pending | `NotApplicable` unless hosted finds a defect | `NotApplicable` unless hosted finds a defect | About `36m38s` of hosted critical-path wait from the two avoided intermediate pushes, using the design cohort's `18m19s` longest job as the comparison basis | None observed; the local commit-reference recurrence caught the only record defect before push |
+| Activation | `3h10m` measured from the first package commit through the final synchronized exact-tree gate | Ubuntu `22m23s`; Windows `18m57s`; publication skipped | `0` | `NotApplicable` | `NotApplicable` | About `44m46s` of hosted critical-path wait from the two avoided intermediate pushes, using this cohort's `22m23s` longest job as the comparison basis | None observed; the local commit-reference recurrence caught the only record defect before push |
 | Applicability | `NotMeasured` | `NotMeasured` | `NotMeasured` | `NotApplicable` until a defect | `NotApplicable` until a defect | `NotMeasured` | `NotObserved` initially |
 | Evaluation | `NotMeasured` | `NotMeasured` | `NotMeasured` | `NotApplicable` until a defect | `NotApplicable` until a defect | `NotMeasured` | `NotObserved` initially |
 | Results/closure | `NotMeasured` | `NotMeasured` | `NotMeasured` | `NotApplicable` until a defect | `NotApplicable` until a defect | `NotMeasured` | `NotObserved` initially |
@@ -154,6 +154,8 @@ defect, and the full cohort validation recurs on the amended exact tree.
 The amended tree passed StructureOnly in `449.389s`, publication evidence
 `7/7` in `294.077s` without a publication claim, and the canonical graph at
 `359/4162/321/4553078` under schema-2 ceilings.
+The single cohort push then passed exact-head Ubuntu in `22m23s` and Windows in
+`18m57s`; publication verification was skipped and hosted defects were `0`.
 
 ## Frozen first-packet allowlist and fixture
 
@@ -321,8 +323,8 @@ allowlist compile only through the final operation interfaces' fail-closed
 override those operations on the same registered identities; this packet's Fact
 proves those concrete operations are callable and no default is executable.
 
-The predecessor is the separate local registration commit; it remains
-unpushed and carries no hosted claim. The sole Fact is
+At that packet checkpoint the predecessor was the separate local registration
+commit; it was unpushed and carried no hosted claim. The sole Fact is
 `ContractSliceCProducerPipelineTests.Activates_and_orders_exact_six_family_producer_graph`,
 with only `ContractSlice=C`, no Scenario, and marker
 `TEST-0210-C-BEHAVIOR-RED-0003`. Canonical R=0005 replaces only the fully
@@ -399,8 +401,102 @@ result/definition/entry has marker count `2`, exact failed counters, all other
 thirteen counters zero, and no attachment/collector evidence. Green is focused
 `1/1`, C `5/5`, full Conformance `48/48`, Domain `98/98`, build `0/0`, clean
 format/diff, StructureOnly green in `434.832s`, and
-code/evidence/traceability reviews `0/0/0`. The packet is
-`ReviewedLocalGreen`; the cohort remains unpushed and has no hosted claim.
+code/evidence/traceability reviews `0/0/0`. At that packet checkpoint it was
+`ReviewedLocalGreen`; the later cohort closure below owns its hosted claim.
+
+## Frozen `C-APPLICABILITY-PLAN-01` packet boundary
+
+The exact predecessor is the Activation cohort's hosted-green head owned by the
+C evidence ledger. This packet does not alter the accepted rule catalog,
+profile declarations, packet order, FQN, marker, or ownership. Its one direct
+Fact is
+`MeAndAI.Protocol.Conformance.Tests.ContractSliceCApplicabilityPlanTests.Plans_exact_static_applicability_instructions`,
+with only `ContractSlice=C`, no Scenario, and marker
+`TEST-0210-C-BEHAVIOR-RED-0004`. Canonical R=0006 changes only the fully
+prepared valid complete-kernel `ApplicabilityPlan` result to `null!`; only that
+null reaches the marker. Setup, target/profile validation, instruction/digest
+checks, and every negative remain marker-free.
+
+The production manifest's five accepted rules intentionally declare no
+applicability-phase slots. The complete named Provider profile therefore
+selects RULE-0003, RULE-0004, and RULE-0005 but exposes exact empty `Slots` and
+`Instructions`; the slice Repository profile selects RULE-0001 through
+RULE-0005 and exposes the same exact empty projection. This is the accepted
+catalog-universal applicability shape, not a missing implementation. The
+packet also implements the already frozen internal applicability-instruction
+factory for future valid non-empty catalogs, using phase rank `0`, round `0`,
+the canonical none-demand frame, and the exact instruction frame; no caller
+supplies either digest.
+
+The complete fixture resolves the release-declared named profile
+`protocol.profile.consumer-provider-exact-commit-conformance-audit`. Its axes
+are Consumer/Conformance/ExactCommit/Provider/Audit and its RuleIds are the
+object-identical catalog RULE-0003..0005 rows. Its target input is deliberately
+reversed and canonicalizes to one Repository support target followed by one
+Provider target under schema surface order. Both share subject identity `repo`
+and ExactCommit. Their target identity is the separator-free ordinal
+concatenation of `0123456789abcdef`, `0123456789abcdef`, and `01234567`;
+Repository has
+source `repo`, Provider has source `github`. The slice fixture uses
+Consumer/Conformance/ExactCommit/Repository/Audit and exactly the Repository
+target. Plans retain the exact profile axes, selected catalog rule objects,
+canonical targets, authority kind, manifest digest, and one opaque kernel/
+session stamp. They contain no route, adapter, provider DTO, I/O, clock, or
+Application authority.
+
+Target input is enumerated once, copied, and must be structurally unique. All
+targets share exact SubjectIdentity, SnapshotKind, and TargetIdentity. The
+required target set is derived across every profile-active applicability and
+evaluation slot of the selected rules, including repository support for a
+Provider profile; unknown selector keys, missing/extra/duplicate/null targets,
+zero/multiple selector matches, inconsistent identity, wrong surface or
+snapshot, and noncanonical profile/rule/session use are
+`CatalogIntegrityException(PlanStateInvalid)`. Input order never breaks a tie.
+An equal-looking caller-created `NamedExecutionProfile`, a profile from another
+kernel, or repeated/stale cross-kernel substitution is rejected. Argument nulls
+retain their argument exceptions.
+
+The exact executable allowlist is:
+
+```text
+src/MeAndAI.Protocol.Conformance/Activation/CatalogSliceKernel.cs
+src/MeAndAI.Protocol.Conformance/Activation/ConformanceKernel.cs
+src/MeAndAI.Protocol.Conformance/Catalog/NamedExecutionProfile.cs
+src/MeAndAI.Protocol.Conformance/Planning/AcquisitionInstruction.cs
+src/MeAndAI.Protocol.Conformance/Planning/ApplicabilityPlan.cs
+src/MeAndAI.Protocol.Conformance/Planning/ApplicabilityPlanningCore.cs
+tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ContractSliceCActivationTests.cs
+tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ContractSliceCApplicabilityPlanTests.cs
+```
+
+These are at most six production paths and two C test paths, with at most
+`2,400` normalized changed C# lines. `ApplicabilityPlanningCore.cs` is the sole
+new production file and the owning Fact is the sole new test file. No export,
+registration, producer graph, Domain, Policy, Application, project, package,
+lock, workflow, Scenario/status/owner, runtime-efficiency, D, release, or
+publication file may change. The first extra path or line redraws before red.
+
+The packet-specific child command is the generic C canonical-red command with
+the exact marker/FQN above, Release, `--no-restore --no-build --nologo`, minimal
+verbosity, one fresh result root, and one TRX logger. A fresh external runner
+must bind exact HEAD/upstream/branch/status, this eight-path source allowlist,
+six locks, warning-free build, fresh DLL/PDB, one child, exit `1`, secure exact
+one-result TRX, marker-only error message, sixteen counters, and no attachment/
+collector evidence. `InvocationCommitted` irrevocably consumes R=0006; no
+changed or unchanged retry is permitted after process creation, timeout,
+interruption, unexpected exit, custody, TRX, or oracle failure.
+
+Green requires focused `1/1`, C `6/6`, full Conformance `49/49`, Domain
+`98/98`, warning/error-free Release build, format/diff/locks, package-local
+structure and code/evidence/traceability reviews, record sync, and one separate
+unpushed local commit named `ReviewedLocalGreen`. Applicability closure cannot
+start before that commit. The two-package Applicability cohort receives no push
+until its complete cohort boundary is green.
+
+Fresh packet-design, evidence/scope, and traceability reviews close `0/0/0`.
+The packet remains inactive until this synchronized records/design head is
+exact-head hosted green and the canonical source/runner custody preflight
+closes; no canonical red or implementation is authorized before both gates.
 
 ## Deferred ContractSlice D cohort plan
 

@@ -3,14 +3,14 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted; ContractSlice A and B merged/exact-main green; B is `11/11`, cumulative A+B `43/43`. All three C Activation-cohort packets are `ReviewedLocalGreen`; C is `5/11`, current A+B+C is `48/48`, and the locally complete cohort awaits one push plus exact-head hosted validation. [TEST-0210](test-cases.md#test-0210) remains `Planned`; D, activation, and DoD remain held. |
+| Status | Gate 2 accepted; ContractSlice A and B merged/exact-main green; B is `11/11`, cumulative A+B `43/43`. The C Activation cohort is `ExactHeadHostedGreen`; C is `5/11`, current A+B+C is `48/48`, and `C-APPLICABILITY-PLAN-01` is `FrozenDesign`/inactive pending its records/design exact-head hosted gate. [TEST-0210](test-cases.md#test-0210) remains `Planned`; D, activation, and DoD remain held. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Test | [TEST-0210](test-cases.md#test-0210) |
 | Gate 3 micro-delivery routing | Historical A delivery remains owned by the [A micro-delivery control plan](subf-0143-micro-delivery-plan.md). Current B design routing is the [ContractSlice B micro-delivery plan](subf-0143-contractslice-b-micro-delivery-plan.md); packet labels refine delivery but activate no executable work. |
 | Exact-main design baseline | Accepted A merge commit [`51623f4d404a95e0f706d72805cf7ddbbbd293b8`](https://github.com/hasanmanzak/meAndAI/commit/51623f4d404a95e0f706d72805cf7ddbbbd293b8), validated by exact-main [run 31304787603](https://github.com/hasanmanzak/meAndAI/actions/runs/31304787603) |
-| Design and Gate 3 authority | Historical A/B directives, accepted reds, diagnostics, and hosted evidence remain immutable. The exact [C micro-delivery plan](subf-0143-contractslice-c-micro-delivery-plan.md) is exact-head hosted-green design authority; its three Activation packets are reviewed local green in separate commits. The locally complete cohort is not pushed and has no hosted claim yet. D, final activation, merge, release, and publication remain outside this authority. |
+| Design and Gate 3 authority | Historical A/B directives, accepted reds, diagnostics, and hosted evidence remain immutable. The exact [C micro-delivery plan](subf-0143-contractslice-c-micro-delivery-plan.md) is exact-head hosted-green design authority; its three Activation packets are immutable separate commits and the complete cohort is `ExactHeadHostedGreen`. Applicability is the only next C cohort. D, final activation, merge, release, and publication remain outside this authority. |
 | Completed predecessor | [SUBF-0153](README.md#subf-0153) / [TEST-0221](test-cases.md#test-0221), merged through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173) and exact-main validated by [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) |
 
 ## Directive and hard boundary
@@ -10677,6 +10677,105 @@ is focused `1/1`, C `5/5`, full Conformance `48/48`, Domain `98/98`, build
 code/evidence/traceability reviews `0/0/0`. Producer-pipeline is
 `ReviewedLocalGreen`; no push or hosted claim is made here.
 
+The ordered three-commit Activation cohort later passed its single exact-head
+hosted gate: Ubuntu `22m23s`, Windows `18m57s`, publication verification
+skipped, hosted defects `0`. That external cohort result activates only the
+next C packet and does not change C from `5/11` or lift any downstream hold.
+
+### Frozen `C-APPLICABILITY-PLAN-01` planning contract
+
+This packet implements only the already accepted `PlanApplicability` phase and
+the internal static instruction factory. The initial five-rule catalog has no
+applicability-phase slots, so its normative output is deliberately a non-null
+plan with zero `Slots` and zero `Instructions`. The complete named Provider
+profile selects the exact catalog RULE-0003, RULE-0004, and RULE-0005 objects;
+the slice Repository diagnostic profile selects exact RULE-0001..0005. Empty
+instructions are therefore catalog-universal applicability, not a shortcut,
+and later closure alone invokes the selected evaluators.
+
+One internal `ApplicabilityPlanningCore` owns both kernel paths. Activation
+creates one opaque `KernelPlanningSession` per kernel, bound to authority kind,
+manifest digest, catalog rules, and the producer graph identity. A resolved
+`NamedExecutionProfile` retains that exact session privately. A plan retains
+the same session through its existing `IPlanBoundEvidenceSession`; no public
+token, constructor, factory, reflection path, or equal-looking value can mint
+or replace it. Cross-kernel, cross-profile, foreign named-profile, stale, or
+modified input fails `CatalogIntegrityCode.PlanStateInvalid`.
+
+Rule selection is exact. Slice selection requires declared SubjectRole,
+Operation, SnapshotKind, and an intersection between profile and rule Surfaces;
+EnforcementPhase never changes membership. Complete selection first requires
+the exact kernel-resolved named-profile session and then selects its declared
+RuleIds object-identically from the catalog. Output RuleIds follow ordinal
+RuleId order. A missing/duplicate/foreign declared rule or profile is
+`PlanStateInvalid`.
+
+Targets are enumerated once and copied. Every element is non-null and
+structurally unique; all values share one exact SubjectIdentity, SnapshotKind,
+and TargetIdentity. The required set is computed from every selected rule slot
+whose `ProfileSurfaces` intersects the profile, across applicability and
+evaluation phases. Schema-1 selector mapping remains exactly:
+
+```text
+protocol.target.repository-snapshot -> Repository
+protocol.target.repository-governed-body-set -> Repository
+protocol.target.repository-target-resolution-set -> Repository
+protocol.target.provider-governed-body-set -> Provider
+```
+
+Each required surface has exactly one target; zero, multiple, extra, unknown,
+wrong-snapshot, or incoherent values fail `PlanStateInvalid`. Provider planning
+therefore retains the Repository support target without adding Repository to
+the profile axes. Output order is schema surface order Repository, Provider,
+Workflow, Release, then ordinal SourceIdentity; input order cannot repair or
+break ambiguity.
+
+Active applicability slots are the structurally equal SlotKey union over the
+selected rules, filtered by profile-surface intersection and ordered by
+SlotKey. A shared SlotKey with unequal requirement/profile/material/selector/
+capability shape is `PlanStateInvalid`. Each active slot maps to its exact
+resolved target and one `AcquisitionInstruction.CreateApplicability`; the
+initial accepted catalog produces none. A future valid non-empty catalog uses
+the already frozen canonical frames without another seam:
+
+```text
+Demand = ASCII "protocol.acquisition-demand/1\n" || u8 none=0 || u32-be 0
+Instruction = ASCII "protocol.acquisition-instruction/1\n"
+  || ManifestDigest raw 32 bytes || u8 applicability=0 || u32-be round=0
+  || text SlotKey || text SubjectIdentity || text SourceIdentity
+  || text Surface.Value || text SnapshotKind.Value || text TargetIdentity
+  || DemandDigest raw 32 bytes
+```
+
+`text` is u32-be strict-UTF-8 byte length plus bytes. Both digests are SHA-256
+of the exact retained frames; the caller supplies neither. DemandItems is the
+empty immutable list. Null arguments use their argument exceptions; frame,
+overflow, selector, collision, or plan-shape failures are `PlanStateInvalid`.
+
+The owning fixtures are exact. Complete uses the release-declared profile
+`protocol.profile.consumer-provider-exact-commit-conformance-audit`, axes
+Consumer/Conformance/ExactCommit/Provider/Audit, and reversed input targets:
+Repository `(repo, repo)` and Provider `(repo, github)`. Both use the target
+identity formed by separator-free ordinal concatenation of
+`0123456789abcdef`, `0123456789abcdef`, and `01234567`; output restores
+Repository then Provider. Slice uses Consumer/Conformance/ExactCommit/
+Repository/Audit and
+only the Repository target. Plans preserve exact authority kind, axes object,
+catalog RuleIds, targets, session, manifest identity, and immutable snapshots;
+they contain no adapter/provider DTO, route, I/O, cache, admission, clock,
+Application, or Policy implementation.
+
+The sole Fact is
+`ContractSliceCApplicabilityPlanTests.Plans_exact_static_applicability_instructions`
+with only `ContractSlice=C`, no Scenario, and marker
+`TEST-0210-C-BEHAVIOR-RED-0004`. Canonical R=0006 replaces only the fully
+prepared complete-kernel plan with `null!`; only that null calls the marker.
+The exact eight-path allowlist and `2,400` normalized changed-line ceiling are
+owned by the C micro-plan. Green is focused `1/1`, C `6/6`, full Conformance
+`49/49`, Domain `98/98`, build/format/diff/locks/structure/reviews/record sync,
+and one separate unpushed `ReviewedLocalGreen` commit. Closure and the cohort
+push remain held.
+
 The first packet is capped at `52` production paths, three C test paths plus two
 bounded predecessor-test adaptations, and `7,000` normalized changed C# lines.
 Every later packet defaults to ten
@@ -10719,10 +10818,9 @@ diagnostics/no-success. Corrected R=0014 is exact-head hosted green.
 B-CONVERGE is merged/exact-main green.
 ContractSlice C is decomposed by the current
 [C micro-delivery plan](subf-0143-contractslice-c-micro-delivery-plan.md), whose
-design head is hosted green. `C-SURFACE-ACTIVATION-01` is
-`ReviewedLocalGreen`; registration-mismatch and producer-pipeline are also
-`ReviewedLocalGreen`; C is `5/11`, current A+B+C is `48/48`, and the locally
-complete Activation cohort awaits one push plus its exact-head hosted gate.
+design head is hosted green. The three Activation packets and their exact
+cohort head are hosted green; C is `5/11`, current A+B+C is `48/48`, and
+`C-APPLICABILITY-PLAN-01` is the frozen/inactive next packet.
 
 C implementation and D still require separate packet activation, and no
 packet is active merely from this list. No directive here allocates new stable

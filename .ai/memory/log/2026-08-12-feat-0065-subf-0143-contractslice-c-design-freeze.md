@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Scope | ContractSlice C micro-delivery design only |
-| State | Design cohort `ExactHeadHostedGreen`; all three Activation-cohort packets `ReviewedLocalGreen`; cohort locally complete, one push/exact-head hosted gate pending |
+| State | Design and Activation cohorts `ExactHeadHostedGreen`; `C-APPLICABILITY-PLAN-01` `FrozenDesign`/inactive pending this records/design exact-head hosted gate |
 | Predecessor | ContractSlice B merged and exact-main hosted green |
 | Design delivery | Exact [`dd8940156408c103edb837f17bc05e6bb25de8c3`](https://github.com/hasanmanzak/meAndAI/commit/dd8940156408c103edb837f17bc05e6bb25de8c3) / [run 31585390450](https://github.com/hasanmanzak/meAndAI/actions/runs/31585390450): Ubuntu `16m07s`, Windows `18m19s`, publication verification skipped |
 | C authority | [Maintainer continuation directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5264403013) |
@@ -220,9 +220,9 @@ kernel. Release build is `0/0`; focused is `1/1`, C is `4/4`, full Conformance i
 passed in `429.279s`. The observed first-C#-mutation through final structural
 validation window was about `28` minutes. Code/test, evidence/scope, and
 records/traceability reviews closed `0/0/0`; consistency/traceability loss was
-not observed. The packet is `ReviewedLocalGreen`, remains unpushed, and grants
-no hosted-green claim. `C-PRODUCER-PIPELINE-01` is next only after this separate
-local commit.
+not observed. At that packet checkpoint it was `ReviewedLocalGreen`, unpushed,
+and granted no hosted-green claim. `C-PRODUCER-PIPELINE-01` followed only after
+that separate local commit.
 
 ## Frozen producer-pipeline packet
 
@@ -245,9 +245,9 @@ DAG nodes. Both kernel variants retain the same non-null graph and original
 registration objects. Policy/Application/Domain/project/package/lock/
 workflow/Scenario/D/downstream activation remains immutable. Green is
 `1/1`, C `5/5`, full `48/48`, Domain `98/98`, build/format/diff/locks/
-StructureOnly/reviews/record sync, and a third unpushed local commit. Only the
-complete Activation cohort may later receive one push and an exact-head hosted
-gate.
+StructureOnly/reviews/record sync, and a third unpushed local commit. The
+complete Activation cohort was later pushed once and closed through the
+exact-head hosted gate recorded below.
 
 The operation interfaces' fail-closed `NotSupportedException` defaults retain
 only allowlist-excluded predecessor negative-fixture compilation. They are not
@@ -279,3 +279,42 @@ publication evidence passed `7/7` in `294.077s` without a publication claim,
 and the canonical graph was `359/4162/321/4553078`; full C was `5/5`, combined
 A+B+C and Conformance were `48/48`, Domain was `98/98`, API/ownership was
 `11/11`, and Release build/format/locks/diff were clean.
+
+## Activation cohort hosted closure
+
+The exact ordered cohort head
+[`2358d0e1dc329cab0da9ac42abfed9c9153fa980`](https://github.com/hasanmanzak/meAndAI/commit/2358d0e1dc329cab0da9ac42abfed9c9153fa980)
+passed [run 31614365119](https://github.com/hasanmanzak/meAndAI/actions/runs/31614365119):
+Ubuntu `22m23s`, Windows `18m57s`, publication verification skipped, hosted
+defects `0`. The three separate package commits remain individually traceable;
+one push avoided two intermediate hosted waits, estimated at `44m46s` against
+the cohort's longest job. No consistency or traceability loss was observed.
+
+## Frozen applicability-plan packet
+
+`C-APPLICABILITY-PLAN-01` is the sole next packet. Its direct Fact/FQN is
+`MeAndAI.Protocol.Conformance.Tests.ContractSliceCApplicabilityPlanTests.Plans_exact_static_applicability_instructions`;
+the only trait is `ContractSlice=C`, Scenario is absent, and marker is
+`TEST-0210-C-BEHAVIOR-RED-0004`. Fresh design, evidence, and traceability
+reviews closed `0/0/0`; R=0006 remains held until this synchronized
+records/design head is exact-head hosted green and its source/runner custody
+preflight closes.
+
+The accepted initial five-rule catalog has exact empty applicability-slot
+lists. Complete Provider planning selects RULE-0003..0005 and canonicalizes
+Repository-support plus Provider targets; slice Repository planning selects
+RULE-0001..0005 and the one Repository target. Both expose non-null exact plans
+with empty Slots/Instructions and an opaque kernel session. Target validation
+still closes the complete potential applicability/evaluation selector set;
+missing, extra, duplicate, inconsistent, foreign-profile, cross-kernel, and
+unknown-selector shapes fail `PlanStateInvalid`. The already accepted static
+instruction factory owns phase `0`, round `0`, none-demand and exact SHA-256
+frames for later non-empty valid catalogs.
+
+The executable allowlist is six production planning/kernel files plus the
+retained activation fixture and one new applicability-plan Fact, exactly as
+listed by the micro-plan; the cap is `2,400` normalized changed C# lines. No
+export, registration, graph, Domain, Policy, Application, project/package/lock/
+workflow, Scenario/status/owner, D, release, or publication path is admitted.
+Green is focused `1/1`, C `6/6`, full `49/49`, Domain `98/98`, build/format/
+diff/locks/structure/reviews/record sync, and a separate unpushed local commit.
