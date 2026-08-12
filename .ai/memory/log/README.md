@@ -5,6 +5,13 @@ and follow its canonical links.
 
 ## Current continuation
 
+Follow the proposed
+[agentic SDLC workflow architecture planning handoff](2026-08-12-agentic-sdlc-workflow-architecture.md)
+for the records-only promotion of the role-based multi-agent idea, the refreshed
+explicit SDLC/backlog scope, workflow/role/context architecture, planned tests,
+open Definition of Ready items, and the ContractSlice-C-first merge order. It
+does not change the active continuation or authorize implementation.
+
 Follow the current
 [ContractSlice B codec-activation and wire handoff](2026-08-09-feat-0065-subf-0143-contractslice-b-codec-activation-freeze.md).
 ContractSlice A is merged/exact-main green; `B-SURFACE-01` and
@@ -403,6 +410,7 @@ conversations while disallowing force pushes and deletion.
 
 ## History
 
+- [2026-08-12 - Agentic SDLC workflow architecture planning](2026-08-12-agentic-sdlc-workflow-architecture.md)
 - [2026-08-09 - ContractSlice B codec activation and wire packets](2026-08-09-feat-0065-subf-0143-contractslice-b-codec-activation-freeze.md)
 - [2026-08-09 - ContractSlice B structural surface](2026-08-09-feat-0065-subf-0143-contractslice-b-surface-freeze.md)
 - [2026-08-09 - ContractSlice B design freeze](2026-08-09-feat-0065-subf-0143-contractslice-b-design-freeze.md)

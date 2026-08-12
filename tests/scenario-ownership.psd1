@@ -184,6 +184,11 @@
         }
         @{
             Evidence = 'PlannedDocumentation'
+            Owner = 'docs/features/FEAT-0057-explicit-sdlc-backlog-governance/test-cases.md'
+            TestIds = @('TEST-0224', 'TEST-0225', 'TEST-0226')
+        }
+        @{
+            Evidence = 'PlannedDocumentation'
             Owner = 'docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md'
             TestIds = @('TEST-0194', 'TEST-0195', 'TEST-0196')
         }
@@ -225,6 +230,14 @@
             Evidence = 'PlannedDocumentation'
             Owner = 'docs/features/FEAT-0068-protocol-release-finalizer-authority-transfer/test-cases.md'
             TestIds = @('TEST-0217', 'TEST-0218', 'TEST-0219')
+        }
+        @{
+            Evidence = 'PlannedDocumentation'
+            Owner = 'docs/features/FEAT-0070-agentic-sdlc-workflow-capabilities/test-cases.md'
+            TestIds = @(
+                'TEST-0227', 'TEST-0228', 'TEST-0229', 'TEST-0230',
+                'TEST-0231', 'TEST-0232', 'TEST-0233'
+            )
         }
         @{
             Evidence = 'GitHubActionsSemantic'
