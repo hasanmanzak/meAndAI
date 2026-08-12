@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Gate 2 micro-delivery plan and design freeze |
-| State | Design, Activation, Applicability, and Evaluation design cohorts `ExactHeadHostedGreen`; C `7/11`, current A+B+C `50/50`; R=0006/R=0008/R=0009/R=0010/R=0012 diagnostic/no-success, R=0007/R=0011 accepted/immutable; corrected R=0013 `FrozenDesign`/inactive pending this synchronized correction head's exact-head hosted gate; parent scenario held |
+| State | Design, Activation, Applicability, and Evaluation design cohorts `ExactHeadHostedGreen`; C `7/11`, current A+B+C `50/50`; R=0006/R=0008/R=0009/R=0010/R=0012/R=0013 diagnostic/no-success, R=0007/R=0011 accepted/immutable; corrected R=0014 `FrozenDesign`/inactive pending this synchronized correction head's exact-head hosted gate; parent scenario held |
 | Parent | Owning feature and current subfeature |
 | Scenario | [TEST-0210](test-cases.md#test-0210), retained `Planned` |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
@@ -570,9 +570,12 @@ R changes only the fully prepared valid `PlanEvaluation(closure)` return to
 cancellation, wrong ordering/digest/round, zero-demand, and unresolved paths are
 marker-free. Canonical R=0012 executed once but was rejected marker-free because
 the fixture terminalized the rule and returned `EvaluationClosure`; it is an
-immutable diagnostic/no-success/no-retry. Corrected R=0013 retains the same
-semantic seam and is authorized only once after this exact correction head is
-hosted green. Green restores only the semantic result and proves focused `1/1`,
+immutable diagnostic/no-success/no-retry. R=0013 reached the marker and passed
+its TRX oracle, but immediate green exposed the fixture's positional
+applicability/evaluation-slot substitution; it is also immutable diagnostic/no-
+success/no-retry. Corrected R=0014 retains the same semantic seam and is
+authorized only once after this exact correction head is hosted green. Green
+restores only the semantic result and proves focused `1/1`,
 C `8/8`, full Conformance `51/51`, Domain `98/98`, Release build, format/diff,
 locks, structure, reviews, record sync, and a separate unpushed
 `ReviewedLocalGreen` commit.
@@ -598,8 +601,8 @@ dotnet test tests/dotnet/MeAndAI.Protocol.Conformance.Tests/MeAndAI.Protocol.Con
 ```
 
 This packet-specific argv supersedes the generic red template for diagnostic
-R=0012 and corrected R=0013; each ordinal owns a distinct fresh runner/report/
-root identity, and R=0012 is never rerun.
+R=0012/R=0013 and corrected R=0014; each ordinal owns a distinct fresh runner/
+report/root identity, and no prior ordinal is rerun.
 The design cohort changes exactly the existing twelve C live-route records, no
 new record node, and no product/test/project/lock/workflow path. Fresh design,
 evidence/scope, and traceability reviews plus schema-2 graph validation must be
