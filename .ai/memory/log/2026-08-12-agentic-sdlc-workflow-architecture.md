@@ -125,3 +125,34 @@ or the active ContractSlice C checkout. ContractSlice C should merge first.
 This branch must then reconcile shared indexes/memory with current `main`,
 preserve C truth, rerun bounded static validation, and require fresh exact-head
 hosted evidence before the records proposal can leave draft state.
+
+## Continuation and cleanup handoff
+
+- Current isolated worktree:
+  `D:\CodeBase\GitHub\hasanmanzak\meAndAI-records-workflow-agent-sdlc`
+- Current branch:
+  `agent/records-workflow-agent-sdlc-architecture`
+- Current durable review:
+  draft [PR #181](https://github.com/hasanmanzak/meAndAI/pull/181)
+- Last verified remote records head before this cleanup-handoff update:
+  [`85bbe564b27c0eef90c10e9463e51d8051501776`](https://github.com/hasanmanzak/meAndAI/commit/85bbe564b27c0eef90c10e9463e51d8051501776)
+- Wait condition: active
+  [FEAT-0065](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md)
+  ContractSlice C delivery merges before this branch is reconciled with
+  then-current `main`.
+- Next delivery action: refresh live PR/issues and current `main`, reconcile
+  shared indexes and memory without losing ContractSlice C truth, rerun the
+  bounded static checks, and obtain the separately authorized exact-head hosted
+  evidence before draft exit.
+
+Archiving the planning conversation does not authorize removal of this
+worktree. The recorded guards grant no mutation authority; even after they all
+pass, cleanup requires a separate explicit maintainer directive naming the
+exact worktree and any branch scope. Under that directive, apply the guarded
+[worktree-closure contract](../../../docs/architecture/agentic-sdlc-workflows/delivery-plan.md#8-continuation-and-worktree-closure)
+only after [PR #181](https://github.com/hasanmanzak/meAndAI/pull/181) is merged
+or explicitly closed, its evidence is synchronized, the registered worktree is
+clean and unused, and its exact head remains durably reachable. Remove only
+the registered records worktree through Git, prune stale metadata, and delete
+local or remote branches only when no live delivery authority depends on them.
+The active ContractSlice C checkout and all user-owned files remain excluded.

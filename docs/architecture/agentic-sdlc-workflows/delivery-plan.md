@@ -161,3 +161,44 @@ A future implementation directive must identify:
 
 Generic instructions such as “implement the architecture” or a slash command
 alone are insufficient authority.
+
+## 8. Continuation and worktree closure
+
+Until draft [PR #181](https://github.com/hasanmanzak/meAndAI/pull/181) is
+merged or explicitly closed, its isolated worktree and branch remain live
+delivery state and must not be removed merely because the originating
+conversation is archived. A future agent starts from this delivery plan,
+refreshes the PR and issue state, and checks the current branch/worktree
+registration rather than relying on a remembered local directory.
+
+The current operator-local continuation is recorded in the
+[project-memory handoff](../../../.ai/memory/log/2026-08-12-agentic-sdlc-workflow-architecture.md#continuation-and-cleanup-handoff).
+It is a convenience pointer, not a portable path requirement.
+
+Cleanup is a separate post-delivery operation and is admitted only when all of
+the following are true:
+
+1. [PR #181](https://github.com/hasanmanzak/meAndAI/pull/181) is merged or
+   explicitly closed, and its disposition is reflected in the owning issues
+   and durable records;
+2. the registered worktree is clean, has no untracked files, and its exact head
+   is reachable from the remote branch, merge commit, or another intentional
+   durable ref;
+3. no active task, process, shell, editor, or agent uses the worktree;
+4. the primary checkout and every unrelated worktree are identified and
+   excluded from the removal target; and
+5. any required post-merge reconciliation, exact-head validation, and evidence
+   synchronization is complete.
+
+These guards are necessary but not sufficient authority. This records-only
+handoff grants no cleanup permission; after every guard passes, a separate
+explicit maintainer directive naming the cleanup target is still required.
+Under that directive, inspect the exact registered and prunable candidates
+first, remove only the exact registered records worktree through Git worktree
+management, prune only confirmed stale worktree metadata, and then delete the
+local records branch if it is no longer checked out. Delete the remote branch
+only when the explicit directive includes it and the pull-request disposition
+and repository policy make that cleanup appropriate. Never use recursive
+filesystem deletion as a substitute for worktree removal, never force-remove a
+dirty worktree, and never touch the active ContractSlice C checkout or its
+user-owned files.
