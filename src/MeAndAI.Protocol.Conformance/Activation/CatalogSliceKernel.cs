@@ -58,7 +58,10 @@ public sealed class CatalogSliceKernel
     public EvaluationAdvanceResult PlanEvaluation(
         ApplicabilityClosure closure,
         CancellationToken cancellationToken = default) =>
-        throw new CatalogIntegrityException(CatalogIntegrityCode.PlanStateInvalid);
+        EvaluationPlanningCore.Plan(
+            _planningSession,
+            closure,
+            cancellationToken);
 
     public EvaluationAdvanceResult AdvanceEvaluation(
         EvaluationPlan plan,

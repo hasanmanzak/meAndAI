@@ -6,7 +6,7 @@
 | Parent epic | [EPIC-0002 / issue #163](https://github.com/hasanmanzak/meAndAI/issues/163) |
 | Architecture task | [TASK-0003 / issue #164](https://github.com/hasanmanzak/meAndAI/issues/164) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
-| Current authority | ContractSlice A and B are merged/exact-main green, with B `11/11` and A+B `43/43`. C Activation and Applicability are `ExactHeadHostedGreen`; C is `7/11`, current A+B+C `50/50`. R=0012/R=0013 are diagnostics/no-success; corrected R=0014 is `FrozenDesign`/inactive pending its correction-head hosted gate. D, activation, merge/release/publication remain held. |
+| Current authority | ContractSlice A and B are merged/exact-main green, with B `11/11` and A+B `43/43`. C Activation and Applicability are `ExactHeadHostedGreen`; Evaluation Plan is `ReviewedLocalGreen`/unpushed, C is `8/11`, current A+B+C `51/51`. R=0012/R=0013 are diagnostics/no-success; R=0014 is accepted/immutable. Evaluation Advance is next/`FrozenDesign`; D, activation, merge/release/publication remain held. |
 
 This plan allocates the accepted architecture to stable delivery records. It
 did not itself authorize implementation. The later

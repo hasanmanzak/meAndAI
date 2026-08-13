@@ -141,7 +141,9 @@ public sealed class ContractSliceCApplicabilityClosureTests
         AssertInvalid(() => kernel.CloseApplicability(plan, fixture.Proofs));
     }
 
-    private static ClosureFixture CreateFixture()
+    internal static ClosureFixture CreateFixture(
+        bool terminalizeEvaluationRule = false,
+        bool evaluationReady = false)
     {
         var source = ContractSliceCActivationTests.CreateFixture();
         var sourceTree = source.Export.Catalog.Rules[0].EvaluationSlots.Single();
@@ -160,7 +162,19 @@ public sealed class ContractSliceCApplicabilityClosureTests
             .ToArray();
         rules[2] = CloneRule(rules[2], [tree]);
         rules[3] = CloneRule(rules[3], [tree]);
-        rules[4] = CloneRule(rules[4], rules[4].EvaluationSlots);
+        var evaluationSlots = rules
+            .SelectMany(rule => rule.EvaluationSlots)
+            .Where(slot => slot.SlotKey is
+                "protocol.slot.repository-governed-text" or
+                "protocol.slot.repository-target-resolution")
+            .DistinctBy(slot => slot.SlotKey)
+            .Append(tree)
+            .OrderBy(slot => slot.SlotKey, StringComparer.Ordinal)
+            .ToArray();
+        rules[4] = CloneRule(
+            rules[4],
+            applicability: evaluationReady ? [tree] : rules[4].EvaluationSlots,
+            evaluation: evaluationReady ? evaluationSlots : rules[4].EvaluationSlots);
         var catalog = CompleteCatalogDeclaration.Create(
             source.Export.Catalog.ProtocolVersion,
             source.Export.Catalog.CatalogVersion,
@@ -179,7 +193,13 @@ public sealed class ContractSliceCApplicabilityClosureTests
             RuleEvaluatorRegistration.Create(rules[3], new Rule0004EvaluatorMirror(
                 input => ApplicabilityIntent.Unresolved(
                     [input.GetContextProof(tree.SlotKey)]))),
-            RuleEvaluatorRegistration.Create(rules[4], new Rule0005EvaluatorMirror()),
+            RuleEvaluatorRegistration.Create(
+                rules[4],
+                terminalizeEvaluationRule
+                    ? new Rule0005EvaluatorMirror(input =>
+                        ApplicabilityIntent.Unresolved(
+                            [input.GetContextProof(tree.SlotKey)]))
+                    : new Rule0005EvaluatorMirror()),
         };
         var export = CompletePolicyPackExport.Create(
             source.Export.ExportKey,
@@ -221,6 +241,17 @@ public sealed class ContractSliceCApplicabilityClosureTests
             instructions.Single(item => item.Slot.SlotKey ==
                 "protocol.slot.repository-tree"),
             complete: true);
+        if (evaluationReady)
+        {
+            return new ClosureFixture(
+                manifest,
+                export,
+                repository,
+                provider,
+                [observedComplete],
+                AcquisitionProofSet.Create([observedComplete], [], []));
+        }
+
         var observedIncomplete = CObservedQualificationProof.Create(
             manifest,
             instructions.Single(item => item.Slot.SlotKey ==
@@ -294,7 +325,7 @@ public sealed class ContractSliceCApplicabilityClosureTests
         Assert.Equal(CatalogIntegrityCode.PlanStateInvalid, error.Code);
     }
 
-    private sealed record ClosureFixture(
+    internal sealed record ClosureFixture(
         FinalizedPolicyManifest Manifest,
         CompletePolicyPackExport Export,
         AcquisitionTarget RepositoryTarget,

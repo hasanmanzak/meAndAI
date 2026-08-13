@@ -10,6 +10,10 @@ internal sealed class KernelPlanningSession : IPlanBoundEvidenceSession
         new(ReferenceEqualityComparer.Instance);
     private readonly HashSet<ApplicabilityPlan> _closed =
         new(ReferenceEqualityComparer.Instance);
+    private readonly HashSet<ApplicabilityClosure> _planningEvaluation =
+        new(ReferenceEqualityComparer.Instance);
+    private readonly HashSet<ApplicabilityClosure> _plannedEvaluation =
+        new(ReferenceEqualityComparer.Instance);
 
     internal KernelPlanningSession(
         FinalizedPolicyManifest manifest,
@@ -75,6 +79,36 @@ internal sealed class KernelPlanningSession : IPlanBoundEvidenceSession
         lock (_stateGate)
         {
             _closing.Remove(plan);
+        }
+    }
+
+    internal void BeginEvaluationPlan(ApplicabilityClosure closure)
+    {
+        lock (_stateGate)
+        {
+            if (_plannedEvaluation.Contains(closure) ||
+                !_planningEvaluation.Add(closure))
+            {
+                throw new CatalogIntegrityException(
+                    CatalogIntegrityCode.PlanStateInvalid);
+            }
+        }
+    }
+
+    internal void CompleteEvaluationPlan(ApplicabilityClosure closure)
+    {
+        lock (_stateGate)
+        {
+            _planningEvaluation.Remove(closure);
+            _plannedEvaluation.Add(closure);
+        }
+    }
+
+    internal void AbandonEvaluationPlan(ApplicabilityClosure closure)
+    {
+        lock (_stateGate)
+        {
+            _planningEvaluation.Remove(closure);
         }
     }
 }

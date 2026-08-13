@@ -391,9 +391,26 @@ internal sealed partial class RepositoryTreeIndexMirror
 
 internal sealed partial class RepositoryTargetProjectorMirror
 {
+    private IReadOnlyList<RepositoryTargetResolutionDemandCandidate> _candidates =
+        Array.Empty<RepositoryTargetResolutionDemandCandidate>();
+
+    internal void Configure(
+        IEnumerable<RepositoryTargetResolutionDemandCandidate> candidates)
+    {
+        ArgumentNullException.ThrowIfNull(candidates);
+        _candidates = Array.AsReadOnly(candidates.ToArray());
+    }
+
     public DemandProjectionIntent Project(
-        DemandProjectionInput<IGovernedReferenceIndex> input, CancellationToken token) =>
-        ProducerOperationStub.EmptyProjection(input);
+        DemandProjectionInput<IGovernedReferenceIndex> input, CancellationToken token)
+    {
+        ArgumentNullException.ThrowIfNull(input);
+        token.ThrowIfCancellationRequested();
+        return DemandProjectionIntent.Projected(
+            DemandProjectionProduct.Create(
+                _candidates,
+                SemanticResourceLocalUsage.Create(0, 0, 0, 0)));
+    }
     public SemanticResourceLocalUsage MeasureLocal(
         DemandProjectionInput<IGovernedReferenceIndex> input,
         IReadOnlyList<RepositoryTargetResolutionDemandCandidate> value,

@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Gate 2 micro-delivery plan and design freeze |
-| State | Design, Activation, Applicability, and Evaluation design cohorts `ExactHeadHostedGreen`; C `7/11`, current A+B+C `50/50`; R=0006/R=0008/R=0009/R=0010/R=0012/R=0013 diagnostic/no-success, R=0007/R=0011 accepted/immutable; corrected R=0014 `FrozenDesign`/inactive pending this synchronized correction head's exact-head hosted gate; parent scenario held |
+| State | Design, Activation, Applicability, and Evaluation design cohorts `ExactHeadHostedGreen`; Evaluation Plan `ReviewedLocalGreen`/unpushed, C `8/11`, current A+B+C `51/51`; R=0006/R=0008/R=0009/R=0010/R=0012/R=0013 diagnostic/no-success, R=0007/R=0011/R=0014 accepted/immutable; Evaluation Advance next/`FrozenDesign`; parent scenario held |
 | Parent | Owning feature and current subfeature |
 | Scenario | [TEST-0210](test-cases.md#test-0210), retained `Planned` |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
@@ -573,12 +573,13 @@ the fixture terminalized the rule and returned `EvaluationClosure`; it is an
 immutable diagnostic/no-success/no-retry. R=0013 reached the marker and passed
 its TRX oracle, but immediate green exposed the fixture's positional
 applicability/evaluation-slot substitution; it is also immutable diagnostic/no-
-success/no-retry. Corrected R=0014 retains the same semantic seam and is
-authorized only once after this exact correction head is hosted green. Green
-restores only the semantic result and proves focused `1/1`,
-C `8/8`, full Conformance `51/51`, Domain `98/98`, Release build, format/diff,
-locks, structure, reviews, record sync, and a separate unpushed
-`ReviewedLocalGreen` commit.
+success/no-retry. Corrected R=0014 retained the same semantic seam, executed
+once after its exact correction head became hosted green, and is now accepted/
+immutable. Green restored only the semantic result and passed focused `1/1`, C
+`8/8`, full Conformance `51/51`, Domain `98/98`, Release build `0/0`, format/
+diff, locks, StructureOnly, publication evidence, reviews, and record sync. The
+packet is `ReviewedLocalGreen` only in its separate unpushed local commit;
+Evaluation Advance is next/`FrozenDesign`.
 
 The executable allowlist is exact: modify
 `Activation/ConformanceKernel.cs`, `Activation/CatalogSliceKernel.cs`,
