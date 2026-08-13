@@ -145,7 +145,10 @@ public sealed class ContractSliceCApplicabilityClosureTests
         bool terminalizeEvaluationRule = false,
         bool evaluationReady = false,
         IReadOnlyDictionary<string,
-            Func<RuleEvaluationInput, EvaluationIntent>>? evaluationByRule = null)
+            Func<RuleEvaluationInput, EvaluationIntent>>? evaluationByRule = null,
+        IReadOnlyDictionary<string,
+            Func<RuleApplicabilityInput, ApplicabilityIntent>>?
+            applicabilityByRule = null)
     {
         var source = ContractSliceCActivationTests.CreateFixture(evaluationByRule);
         var sourceTree = source.Export.Catalog.Rules[0].EvaluationSlots.Single();
@@ -162,6 +165,17 @@ public sealed class ContractSliceCApplicabilityClosureTests
                 evaluation: rule.EvaluationSlots.Select(slot =>
                     slot.SlotKey == sourceTree.SlotKey ? tree : slot)))
             .ToArray();
+        if (applicabilityByRule is not null &&
+            (applicabilityByRule.Any(item => item.Value is null) ||
+             applicabilityByRule.Keys.Except(
+                 rules.Select(rule => rule.RuleId.Value),
+                 StringComparer.Ordinal).Any()))
+        {
+            throw new ArgumentException(
+                "Applicability callbacks must name exact catalog rules.",
+                nameof(applicabilityByRule));
+        }
+
         if (evaluationByRule is not null)
         {
             var declaration = rules[1].Findings.Single(finding =>
@@ -196,7 +210,7 @@ public sealed class ContractSliceCApplicabilityClosureTests
             rules[4],
             applicability: evaluationReady ? [tree] : rules[4].EvaluationSlots,
             evaluation: evaluationReady ? evaluationSlots : rules[4].EvaluationSlots);
-        var profiles = evaluationByRule is null
+        var profiles = evaluationByRule is null && applicabilityByRule is null
             ? source.Export.Catalog.NamedProfiles
             : source.Export.Catalog.NamedProfiles.Select(profile =>
                 NamedProfileDeclaration.Create(
@@ -222,27 +236,38 @@ public sealed class ContractSliceCApplicabilityClosureTests
             RuleEvaluatorRegistration.Create(
                 rules[0],
                 new Rule0001EvaluatorMirror(
+                    Applicability(applicabilityByRule, rules[0]),
                     evaluation: Evaluation(evaluationByRule, rules[0]))),
             RuleEvaluatorRegistration.Create(
                 rules[1],
                 new Rule0002EvaluatorMirror(
+                    Applicability(applicabilityByRule, rules[1]),
                     evaluation: Evaluation(evaluationByRule, rules[1]))),
             RuleEvaluatorRegistration.Create(rules[2], new Rule0003EvaluatorMirror(
-                input => ApplicabilityIntent.NotApplicable(
-                    [input.GetContextProof(tree.SlotKey)]),
+                Applicability(
+                    applicabilityByRule,
+                    rules[2],
+                    input => ApplicabilityIntent.NotApplicable(
+                        [input.GetContextProof(tree.SlotKey)])),
                 Evaluation(evaluationByRule, rules[2]))),
             RuleEvaluatorRegistration.Create(rules[3], new Rule0004EvaluatorMirror(
-                input => ApplicabilityIntent.Unresolved(
-                    [input.GetContextProof(tree.SlotKey)]),
+                Applicability(
+                    applicabilityByRule,
+                    rules[3],
+                    input => ApplicabilityIntent.Unresolved(
+                        [input.GetContextProof(tree.SlotKey)])),
                 Evaluation(evaluationByRule, rules[3]))),
             RuleEvaluatorRegistration.Create(
                 rules[4],
                 terminalizeEvaluationRule
-                    ? new Rule0005EvaluatorMirror(input =>
-                        ApplicabilityIntent.Unresolved(
-                            [input.GetContextProof(tree.SlotKey)]),
+                    ? new Rule0005EvaluatorMirror(Applicability(
+                        applicabilityByRule,
+                        rules[4],
+                        input => ApplicabilityIntent.Unresolved(
+                            [input.GetContextProof(tree.SlotKey)])),
                         Evaluation(evaluationByRule, rules[4]))
                     : new Rule0005EvaluatorMirror(
+                        Applicability(applicabilityByRule, rules[4]),
                         evaluation: Evaluation(evaluationByRule, rules[4]))),
         };
         var export = CompletePolicyPackExport.Create(
@@ -363,6 +388,18 @@ public sealed class ContractSliceCApplicabilityClosureTests
         evaluationByRule.TryGetValue(rule.RuleId.Value, out var callback)
             ? callback
             : null;
+
+    private static Func<RuleApplicabilityInput, ApplicabilityIntent>?
+        Applicability(
+            IReadOnlyDictionary<string,
+                Func<RuleApplicabilityInput, ApplicabilityIntent>>?
+                applicabilityByRule,
+            RuleDeclaration rule,
+            Func<RuleApplicabilityInput, ApplicabilityIntent>? fallback = null) =>
+        applicabilityByRule is not null &&
+        applicabilityByRule.TryGetValue(rule.RuleId.Value, out var callback)
+            ? callback
+            : fallback;
 
     private static AcquisitionTarget Target(
         string source,

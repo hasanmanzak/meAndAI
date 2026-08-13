@@ -17,8 +17,8 @@ public sealed class CatalogSliceEvaluation
         Catalog = catalog;
         ManifestDigest = manifestDigest;
         Profile = profile;
-        Acquisitions = acquisitions.ToArray();
-        Evaluations = evaluations.ToArray();
+        Acquisitions = Array.AsReadOnly(acquisitions.ToArray());
+        Evaluations = Array.AsReadOnly(evaluations.ToArray());
         HasKnownViolation = hasKnownViolation;
         HasUnresolvedRequiredEvaluation = hasUnresolvedRequiredEvaluation;
     }

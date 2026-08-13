@@ -102,6 +102,12 @@ public sealed class ConformanceKernel
 
     public CompleteCatalogEvaluation Evaluate(
         EvaluationClosure closure,
-        CancellationToken cancellationToken = default) =>
-        throw new CatalogIntegrityException(CatalogIntegrityCode.PlanStateInvalid);
+        CancellationToken cancellationToken = default)
+    {
+        return EvaluationAggregationCore.EvaluateComplete(
+            _planningSession,
+            Catalog,
+            closure,
+            cancellationToken);
+    }
 }

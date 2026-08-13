@@ -180,14 +180,18 @@ public sealed class ContractSliceCIntentTests
             },
         };
 
-    private static MintingContext CreateContext(
+    internal static MintingContext CreateContext(
         IReadOnlyDictionary<string,
             Func<RuleEvaluationInput, EvaluationIntent>> callbacks,
-        string? incompleteSlot = null)
+        string? incompleteSlot = null,
+        IReadOnlyDictionary<string,
+            Func<RuleApplicabilityInput, ApplicabilityIntent>>?
+            applicabilityByRule = null)
     {
         var fixture = ContractSliceCApplicabilityClosureTests.CreateFixture(
             evaluationReady: true,
-            evaluationByRule: callbacks);
+            evaluationByRule: callbacks,
+            applicabilityByRule: applicabilityByRule);
         Assert.Single(fixture.Export.DemandProjectorRegistrations)
             .Accept(ProjectorVisitor.Instance)
             .Configure([]);
@@ -219,7 +223,12 @@ public sealed class ContractSliceCIntentTests
         var closure = Assert.IsType<EvaluationClosure>(kernel.AdvanceEvaluation(
             evaluationPlan,
             AcquisitionProofSet.Create(observed, [], [])));
-        return new MintingContext(fixture, applicability, closure);
+        return new MintingContext(
+            fixture,
+            kernel,
+            profile,
+            applicability,
+            closure);
     }
 
     private static void CarrierInvariants()
@@ -280,8 +289,10 @@ public sealed class ContractSliceCIntentTests
         Assert.Equal(CatalogIntegrityCode.PlanStateInvalid, error.Code);
     }
 
-    private sealed record MintingContext(
+    internal sealed record MintingContext(
         ContractSliceCApplicabilityClosureTests.ClosureFixture Fixture,
+        ConformanceKernel Kernel,
+        NamedExecutionProfile Profile,
         ApplicabilityClosure Applicability,
         EvaluationClosure Closure);
 

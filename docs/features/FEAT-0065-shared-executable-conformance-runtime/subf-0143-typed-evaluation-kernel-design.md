@@ -3,14 +3,14 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted; ContractSlice A and B merged/exact-main green; B is `11/11`, cumulative A+B `43/43`. C Activation, Applicability, and Evaluation are `ExactHeadHostedGreen`; C is `10/11`, current A+B+C `53/53`. R=0007/R=0011/R=0014/R=0015/R=0017 are accepted/immutable; R=0012/R=0013/R=0016 are diagnostics/no-success. `C-INTENT-RESULT-01` is `ReviewedLocalGreen` in its separate unpushed commit; `C-AGGREGATION-01` remains next/`FrozenDesign`; [TEST-0210](test-cases.md#test-0210) remains `Planned`, and D/activation/DoD remain held. |
+| Status | Gate 2 accepted; ContractSlice A and B merged/exact-main green; B is `11/11`, cumulative A+B `43/43`. C Activation, Applicability, and Evaluation are `ExactHeadHostedGreen`; C Intent and Aggregation are separate unpushed `ReviewedLocalGreen` commits. C is `11/11`, current A+B+C/full Conformance `54/54`. R=0007/R=0011/R=0014/R=0015/R=0017/R=0018 are accepted/immutable; R=0012/R=0013/R=0016 are diagnostics/no-success. `C-CONVERGE-01` is the next code-free audit; [TEST-0210](test-cases.md#test-0210) remains `Planned`, and D/activation/DoD remain held. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Test | [TEST-0210](test-cases.md#test-0210) |
 | Gate 3 micro-delivery routing | Historical A delivery remains owned by the [A micro-delivery control plan](subf-0143-micro-delivery-plan.md). Current B design routing is the [ContractSlice B micro-delivery plan](subf-0143-contractslice-b-micro-delivery-plan.md); packet labels refine delivery but activate no executable work. |
 | Exact-main design baseline | Accepted A merge commit [`51623f4d404a95e0f706d72805cf7ddbbbd293b8`](https://github.com/hasanmanzak/meAndAI/commit/51623f4d404a95e0f706d72805cf7ddbbbd293b8), validated by exact-main [run 31304787603](https://github.com/hasanmanzak/meAndAI/actions/runs/31304787603) |
-| Design and Gate 3 authority | Historical A/B directives, accepted reds, diagnostics, and hosted evidence remain immutable. The exact [C micro-delivery plan](subf-0143-contractslice-c-micro-delivery-plan.md) is exact-head hosted-green design authority; Activation, Applicability, and Evaluation are `ExactHeadHostedGreen`, diagnostic R=0012/R=0013/R=0016 are immutable, and R=0014/R=0015/R=0017 are accepted/immutable. `C-INTENT-RESULT-01` is `ReviewedLocalGreen`; `C-AGGREGATION-01` is the sole next frozen packet and remains held until the focused intent commit exists. D, final activation, merge, release, and publication remain outside this authority. |
+| Design and Gate 3 authority | Historical A/B directives, accepted reds, diagnostics, and hosted evidence remain immutable. The exact [C micro-delivery plan](subf-0143-contractslice-c-micro-delivery-plan.md) is exact-head hosted-green design authority; Activation, Applicability, and Evaluation are `ExactHeadHostedGreen`, diagnostic R=0012/R=0013/R=0016 are immutable, and R=0014/R=0015/R=0017/R=0018 are accepted/immutable. `C-INTENT-RESULT-01` and `C-AGGREGATION-01` are separate unpushed `ReviewedLocalGreen` commits; `C-CONVERGE-01` is the next pure audit. D, final activation, merge, release, and publication remain outside this authority. |
 | Completed predecessor | [SUBF-0153](README.md#subf-0153) / [TEST-0221](test-cases.md#test-0221), merged through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173) and exact-main validated by [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) |
 
 ## Directive and hard boundary
@@ -10926,6 +10926,67 @@ locks, structure, reviews, record sync, and one separate unpushed
 Exact artifact and timing evidence is owned by the C evidence ledger; no
 package-hosted claim is made.
 
+### `C-AGGREGATION-01` executable closure
+
+The sole implementation core is internal and shared by both public kernels:
+
+```csharp
+internal static class EvaluationAggregationCore
+{
+    internal static CatalogSliceEvaluation EvaluateSlice(
+        KernelPlanningSession session,
+        EvaluationClosure closure,
+        CancellationToken cancellationToken);
+
+    internal static CompleteCatalogEvaluation EvaluateComplete(
+        KernelPlanningSession session,
+        EvaluationClosure closure,
+        CancellationToken cancellationToken);
+}
+```
+
+Every issued evaluation closure is retained with its exact plan, manifest,
+catalog, profile when complete, acquisition outcomes, terminal evaluations, and
+object-identical planning session. Aggregation accepts only one live closure
+from that session, validates the catalog/profile and the exact complete RuleId/
+revision partition, then mints the final ordered result. Validation,
+cancellation, or a host failure before successful return leaves the closure
+retryable; successful return atomically consumes it, and replay, foreign,
+colliding, or stale input fails `PlanStateInvalid`.
+
+Acquisition outcomes are unique and ordered by SlotKey. Rule evaluations are
+RuleId/revision ordered. Result carriers snapshot both lists. A slice result
+retains its exact activated catalog plus manifest digest, flags violations and
+unresolved required evaluation, and has no verdict. A complete result retains
+the exact complete catalog plus named profile. Its truth table is exact:
+
+| Unresolved required evaluation | Known violation | Verdict |
+| --- | --- | --- |
+| Yes | Either | `Indeterminate` |
+| No | Yes | `NonConforming` |
+| No | No | `Conforming` |
+
+Aggregation owns no report, enforcement, waiver/debt, real Policy, Scenario,
+or workflow authority. The one direct Fact/FQN is
+`ContractSliceCAggregationTests.Aggregates_exact_catalog_evaluation_and_verdict`,
+with only `ContractSlice=C`, no Scenario/Theory/class trait, and marker
+`TEST-0210-C-BEHAVIOR-RED-0009`. R=0018 changed only the fully prepared valid
+complete result to `null!`; only that semantic null called the marker assertion.
+Its exact packet argv and ten-path executable allowlist are owned by the C
+micro-plan. The runner passed ValidateOnly and one Execute; native/runner exits
+were `1/0`, and the sole Failed TRX passed exact identity, marker, counter,
+diagnostic, attachment, source, binary, lock, root, and custody oracles. R=0018
+is accepted/immutable and never reruns.
+
+The semantic null alone was removed for green. Focused `1/1`, C `11/11`, full
+Conformance `54/54`, Domain `98/98`, warning/error-free Release build, format,
+locks, diff, preliminary StructureOnly/publication evidence, and package reviews
+are green. `C-AGGREGATION-01` is captured in its own unpushed
+`ReviewedLocalGreen` commit. `C-CONVERGE-01` alone may follow as a twelve-record,
+code-free P/R/G-NotApplicable audit; it may not rewrite any immutable red or
+activate D, the parent scenario, final status/owner/workflow, release, or
+publication.
+
 ## Internal implementation slices
 
 ContractSlice A's historical delivery is owned by its
@@ -10943,10 +11004,11 @@ B-CONVERGE is merged/exact-main green.
 ContractSlice C is decomposed by the current
 [C micro-delivery plan](subf-0143-contractslice-c-micro-delivery-plan.md), whose
 design head is hosted green. Activation, Applicability, and Evaluation are
-exact-head hosted green. C is `10/11`, current A+B+C is `53/53`, R=0012/R=0013/
-R=0016 are immutable diagnostics, and R=0014/R=0015/R=0017 are accepted/
-immutable. `C-INTENT-RESULT-01` is `ReviewedLocalGreen`; `C-AGGREGATION-01`
-remains the sole next frozen packet until the focused intent commit exists.
+exact-head hosted green. C Intent and Aggregation are separate unpushed
+`ReviewedLocalGreen` commits. C is `11/11`, current A+B+C/full Conformance is
+`54/54`, R=0012/R=0013/R=0016 are immutable diagnostics, and R=0014/R=0015/
+R=0017/R=0018 are accepted/immutable. `C-CONVERGE-01` is the sole next pure
+audit.
 
 C implementation and D still require separate packet activation, and no
 packet is active merely from this list. No directive here allocates new stable

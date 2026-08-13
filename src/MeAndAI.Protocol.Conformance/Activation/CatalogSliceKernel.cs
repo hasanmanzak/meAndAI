@@ -5,13 +5,16 @@ namespace MeAndAI.Protocol.Conformance;
 
 public sealed class CatalogSliceKernel
 {
+    private readonly CatalogSliceDeclaration _catalog;
     private readonly CatalogSliceProducerGraph _producerGraph;
     private readonly KernelPlanningSession _planningSession;
 
     private CatalogSliceKernel(
+        CatalogSliceDeclaration catalog,
         CatalogSliceProducerGraph producerGraph,
         KernelPlanningSession planningSession)
     {
+        _catalog = catalog;
         _producerGraph = producerGraph;
         _planningSession = planningSession;
     }
@@ -24,6 +27,7 @@ public sealed class CatalogSliceKernel
         KernelActivationCore.ValidateSlice(manifest, policy, activationProof);
         var graph = CatalogSliceProducerGraph.Create(policy);
         return new CatalogSliceKernel(
+            policy.Catalog,
             graph,
             new KernelPlanningSession(
                 manifest,
@@ -76,5 +80,9 @@ public sealed class CatalogSliceKernel
     public CatalogSliceEvaluation Evaluate(
         EvaluationClosure closure,
         CancellationToken cancellationToken = default) =>
-        throw new CatalogIntegrityException(CatalogIntegrityCode.PlanStateInvalid);
+        EvaluationAggregationCore.EvaluateSlice(
+            _planningSession,
+            _catalog,
+            closure,
+            cancellationToken);
 }

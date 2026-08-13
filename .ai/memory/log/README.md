@@ -11,12 +11,13 @@ ContractSlice A and B are merged/exact-main green; the linked C freeze owns the
 exact B merge and hosted-run closure. B remains
 `11/11`, cumulative A+B `43/43`; its accepted reds and immutable diagnostics
 remain owned by the historical B handoff below. C Activation and Applicability
-and Evaluation are `ExactHeadHostedGreen`; C is `10/11`, and current A+B+C is
-`53/53`. R=0006/R=0008/R=0009/R=0010/R=0012/R=0013/R=0016 are
+and Evaluation are `ExactHeadHostedGreen`; C is `11/11`, and current A+B+C/full
+Conformance is `54/54`. R=0006/R=0008/R=0009/R=0010/R=0012/R=0013/R=0016 are
 diagnostics/no-success and R=0007/R=0011/R=0014/R=0015/R=0017 are
-accepted/immutable. `C-INTENT-RESULT-01` is `ReviewedLocalGreen` in its separate
-unpushed commit, and `C-AGGREGATION-01` remains next/`FrozenDesign`; the parent
-scenario remains `Planned`, and D/activation are held.
+accepted/immutable; R=0018 is also accepted/immutable. `C-INTENT-RESULT-01` and
+`C-AGGREGATION-01` are separate unpushed `ReviewedLocalGreen` commits, and
+`C-CONVERGE-01` is the next code-free audit; the parent scenario remains
+`Planned`, and D/activation are held.
 
 Follow the current
 [instruction-graph capacity handoff](2026-08-09-feat-0069-instruction-graph-capacity.md)

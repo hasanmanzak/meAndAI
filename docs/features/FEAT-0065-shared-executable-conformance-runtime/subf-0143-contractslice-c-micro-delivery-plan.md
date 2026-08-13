@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Gate 2 micro-delivery plan and design freeze |
-| State | Initial design, Activation, Applicability, and Evaluation cohorts `ExactHeadHostedGreen`; C `10/11`, current A+B+C `53/53`; R=0006/R=0008/R=0009/R=0010/R=0012/R=0013/R=0016 diagnostic/no-success, R=0007/R=0011/R=0014/R=0015/R=0017 accepted/immutable; `C-INTENT-RESULT-01` `ReviewedLocalGreen` in its separate unpushed commit, with `C-AGGREGATION-01` next/`FrozenDesign`; parent scenario held |
+| State | Initial design, Activation, Applicability, and Evaluation cohorts `ExactHeadHostedGreen`; C `11/11`, current A+B+C/full Conformance `54/54`; R=0006/R=0008/R=0009/R=0010/R=0012/R=0013/R=0016 diagnostic/no-success, R=0007/R=0011/R=0014/R=0015/R=0017/R=0018 accepted/immutable; `C-INTENT-RESULT-01` and `C-AGGREGATION-01` are separate unpushed `ReviewedLocalGreen` commits, with `C-CONVERGE-01` next/pure audit; parent scenario held |
 | Parent | Owning feature and current subfeature |
 | Scenario | [TEST-0210](test-cases.md#test-0210), retained `Planned` |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
@@ -141,7 +141,7 @@ sequence with a push and Ubuntu/Windows wait after every package.
 | Activation | `3h10m` measured from the first package commit through the final synchronized exact-tree gate | Ubuntu `22m23s`; Windows `18m57s`; publication skipped | `0` | `NotApplicable` | `NotApplicable` | About `44m46s` of hosted critical-path wait from the two avoided intermediate pushes, using this cohort's `22m23s` longest job as the comparison basis | None observed; the local commit-reference recurrence caught the only record defect before push |
 | Applicability | About `63m` active package/validation time | `20m37s` critical hosted duration (`13m46s` Windows) | `0` | `NotApplicable` | `NotApplicable` | About `14-21m` by avoiding a second hosted round | `No`; separate package commits and exact FQN/runner evidence remained intact |
 | Evaluation | `1h14m46s` observed Plan-to-Advance commit interval, including package-local validation and final cohort gates | `21m26s` critical hosted duration (`17m52s` Windows) | `0` | `NotApplicable` | `NotApplicable` | About `18-22m` by avoiding a second hosted round | `No`; separate package commits, exact red identities, and traceability remained intact |
-| Results/closure | `NotMeasured` | `NotMeasured` | `NotMeasured` | `NotApplicable` until a defect | `NotApplicable` until a defect | `NotMeasured` | `NotObserved` initially |
+| Results/closure | About `44m` from the Intent commit through Aggregation record preparation; final converge validation pending | `NotMeasured` until the single cohort push | `0` locally | `NotApplicable` | One fixture-only zero-demand setup correction was isolated in under `2m` and revalidated in about `3m` | Two intermediate hosted rounds avoided; exact saving finalized after cohort hosted closure | `No`; separate commits, immutable red evidence, and ownership remained traceable |
 
 C closure reports elapsed time, isolation cost, estimated saved time, and any
 consistency or traceability loss for these four cohorts separately from D.
@@ -675,10 +675,11 @@ traceability loss was observed.
 
 ## Frozen `C-INTENT-RESULT-01` packet boundary
 
-This Results/closure predecessor is `ReviewedLocalGreen` in its separate
+This Results/closure predecessor became `ReviewedLocalGreen` in its separate
 unpushed commit after the corrected twelve-record design cohort became
-exact-head hosted green. `C-AGGREGATION-01` is the sole next frozen packet and
-cannot start until this focused intent commit exists. The intent packet's one direct Fact/FQN is
+exact-head hosted green. At that packet checkpoint, `C-AGGREGATION-01` was the
+sole next frozen packet and could not start before the focused intent commit.
+The intent packet's one direct Fact/FQN is
 `MeAndAI.Protocol.Conformance.Tests.ContractSliceCIntentTests.Mints_exact_intents_findings_and_failures`,
 with only `ContractSlice=C`, no Scenario/Theory/class trait, and marker
 `TEST-0210-C-BEHAVIOR-RED-0008`.
@@ -783,7 +784,8 @@ packet cap is `2,400` changed lines and the owning test cap is `900`; `2,401`
 or `901` requires redraw. Package green is focused `1/1`, C `10/10`, full
 Conformance `53/53`, Domain `98/98`, Release/format/diff/locks/structure/reviews
 and record sync green, then one separate unpushed `ReviewedLocalGreen` commit.
-Only then may `C-AGGREGATION-01` start inside the same Results/closure cohort.
+That focused commit activated `C-AGGREGATION-01` inside the same Results/closure
+cohort.
 
 The design cohort allowlist is exactly
 [memory index](../../../.ai/memory/README.md),
@@ -812,6 +814,59 @@ test is `299/900`; focused `1/1`, C `10/10`, full Conformance `53/53`, Domain
 Exact artifact hashes and final package-local structural/review evidence are
 owned by the C evidence ledger. R=0017 is never rerun, and no package-hosted
 claim is made.
+
+## `C-AGGREGATION-01` reviewed-local-green evidence
+
+The focused Intent commit exists at exact local head
+[`414a7d00f7fb8d5ae3ee81ee327c5b75be7f3216`](https://github.com/hasanmanzak/meAndAI/commit/414a7d00f7fb8d5ae3ee81ee327c5b75be7f3216).
+Aggregation then adds only the internal `EvaluationAggregationCore`, threads
+the exact issued closure/profile through the existing kernel session, and makes
+the public slice and complete `Evaluate` methods delegate to that one core. A
+successful call consumes the closure once; cancellation, validation failure,
+or host failure before commit leaves it retryable. Result collections remain
+defensive snapshots in canonical acquisition/evaluation order. Slice output has
+no verdict. Complete output is `Indeterminate` when any required evaluation is
+unresolved, otherwise `NonConforming` when any rule is violated, otherwise
+`Conforming`; neither path mints a report or enforcement decision.
+
+The packet owns one direct Fact/FQN,
+`MeAndAI.Protocol.Conformance.Tests.ContractSliceCAggregationTests.Aggregates_exact_catalog_evaluation_and_verdict`,
+with only `ContractSlice=C`, no Scenario/Theory/class trait, and marker
+`TEST-0210-C-BEHAVIOR-RED-0009`. R=0018 changed only the fully prepared valid
+complete evaluation return to `null!`; only that semantic null reached the
+marker. The exact child argv was:
+
+```text
+dotnet test tests/dotnet/MeAndAI.Protocol.Conformance.Tests/MeAndAI.Protocol.Conformance.Tests.csproj --configuration Release --no-restore --no-build --nologo --verbosity minimal --results-directory "<fresh-root>" --logger "trx;LogFileName=TEST-0210-C-BEHAVIOR-RED-0009.trx" --filter "ContractSlice=C&FullyQualifiedName=MeAndAI.Protocol.Conformance.Tests.ContractSliceCAggregationTests.Aggregates_exact_catalog_evaluation_and_verdict"
+```
+
+The exact executable allowlist modifies the two kernels, two evaluation result
+carriers, applicability planning core, evaluation advance core, applicability-
+closure and intent fixtures; it adds `EvaluationAggregationCore.cs` and the
+aggregation Fact. No Abstractions, Domain, Policy, public API, project/package/
+lock/workflow file changes. The captured pre-red budget was `579/2,400`
+normalized changed lines and `268/900` owning-test lines.
+
+Fresh runner `43,245` bytes / SHA-256
+`BBDF57B940B3ACA2A7537ECA3D64B2E68EC9E65D18325FEC36E3DF90870F9C19`
+passed ValidateOnly and its sole Execute. Report SHA-256 is
+`02479BEA8AD9F6DA8E7341AC3CEF392ABF2D1C0C4FF9C98490EAC43BAA6E24B3`;
+sole TRX is `4,838` bytes / SHA-256
+`D164AC28CA286D96A6D2AB4CE598B596DF7366F736B416CFE5DE04858567920E`.
+Native/runner exits were `1/0` in `2,304ms`; exact result/definition/entry,
+marker, optional stack/stdout/RunInfo, sixteen counters, source/binary/lock/root,
+and zero-attachment/collector oracles passed. R=0018 is immutable and never
+reruns.
+
+Green is focused `1/1`, C `11/11`, full Conformance `54/54`, Domain `98/98`,
+warning/error-free Release build, format, six locks, and diff-check. A first
+focused green exposed only a zero-demand fixture with no applicability scope;
+ownership was isolated in under `2m`, the canonical non-empty candidate set was
+restored, and revalidation cost about `3m`. Preliminary StructureOnly passed in
+`487.011s`; publication evidence passed `7/7` in `321s` with no publication
+claim. Exact-tree recurrences and final reviews remain the focused commit gate.
+No package push or hosted claim exists. `C-CONVERGE-01` is next and may change
+only the twelve records, with P/R/G `NotApplicable` and no executable delta.
 
 ## Deferred ContractSlice D cohort plan
 

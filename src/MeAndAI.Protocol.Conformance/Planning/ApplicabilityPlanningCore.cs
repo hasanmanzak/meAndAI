@@ -20,6 +20,14 @@ internal sealed class KernelPlanningSession : IPlanBoundEvidenceSession
         new(ReferenceEqualityComparer.Instance);
     private readonly HashSet<EvaluationPlan> _advancedEvaluation =
         new(ReferenceEqualityComparer.Instance);
+    private readonly HashSet<EvaluationClosure> _issuedEvaluationClosures =
+        new(ReferenceEqualityComparer.Instance);
+    private readonly HashSet<EvaluationClosure> _evaluating =
+        new(ReferenceEqualityComparer.Instance);
+    private readonly HashSet<EvaluationClosure> _evaluated =
+        new(ReferenceEqualityComparer.Instance);
+    private readonly Dictionary<ApplicabilityPlan, NamedExecutionProfile>
+        _namedProfiles = new(ReferenceEqualityComparer.Instance);
 
     internal KernelPlanningSession(
         FinalizedPolicyManifest manifest,
@@ -58,6 +66,31 @@ internal sealed class KernelPlanningSession : IPlanBoundEvidenceSession
     internal IReadOnlyList<RuleDeclaration> Rules { get; }
 
     internal CatalogSliceProducerGraph ProducerGraph { get; }
+
+    internal void RegisterNamedProfile(
+        ApplicabilityPlan plan,
+        NamedExecutionProfile profile)
+    {
+        lock (_stateGate)
+        {
+            if (!_namedProfiles.TryAdd(plan, profile))
+            {
+                throw new CatalogIntegrityException(
+                    CatalogIntegrityCode.PlanStateInvalid);
+            }
+        }
+    }
+
+    internal NamedExecutionProfile GetNamedProfile(ApplicabilityPlan plan)
+    {
+        lock (_stateGate)
+        {
+            return _namedProfiles.TryGetValue(plan, out var profile)
+                ? profile
+                : throw new CatalogIntegrityException(
+                    CatalogIntegrityCode.PlanStateInvalid);
+        }
+    }
 
     internal void BeginClose(ApplicabilityPlan plan)
     {
@@ -113,6 +146,10 @@ internal sealed class KernelPlanningSession : IPlanBoundEvidenceSession
             {
                 _issuedEvaluationPlans.Add(plan);
             }
+            else if (result is EvaluationClosure evaluationClosure)
+            {
+                _issuedEvaluationClosures.Add(evaluationClosure);
+            }
         }
     }
 
@@ -138,13 +175,19 @@ internal sealed class KernelPlanningSession : IPlanBoundEvidenceSession
         }
     }
 
-    internal void CompleteEvaluationAdvance(EvaluationPlan plan)
+    internal void CompleteEvaluationAdvance(
+        EvaluationPlan plan,
+        EvaluationAdvanceResult result)
     {
         lock (_stateGate)
         {
             _advancingEvaluation.Remove(plan);
             _issuedEvaluationPlans.Remove(plan);
             _advancedEvaluation.Add(plan);
+            if (result is EvaluationClosure closure)
+            {
+                _issuedEvaluationClosures.Add(closure);
+            }
         }
     }
 
@@ -153,6 +196,38 @@ internal sealed class KernelPlanningSession : IPlanBoundEvidenceSession
         lock (_stateGate)
         {
             _advancingEvaluation.Remove(plan);
+        }
+    }
+
+    internal void BeginEvaluate(EvaluationClosure closure)
+    {
+        lock (_stateGate)
+        {
+            if (!_issuedEvaluationClosures.Contains(closure) ||
+                _evaluated.Contains(closure) ||
+                !_evaluating.Add(closure))
+            {
+                throw new CatalogIntegrityException(
+                    CatalogIntegrityCode.PlanStateInvalid);
+            }
+        }
+    }
+
+    internal void CompleteEvaluate(EvaluationClosure closure)
+    {
+        lock (_stateGate)
+        {
+            _evaluating.Remove(closure);
+            _issuedEvaluationClosures.Remove(closure);
+            _evaluated.Add(closure);
+        }
+    }
+
+    internal void AbandonEvaluate(EvaluationClosure closure)
+    {
+        lock (_stateGate)
+        {
+            _evaluating.Remove(closure);
         }
     }
 }
@@ -208,7 +283,9 @@ internal static class ApplicabilityPlanningCore
             Invalid();
         }
 
-        return Create(session, profile.Axes, rules, targets);
+        var plan = Create(session, profile.Axes, rules, targets);
+        session.RegisterNamedProfile(plan, profile);
+        return plan;
     }
 
     private static ApplicabilityPlan Create(

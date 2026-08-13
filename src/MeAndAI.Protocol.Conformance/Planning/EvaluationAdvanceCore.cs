@@ -143,7 +143,7 @@ internal static class EvaluationAdvanceCore
                 return null!;
             }
 
-            session.CompleteEvaluationAdvance(plan);
+            session.CompleteEvaluationAdvance(plan, result);
             return result;
         }
         catch
