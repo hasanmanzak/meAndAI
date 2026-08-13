@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Gate 2 micro-delivery plan and design freeze |
-| State | Design exact-head hosted green and maintainer accepted; `D-POLICY-SURFACE-ACTIVATION-01` is `ExactHeadHostedGreen`; D is `3/11` and A+B+C+D/full Conformance is `57/57`; `D-REAL-PRODUCER-INFRASTRUCTURE-01` is `FrozenDesign`/inactive pending its exact design-head hosted gate |
+| State | Design exact-head hosted green and maintainer accepted; `D-POLICY-SURFACE-ACTIVATION-01` is `ExactHeadHostedGreen`; `D-REAL-PRODUCER-INFRASTRUCTURE-01` is `ReviewedLocalGreen`; D is `4/11` and A+B+C+D/full Conformance is `58/58`; the Cohort 2 exact-head hosted gate is pending and RULE-0001 remains inactive |
 | Parent | [SUBF-0143](README.md#subf-0143) |
 | Scenario | [TEST-0210](test-cases.md#test-0210), retained `Planned` |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
@@ -208,7 +208,7 @@ surface assertions remain unchanged; the D Structural/Ownership Facts alone own
 the new Policy export. The packet cap is ten production paths, five test paths,
 and `3,500` normalized changed C# lines. No project, package, lock, workflow,
 Abstractions, Conformance, Domain, Application or other source/test path may
-change. Cohort 2 behavior remains absent: real producers may expose only their
+change. At that Cohort 1 checkpoint, Cohort 2 behavior was absent: real producers could expose only their
 object-identical registration identities and fail-closed staging behavior here.
 
 ### `D-REAL-PRODUCER-INFRASTRUCTURE-01` pre-red freeze
@@ -285,7 +285,7 @@ same-head Ubuntu/Windows validation before the runner is materialized.
 | Cohort | Local work/validation | Hosted CI | Hosted defects | Owner identification | Correction/revalidation | Estimated saving vs package-hosted | Consistency/traceability loss |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Policy activation | About `45m` local work; exact-tree StructureOnly `546.622s` and publication evidence `7/7` in `369.5s`, run concurrently | [Run 31719641316](https://github.com/hasanmanzak/meAndAI/actions/runs/31719641316): Ubuntu `18m53s`, Windows `18m40s`, publication skipped | `0` | Not applicable | `0` | Baseline: one avoided intermediate hosted wait | None observed |
-| Real producer infrastructure | `NotMeasured` | `NotMeasured` | `NotMeasured` | `NotMeasured` | `NotMeasured` | No avoided package push; cohort exists for semantic isolation | `NotMeasured` |
+| Real producer infrastructure | About `2h` active implementation/validation; StructureOnly `527.148s`, publication evidence `7/7` in `337.4s` | Pending one cohort push | `0` locally | Not applicable locally | `0` locally | No avoided package push; singleton cohort preserves semantic isolation | None observed locally |
 | First common rules | `NotMeasured` | `NotMeasured` | `NotMeasured` | `NotMeasured` | `NotMeasured` | Baseline: one avoided intermediate hosted wait | `NotMeasured` |
 | Specialized common rules | `NotMeasured` | `NotMeasured` | `NotMeasured` | `NotMeasured` | `NotMeasured` | Baseline: two avoided intermediate hosted waits | `NotMeasured` |
 | Equivalence/closure | `NotMeasured` | `NotMeasured` | `NotMeasured` | `NotMeasured` | `NotMeasured` | Baseline: two avoided intermediate hosted waits | `NotMeasured` |

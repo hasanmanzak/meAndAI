@@ -17,10 +17,10 @@ Follow the current
 ContractSlice A, B, and C are merged/exact-main green; C is `11/11`, and
 A+B+C/full Conformance is `54/54`. The linked handoff owns exact C closure and
 the records-only D cohort/package freeze. D design delivery is exact-head hosted
-green and maintainer accepted. Policy activation is `ExactHeadHostedGreen` at
-its exact activation head: D is `3/11` and
-A+B+C+D/full Conformance is `57/57`. Real producer infrastructure is
-`FrozenDesign`/inactive pending its exact design-head hosted gate.
+green and maintainer accepted. Policy activation is `ExactHeadHostedGreen`;
+real producer infrastructure is `ReviewedLocalGreen`: D is `4/11` and
+A+B+C+D/full Conformance is `58/58`. Real producer infrastructure is
+locally green; Cohort 2 exact-head hosted validation remains pending.
 The parent scenario remains `Planned`; later D cohorts and final activation
 are held.
 

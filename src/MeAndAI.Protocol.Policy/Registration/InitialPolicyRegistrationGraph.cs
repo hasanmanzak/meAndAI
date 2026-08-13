@@ -38,21 +38,26 @@ internal static class InitialPolicyRegistrationGraph
         var governed = Schema(registry, "protocol.governed-text");
         var target = Schema(registry, "protocol.repository-target-resolution");
         var tree = Schema(registry, "protocol.repository-tree");
+        var governedModel = ModelTypeToken<SourceTextModel>.Create(
+            governed.OutputModel);
+        var targetModel = ModelTypeToken<RepositoryTargetResolutionModel>.Create(
+            target.OutputModel);
+        var treeModel = ModelTypeToken<RepositoryTreeModel>.Create(
+            tree.OutputModel);
         return
         [
             CodecRegistration<SourceTextModel>.Create(
                 governed,
-                ModelTypeToken<SourceTextModel>.Create(governed.OutputModel),
-                new GovernedTextCodec()),
+                governedModel,
+                new GovernedTextCodec(governed, governedModel)),
             CodecRegistration<RepositoryTargetResolutionModel>.Create(
                 target,
-                ModelTypeToken<RepositoryTargetResolutionModel>.Create(
-                    target.OutputModel),
-                new RepositoryTargetResolutionCodec()),
+                targetModel,
+                new RepositoryTargetResolutionCodec(target, targetModel)),
             CodecRegistration<RepositoryTreeModel>.Create(
                 tree,
-                ModelTypeToken<RepositoryTreeModel>.Create(tree.OutputModel),
-                new RepositoryTreeCodec()),
+                treeModel,
+                new RepositoryTreeCodec(tree, treeModel)),
         ];
     }
 
@@ -63,18 +68,28 @@ internal static class InitialPolicyRegistrationGraph
         var target = Parser(
             registry,
             "protocol.parser.repository-target-markdown");
+        var sourceInput = ModelTypeToken<SourceTextModel>.Create(
+            Schema(registry, "protocol.governed-text").OutputModel);
+        var targetInput = ModelTypeToken<RepositoryTargetResolutionModel>.Create(
+            Schema(registry, "protocol.repository-target-resolution").OutputModel);
         return
         [
             ParserRegistration<SourceTextInput, MarkdownDocumentModel>.Create(
                 markdown,
-                new PolicyInputBinder<SourceTextInput>(markdown.Inputs),
+                new PolicyInputBinder<SourceTextInput>(
+                    markdown.Inputs,
+                    reader => new SourceTextInput(
+                        reader.RequireModel(sourceInput))),
                 ModelTypeToken<MarkdownDocumentModel>.Create(
                     markdown.OutputModel),
                 new MarkdownDocumentParser()),
             ParserRegistration<RepositoryTargetInput,
                 RepositoryTargetMarkdownDocumentSetModel>.Create(
                     target,
-                    new PolicyInputBinder<RepositoryTargetInput>(target.Inputs),
+                    new PolicyInputBinder<RepositoryTargetInput>(
+                        target.Inputs,
+                        reader => new RepositoryTargetInput(
+                            reader.RequireModel(targetInput))),
                     ModelTypeToken<RepositoryTargetMarkdownDocumentSetModel>
                         .Create(target.OutputModel),
                     new RepositoryTargetMarkdownDocumentParser()),
@@ -113,7 +128,9 @@ internal static class InitialPolicyRegistrationGraph
         var declaration = Index(registry, key);
         return IndexRegistration<PolicyIndexInput, TCapability>.Create(
             declaration,
-            new PolicyInputBinder<PolicyIndexInput>(declaration.Inputs),
+            new PolicyInputBinder<PolicyIndexInput>(
+                declaration.Inputs,
+                reader => new PolicyIndexInput(reader)),
             CapabilityTypeToken<TCapability>.Create(
                 declaration.OutputCapability),
             indexer);
@@ -209,9 +226,22 @@ internal static class InitialPolicyRegistrationGraph
 internal sealed class PolicyInputBinder<TInput> : IComponentInputBinder<TInput>
     where TInput : class, IComponentInput
 {
-    internal PolicyInputBinder(IEnumerable<ComponentInputDeclaration> inputs) =>
+    private readonly Func<TypedInputReader, TInput> _bind;
+
+    internal PolicyInputBinder(
+        IEnumerable<ComponentInputDeclaration> inputs,
+        Func<TypedInputReader, TInput> bind)
+    {
         Inputs = Array.AsReadOnly(
             (inputs ?? throw new ArgumentNullException(nameof(inputs))).ToArray());
+        _bind = bind ?? throw new ArgumentNullException(nameof(bind));
+    }
 
     public IReadOnlyList<ComponentInputDeclaration> Inputs { get; }
+
+    public TInput Bind(TypedInputReader reader)
+    {
+        ArgumentNullException.ThrowIfNull(reader);
+        return _bind(reader);
+    }
 }

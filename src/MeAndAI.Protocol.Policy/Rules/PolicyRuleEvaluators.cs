@@ -6,15 +6,19 @@ internal abstract class InitialRuleEvaluator : IRuleEvaluator
 {
     public ApplicabilityIntent EvaluateApplicability(
         RuleApplicabilityInput input,
-        CancellationToken cancellationToken) =>
-        throw new NotSupportedException(
-            "Rule evaluation is not active in the Policy surface packet.");
+        CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        return ApplicabilityIntent.Applicable([]);
+    }
 
     public EvaluationIntent Evaluate(
         RuleEvaluationInput input,
-        CancellationToken cancellationToken) =>
-        throw new NotSupportedException(
-            "Rule evaluation is not active in the Policy surface packet.");
+        CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        return EvaluationIntent.Create([], []);
+    }
 }
 
 internal sealed class FeaturePacketRuleEvaluator : InitialRuleEvaluator;
