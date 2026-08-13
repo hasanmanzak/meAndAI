@@ -6,7 +6,7 @@
 | Parent epic | [EPIC-0002 / issue #163](https://github.com/hasanmanzak/meAndAI/issues/163) |
 | Architecture task | [TASK-0003 / issue #164](https://github.com/hasanmanzak/meAndAI/issues/164) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
-| Current authority | ContractSlice A, B, and C are merged/exact-main green; C is `11/11`. Policy activation and producer infrastructure are `ExactHeadHostedGreen`; RULE-0001 is `ReviewedLocalGreen`: D is `5/11` and A+B+C+D/full Conformance is `59/59`. RULE-0002 is next/inactive. Final D activation, merge, release, and publication remain held. |
+| Current authority | ContractSlice A, B, and C are merged/exact-main green; C is `11/11`. Policy activation and producer infrastructure are `ExactHeadHostedGreen`; RULE-0001 and RULE-0002 are `ReviewedLocalGreen`: D is `6/11` and A+B+C+D/full Conformance is `60/60`. The first-rules cohort is local green with push/hosted validation pending; RULE-0003 is next/inactive. Final D activation, merge, release, and publication remain held. |
 
 This plan allocates the accepted architecture to stable delivery records. It
 did not itself authorize implementation. The later

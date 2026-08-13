@@ -1,5 +1,8 @@
 using MeAndAI.Protocol.Conformance.Abstractions;
 using MeAndAI.Protocol.Policy.Models;
+using Markdig;
+using Markdig.Extensions.AutoLinks;
+using Markdig.Extensions.Tables;
 using System.Text;
 
 namespace MeAndAI.Protocol.Policy.Parsers;
@@ -34,7 +37,31 @@ internal sealed class MarkdownDocumentParser :
         cancellationToken.ThrowIfCancellationRequested();
         var source = input.Value.Source;
         var text = StrictUtf8.GetString(source.Value.Body.Span);
-        var model = new MarkdownDocumentModel(source.Evidence, text);
+        var builder = new MarkdownPipelineBuilder
+        {
+            MaximumNestingDepth = 512,
+        };
+        builder
+            .UsePreciseSourceLocation()
+            .UsePipeTables(new PipeTableOptions
+            {
+                RequireHeaderSeparator = true,
+                UseHeaderForColumnCount = true,
+                InferColumnWidthsFromSeparator = false,
+            })
+            .UseFootnotes()
+            .UseAutoLinks(new AutoLinkOptions
+            {
+                ValidPreviousCharacters = "*_~(",
+                OpenInNewWindow = false,
+                AllowDomainWithoutPeriod = false,
+                UseHttpsForWWWLinks = false,
+            });
+        var model = new MarkdownDocumentModel(
+            source.Evidence,
+            source.Value.Binding.Location,
+            text,
+            Markdown.Parse(text, builder.Build(), context: null));
         return SemanticModelIntent<MarkdownDocumentModel>.Produced(
             SemanticModelProduct<MarkdownDocumentModel>.Create(
                 model,

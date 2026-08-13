@@ -103,7 +103,79 @@ internal sealed class FeaturePacketRuleEvaluator : InitialRuleEvaluator
     }
 }
 
-internal sealed class DecisionRecordRuleEvaluator : InitialRuleEvaluator;
+internal sealed class DecisionRecordRuleEvaluator : InitialRuleEvaluator
+{
+    private const string TreeSlot = "protocol.slot.repository-tree";
+    private const string TextSlot = "protocol.slot.repository-governed-text";
+    private const string DecisionKind = "protocol.record.decision";
+    private const string ReferenceKind = "protocol.record.decision-reference";
+    private const string Selector = "protocol.selector.decision-record";
+    private static readonly string[] RequiredMembers =
+    [
+        "heading",
+        "metadata:Classification",
+        "metadata:Status",
+        "metadata:Date",
+        "metadata:Decision owners",
+        "metadata:Related features",
+        "metadata:Related decisions",
+        "section:Context",
+        "section:Decision",
+        "section:Consequences",
+        "section:Alternatives considered",
+        "section:Review condition",
+    ];
+
+    public override EvaluationIntent Evaluate(
+        RuleEvaluationInput input,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(input);
+        cancellationToken.ThrowIfCancellationRequested();
+        var index = input.GetCapability<IProtocolRecordIndex>(TextSlot);
+        var contextProofs = new[]
+        {
+            input.GetContextProof(TreeSlot),
+            input.GetContextProof(TextSlot),
+        };
+        var decisions = index.Records
+            .Where(item => item.RecordKind == DecisionKind)
+            .ToArray();
+        var findings = new List<FindingIntent>();
+
+        foreach (var reference in index.Records
+            .Where(item => item.RecordKind == ReferenceKind)
+            .OrderBy(item => item.Ordinal))
+        {
+            var matches = decisions
+                .Where(item => item.RecordId == reference.RecordId)
+                .OrderBy(item => item.Ordinal)
+                .ToArray();
+            if (matches.Length == 0)
+            {
+                findings.Add(FindingIntent.Create(
+                    FindingCode.Parse("protocol.decision.record-missing"),
+                    input.GetExpectedReference(Selector, reference.Evidence),
+                    [.. contextProofs, reference.Evidence]));
+                continue;
+            }
+
+            if (matches.Length != 1 ||
+                !matches[0].Members
+                    .OrderBy(item => item.Ordinal)
+                    .Select(item => item.MemberKey)
+                    .SequenceEqual(RequiredMembers, StringComparer.Ordinal))
+            {
+                findings.Add(FindingIntent.Create(
+                    FindingCode.Parse("protocol.decision.structure-invalid"),
+                    matches[0].Evidence,
+                    [.. contextProofs, reference.Evidence]));
+            }
+        }
+
+        return EvaluationIntent.Create(findings, []);
+    }
+}
 
 internal sealed class ClickableExactTargetRuleEvaluator : InitialRuleEvaluator;
 

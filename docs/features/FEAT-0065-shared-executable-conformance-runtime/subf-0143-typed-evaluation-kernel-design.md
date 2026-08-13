@@ -3,14 +3,14 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted; ContractSlice A, B, and C are merged/exact-main green. D Policy activation and real producer infrastructure are `ExactHeadHostedGreen`; RULE-0001 is `ReviewedLocalGreen`; D is `5/11` and cumulative A+B+C+D/full Conformance is `59/59`. RULE-0002 is next/inactive. [TEST-0210](test-cases.md#test-0210) remains `Planned`; final activation and DoD remain held. |
+| Status | Gate 2 accepted; ContractSlice A, B, and C are merged/exact-main green. D Policy activation and real producer infrastructure are `ExactHeadHostedGreen`; RULE-0001 and RULE-0002 are `ReviewedLocalGreen`; D is `6/11` and cumulative A+B+C+D/full Conformance is `60/60`. The first-rules cohort is local green with push/hosted validation pending; RULE-0003 is next/inactive. [TEST-0210](test-cases.md#test-0210) remains `Planned`; final activation and DoD remain held. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Test | [TEST-0210](test-cases.md#test-0210) |
 | Gate 3 micro-delivery routing | Historical A, B, and C delivery remains owned by their micro plans. Current prospective routing is the [ContractSlice D micro-delivery plan](subf-0143-contractslice-d-micro-delivery-plan.md); packet labels refine delivery but activate no executable work. |
 | Exact-main design baseline | Accepted A merge commit [`51623f4d404a95e0f706d72805cf7ddbbbd293b8`](https://github.com/hasanmanzak/meAndAI/commit/51623f4d404a95e0f706d72805cf7ddbbbd293b8), validated by exact-main [run 31304787603](https://github.com/hasanmanzak/meAndAI/actions/runs/31304787603) |
-| Design and Gate 3 authority | Historical A/B/C directives, accepted reds, diagnostics, and hosted evidence remain immutable. D Policy activation and producer infrastructure are `ExactHeadHostedGreen`; RULE-0001 is `ReviewedLocalGreen`. RULE-0002 is next/inactive; later rules, final activation, merge, release, and publication remain held. |
+| Design and Gate 3 authority | Historical A/B/C directives, accepted reds, diagnostics, and hosted evidence remain immutable. D Policy activation and producer infrastructure are `ExactHeadHostedGreen`; RULE-0001 and RULE-0002 are `ReviewedLocalGreen`. The first-rules cohort is local green with push/hosted validation pending; RULE-0003 is next/inactive; later rules, final activation, merge, release, and publication remain held. |
 | Completed predecessor | [SUBF-0153](README.md#subf-0153) / [TEST-0221](test-cases.md#test-0221), merged through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173) and exact-main validated by [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) |
 
 ## Directive and hard boundary
@@ -10852,6 +10852,33 @@ semantic-null seam, filter, counters and no-diagnostic oracle; no artifact from
 the diagnostic run is reusable.
 The first cumulative green exposed and closed only that obsolete infrastructure
 test expectation; the new Fact remains the sole owner of RULE-0001 findings.
+
+### `D-RULE-0002-01` executable freeze
+
+The packet-local contract in the D micro-plan is normative. The separate
+RULE-0001 `ReviewedLocalGreen` commit activates only this packet; the cohort is
+not pushed before RULE-0002 closes. One fresh repository-tree/governed-text
+fixture traverses the real codec, frozen Markdig parser, object-identical
+protocol-record index and registered RULE-0002 evaluator. The record index
+retains ordinal immutable decision and decision-reference rows; the evaluator
+owns the exact missing-record/required-structure precedence and reference
+identities from the initial-rule truth table. Its sole nullable semantic seam,
+FQN and marker are respectively
+`EvaluateRule0002(InitialRuleQualificationPolicy.Export)`,
+`ContractSliceDPolicyEvaluatorTests.Evaluates_rule_0002_against_fresh_qualified_fixture`,
+and `TEST-0210-D-BEHAVIOR-RED-0004`; only the complete valid empty predecessor
+intent reaches the marker.
+
+The exact allowlist is `PolicyModels.cs`, `PolicyParsers.cs`,
+`PolicyIndexes.cs`, `InitialPolicyRegistrationGraph.cs`,
+`PolicyRuleEvaluators.cs`, the retained evaluator test, and the retained
+infrastructure test only for RULE-0002 staging retirement. The cap is `1,500`
+normalized changed C# lines. Public API, declarations, projects/packages/
+locks/workflows, other producers/rules and all downstream surfaces remain
+frozen. Canonical red uses the common fresh one-shot Release `--no-build`
+oracle and becomes immutable after invocation commitment; green is focused
+`1/1`, D `6/6`, full Conformance `60/60`, followed by the complete first-rules
+cohort gate and one push of the two separate package commits.
 
 ### `C-EVALUATION-PLAN-01` executable freeze
 

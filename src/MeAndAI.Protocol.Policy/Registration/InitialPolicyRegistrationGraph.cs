@@ -20,6 +20,8 @@ internal static class InitialPolicyRegistrationGraph
         var catalog = declarations.Catalog;
         var treeModel = ModelTypeToken<RepositoryTreeModel>.Create(
             Schema(registry, "protocol.repository-tree").OutputModel);
+        var markdownModel = ModelTypeToken<MarkdownDocumentModel>.Create(
+            Parser(registry, "protocol.parser.markdown").OutputModel);
 
         return PolicyQualificationSliceExport.Create(
             "protocol.policy.initial-rule-qualification",
@@ -27,8 +29,8 @@ internal static class InitialPolicyRegistrationGraph
             catalog,
             registry,
             CreateCodecs(registry, treeModel),
-            CreateParsers(registry),
-            CreateIndexes(registry, treeModel),
+            CreateParsers(registry, markdownModel),
+            CreateIndexes(registry, treeModel, markdownModel),
             CreateProjectors(registry),
             CreateSelectors(catalog),
             CreateEvaluators(catalog));
@@ -63,7 +65,8 @@ internal static class InitialPolicyRegistrationGraph
     }
 
     private static IParserRegistration[] CreateParsers(
-        ReleaseSchemaRegistry registry)
+        ReleaseSchemaRegistry registry,
+        ModelTypeToken<MarkdownDocumentModel> markdownModel)
     {
         var markdown = Parser(registry, "protocol.parser.markdown");
         var target = Parser(
@@ -81,8 +84,7 @@ internal static class InitialPolicyRegistrationGraph
                     markdown.Inputs,
                     reader => new SourceTextInput(
                         reader.RequireModel(sourceInput))),
-                ModelTypeToken<MarkdownDocumentModel>.Create(
-                    markdown.OutputModel),
+                markdownModel,
                 new MarkdownDocumentParser()),
             ParserRegistration<RepositoryTargetInput,
                 RepositoryTargetMarkdownDocumentSetModel>.Create(
@@ -99,16 +101,14 @@ internal static class InitialPolicyRegistrationGraph
 
     private static IIndexRegistration[] CreateIndexes(
         ReleaseSchemaRegistry registry,
-        ModelTypeToken<RepositoryTreeModel> treeModel) =>
+        ModelTypeToken<RepositoryTreeModel> treeModel,
+        ModelTypeToken<MarkdownDocumentModel> markdownModel) =>
     [
         CreateIndex<IGovernedReferenceIndex, GovernedReferenceIndex>(
             registry,
             "protocol.index.governed-reference",
             new GovernedReferenceIndex()),
-        CreateIndex<IProtocolRecordIndex, ProtocolRecordIndex>(
-            registry,
-            "protocol.index.protocol-record",
-            new ProtocolRecordIndex()),
+        CreateProtocolRecordIndex(registry, markdownModel),
         CreateIndex<IRepositoryTargetResolutionIndex,
             RepositoryTargetResolutionIndex>(
                 registry,
@@ -116,6 +116,21 @@ internal static class InitialPolicyRegistrationGraph
                 new RepositoryTargetResolutionIndex()),
         CreateRepositoryTreeIndex(registry, treeModel),
     ];
+
+    private static IIndexRegistration CreateProtocolRecordIndex(
+        ReleaseSchemaRegistry registry,
+        ModelTypeToken<MarkdownDocumentModel> inputModel)
+    {
+        var declaration = Index(registry, "protocol.index.protocol-record");
+        return IndexRegistration<PolicyIndexInput, IProtocolRecordIndex>.Create(
+            declaration,
+            new PolicyInputBinder<PolicyIndexInput>(
+                declaration.Inputs,
+                reader => new PolicyIndexInput(reader)),
+            CapabilityTypeToken<IProtocolRecordIndex>.Create(
+                declaration.OutputCapability),
+            new ProtocolRecordIndex(inputModel));
+    }
 
     private static IIndexRegistration CreateRepositoryTreeIndex(
         ReleaseSchemaRegistry registry,

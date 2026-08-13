@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Gate 2 micro-delivery plan and design freeze |
-| State | Design exact-head hosted green and maintainer accepted; Policy activation and producer infrastructure are `ExactHeadHostedGreen`; `D-RULE-0001-01` is `ReviewedLocalGreen`; D is `5/11` and A+B+C+D/full Conformance is `59/59`; `D-RULE-0002-01` is next/inactive |
+| State | Design exact-head hosted green and maintainer accepted; Policy activation and producer infrastructure are `ExactHeadHostedGreen`; `D-RULE-0001-01` and `D-RULE-0002-01` are `ReviewedLocalGreen`; D is `6/11` and A+B+C+D/full Conformance is `60/60`; first-rules cohort push/hosted pending; `D-RULE-0003-01` is next/inactive |
 | Parent | [SUBF-0143](README.md#subf-0143) |
 | Scenario | [TEST-0210](test-cases.md#test-0210), retained `Planned` |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
@@ -350,13 +350,92 @@ correction skips that obsolete normal-call assertion for RULE-0001 while keeping
 its registration/applicability/cancellation checks; semantic outcomes remain
 owned solely by the new RULE-0001 Fact.
 
+### `D-RULE-0002-01` pre-red freeze
+
+The predecessor is the separate local `ReviewedLocalGreen` RULE-0001 commit
+[`d5348e822f071898926c7d2834641ac3a5a92e5c`](https://github.com/hasanmanzak/meAndAI/commit/d5348e822f071898926c7d2834641ac3a5a92e5c); the first-common-rules cohort is
+not pushed until this packet also closes. The sole new Fact/FQN/marker are
+`ContractSliceDPolicyEvaluatorTests.Evaluates_rule_0002_against_fresh_qualified_fixture`
+and `TEST-0210-D-BEHAVIOR-RED-0004`, with only `ContractSlice=D` and no
+Scenario, Theory, overload, class trait, or second new test class.
+
+The fully prepared call is
+`ContractSliceDPolicyEvaluatorFixture.EvaluateRule0002(InitialRuleQualificationPolicy.Export)`;
+its nullable semantic return is the retained
+`ContractSliceDPolicyEvaluatorEvidence?`. It writes and qualifies fresh
+repository-tree and governed-text payloads, parses each text once through the
+frozen Markdig pipeline, indexes the resulting object-identical Markdown
+models through the real protocol-record registration, then binds the tree and
+record capabilities plus both exact context proofs and selector lookup to the
+object-identical RULE-0002 evaluator. Only the predecessor evaluator's empty
+intent after that complete valid call returns null and reaches the marker.
+Construction, parsing, indexing, cancellation, wrong result/reference/order,
+negative/boundary fixtures, and every exception remain marker-free.
+
+For this packet the protocol-record index emits ordinal immutable rows with
+record kinds `protocol.record.decision` and
+`protocol.record.decision-reference`. A decision row is recognized by its
+exact H1 `DEC-NNNN - <nonempty title>` identity; malformed title/shape still
+retains the exact `DEC-NNNN` identity so RULE-0002, rather than absence, owns
+the structure finding. Its member sequence is exactly `heading`, the six
+ordered nonempty metadata keys `Classification`, `Status`, `Date`,
+`Decision owners`, `Related features`, `Related decisions`, and the five
+ordered exactly-once nonempty H2 keys `Context`, `Decision`, `Consequences`,
+`Alternatives considered`, `Review condition`. A distinct governed occurrence
+of exact ASCII `DEC-[0-9]{4}` creates one decision-reference row whose Derived
+handle is the selector parent; the owning H1 identity itself is not a
+reference. Inputs, records and members are copied and ordinal; duplicate
+decision identities are structurally invalid, never an arbitrary winner.
+
+For each ordinal reference, zero matching decisions emits exactly
+`protocol.decision.record-missing`: primary is the exact
+`protocol.selector.decision-record` ExpectedSelector for the reference handle;
+related evidence is repository-tree ContextProof, governed-text Root proof,
+then the reference Derived proof. One exact valid decision emits no finding.
+One malformed or duplicate matching decision emits exactly
+`protocol.decision.structure-invalid`: primary is its record Derived proof and
+the same ordered related proof kinds are retained. Missing precedes structure;
+distinct references remain independently reportable. The fixture proves
+missing, exact valid, missing/reordered/duplicate metadata, missing/reordered/
+duplicate/empty sections, malformed H1, duplicate record identity, ordinal
+multi-reference results, caller-copy immutability, exact handle identity, and
+cancellation before capability access.
+
+The exact production allowlist modifies only:
+
+```text
+src/MeAndAI.Protocol.Policy/Models/PolicyModels.cs
+src/MeAndAI.Protocol.Policy/Parsers/PolicyParsers.cs
+src/MeAndAI.Protocol.Policy/Indexes/PolicyIndexes.cs
+src/MeAndAI.Protocol.Policy/Registration/InitialPolicyRegistrationGraph.cs
+src/MeAndAI.Protocol.Policy/Rules/PolicyRuleEvaluators.cs
+```
+
+The test allowlist modifies only
+`tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ContractSliceDPolicyEvaluatorTests.cs`
+and `tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ContractSliceDProducerInfrastructureTests.cs`;
+the latter may retire only RULE-0002's predecessor empty-intent assertion while
+retaining registration/applicability/cancellation ownership. No declaration,
+public API, project, package, lock, workflow, other producer/rule, Abstractions,
+Conformance, Domain, Application, or record node may change. The cap is five
+production paths, two retained test paths, and `1,500` normalized changed C#
+lines. A crossing requires a reviewed pre-red redraw and cannot silently raise
+the cap.
+
+Canonical red uses one fresh external result root, exact full-FQN filter and
+marker-named TRX, one Release `--no-restore --no-build` child, native exit `1`,
+the common sixteen-counter/marker-only/no-diagnostic oracle, and no rerun after
+invocation commitment. Focused green is `1/1`, D is `6/6`, full Conformance is
+`60/60`; the cohort then runs the complete local boundary and only its two
+separate commits are pushed together for exact-head hosted validation.
+
 ## Cohort measurement ledger
 
 | Cohort | Local work/validation | Hosted CI | Hosted defects | Owner identification | Correction/revalidation | Estimated saving vs package-hosted | Consistency/traceability loss |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Policy activation | About `45m` local work; exact-tree StructureOnly `546.622s` and publication evidence `7/7` in `369.5s`, run concurrently | [Run 31719641316](https://github.com/hasanmanzak/meAndAI/actions/runs/31719641316): Ubuntu `18m53s`, Windows `18m40s`, publication skipped | `0` | Not applicable | `0` | Baseline: one avoided intermediate hosted wait | None observed |
 | Real producer infrastructure | About `2h` active implementation/validation; StructureOnly `527.148s`, publication evidence `7/7` in `337.4s` | Pending one cohort push | `0` locally | Not applicable locally | `0` locally | No avoided package push; singleton cohort preserves semantic isolation | None observed locally |
-| First common rules | RULE-0001 about `1h` active implementation/validation; focused `1/1`, D `5/5`, full `59/59`, Release `0/0`, StructureOnly `479.695s`, publication evidence `7/7` in `302.5s`; RULE-0002 pending | Held until RULE-0002 and the full cohort gate | `0` locally | One registration token-identity defect in diagnostic red and one predecessor staging-test expectation were isolated to RULE-0001 immediately | About `15m` including rebuild/revalidation | Baseline: one avoided intermediate hosted wait | None observed |
+| First common rules | RULE-0001 about `1h`; RULE-0002 about `1h` active implementation/validation; focused `1/1`, D `6/6`, full `60/60`, Domain `98/98`, API/ownership `15/15`, Release `0/0`, locks/format/diff clean; synchronized StructureOnly `528.328s`, publication evidence `7/7` in `334.7s`; evidence-line recurrence StructureOnly `501.510s`, publication `7/7` in `329.4s` | One cohort push/hosted validation pending | `0` locally | RULE-0001 isolated one registration token-identity defect plus one staging expectation; RULE-0002 isolated one predecessor staging expectation immediately | About `20m` total including rebuild/revalidation | One intermediate hosted wait avoided | None observed |
 | Specialized common rules | `NotMeasured` | `NotMeasured` | `NotMeasured` | `NotMeasured` | `NotMeasured` | Baseline: two avoided intermediate hosted waits | `NotMeasured` |
 | Equivalence/closure | `NotMeasured` | `NotMeasured` | `NotMeasured` | `NotMeasured` | `NotMeasured` | Baseline: two avoided intermediate hosted waits | `NotMeasured` |
 

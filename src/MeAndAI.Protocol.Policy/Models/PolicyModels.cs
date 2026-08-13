@@ -1,5 +1,6 @@
 using MeAndAI.Protocol.Conformance.Abstractions;
 using MeAndAI.Protocol.Domain;
+using Markdig.Syntax;
 
 namespace MeAndAI.Protocol.Policy.Models;
 
@@ -80,14 +81,20 @@ internal sealed class MarkdownDocumentModel : IProtocolSemanticModel
 {
     internal MarkdownDocumentModel(
         QualifiedEvidenceHandle parent,
-        string canonicalText)
+        EvidenceLocation location,
+        string canonicalText,
+        MarkdownDocument document)
     {
         Parent = parent ?? throw new ArgumentNullException(nameof(parent));
+        Location = location ?? throw new ArgumentNullException(nameof(location));
         CanonicalText = canonicalText ?? throw new ArgumentNullException(nameof(canonicalText));
+        Document = document ?? throw new ArgumentNullException(nameof(document));
     }
 
     internal QualifiedEvidenceHandle Parent { get; }
+    internal EvidenceLocation Location { get; }
     internal string CanonicalText { get; }
+    internal MarkdownDocument Document { get; }
 }
 
 internal sealed class RepositoryTargetMarkdownDocumentSetModel :
