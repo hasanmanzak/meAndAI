@@ -58,7 +58,7 @@
 | [FEAT-0054](FEAT-0054-v0153-bounded-quick-adoption-runtime/README.md) | [Bounded quick-adoption runtime reduction](FEAT-0054-v0153-bounded-quick-adoption-runtime/README.md) | Complete | 0.15.3 |
 | [FEAT-0055](FEAT-0055-v0154-utf8-workflow-dispatch/README.md) | [UTF-8 workflow dispatch](FEAT-0055-v0154-utf8-workflow-dispatch/README.md) | Complete | 0.15.4 |
 | [FEAT-0056](FEAT-0056-v0155-instruction-graph-resilience/README.md) | [Instruction-graph preflight resilience](FEAT-0056-v0155-instruction-graph-resilience/README.md) | Complete | 0.15.5 |
-| [FEAT-0057](FEAT-0057-explicit-sdlc-backlog-governance/README.md) | [Explicit SDLC and GitHub-native backlog governance](FEAT-0057-explicit-sdlc-backlog-governance/README.md) | Proposed current-main re-intake / DoR incomplete / implementation not authorized | Unassigned |
+| [FEAT-0057](FEAT-0057-explicit-sdlc-backlog-governance/README.md) | [Explicit SDLC and GitHub-native backlog governance](FEAT-0057-explicit-sdlc-backlog-governance/README.md) | Proposed current-main re-intake / DoR incomplete / implementation not authorized | 0.20.0 |
 | [FEAT-0058](FEAT-0058-v0156-completed-historical-adoption-issues/README.md) | [Completed historical adoption-issue compatibility](FEAT-0058-v0156-completed-historical-adoption-issues/README.md) | Complete | 0.15.6 |
 | [FEAT-0059](FEAT-0059-csharp-operational-foundation/README.md) | [Shared C# operational foundation and portable release contract](FEAT-0059-csharp-operational-foundation/README.md) | Complete | 0.16.0 |
 | [FEAT-0060](FEAT-0060-any-consumer-governance-cli/README.md) | [Any-consumer governance CLI](FEAT-0060-any-consumer-governance-cli/README.md) | Frozen historical WIP under accepted architecture; parent incomplete | 0.17.0 |
@@ -70,7 +70,7 @@
 | [FEAT-0067](FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md) | [Evidence acquisition and managed consumer integration](FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md) | Proposed under accepted architecture / implementation not authorized | 0.17.0 |
 | [FEAT-0068](FEAT-0068-protocol-release-finalizer-authority-transfer/README.md) | [Protocol release finalizer and authority transfer](FEAT-0068-protocol-release-finalizer-authority-transfer/README.md) | Proposed under accepted architecture / implementation not authorized | 0.17.0 |
 | [FEAT-0069](FEAT-0069-instruction-graph-capacity/README.md) | [Bounded instruction-graph capacity revision](FEAT-0069-instruction-graph-capacity/README.md) | Per-blob amendment exact-head hosted green; release/publication held | 0.17.0 |
-| [FEAT-0070](FEAT-0070-agentic-sdlc-workflow-capabilities/README.md) | [Protocol-owned workflow contracts and bounded agent execution](FEAT-0070-agentic-sdlc-workflow-capabilities/README.md) | Proposed / DoR incomplete / implementation not authorized | Unassigned |
+| [FEAT-0070](FEAT-0070-agentic-sdlc-workflow-capabilities/README.md) | [Protocol-owned workflow contracts and bounded agent execution](FEAT-0070-agentic-sdlc-workflow-capabilities/README.md) | Proposed / DoR incomplete / implementation not authorized | 0.20.0 |
 
 The [preserved coverage-equivalence WIP draft](https://github.com/hasanmanzak/meAndAI/blob/1873c98638ba4960734aadb188eb8c8d70b4bc52/docs/features/FEAT-0064-governance-coverage-equivalence/README.md?plain=1)
 was allocated only on the preserved, unmerged

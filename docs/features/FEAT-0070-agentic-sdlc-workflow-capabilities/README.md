@@ -4,14 +4,14 @@
 | --- | --- |
 | Classification | Feature |
 | Status | Proposed; Definition of Ready incomplete; implementation not authorized |
-| Target version | Unassigned; depends on accepted architecture and predecessor review |
+| Target version | 0.20.0 |
 | Issue | [Issue #180](https://github.com/hasanmanzak/meAndAI/issues/180) |
-| Parent epic | [EPIC-0003 / issue #179](https://github.com/hasanmanzak/meAndAI/issues/179) |
+| Parent work | [Issue #179](https://github.com/hasanmanzak/meAndAI/issues/179) |
 | Pull request | Draft [PR #181](https://github.com/hasanmanzak/meAndAI/pull/181) |
 | Decisions | Proposed [DEC-0038](../../decisions/DEC-0038-protocol-owned-workflow-contracts-and-bounded-agent-execution.md) and proposed [DEC-0037](../../decisions/DEC-0037-explicit-sdlc-and-github-native-workflow-authority.md) |
 | Architecture | [Agentic SDLC Workflow Architecture](../../architecture/agentic-sdlc-workflows/README.md) and [delivery plan](../../architecture/agentic-sdlc-workflows/delivery-plan.md) |
 | Originating idea | [IDEA-0001](../../ideas/IDEA-0001-role-based-multi-agent-protocol.md) |
-| Tests | [TEST-0227](test-cases.md#test-0227) through [TEST-0233](test-cases.md#test-0233) |
+| Tests | [TEST-0227](test-cases.md#test-0227), [TEST-0228](test-cases.md#test-0228), [TEST-0229](test-cases.md#test-0229), [TEST-0230](test-cases.md#test-0230), [TEST-0231](test-cases.md#test-0231), [TEST-0232](test-cases.md#test-0232), and [TEST-0233](test-cases.md#test-0233) |
 
 ## Problem
 
@@ -136,7 +136,7 @@ recursive delegation in the first release.
 
 | Test readiness | Gate 1 state | Evidence |
 | --- | --- | --- |
-| Scenarios | Defined | [TEST-0227](test-cases.md#test-0227) through [TEST-0233](test-cases.md#test-0233) |
+| Scenarios | Defined | [TEST-0227](test-cases.md#test-0227), [TEST-0228](test-cases.md#test-0228), [TEST-0229](test-cases.md#test-0229), [TEST-0230](test-cases.md#test-0230), [TEST-0231](test-cases.md#test-0231), [TEST-0232](test-cases.md#test-0232), and [TEST-0233](test-cases.md#test-0233) |
 | Test code | Planned / not started | Future protocol runtime and existing structural owners; exact allocation is a DoR gap |
 | Baseline run | Not run | Records-only scope; expected-red design is required before each executable slice |
 
@@ -156,7 +156,7 @@ recursive delegation in the first release.
   [DEC-0038](../../decisions/DEC-0038-protocol-owned-workflow-contracts-and-bounded-agent-execution.md).
 - Proposed lifecycle decision:
   [DEC-0037](../../decisions/DEC-0037-explicit-sdlc-and-github-native-workflow-authority.md).
-- Parent: [EPIC-0003 / issue #179](https://github.com/hasanmanzak/meAndAI/issues/179).
+- Parent: [issue #179](https://github.com/hasanmanzak/meAndAI/issues/179).
 - Lifecycle predecessor/sibling:
   [FEAT-0057](../FEAT-0057-explicit-sdlc-backlog-governance/README.md).
 - Technical context: [EPIC-0002 / issue #163](https://github.com/hasanmanzak/meAndAI/issues/163)

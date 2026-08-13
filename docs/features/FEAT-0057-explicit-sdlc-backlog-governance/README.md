@@ -4,9 +4,9 @@
 | --- | --- |
 | Classification | Feature |
 | Status | Proposed current-main re-intake; Definition of Ready incomplete; implementation not authorized |
-| Target version | Unassigned; select only after refreshed Gate 1 review |
+| Target version | 0.20.0 |
 | Issue | [Issue #150](https://github.com/hasanmanzak/meAndAI/issues/150) |
-| Parent epic | [EPIC-0003 / issue #179](https://github.com/hasanmanzak/meAndAI/issues/179) |
+| Parent work | [Issue #179](https://github.com/hasanmanzak/meAndAI/issues/179) |
 | Pull request | Draft [PR #181](https://github.com/hasanmanzak/meAndAI/pull/181) |
 | Decisions | Proposed [DEC-0037](../../decisions/DEC-0037-explicit-sdlc-and-github-native-workflow-authority.md) |
 | Architecture | [Agentic SDLC Workflow Architecture](../../architecture/agentic-sdlc-workflows/README.md) |
@@ -153,7 +153,7 @@ second manually synchronized backlog.
 ## Decisions and relationships
 
 - Proposed decision: [DEC-0037](../../decisions/DEC-0037-explicit-sdlc-and-github-native-workflow-authority.md).
-- Parent: [EPIC-0003 / issue #179](https://github.com/hasanmanzak/meAndAI/issues/179).
+- Parent: [issue #179](https://github.com/hasanmanzak/meAndAI/issues/179).
 - Sibling: [FEAT-0070](../FEAT-0070-agentic-sdlc-workflow-capabilities/README.md)
   may consume this lifecycle projection only after the relevant proposal is
   accepted; it separately owns workflow and agent execution.

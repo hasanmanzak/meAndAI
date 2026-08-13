@@ -12,7 +12,7 @@ merge, release, or authority-transfer permission is granted.
 - Draft [PR #181](https://github.com/hasanmanzak/meAndAI/pull/181) is the
   current records review and remains open; it grants no implementation or
   merge authority.
-- [EPIC-0003 / issue #179](https://github.com/hasanmanzak/meAndAI/issues/179)
+- [Issue #179](https://github.com/hasanmanzak/meAndAI/issues/179)
   owns the proposed program.
 - [FEAT-0057](../../../docs/features/FEAT-0057-explicit-sdlc-backlog-governance/README.md)
   refreshes the distinct SDLC/backlog scope retained by
@@ -119,12 +119,12 @@ exact effect boundary.
 
 ## Active-work isolation
 
-The proposal was prepared in a separate worktree and does not edit
+The proposal was prepared in a separate worktree and did not edit
 [FEAT-0065](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md)
-or the active ContractSlice C checkout. ContractSlice C should merge first.
-This branch must then reconcile shared indexes/memory with current `main`,
-preserve C truth, rerun bounded static validation, and require fresh exact-head
-hosted evidence before the records proposal can leave draft state.
+or its ContractSlice C checkout. ContractSlice C has since merged into `main`.
+This branch now incorporates that exact `main` state and preserves C truth in
+the shared indexes and memory. Fresh bounded static validation and exact-head
+hosted evidence remain required before the records proposal can merge.
 
 ## Continuation and cleanup handoff
 
@@ -136,14 +136,12 @@ hosted evidence before the records proposal can leave draft state.
   draft [PR #181](https://github.com/hasanmanzak/meAndAI/pull/181)
 - Last verified remote records head before this cleanup-handoff update:
   [`85bbe564b27c0eef90c10e9463e51d8051501776`](https://github.com/hasanmanzak/meAndAI/commit/85bbe564b27c0eef90c10e9463e51d8051501776)
-- Wait condition: active
+- Wait condition: satisfied
   [FEAT-0065](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md)
-  ContractSlice C delivery merges before this branch is reconciled with
-  then-current `main`.
-- Next delivery action: refresh live PR/issues and current `main`, reconcile
-  shared indexes and memory without losing ContractSlice C truth, rerun the
-  bounded static checks, and obtain the separately authorized exact-head hosted
-  evidence before draft exit.
+  ContractSlice C is merged and this branch is reconciled with current `main`.
+- Next delivery action: rerun the bounded static checks, obtain exact-head
+  hosted evidence, complete the readiness review, and merge the records-only
+  proposal without granting implementation authority.
 
 Archiving the planning conversation does not authorize removal of this
 worktree. The recorded guards grant no mutation authority; even after they all
@@ -155,4 +153,4 @@ or explicitly closed, its evidence is synchronized, the registered worktree is
 clean and unused, and its exact head remains durably reachable. Remove only
 the registered records worktree through Git, prune stale metadata, and delete
 local or remote branches only when no live delivery authority depends on them.
-The active ContractSlice C checkout and all user-owned files remain excluded.
+Every active implementation checkout and all user-owned files remain excluded.

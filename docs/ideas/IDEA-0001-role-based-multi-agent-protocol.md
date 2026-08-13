@@ -2,7 +2,7 @@
 
 Status: **Promoted**
 Created: **2026-07-15**
-Promoted record: **[EPIC-0003 / issue #179](https://github.com/hasanmanzak/meAndAI/issues/179)**
+Promoted proposal: **[issue #179](https://github.com/hasanmanzak/meAndAI/issues/179)**
 
 Promotion creates durable planning authority; it does not authorize
 implementation or satisfy Definition of Ready.
@@ -50,7 +50,7 @@ Ready gaps.
 
 ## Outcome
 
-Promoted to [EPIC-0003 / issue #179](https://github.com/hasanmanzak/meAndAI/issues/179)
+Promoted to [issue #179](https://github.com/hasanmanzak/meAndAI/issues/179)
 for records-only architecture and future gated delivery. The two linked
 features and proposed decisions preserve accepted conclusions, open choices,
 risks, planned scenarios, and successor slices. No agent configuration,

@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Status | Proposed planning; no implementation authority |
-| Parent | [EPIC-0003 / issue #179](https://github.com/hasanmanzak/meAndAI/issues/179) |
+| Parent | [Issue #179](https://github.com/hasanmanzak/meAndAI/issues/179) |
 | Records review | Draft [PR #181](https://github.com/hasanmanzak/meAndAI/pull/181) |
 | Architecture | [Agentic SDLC Workflow Architecture](README.md) |
 | Lifecycle owner | [FEAT-0057](../../features/FEAT-0057-explicit-sdlc-backlog-governance/README.md) |
@@ -35,8 +35,8 @@ implementation grant.
 
 | Work identity | Canonical state and evidence | Relationship to this program |
 | --- | --- | --- |
-| [FEAT-0057](../../features/FEAT-0057-explicit-sdlc-backlog-governance/README.md) / [issue #150](https://github.com/hasanmanzak/meAndAI/issues/150) | Open current-main re-intake in this records packet; obsolete [draft PR #151](https://github.com/hasanmanzak/meAndAI/pull/151) remains closed and unmerged prior art | The only earlier work line resumed here; future delivery is owned by [SUBF-0157](../../features/FEAT-0057-explicit-sdlc-backlog-governance/README.md#subf-0157) through [SUBF-0159](../../features/FEAT-0057-explicit-sdlc-backlog-governance/README.md#subf-0159) after their entry gates close |
-| [BUG-0045](https://github.com/hasanmanzak/meAndAI/issues/149) / [FEAT-0058](../../features/FEAT-0058-v0156-completed-historical-adoption-issues/README.md) | Complete in closed [issue #149](https://github.com/hasanmanzak/meAndAI/issues/149), merged [PR #152](https://github.com/hasanmanzak/meAndAI/pull/152), and immutable [v0.15.6](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.6) at [`5321f1f1aa5966114c69b46bf6ed9191df109e6b`](https://github.com/hasanmanzak/meAndAI/commit/5321f1f1aa5966114c69b46bf6ed9191df109e6b) | Historical adjacent delivery evidence only; no reimplementation, reopened scope, or remaining action in [EPIC-0003 / issue #179](https://github.com/hasanmanzak/meAndAI/issues/179) |
+| [FEAT-0057](../../features/FEAT-0057-explicit-sdlc-backlog-governance/README.md) / [issue #150](https://github.com/hasanmanzak/meAndAI/issues/150) | Open current-main re-intake in this records packet; obsolete [draft PR #151](https://github.com/hasanmanzak/meAndAI/pull/151) remains closed and unmerged prior art | The only earlier work line resumed here; future delivery is owned by [SUBF-0157](../../features/FEAT-0057-explicit-sdlc-backlog-governance/README.md#subf-0157), [SUBF-0158](../../features/FEAT-0057-explicit-sdlc-backlog-governance/README.md#subf-0158), and [SUBF-0159](../../features/FEAT-0057-explicit-sdlc-backlog-governance/README.md#subf-0159) after their entry gates close |
+| [BUG-0045](https://github.com/hasanmanzak/meAndAI/issues/149) / [FEAT-0058](../../features/FEAT-0058-v0156-completed-historical-adoption-issues/README.md) | Complete in closed [issue #149](https://github.com/hasanmanzak/meAndAI/issues/149), merged [PR #152](https://github.com/hasanmanzak/meAndAI/pull/152), and immutable [v0.15.6](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.6) at [`5321f1f1aa5966114c69b46bf6ed9191df109e6b`](https://github.com/hasanmanzak/meAndAI/commit/5321f1f1aa5966114c69b46bf6ed9191df109e6b) | Historical adjacent delivery evidence only; no reimplementation, reopened scope, or remaining action in [issue #179](https://github.com/hasanmanzak/meAndAI/issues/179) |
 | [FIND-0120 / issue #44](https://github.com/hasanmanzak/meAndAI/issues/44) | Complete and closed after the required `main` repository controls were established | Historical external-control evidence only; it is not reopened or owned by [FEAT-0057](../../features/FEAT-0057-explicit-sdlc-backlog-governance/README.md) or [FEAT-0070](../../features/FEAT-0070-agentic-sdlc-workflow-capabilities/README.md) |
 | [BUG-0036 / issue #139](https://github.com/hasanmanzak/meAndAI/issues/139) | Open planned handoff for live GitHub reference validation before merge; its issue remains the live tracker/state store for that separate work identity | Separate backlog item. This records packet does not implement, close, reprioritize, or absorb it; any implementation requires its own refreshed intake and explicit directive |
 
@@ -118,29 +118,26 @@ The current operation is records-only. Its local budget is:
    suite;
 3. one fresh-diff independent review.
 
-No production build, executable feature test, full protocol suite, hosted
-fan-out, release verification, consumer simulation, or publication claim is
-part of this packet. Exact-head hosted validation is a later draft-exit
-prerequisite after ContractSlice C merges and this branch is reconciled with
-then-current `main`; it is not authorized by the current records operation. A
-dirty-worktree result cannot prove the new committed instruction graph.
+No production build, executable feature test, full protocol suite, release,
+consumer simulation, or publication claim was part of the original packet.
+ContractSlice C has since merged and this branch is reconciled with current
+`main`; fresh exact-head hosted validation is now the remaining integration
+gate. A dirty-worktree result cannot prove the new committed instruction graph.
 
 ## 6. Active-work isolation and merge order
 
-This records branch is intentionally isolated from the active ContractSlice C
-checkout. It does not modify
+This records branch remains isolated from active implementation checkouts.
+It does not independently modify
 [FEAT-0065](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md),
 its implementation, tests, architecture ledger, or current continuation.
 
-The safest integration order is:
+The integration order and current disposition are:
 
-1. keep this proposal as a draft;
-2. allow the active ContractSlice C delivery to finish and merge first;
-3. reconcile this branch with the then-current `main`;
-4. preserve ContractSlice C truth in shared feature and memory indexes;
-5. rerun the bounded static link/scope checks and require fresh exact-head
-   hosted validation; and
-6. review this records proposal for readiness separately.
+1. ContractSlice C finished and merged first;
+2. this branch reconciled with current `main`;
+3. shared feature and memory indexes preserve ContractSlice C truth;
+4. bounded static checks and fresh exact-head hosted validation must pass; and
+5. this records proposal receives a separate readiness review before merge.
 
 Shared index or memory conflicts are reconciliation work for this branch and
 must not be solved by reverting, editing, or pausing the active checkout.
@@ -200,5 +197,5 @@ local records branch if it is no longer checked out. Delete the remote branch
 only when the explicit directive includes it and the pull-request disposition
 and repository policy make that cleanup appropriate. Never use recursive
 filesystem deletion as a substitute for worktree removal, never force-remove a
-dirty worktree, and never touch the active ContractSlice C checkout or its
-user-owned files.
+dirty worktree, and never touch any active implementation checkout or its user-owned
+files.

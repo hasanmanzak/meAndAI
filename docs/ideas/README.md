@@ -5,7 +5,7 @@ They are not work items and do not satisfy Definition of Ready.
 
 | ID | Idea | Status | Promoted record |
 | --- | --- | --- | --- |
-| [IDEA-0001](IDEA-0001-role-based-multi-agent-protocol.md) | [Role-based multi-agent protocol](IDEA-0001-role-based-multi-agent-protocol.md) | Promoted | [EPIC-0003 / issue #179](https://github.com/hasanmanzak/meAndAI/issues/179) |
+| [IDEA-0001](IDEA-0001-role-based-multi-agent-protocol.md) | [Role-based multi-agent protocol](IDEA-0001-role-based-multi-agent-protocol.md) | Promoted | [Issue #179](https://github.com/hasanmanzak/meAndAI/issues/179) |
 
 Allowed statuses are `Exploring`, `Parked`, `Promoted`, and `Rejected`.
 Terminal records remain in this index with their rationale and links.

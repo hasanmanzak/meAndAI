@@ -4,7 +4,7 @@
 | --- | --- |
 | Classification | Architecture design |
 | Status | Proposed; records-only review; implementation authority withheld |
-| Parent work | [EPIC-0003 / issue #179](https://github.com/hasanmanzak/meAndAI/issues/179) |
+| Parent work | [Issue #179](https://github.com/hasanmanzak/meAndAI/issues/179) |
 | Records review | Draft [PR #181](https://github.com/hasanmanzak/meAndAI/pull/181) |
 | Lifecycle feature | [FEAT-0057](../../features/FEAT-0057-explicit-sdlc-backlog-governance/README.md) / [issue #150](https://github.com/hasanmanzak/meAndAI/issues/150) |
 | Execution feature | [FEAT-0070](../../features/FEAT-0070-agentic-sdlc-workflow-capabilities/README.md) / [issue #180](https://github.com/hasanmanzak/meAndAI/issues/180) |
