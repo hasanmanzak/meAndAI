@@ -147,8 +147,8 @@ plugins or a shadow parser.
   invocation must compose through those accepted paths rather than replace them.
 - The detailed contract and delivery questions are recorded in the
   [architecture record](../../architecture/repository-knowledge-catalog/README.md).
-- Identifier allocation accounts for the still-open allocations in
-  [draft PR #181](https://github.com/hasanmanzak/meAndAI/pull/181): the
+- Identifier allocation accounts for the merged allocations in
+  [PR #181](https://github.com/hasanmanzak/meAndAI/pull/181): the
   immediately preceding feature position, two immediately preceding decision
   positions, five subfeatures, ten tests, and eight risks allocated by that
   draft remain reserved there.
@@ -192,7 +192,7 @@ may not make an earlier incomplete scenario appear passing.
 - Applicable recurrence: [noncanonical cross-record links](../../../.ai/memory/project.md#record-synchronization-reintroduces-noncanonical-cross-record-links).
   Every rendered registered stable ID in this packet is wholly linked to its
   canonical record/anchor. Unmerged reserved IDs are deliberately not rendered;
-  [draft PR #181](https://github.com/hasanmanzak/meAndAI/pull/181) is linked
+  [PR #181](https://github.com/hasanmanzak/meAndAI/pull/181) is linked
   descriptively as allocation evidence. The records-only packet requires the
   clickable-link structural coverage owned by
   [TEST-0175](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175)
@@ -232,7 +232,7 @@ may not make an earlier incomplete scenario appear passing.
 ## Definition of Ready
 
 - [x] Stable feature, subfeature, test, and risk IDs are reserved with a linked
-  issue and conflict accounting for open draft allocations.
+  issue and conflict accounting for the merged predecessor allocations.
 - [x] Problem, outcome, scope, non-goals, source/projection authority, risks,
   tests, decomposition, and delivery sequence are reviewable.
 - [x] React is selected as the UI; Razor Pages and Blazor are excluded.
@@ -258,8 +258,9 @@ may not make an earlier incomplete scenario appear passing.
 - [ ] Dependency/release ordering with active
   [FEAT-0065](../FEAT-0065-shared-executable-conformance-runtime/README.md),
   [FEAT-0067](../FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md),
-  and [draft PR #181](https://github.com/hasanmanzak/meAndAI/pull/181) is
-  reconciled against current `main`.
+  and merged [PR #181](https://github.com/hasanmanzak/meAndAI/pull/181) is
+  reconciled against current `main`; the remaining feature dependencies still
+  require their own accepted delivery evidence.
 - [ ] A separate maintainer implementation directive names exactly one ready
   slice and its mutation authority.
 

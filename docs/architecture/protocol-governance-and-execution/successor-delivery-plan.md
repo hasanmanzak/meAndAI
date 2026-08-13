@@ -6,7 +6,7 @@
 | Parent epic | [EPIC-0002 / issue #163](https://github.com/hasanmanzak/meAndAI/issues/163) |
 | Architecture task | [TASK-0003 / issue #164](https://github.com/hasanmanzak/meAndAI/issues/164) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
-| Current authority | ContractSlice A is merged/exact-main green. All B implementation packets are exact-head hosted green; R=0006/R=0007/R=0011/R=0012 and corrected codec-derivation R=0014 are accepted/immutable. Admission R=0008/R=0009/R=0010 and codec-derivation R=0013 remain immutable diagnostics/no-success. B is `11/11`, A+B `43/43`; B-CONVERGE pure audit is complete locally with the final-sync exact-head hosted gate pending. C/D, activation, merge/release/publication remain held. |
+| Current authority | ContractSlice A and B are merged/exact-main green, with B `11/11` and A+B `43/43`. C Activation, Applicability, and Evaluation are `ExactHeadHostedGreen`; the Results/closure cohort is locally validated through three separate `ReviewedLocalGreen` commits. C is `11/11`, current A+B+C/full Conformance `54/54`; R=0016 is diagnostic/no-success and R=0017/R=0018 are accepted/immutable. `C-CONVERGE-01` records local `CompletionRecommended`; the cohort exact-head hosted gate is pending. D, activation, merge/release/publication remain held. |
 
 This plan allocates the accepted architecture to stable delivery records. It
 did not itself authorize implementation. The later

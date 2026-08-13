@@ -452,7 +452,7 @@ dependency is accepted and available.
 - What is the exact delivery and compatibility relationship with active
   [FEAT-0065](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md),
   [FEAT-0067](../../features/FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md),
-  and [draft PR #181](https://github.com/hasanmanzak/meAndAI/pull/181)?
+  and the records merged by [PR #181](https://github.com/hasanmanzak/meAndAI/pull/181)?
 - What fixed profile merge order, namespace rules, and collision behavior allow
   generic facts, then meAndAI additions, then consumer additions without any
   later layer overriding an earlier fact?

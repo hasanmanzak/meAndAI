@@ -3,14 +3,14 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted; ContractSlice A merged/exact-main green. All B implementation packets are exact-head hosted green. Repository-target R=0004, admission R=0008/R=0009/R=0010, and codec-derivation R=0013 remain diagnostics/no-success; R=0005/R=0006/R=0007/R=0011/R=0012 and corrected codec-derivation R=0014 are accepted and immutable. B is `11/11`, cumulative A+B `43/43`; B-CONVERGE pure audit is complete locally with final-sync exact-head hosted pending. [TEST-0210](test-cases.md#test-0210) remains `Planned`; C/D, activation, and DoD remain held. |
+| Status | Gate 2 accepted; ContractSlice A and B merged/exact-main green; B is `11/11`, cumulative A+B `43/43`. C Activation, Applicability, and Evaluation are `ExactHeadHostedGreen`; Results/closure is locally validated through three separate `ReviewedLocalGreen` commits. C is `11/11`, current A+B+C/full Conformance `54/54`. R=0007/R=0011/R=0014/R=0015/R=0017/R=0018 are accepted/immutable; R=0012/R=0013/R=0016 are diagnostics/no-success. `C-CONVERGE-01` records local `CompletionRecommended` while the cohort exact-head hosted gate is pending; [TEST-0210](test-cases.md#test-0210) remains `Planned`, and D/activation/DoD remain held. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Test | [TEST-0210](test-cases.md#test-0210) |
 | Gate 3 micro-delivery routing | Historical A delivery remains owned by the [A micro-delivery control plan](subf-0143-micro-delivery-plan.md). Current B design routing is the [ContractSlice B micro-delivery plan](subf-0143-contractslice-b-micro-delivery-plan.md); packet labels refine delivery but activate no executable work. |
 | Exact-main design baseline | Accepted A merge commit [`51623f4d404a95e0f706d72805cf7ddbbbd293b8`](https://github.com/hasanmanzak/meAndAI/commit/51623f4d404a95e0f706d72805cf7ddbbbd293b8), validated by exact-main [run 31304787603](https://github.com/hasanmanzak/meAndAI/actions/runs/31304787603) |
-| Design and Gate 3 authority | Historical A directives and clarifications remain immutable evidence. All B implementation packets are immutable hosted-green predecessors; R=0006/R=0007/R=0011/R=0012 and corrected codec-derivation R=0014 are accepted, while admission R=0008/R=0009/R=0010 and codec-derivation R=0013 are immutable diagnostics/no-success. B-CONVERGE pure audit is complete locally with final-sync exact-head hosted pending. C/D, final activation, merge, release, and publication remain outside this authority. |
+| Design and Gate 3 authority | Historical A/B directives, accepted reds, diagnostics, and hosted evidence remain immutable. The exact [C micro-delivery plan](subf-0143-contractslice-c-micro-delivery-plan.md) is exact-head hosted-green design authority; Activation, Applicability, and Evaluation are `ExactHeadHostedGreen`, diagnostic R=0012/R=0013/R=0016 are immutable, and R=0014/R=0015/R=0017/R=0018 are accepted/immutable. Results/closure is locally validated through three separate `ReviewedLocalGreen` commits; `C-CONVERGE-01` records local `CompletionRecommended` while the cohort exact-head hosted gate is pending. D, final activation, merge, release, and publication remain outside this authority. |
 | Completed predecessor | [SUBF-0153](README.md#subf-0153) / [TEST-0221](test-cases.md#test-0221), merged through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173) and exact-main validated by [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) |
 
 ## Directive and hard boundary
@@ -1005,23 +1005,9 @@ per-file caps and cleanup allocation are mapped by basename in the control plan.
 Transition semantics, authenticity/coherence, lifecycle truth, public API,
 project/friend/lock/workflow changes, and kernel activation remain held.
 
-The bounded implementation keeps those ownership seams exact. Canonical R used
-transient source `423` lines at SHA-256
-`3535913224F9413B1201A910BDB5139A34EFB6ABB8148C37591244C0E2DFB002`;
-its sole TRX SHA-256 is
-`DCC53EBC3B095C88E4CDE18AEABFD450286238B9273BC855F7370E01060F5567`,
-with the complete oracle green. Final source is `410` lines at SHA-256
-`3501D655D2B27CBA82008B761D3C674EBE0890E817710C5EB1617BFEE1C9429D`.
-Focused, retained A-COMPLETE, cumulative A, full Conformance, and Domain are
-`1/1`, `1/1`, `29/29`, `29/29`, and `98/98`. Reader/Writer/Catalog gross
-changes are `70/36/14`; production/test/combined are `120/416/536`. Release
-build, format, diff, all six lock fingerprints, and StructureOnly
-(`elapsedMs=419847`) are green; three independent final reviews each closed
-`0/0/0`. The exact correction head passed Ubuntu in `19m00s` and Windows in
-`35m20s`; publication verification was correctly skipped and its instruction
-graph is `351 nodes / 4096 edges`. This records-only synchronization does not claim hosted
-proof for its own delivery head. That distinct freeze-delivery gate later
-closed before transition implementation began.
+The bounded implementation, canonical red/green identities, exact test counts,
+graph result, reviews, and two-stage hosted delivery remain immutable in the
+owning A-PREDECESSOR historical ledger; they grant no current C authority.
 
 ### ReviewedLocalGreen `A-TRANSITION-01` boundary and evidence <a name="a-transition-01-freeze"></a>
 
@@ -1544,102 +1530,10 @@ while the root remains absent and the same process set remains zero. Invoke one 
 hosted-green forty-character head for `<HEAD>`, with exact command
 `& 'C:\Program Files\WindowsApps\Microsoft.PowerShell_7.6.4.0_x64__8wekyb3d8bbwe\pwsh.exe' -NoProfile -File 'D:\Temp\meandai-aconverge-v4-91a7c6e4c5e349a0b22e3f37d5d0f84a.ps1' -ExpectedHead '<HEAD>'; exit $LASTEXITCODE`.
 No wrapper/fallback/retry is permitted; every admitted tool call, including an
-outer admission failure, consumes the attempt. The exact V4 PowerShell script is:
-
-```powershell
-param([Parameter(Mandatory)][ValidatePattern('^[0-9a-f]{40}$')][string] $ExpectedHead)
-$ErrorActionPreference = 'Stop'
-$root = 'D:\Temp\meandai-test-0210-a-converge-v4-91a7c6e4c5e349a0b22e3f37d5d0f84a'
-if (Test-Path -LiteralPath $root) { throw 'Fresh V4 evidence root already exists.' }
-[void][IO.Directory]::CreateDirectory($root)
-$entryPath = Join-Path $root 'entry.json'
-$entry = [ordered]@{ schema = 1; attempt = 'V4'; expectedHead = $ExpectedHead; state = 'Entered'; enteredUtc = [DateTime]::UtcNow.ToString('O'); completedUtc = $null; pid = $PID }
-[IO.File]::WriteAllText($entryPath, (($entry | ConvertTo-Json -Compress) + "`n"), [Text.UTF8Encoding]::new($false))
-Write-Output ('A-CONVERGE-V4-ENTERED=' + $root)
-$expectedPwsh = 'C:\Program Files\WindowsApps\Microsoft.PowerShell_7.6.4.0_x64__8wekyb3d8bbwe\pwsh.exe'
-if ($PSVersionTable.PSVersion -ne [Version]'7.6.4') { throw 'A-CONVERGE V4 requires exact PowerShell 7.6.4.' }
-$pwsh = [IO.Path]::GetFullPath((Join-Path $PSHOME 'pwsh.exe'))
-if ($pwsh -cne $expectedPwsh -or -not [IO.File]::Exists($pwsh)) { throw 'A-CONVERGE V4 PowerShell identity mismatch.' }
-$PSNativeCommandUseErrorActionPreference = $true
-function Assert-SourceIdentity {
-  $head = (& git rev-parse HEAD).Trim()
-  if ($head -cne $ExpectedHead) { throw 'V4 source HEAD mismatch.' }
-  $status = @(& git status --porcelain=v1 --untracked-files=all)
-  if (@($status | Where-Object { $_ -cne '?? MeAndAI.Protocol.v3.ncrunchsolution.user' }).Count) { throw 'V4 tracked source is dirty.' }
-}
-Assert-SourceIdentity
-$c = 'tests/dotnet/MeAndAI.Protocol.Conformance.Tests/MeAndAI.Protocol.Conformance.Tests.csproj'
-$d = 'tests/dotnet/MeAndAI.Protocol.Domain.Tests/MeAndAI.Protocol.Domain.Tests.csproj'
-& dotnet build MeAndAI.Protocol.slnx -c Release --no-restore --nologo
-function Get-Digest([string[]] $v) { [Array]::Sort($v, [StringComparer]::Ordinal); $b = [Text.Encoding]::UTF8.GetBytes(($v -join "`n") + "`n"); [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($b)) }
-function Get-Discovery([string] $p, [string] $f = '') { $a = @('test', $p, '-c', 'Release', '--no-restore', '--no-build', '--list-tests', '--nologo'); if ($f) { $a += @('--filter', $f) }; $o = & dotnet @a 2>&1; [string[]] @($o | ForEach-Object { $_.ToString().Trim() } | Where-Object { $_ -like 'MeAndAI.Protocol.*.Tests.*' }) }
-function Assert-Set([string[]] $v, [int] $n, [string] $h, [string] $name) { if ($v.Count -ne $n -or (Get-Digest $v) -cne $h) { throw "$name discovery mismatch." } }
-$a = @(Get-Discovery $c 'ContractSlice=A')
-$u = @($a | Where-Object { $_ -like '*.ContractSliceAPublicApiTests.*' -or $_ -like '*.ContractSliceAOwnershipTests.*' })
-$domain = @(Get-Discovery $d)
-Assert-Set $a 32 'C42DF0B847DF11078C904346CA5D033084797B5386450527E3F8D99612F08B92' 'A'
-Assert-Set $u 11 'F58C362D6CA12A4C67AFCD1C75573063A89F2909088BA11DFA9BAF247E68B0C6' 'API/ownership'
-Assert-Set $domain 98 'FABE8953F91FC735BCB4A74DF1AD00A01F3B37DE4DAC21841F381BC9845A132B' 'Domain'
-$resource = @('MeAndAI.Protocol.Conformance.Tests.ContractSliceAResourceManifestTests.Enforces_exact_manifest_byte_reachable_depth_and_token_ceilings')
-function Invoke-Run([string] $p, [string] $file, [string] $f = '') { $x = @('test', $p, '-c', 'Release', '--no-restore', '--no-build', '--nologo'); if ($f) { $x += @('--filter', $f) }; $x += @('--logger', "trx;LogFileName=$file", '--results-directory', $root); & dotnet @x }
-Invoke-Run $c 'resource.trx' 'FullyQualifiedName=MeAndAI.Protocol.Conformance.Tests.ContractSliceAResourceManifestTests.Enforces_exact_manifest_byte_reachable_depth_and_token_ceilings'
-Invoke-Run $c 'a.trx' 'ContractSlice=A'
-Invoke-Run $c 'api-ownership.trx' 'FullyQualifiedName~ContractSliceAPublicApiTests|FullyQualifiedName~ContractSliceAOwnershipTests'
-Invoke-Run $c 'conformance.trx'
-Invoke-Run $d 'domain.trx'
-function Assert-Trx([string] $file, [string[]] $expected) {
-  [xml] $trx = Get-Content -LiteralPath (Join-Path $root $file) -Raw
-  $r = @($trx.SelectNodes('//*[local-name()="UnitTestResult"]')); $d = @($trx.SelectNodes('//*[local-name()="UnitTest"]')); $e = @($trx.SelectNodes('//*[local-name()="TestEntry"]'))
-  [string[]] $rn = @($r | ForEach-Object { [string]$_.testName }); [string[]] $dn = @($d | ForEach-Object { [string]$_.name }); $h = Get-Digest $expected
-  if ($r.Count -ne $expected.Count -or $d.Count -ne $expected.Count -or $e.Count -ne $expected.Count -or (Get-Digest $rn) -cne $h -or (Get-Digest $dn) -cne $h) { throw "$file FQN-set mismatch." }
-  if (@($r | ForEach-Object { [string]$_.executionId } | Sort-Object -Unique).Count -ne $expected.Count) { throw "$file result executionId uniqueness mismatch." }
-  foreach ($result in $r) {
-    $definition = @($d | Where-Object { [string]$_.id -ceq [string]$result.testId -and [string]$_.name -ceq [string]$result.testName })
-    $entry = @($e | Where-Object { [string]$_.testId -ceq [string]$result.testId -and [string]$_.executionId -ceq [string]$result.executionId })
-    if ($definition.Count -ne 1 -or $entry.Count -ne 1) { throw "$file definition/entry/result identity mismatch." }
-  }
-  if (@($r | Where-Object { [string]$_.outcome -cne 'Passed' }).Count) { throw "$file has a non-passing result." }
-  $counters = @($trx.SelectNodes('//*[local-name()="Counters"]')); if ($counters.Count -ne 1) { throw "$file Counters cardinality mismatch." }; $k = $counters[0]
-  if ($k.Attributes.Count -ne 16) { throw "$file Counters attribute-count mismatch." }
-  foreach ($n in @('total','executed','passed')) { $x = $k.Attributes.GetNamedItem($n); $v = 0; if ($null -eq $x -or -not [int]::TryParse($x.Value, [ref]$v) -or $v -ne $expected.Count) { throw "$file/$n mismatch." } }
-  foreach ($n in @('failed','error','timeout','aborted','inconclusive','passedButRunAborted','notRunnable','notExecuted','disconnected','warning','completed','inProgress','pending')) { $x = $k.Attributes.GetNamedItem($n); $v = 0; if ($null -eq $x -or -not [int]::TryParse($x.Value, [ref]$v) -or $v -ne 0) { throw "$file/$n mismatch." } }
-  if (@($trx.SelectNodes('//*[local-name()="ResultFiles"]/* | //*[local-name()="CollectorDataEntries"]/* | //*[local-name()="RunInfo"]')).Count) { throw "$file has a diagnostic or attachment." }
-}
-Assert-Trx 'resource.trx' $resource; Assert-Trx 'a.trx' $a; Assert-Trx 'api-ownership.trx' $u; Assert-Trx 'conformance.trx' $a; Assert-Trx 'domain.trx' $domain
-& dotnet format MeAndAI.Protocol.slnx --verify-no-changes --no-restore
-& $pwsh -NoProfile -File tests/protocol.tests.ps1 -StructureOnly
-& $pwsh -NoProfile -File tests/capabilities/publication-evidence/post-publication-evidence.tests.ps1
-$locks = [ordered]@{
-  'src/MeAndAI.Protocol.Domain/packages.lock.json' = '03EEADC5EF377C17F787AB65F41FB4C8A9C936BB7F7F4171111FDEEC8A81CB46'; 'src/MeAndAI.Protocol.Conformance.Abstractions/packages.lock.json' = 'D79FF11818ABFE0B6CA9CAEC111778169AA36A04709BCA3E0EC0AB84325BF799'; 'src/MeAndAI.Protocol.Conformance/packages.lock.json' = '20E6BA80BFB6EDE58228D28560A03B6143F3D163AC5E06720491458FEA9570E7'; 'src/MeAndAI.Protocol.Policy/packages.lock.json' = 'C57F6AFAEBA953E49D3B6D2CB85E82C00E6A40631507426B1616E57B94724309'; 'tests/dotnet/MeAndAI.Protocol.Domain.Tests/packages.lock.json' = 'D2065F11ED7030EE7DFA7A757FBA2A0D420DAC2F32D0105DFA93D3F78F9B00BC'; 'tests/dotnet/MeAndAI.Protocol.Conformance.Tests/packages.lock.json' = 'BA8D8C653CF0CFD2398F9E43F7AB87ED268A9B77EC5FC2E0F81D2BD7849016C0'
-}
-foreach ($x in $locks.GetEnumerator()) { if ((Get-FileHash -LiteralPath $x.Key -Algorithm SHA256).Hash -cne $x.Value) { throw "Lock mismatch: $($x.Key)" } }
-& git diff --check
-Assert-SourceIdentity
-$expectedFiles = @('a.trx','api-ownership.trx','conformance.trx','domain.trx','entry.json','resource.trx')
-function Assert-RootInventory {
-  $items = @(Get-ChildItem -LiteralPath $root -Force)
-  if (@($items | Where-Object { $_.PSIsContainer -or $_ -isnot [IO.FileInfo] -or ($_.Attributes -band [IO.FileAttributes]::ReparsePoint) }).Count) { throw 'V4 evidence root has a non-regular entry.' }
-  [string[]] $actualFiles = @($items | ForEach-Object Name); [Array]::Sort($actualFiles, [StringComparer]::Ordinal)
-  if ($actualFiles.Count -ne $expectedFiles.Count) { throw 'V4 evidence-root inventory count mismatch.' }
-  for ($i = 0; $i -lt $expectedFiles.Count; $i++) { if ($actualFiles[$i] -cne $expectedFiles[$i]) { throw 'V4 evidence-root inventory name mismatch.' } }
-}
-Assert-RootInventory
-$entry['state'] = 'Completed'; $entry['completedUtc'] = [DateTime]::UtcNow.ToString('O')
-$completedText = ($entry | ConvertTo-Json -Compress) + "`n"
-$sealedEntry = $completedText | ConvertFrom-Json -DateKind String
-$names = @($sealedEntry.PSObject.Properties.Name); $expectedNames = @('schema','attempt','expectedHead','state','enteredUtc','completedUtc','pid')
-if ($names.Count -ne $expectedNames.Count) { throw 'V4 completed-entry property count mismatch.' }
-for ($i = 0; $i -lt $expectedNames.Count; $i++) { if ($names[$i] -cne $expectedNames[$i]) { throw 'V4 completed-entry property order mismatch.' } }
-if ([int]$sealedEntry.schema -ne 1 -or [string]$sealedEntry.attempt -cne 'V4' -or [string]$sealedEntry.expectedHead -cne $ExpectedHead -or [string]$sealedEntry.state -cne 'Completed' -or [int]$sealedEntry.pid -ne $PID) { throw 'V4 completed-entry identity mismatch.' }
-$style = [Globalization.DateTimeStyles]::AssumeUniversal -bor [Globalization.DateTimeStyles]::AdjustToUniversal; $pattern = "yyyy-MM-dd'T'HH:mm:ss.fffffff'Z'"; $stamps = @()
-foreach ($name in @('enteredUtc','completedUtc')) { $value = $sealedEntry.$name; $parsed = [DateTimeOffset]::MinValue; if ($value -isnot [string] -or $value -notmatch '^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{7}Z$' -or -not [DateTimeOffset]::TryParseExact($value, $pattern, [Globalization.CultureInfo]::InvariantCulture, $style, [ref]$parsed) -or $value -cne $parsed.UtcDateTime.ToString('O', [Globalization.CultureInfo]::InvariantCulture)) { throw "V4 $name lexical mismatch." }; $stamps += $parsed }
-if ($stamps[1] -lt $stamps[0]) { throw 'V4 completed-entry chronology mismatch.' }
-[IO.File]::WriteAllText($entryPath, $completedText, [Text.UTF8Encoding]::new($false))
-Assert-RootInventory
-$readBack = [IO.File]::ReadAllText($entryPath, [Text.UTF8Encoding]::new($false, $true))
-if ($readBack -cne $completedText) { throw 'V4 completed-entry byte mismatch.' }
-Write-Output ('A-CONVERGE-V4-COMPLETED=' + $root)
-```
+outer admission failure, consumes the attempt. The exact immutable V4 script body
+(identity above) and its final six-file evidence-root inventory are retained by
+the owning convergence ledger; this historical design intentionally omits the
+verbatim copy.
 
 V4 attempt classification is fail closed: absent root means outer/pre-entry
 failure; root without `entry.json` means entry-write failure; a malformed or
@@ -3276,7 +3170,7 @@ internal sealed class TypedInputReader
         IReadOnlyDictionary<string, QualifiedEvidenceHandle> contextProofs,
         IExpectedReferenceLookup expectedReferences,
         IEnumerable<RepositoryTargetResolutionDemandItem> demandItems,
-        IReadOnlyDictionary<int, QualifiedEvidenceHandle> demandReferences);
+        IEnumerable<DemandReferenceAuthorityBinding> demandBindings);
     internal SealedModelHandle<TModel> RequireModel<TModel>(
         ModelTypeToken<TModel> expected)
         where TModel : class, IProtocolSemanticModel;
@@ -9620,7 +9514,7 @@ Scenario/status/owner and both workflow filters,
 [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146), C/D,
 activation, merge, release, publication, and DoD remain held. R=0014 is
 immutable and never reruns. Its implementation is exact-head hosted green;
-B-CONVERGE pure audit is complete locally with final-sync hosted pending.
+B-CONVERGE is merged/exact-main green.
 
 ## [TEST-0210](test-cases.md#test-0210) expected-red contract
 
@@ -10396,11 +10290,710 @@ automatically raise the timeout, split or remove coverage, add another
 invocation, or weaken
 [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146).
 
+## Frozen ContractSlice C delivery overlay
+
+ContractSlice B is merged and exact-main hosted green; exact identities and
+durations remain owned by the C handoff. At the C design checkpoint,
+ContractSlice C was `FrozenDesign`/inactive: that cohort and its exact hosted
+gate preceded every C# mutation and canonical C red.
+
+The normative C delivery order is:
+
+```text
+C-SURFACE-ACTIVATION-01
+  -> C-REGISTRATION-MISMATCH-01
+  -> C-PRODUCER-PIPELINE-01
+  -> C-APPLICABILITY-PLAN-01
+  -> C-APPLICABILITY-CLOSURE-01
+  -> C-EVALUATION-PLAN-01
+  -> C-EVALUATION-ADVANCE-01
+  -> C-INTENT-RESULT-01
+  -> C-AGGREGATION-01
+  -> C-CONVERGE-01
+```
+
+Delivery preserves that exact dependency order through four C-only cohorts:
+Activation owns the first three packets, Applicability the next two,
+Evaluation the next two, and Results/closure the final three. Inside a cohort,
+each package must close its canonical red, focused and cumulative local gates,
+Release build, diff/format/structure checks, independent review, record sync,
+and focused local commit as `ReviewedLocalGreen`; those commits are not pushed
+individually. The cohort then runs full C cumulative, A-through-cohort, full
+Conformance and Domain, build/format/locks/API/ownership/graph/StructureOnly/
+publication-evidence and full-diff gates, pushes the ordered commit sequence
+once, and becomes `ExactHeadHostedGreen` only after exact-head Ubuntu/Windows
+success. The next cohort remains inactive until that hosted boundary. A hosted
+failure reopens only its cohort and owning package; the entire local cohort gate
+must be repeated before a new exact-head push.
+
+The exact C Fact inventory is the eleven ordinal FQNs owned by the
+[C micro-delivery plan](subf-0143-contractslice-c-micro-delivery-plan.md).
+Structural, Ownership, and Activation belong to the first packet; each later
+semantic packet owns one Fact; convergence is P/R/G `NotApplicable` and adds
+none. Final C is `11/11`, cumulative A+B+C/full Conformance `54/54`, and Domain
+remains `98/98`.
+
+`C-SURFACE-ACTIVATION-01` atomically introduces the already-specified eight
+Abstractions and fifteen Conformance supported types, final six internal
+registration families, and Tests-owned synthetic complete export/proof. The
+only first-red seam is the fully prepared valid
+`ConformanceKernel.Activate(...)` returning `null!`; only that null calls
+`Assert.Fail("TEST-0210-C-BEHAVIOR-RED-0001")`. Its retained exact FQN is
+`MeAndAI.Protocol.Conformance.Tests.ContractSliceCActivationTests.Activates_exact_synthetic_registration_graph`.
+The packet proves exact success only; the next packet owns the exhaustive
+registration-mismatch matrix.
+
+The first-packet source allowlist is exact:
+
+```text
+src/MeAndAI.Protocol.Conformance.Abstractions/Exports/CompletePolicyPackExport.cs
+src/MeAndAI.Protocol.Conformance.Abstractions/Exports/PolicyQualificationSliceExport.cs
+src/MeAndAI.Protocol.Conformance.Abstractions/Evaluation/ApplicabilityIntent.cs
+src/MeAndAI.Protocol.Conformance.Abstractions/Evaluation/EvaluationFailureIntent.cs
+src/MeAndAI.Protocol.Conformance.Abstractions/Evaluation/EvaluationIntent.cs
+src/MeAndAI.Protocol.Conformance.Abstractions/Evaluation/FindingIntent.cs
+src/MeAndAI.Protocol.Conformance.Abstractions/Evaluation/IRuleEvaluator.cs
+src/MeAndAI.Protocol.Conformance.Abstractions/Evaluation/RuleApplicabilityInput.cs
+src/MeAndAI.Protocol.Conformance.Abstractions/Evaluation/RuleEvaluationInput.cs
+src/MeAndAI.Protocol.Conformance.Abstractions/Tokens/ApplicabilityIntentKind.cs
+src/MeAndAI.Protocol.Conformance.Abstractions/Registration/ProducerRegistrationContracts.cs
+src/MeAndAI.Protocol.Conformance.Abstractions/Registration/ParserRegistration.cs
+src/MeAndAI.Protocol.Conformance.Abstractions/Registration/IndexRegistration.cs
+src/MeAndAI.Protocol.Conformance.Abstractions/Registration/DemandProjectorRegistration.cs
+src/MeAndAI.Protocol.Conformance.Abstractions/Registration/SelectorRegistration.cs
+src/MeAndAI.Protocol.Conformance.Abstractions/Registration/RuleEvaluatorRegistration.cs
+src/MeAndAI.Protocol.Conformance/Activation/CatalogSliceKernel.cs
+src/MeAndAI.Protocol.Conformance/Activation/ConformanceKernel.cs
+src/MeAndAI.Protocol.Conformance/Activation/KernelActivationCore.cs
+src/MeAndAI.Protocol.Conformance/Planning/AcquisitionInstruction.cs
+src/MeAndAI.Protocol.Conformance/Planning/ApplicabilityPlan.cs
+src/MeAndAI.Protocol.Conformance/Planning/ApplicabilityClosure.cs
+src/MeAndAI.Protocol.Conformance/Planning/EvaluationAdvanceResult.cs
+src/MeAndAI.Protocol.Conformance/Evaluation/CatalogSliceEvaluation.cs
+src/MeAndAI.Protocol.Conformance/Evaluation/CompleteCatalogEvaluation.cs
+src/MeAndAI.Protocol.Conformance/Evaluation/RuleEvaluation.cs
+src/MeAndAI.Protocol.Conformance/Evaluation/RuleEvaluationFailure.cs
+src/MeAndAI.Protocol.Conformance/Evaluation/RuleFinding.cs
+src/MeAndAI.Protocol.Conformance/Evidence/SealedAcquisitionAttempt.cs
+src/MeAndAI.Protocol.Conformance/Evidence/SealedAcquisitionOutcome.cs
+tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ContractSliceCStructuralTests.cs
+tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ContractSliceCOwnershipTests.cs
+tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ContractSliceCActivationTests.cs
+tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ContractSliceAPublicApiTests.cs
+tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ContractSliceBStructuralTests.cs
+```
+
+The two retained predecessor paths change only predecessor-only C-absence and
+successor-safe A+B subset assertions while retaining A export internals and B
+negative ownership. Their A/B surface, FQN, and trait authority is otherwise
+immutable, while the C structural Fact owns exact current A+B+C export equality.
+They add no C Fact. No sixth test path or other source path is permitted.
+The six registration
+containers have their final generic identities, declarations, tokens, visitors,
+and object references now. Component-operation interfaces are introduced on
+those same identities as memberless staging seams; only
+`C-PRODUCER-PIPELINE-01` adds their already-accepted final methods and carriers.
+It may not replace an identity, add an adapter, or alter a registration object.
+Public intent factories and later kernel calls expose their final signatures
+but retain marker-free integrity rejection until their owning packets implement
+the accepted behavior. This staging changes no final architecture or ownership.
+The previously frozen compile-only
+`tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ContractSliceC.SurfaceRed.cs`
+is a transient P input only: it produces its exact one CS0246 observation once
+before the surface exists and is removed before retained BehaviorRed source or
+green. It is not a fourth retained test path and never enters a package commit.
+
+The exact fixture derives the retained five-rule declaration data into one
+complete genesis catalog. It maps the twenty-three Policy implementation rows
+to Tests-owned concrete types and preserves the four Abstractions capability
+interfaces, producing the exact twenty-seven registration/type-contract rows.
+Its artifacts are ordinally exactly `Markdig.dll`,
+`MeAndAI.Protocol.Conformance.Abstractions.dll`,
+`MeAndAI.Protocol.Conformance.Tests.dll`,
+`MeAndAI.Protocol.Conformance.dll`, and `MeAndAI.Protocol.Domain.dll`; neither
+Policy nor Application appears. The successful Fact observes the exact three
+codec, two parser, four index, one projector, three selector, and five evaluator
+registration objects in their canonical lists; it asserts the public component
+union and catalog projection object-identically. No mismatch mutation or
+component invocation belongs to this packet.
+
+Canonical C reds specialize the universal BehaviorRed contract with Release
+`--no-restore --no-build`, one exact `ContractSlice=C&FullyQualifiedName=...`
+child, process-scoped `VSTEST_CONNECTION_TIMEOUT=300`, a `420000` ms outer
+bound, one exact marker TRX, native exit `1`, runner exit `0`, complete sixteen-
+counter and source/binary/lock custody, and irrevocable ordinal consumption at
+`InvocationCommitted`. No discovery prepass, fallback, retry, or red commit is
+permitted.
+
+### Frozen `C-REGISTRATION-MISMATCH-01` boundary
+
+This packet starts only from local commit
+[`8812b22c7cc8a1785d24376f3e91a20fb0fe6cc0`](https://github.com/hasanmanzak/meAndAI/commit/8812b22c7cc8a1785d24376f3e91a20fb0fe6cc0);
+that surface predecessor is
+`ReviewedLocalGreen` and remains unpushed. The sole Fact is
+`ContractSliceCRegistrationTests.Rejects_registration_mismatch_without_kernel_activation`,
+with only `ContractSlice=C`, no Scenario, and canonical marker
+`TEST-0210-C-BEHAVIOR-RED-0002`. The fully prepared valid
+`CatalogSliceKernel.Activate(...)` call is the sole null semantic seam and the
+only route to `Assert.Fail(marker)`; setup, mismatch, proof, and exception paths
+are marker-free.
+
+The exact executable allowlist modifies only
+`KernelActivationCore.cs`, `CatalogSliceKernel.cs`, and
+`ContractSliceCActivationTests.cs`, and adds only
+`ContractSliceCRegistrationTests.cs`. The predecessor test change exposes its
+Tests-owned fixture factory and immutable carriers internally; it changes no
+Fact, FQN, trait, or assertion. No public surface, project, package, lock,
+workflow, Policy, Application, Domain, producer execution, or later C path may
+change. The packet cap is two production paths, two test paths, and `1,800`
+normalized changed C# lines; first-one-over requires redraw.
+
+The qualification fixture reuses the predecessor's object-identical six-family
+registrations and Tests-owned components, creates one `QualificationSlice`
+manifest/export/proof envelope, and contains no Policy artifact or type. Exact
+validation order is null/authority/catalog/schema/proof identity and artifact
+attestation, then registration comparison. The latter requires each presented
+family to equal its manifest-owned canonical declaration order and multiplicity:
+codecs `3`, parsers `2`, indexes `4`, demand projectors `1`, selectors `3`, and
+evaluators `5`. Every declaration is the same object; each CLR generic argument
+matches the manifest model/capability/component identity; selector resolver and
+schema pairs equal the unique ordinal selector declarations; evaluators map
+one-to-one and in order to the five rules; the public component projection is
+the exact 18-member runtime-type union and every member has one manifest map.
+
+Missing, extra, duplicate, reordered, structurally equal but foreign,
+wrong-generic, or public-projection-drift input throws
+`CatalogIntegrityException(RegistrationMismatch)` before a kernel exists. A
+wrong contract/version/digest/artifact/export proof instead remains the earlier
+`ActivationProofInvalid`; argument-boundary nulls retain their argument
+exceptions. One valid envelope returns a non-null kernel. The mismatch matrix
+tests every family, both order-sensitive edges, foreign declarations,
+wrong-generic model/capability/component identities, exact proof precedence,
+and no leaked kernel. Green requires focused `1/1`, C `4/4`, full Conformance
+`47/47`, Domain `98/98`, warning-free Release build, format/diff/locks, required
+structure, independent review, record sync, and a second unpushed local commit.
+
+That contract is now `ReviewedLocalGreen`. Canonical R=0004 is immutable and
+owned in the C evidence ledger; green proves the exact declaration reference,
+order, multiplicity, mapped CLR identity, selector/evaluator, 18-component,
+proof-precedence, and no-kernel boundaries. Focused `1/1`, C `4/4`, full
+Conformance `47/47`, Domain `98/98`, warning-free Release build, format/diff,
+StructureOnly `429.279s`, and code/evidence/traceability reviews `0/0/0` passed.
+At that registration checkpoint no intermediate push or hosted-green claim was
+made; producer-pipeline was next after the separate registration packet commit.
+
+### Frozen `C-PRODUCER-PIPELINE-01` activation graph contract
+
+This packet preserves the final internal declarations already frozen in the
+canonical producer/resource sections above. It adds their callable members on
+the same registered component objects and introduces only the internal carrier,
+handle, intent, allowance, ledger, and activation-graph implementations needed
+by those exact signatures. No alternate adapter, object/dynamic dispatch,
+reflection, service lookup, provider DTO, I/O, Policy implementation, cache
+authority, plan state, or evaluator result is introduced.
+
+The final operation interfaces retain fail-closed `NotSupportedException`
+default bodies solely so predecessor negative-registration fixture types outside
+this packet's test allowlist remain compile-valid. Those defaults are never
+canonical graph components or an alternate execution seam. Every one of the
+exact eighteen registered fixture objects supplies its own packet-local final
+operation implementation; before later behavior packets own semantic products,
+those methods expose only argument validation and marker-free closed rejection
+or empty-result intent shapes. The owning Fact proves the concrete operations
+are callable on the same registered objects and never reaches a default body.
+
+The exact source allowlist is the twelve paths listed by the C micro-plan: six
+Abstractions registration/contract files, four Conformance activation files,
+the retained activation fixture, and one new producer-pipeline Fact. The cap is
+exactly `10` production/Abstractions paths, two C test paths, and `3,500` normalized
+changed C# lines. Domain, Policy, Application, project/package/lock/workflow,
+Scenario/status/owner, runtime-efficiency, D, merge/release/publication, and all
+later C packet paths remain immutable.
+
+Activation validates exactly `18` object-identical registrations with family
+cardinality codec/parser/index/projector/selector/evaluator `3/2/4/1/3/5`.
+The producer DAG itself is exactly the already accepted ten Schema/Parser/
+Index/Projector nodes; selector/evaluator rows are attached activation maps and
+are not DAG nodes. Every parser/index binder input list is structurally equal to
+its declaration, including order and minimum/maximum counts. Dependencies are
+the accepted model/capability/projector-slot edges; Kahn readiness uses the
+existing component key/version, declaration key/version, then
+`Schema < Parser < Index < Projector` ordering.
+
+The two roots are governed-text Schema and repository-tree Schema. The exact
+ordered DAG is governed-text Schema, repository-tree Schema, repository-tree
+Index, Markdown Parser, protocol-record Index, governed-reference Index,
+repository-target-resolution-demand Projector, repository-target-resolution
+Schema, repository-target-Markdown Parser, and repository-target-resolution
+Index. A missing, duplicate, foreign, cyclic, cardinality-invalid, unreachable,
+or unbound edge is `RegistrationMismatch` and exposes no graph/kernel.
+
+`CatalogSliceProducerGraph` owns the ordered ten-node projection plus the exact
+six object-identical registration lists. Both `CatalogSliceKernel` and
+`ConformanceKernel` retain one non-null graph created from their validated
+export; neither recomputes or replaces registration objects. The internal test
+projection exposes immutable node family/key/version/component/input/scope
+metadata only, never `object`, dynamic dispatch, mutable collections, or a
+second execution authority.
+
+Invocation expansion remains exactly the accepted architecture: one codec per
+admitted binding and none for a zero-binding context; one parser per matching
+sealed model/binding; `PerContext` indexes once per exact slot/target/context,
+including the empty protocol-record capability case; `PerPlan` indexes once
+over the canonical unique union; the projector once over its coalesced
+capability union; selectors by exact declared key/parent; evaluators only after
+all declared inputs. Aliases sharing identical handles schedule once, out-of-
+range ready input is `PlanStateInvalid`, and a failed/no-input predecessor
+suppresses its dependent invocation. Resource claims stay producer-local;
+allowance comparison, immutable ledger construction, and sealed handle
+ownership remain Conformance-only.
+
+The sole Fact and marker are
+`ContractSliceCProducerPipelineTests.Activates_and_orders_exact_six_family_producer_graph`
+and `TEST-0210-C-BEHAVIOR-RED-0003`, with only `ContractSlice=C` and no
+Scenario. Canonical R=0005 has the complete source/fixture/oracle present and
+changes only the synthetic complete `ConformanceKernel` graph result to
+`null!`; only that null calls the marker. Green changes only that semantic seam
+and wires the identical graph state into both kernel variants. It requires
+focused `1/1`, C `5/5`, full Conformance `48/48`, Domain `98/98`, build/format/diff/locks/
+structure/reviews/record sync, and closes in a third separate unpushed local
+commit. The Activation cohort is pushed only after its full local cohort gate;
+the Applicability cohort remains held until exact-head hosted green.
+
+Canonical R=0005 is accepted and immutable; it is never rerun. The fresh
+`41,565`-byte runner has SHA-256 `CD92BAD1...D82169B`, its `18,126`-byte report
+has SHA-256 `5563029B...E4E992`, and the sole `4,908`-byte TRX has SHA-256
+`2E55C738...34AF2`. Native/runner exits are `1/0`; one Failed
+result/definition/entry owns marker count `2`, exact failed `1/1/1` counters,
+all other thirteen counters zero, and no attachment/collector evidence. Green
+is focused `1/1`, C `5/5`, full Conformance `48/48`, Domain `98/98`, build
+`0/0`, clean format/diff, StructureOnly green in `434.832s`, and
+code/evidence/traceability reviews `0/0/0`. Producer-pipeline is
+`ReviewedLocalGreen`; no push or hosted claim is made here.
+
+The ordered three-commit Activation cohort later passed its single exact-head
+hosted gate: Ubuntu `22m23s`, Windows `18m57s`, publication verification
+skipped, hosted defects `0`. That external cohort result activates only the
+next C packet and does not change C from `5/11` or lift any downstream hold.
+
+### Frozen `C-APPLICABILITY-PLAN-01` planning contract
+
+This packet implements only the already accepted `PlanApplicability` phase and
+the internal static instruction factory. The initial five-rule catalog has no
+applicability-phase slots, so its normative output is deliberately a non-null
+plan with zero `Slots` and zero `Instructions`. The complete named Provider
+profile selects the exact catalog RULE-0003, RULE-0004, and RULE-0005 objects;
+the slice Repository diagnostic profile selects exact RULE-0001..0005. Empty
+instructions are therefore catalog-universal applicability, not a shortcut,
+and later closure alone invokes the selected evaluators.
+
+One internal `ApplicabilityPlanningCore` owns both kernel paths. Activation
+creates one opaque `KernelPlanningSession` per kernel, bound to authority kind,
+manifest digest, catalog rules, and the producer graph identity. A resolved
+`NamedExecutionProfile` retains that exact session privately. A plan retains
+the same session through its existing `IPlanBoundEvidenceSession`; no public
+token, constructor, factory, reflection path, or equal-looking value can mint
+or replace it. Cross-kernel, cross-profile, foreign named-profile, stale, or
+modified input fails `CatalogIntegrityCode.PlanStateInvalid`.
+
+Rule selection is exact. Slice selection requires declared SubjectRole,
+Operation, SnapshotKind, and an intersection between profile and rule Surfaces;
+EnforcementPhase never changes membership. Complete selection first requires
+the exact kernel-resolved named-profile session and then selects its declared
+RuleIds object-identically from the catalog. Output RuleIds follow ordinal
+RuleId order. A missing/duplicate/foreign declared rule or profile is
+`PlanStateInvalid`.
+
+Targets are enumerated once and copied. Every element is non-null and
+structurally unique; all values share one exact SubjectIdentity, SnapshotKind,
+and TargetIdentity. The required set is computed from every selected rule slot
+whose `ProfileSurfaces` intersects the profile, across applicability and
+evaluation phases. Schema-1 selector mapping remains exactly:
+
+```text
+protocol.target.repository-snapshot -> Repository
+protocol.target.repository-governed-body-set -> Repository
+protocol.target.repository-target-resolution-set -> Repository
+protocol.target.provider-governed-body-set -> Provider
+```
+
+Each required surface has exactly one target; zero, multiple, extra, unknown,
+wrong-snapshot, or incoherent values fail `PlanStateInvalid`. Provider planning
+therefore retains the Repository support target without adding Repository to
+the profile axes. Output order is schema surface order Repository, Provider,
+Workflow, Release, then ordinal SourceIdentity; input order cannot repair or
+break ambiguity.
+
+Active applicability slots are the structurally equal SlotKey union over the
+selected rules, filtered by profile-surface intersection and ordered by
+SlotKey. A shared SlotKey with unequal requirement/profile/material/selector/
+capability shape is `PlanStateInvalid`. Each active slot maps to its exact
+resolved target and one `AcquisitionInstruction.CreateApplicability`; the
+initial accepted catalog produces none. A future valid non-empty catalog uses
+the already frozen canonical frames without another seam:
+
+```text
+Demand = ASCII "protocol.acquisition-demand/1\n" || u8 none=0 || u32-be 0
+Instruction = ASCII "protocol.acquisition-instruction/1\n"
+  || ManifestDigest raw 32 bytes || u8 applicability=0 || u32-be round=0
+  || text SlotKey || text SubjectIdentity || text SourceIdentity
+  || text Surface.Value || text SnapshotKind.Value || text TargetIdentity
+  || DemandDigest raw 32 bytes
+```
+
+`text` is u32-be strict-UTF-8 byte length plus bytes. Both digests are SHA-256
+of the exact retained frames; the caller supplies neither. DemandItems is the
+empty immutable list. Null arguments use their argument exceptions; frame,
+overflow, selector, collision, or plan-shape failures are `PlanStateInvalid`.
+
+The owning fixtures are exact. Complete uses the release-declared profile
+`protocol.profile.consumer-provider-exact-commit-conformance-audit`, axes
+Consumer/Conformance/ExactCommit/Provider/Audit, and reversed input targets:
+Repository `(repo, repo)` and Provider `(repo, github)`. Both use the target
+identity formed by separator-free ordinal concatenation of
+`0123456789abcdef`, `0123456789abcdef`, and `01234567`; output restores
+Repository then Provider. Slice uses Consumer/Conformance/ExactCommit/
+Repository/Audit and
+only the Repository target. Plans preserve exact authority kind, axes object,
+catalog RuleIds, targets, session, manifest identity, and immutable snapshots;
+they contain no adapter/provider DTO, route, I/O, cache, admission, clock,
+Application, or Policy implementation.
+
+The sole Fact is
+`ContractSliceCApplicabilityPlanTests.Plans_exact_static_applicability_instructions`
+with only `ContractSlice=C`, no Scenario, and marker
+`TEST-0210-C-BEHAVIOR-RED-0004`. Canonical R=0006 replaces only the fully
+prepared complete-kernel plan with `null!`; only that null calls the marker.
+The exact eight-path allowlist and `2,400` normalized changed-line ceiling are
+owned by the C micro-plan. Green is focused `1/1`, C `6/6`, full Conformance
+`49/49`, Domain `98/98`, build/format/diff/locks/structure/reviews/record sync,
+and one separate unpushed `ReviewedLocalGreen` commit. Closure and the cohort
+push remain held. R=0006 produced the exact behavior-red TRX but its runner
+retained the predecessor producer method name in the `TestMethod.name` oracle,
+so it ended `OracleRejected`; it is immutable diagnostic/no-success and never
+reruns. Corrected R=0007 changes only that predicate. Its fresh runner is
+`42,368` bytes / SHA-256
+`9EA4B00ADCF91B8CE2CB49F6FA9BD24005B5521E15411F996262C72AE67DD19F`,
+AST `6,038` tokens / `0` errors, and was inactive until the corrected
+records/design head passed exact-head hosted validation.
+
+That corrected head `d251b377...c044` passed exact hosted validation; the sole
+R=0007 was accepted with native/runner exit `1/0`, report SHA-256
+`6DA8C76C...2384`, and TRX SHA-256 `DC1A4426...8250`. The bounded green is
+focused `1/1`, C `6/6`, full Conformance `49/49`, Domain `98/98`, Release
+build `0/0`, clean packet format/diff/locks/StructureOnly, and reviews
+`0/0/0`. The packet is `ReviewedLocalGreen`; at that checkpoint closure was
+next/`FrozenDesign` and no Applicability cohort push or hosted claim existed.
+
+Closure now admits exact Observed/Failed/NoInput proofs into independent
+Complete/Incomplete/Failed outcomes, seals ContextProof references, emits
+NotApplicable/Unresolved terminals, and enforces cancellation/retry atomicity.
+R=0008/R=0009/R=0010 are immutable fixture/reference diagnostics; corrected
+R=0011 is accepted/immutable. Green is focused `1/1`, C `7/7`, full `50/50`,
+Domain `98/98`, and the package is `ReviewedLocalGreen`. The two-commit cohort
+then passed exact-head hosted run `31635734392`. At that cohort checkpoint,
+Evaluation Plan R=0012 was inactive until its synchronized freeze head became
+hosted green.
+
+The first packet is capped at `52` production paths, three C test paths plus two
+bounded predecessor-test adaptations, and `7,000` normalized changed C# lines.
+Every later packet defaults to ten
+production paths, one owning test path, and `3,500` changed lines. Crossing a
+cap requires a pre-red design amendment; it never silently raises a limit.
+Real Policy, Application routing/I/O, D, Scenario/status/owner, both workflow
+filters, runtime-efficiency activation, feature DoD, merge, release, and
+publication remain outside C authority.
+
+The owning C plan records per-cohort local and hosted durations, hosted defect
+count, owner-identification time, correction/revalidation cost, estimated time
+saved against package-by-package hosted validation, and any consistency or
+traceability loss. C completion still requires final convergence, atomic record
+sync, and exact-head hosted green; `CompletionRecommended` or a local commit is
+insufficient.
+
+After C is merged and exact-main hosted green, a separate D micro plan may use
+those measured delivery results but no C product evidence. Accepted D topology
+must be frozen by pre-D D/RT into roughly two-to-four-package cohorts without
+combining distinct expected-red or ownership boundaries. Separate cohorts must
+retain real Policy export/registration activation; real codec/parser/index/
+projector infrastructure; RULE-0001/0002; RULE-0003/0004/0005 with
+specialization/co-report; and repository/provider equivalence plus D-CONVERGE.
+D remains inactive here and must freshly prove required B/C behavior against
+real Policy registrations.
+
+### `C-EVALUATION-PLAN-01` executable freeze
+
+The first Evaluation packet implements only `PlanEvaluation`; Advance and
+Evaluate remain integrity failures. Its one direct Fact is
+`ContractSliceCEvaluationPlanTests.Plans_exact_projected_evaluation_round`, with
+only `ContractSlice=C`, no Scenario, and marker
+`TEST-0210-C-BEHAVIOR-RED-0006`. The complete Tests-owned fixture has one ready
+Applicable rule with an admitted repository-tree slot, a static repository-
+governed-text slot, and the projected repository-target slot. Projector output
+is the canonical ItemId sequence `0..2` with owners `alpha,alpha,omega`; the
+plan reuses the admitted slot, emits one round-0 none-demand static instruction,
+then two round-0 owner shards ordered `alpha` before `omega`. The empty-projector
+variant emits no projected instruction or proof/I/O; an applicability-unresolved
+predecessor terminalizes the rule and emits no evaluation instruction.
+
+`AcquisitionInstruction.CreateEvaluation` derives both frames/digests, accepts
+only canonical contiguous ItemIds and one owner per non-empty shard, and never
+accepts caller digests. Planning snapshots all public projections, binds the
+same session/predecessor stamp, rejects foreign/stale/reused inputs, and commits
+consumption only after a successful non-null result. R replaces only that final
+prepared result with `null!`; every negative is marker-free. The exact eight-
+path executable allowlist and `1,900/650` normalized line caps are owned by the
+C micro-plan; no Abstractions, Domain, Policy, project/package/lock/workflow, or
+held packet surface changes. Green is `1/1`, C `8/8`, full Conformance `51/51`,
+Domain `98/98`, with Release/format/diff/locks/structure/reviews/record sync and
+one unpushed `ReviewedLocalGreen` commit. Canonical red uses the common fresh
+one-shot runner, exact FQN filter, marker TRX, native exit `1`, and consumes its
+identity irrevocably after `InvocationCommitted`.
+
+Diagnostic R=0012 passed ValidateOnly and executed exactly once, but its sole
+Failed TRX returned `EvaluationClosure` before the marker because the retained
+fixture had copied all three evaluation slots into applicability. Raw marker
+count was `0`; R=0012 is immutable `OracleRejected`/no-success/no-retry. The
+bounded correction changes only fixture readiness: applicability retains the
+already admitted repository-tree slot, while governed-text and projected-target
+slots remain evaluation-ready. R=0013 then reached the marker and passed its
+TRX oracle, but immediate green proved that a positional `CloneRule` argument
+had replaced evaluation slots instead of applicability slots. Its actual slot
+set retained provider-governed text and omitted repository-tree, so R=0013 is
+also immutable diagnostic/no-success/no-retry. Corrected R=0014 named both
+arguments, constructed the exact repository-governed/repository-target/
+repository-tree evaluation set, retained the same FQN, marker, semantic null
+seam, argv, allowlist, caps, and oracle, and executed once from its distinct
+fresh runner/report/root after the synchronized correction head became hosted
+green. R=0014 is accepted/immutable; its green is focused `1/1`, C `8/8`, full
+Conformance `51/51`, Domain `98/98`, Release `0/0`, with format/diff,
+StructureOnly, publication evidence, and reviews green.
+
+### `C-EVALUATION-ADVANCE-01` executable freeze
+
+The second Evaluation packet implements only `AdvanceEvaluation`; Evaluate
+remains an integrity failure. It consumes one exact issued plan, admits the
+instruction-digest-bijective proof set, seals static and owner-sharded
+projected outcomes, invokes the target index exactly once after Complete
+aggregate admission, and returns the schema-1 round-1 closure. Zero projected
+demand yields a zero-attempt Complete target outcome and the same single index
+invocation. Cancellation or an index host exception before successful return
+leaves the predecessor retryable; successful return consumes it, and replay or
+foreign/colliding state fails closed. Intent/result and aggregation remain held.
+
+The exact FQN, marker, semantic-null red seam, packet argv, ten-path executable
+allowlist, `1,200/260` caps, one-shot runner custody, and package/cohort green
+gates are normative in the C micro-delivery plan. No Abstractions, Domain,
+Policy, project/package/lock/workflow surface changes. Green advances only to C
+`9/11` and full Conformance `52/52`; it does not activate Results/closure before
+the Evaluation cohort exact-head hosted gate.
+
+The Evaluation cohort is now immutable `ExactHeadHostedGreen` at exact
+[`18a8e3fa28160ec2e622752005b964e0ca98b838`](https://github.com/hasanmanzak/meAndAI/commit/18a8e3fa28160ec2e622752005b964e0ca98b838)
+through [run 31660382684](https://github.com/hasanmanzak/meAndAI/actions/runs/31660382684):
+Ubuntu `21m26s`, Windows `17m52s`, publication skipped, hosted defects `0`.
+
+### `C-INTENT-RESULT-01` executable freeze
+
+This packet introduces one internal pure transformation and no public member:
+
+```csharp
+internal static class EvaluationIntentCore
+{
+    internal static IReadOnlyList<RuleEvaluation> Mint(
+        EvaluationClosure closure,
+        CancellationToken cancellationToken);
+}
+```
+
+`Mint` requires a closure backed by the object-identical `KernelPlanningSession`
+and accepted manifest/catalog/export. The closure must contain every catalog
+rule exactly once across terminal and evaluation-ready partitions. Every ready
+rule's evaluation slot must have exactly one retained acquisition outcome. A
+Complete outcome must have one context proof; Incomplete/Failed produces an
+ordinal unresolved slot and suppresses that rule's evaluator. Only a rule whose
+outcomes are all Complete is evaluation-ready. The core creates one opaque
+`QualifiedEvidenceHandle` per Complete proof and an internal handle-to-reference
+map, creates `RuleEvaluationInput` with the exact rule identity/profile and
+proof map, invokes the object-identical registered evaluator once, and validates
+its returned `EvaluationIntent`. It
+is deterministic and idempotent and performs no session mutation; the later
+aggregation packet alone owns atomic public-kernel consumption.
+
+Intent carrier invariants are final here. Every applicability-reference list
+is a defensive unique snapshot; NotApplicable/Unresolved remain non-empty.
+Finding/failure related-reference
+sequences are defensive snapshots, contain no null or duplicate handle, and do
+not repeat their primary handle. An `EvaluationIntent` snapshots both
+collections and contains no duplicate semantic tuple. A finding code must map
+to exactly one declaration on its rule; its primary and every related reference
+kind must be allowed by that declaration. A failure code must occur in the
+rule's exact `EvaluationFailureCodes`. Every handle must have been minted for
+the same closure. Foreign/stale closure identity, a missing/duplicate outcome,
+partition mismatch, or a Complete outcome without proof is
+`CatalogIntegrityException(PlanStateInvalid)`. A null intent, unknown/foreign
+handle or code, duplicate, disallowed reference kind, or evaluator-registration
+mismatch is `CatalogIntegrityException(IntentInvalid)`. Evaluator
+exceptions propagate without partial result; cancellation is observed before
+each evaluator and before return.
+
+The core converts a valid ready intent by this closed truth table:
+
+| Intent shape | Minted status | Minted payload |
+| --- | --- | --- |
+| zero findings, zero failures | `Satisfied` | no findings/failures; applicability resolved |
+| one or more findings, zero failures | `Violated` | kernel-owned rule identity plus declaration-owned severity/remediation and exact references |
+| any failures | `NotEvaluated` | validated failures and any partial findings; applicability resolved, no unresolved slots |
+| any Incomplete/Failed evaluation outcome | `NotEvaluated` | evaluator not invoked; no findings/failures; applicability resolved; ordinal unresolved slot keys |
+
+Existing terminal `NotApplicable` and applicability-unresolved `NotEvaluated`
+results are preserved value-for-value and merged with ready results in ordinal
+RuleId/revision order. Within a result, findings and failures are ordered by
+code, primary reference, then related-reference sequence. The reference tuple
+is kind, slot key, requirement key, scope target/surface/snapshot identities,
+qualification digest, and any root/location/derivation/selector identity.
+
+The exact project-neutral fixture uses the Evaluation-ready closure and a
+cloned synthetic profile with the exact `Repository+Provider` surface union;
+this keeps all five synthetic rules compatible with their accepted
+declarations without changing any real Policy profile. Synthetic
+RULE-0001 is empty/Satisfied; synthetic RULE-0002 emits exact finding
+`protocol.decision.record-missing` over the repository-tree context proof and
+is Violated; synthetic RULE-0003 remains terminal
+NotApplicable; synthetic RULE-0004 remains terminal applicability-unresolved
+NotEvaluated; synthetic RULE-0005 emits exact failure
+`protocol.evaluator.reference-ambiguity` and is NotEvaluated. Only
+the cloned synthetic RULE-0002 finding declaration extends its existing first
+finding's allowed primary kinds with `ContextProof`; code, severity,
+remediation, and every real Policy declaration remain unchanged. A second
+fixture variant makes one evaluation acquisition Incomplete and proves the
+exact unresolved-slot result plus zero evaluator invocation. Expected-
+selector resolution, capability-backed rule semantics, real Policy RULE-0001
+through RULE-0005, aggregation/verdict, and session consumption remain owned by
+later packets/D.
+
+The test fixture callback shape is closed rather than invented during red.
+`RuleEvaluatorMirror` owns optional applicability and evaluation delegates,
+checks cancellation in both methods, and defaults evaluation to the empty
+intent. Each derived RULE mirror forwards those two delegates. The activation
+and applicability-closure fixture factories accept an optional ordinal map from
+RuleId value to evaluation delegate, reject an unknown key, and bind it only to
+the matching object-identical `RuleEvaluatorRegistration`. This seam is Tests-
+owned and never appears in production or public API.
+
+```csharp
+internal static CFixture CreateFixture(
+    IReadOnlyDictionary<string,
+        Func<RuleEvaluationInput, EvaluationIntent>>? evaluationByRule = null);
+
+internal static ClosureFixture CreateFixture(
+    bool terminalizeEvaluationRule = false,
+    bool evaluationReady = false,
+    IReadOnlyDictionary<string,
+        Func<RuleEvaluationInput, EvaluationIntent>>? evaluationByRule = null);
+```
+
+The one Fact is
+`ContractSliceCIntentTests.Mints_exact_intents_findings_and_failures`, with only
+`ContractSlice=C`, no Scenario/Theory/class trait, and sole marker
+`TEST-0210-C-BEHAVIOR-RED-0008`. R=0016 is immutable diagnostic/no-success: its
+sole test failed before `Mint` because a Provider-only synthetic named profile
+contained Repository-scoped RULE-0001/RULE-0002, so the TRX had zero marker
+occurrences and exact setup failure `A named profile must contain exactly its
+compatible rules. (Parameter 'profiles')`. Corrected R=0017 replaces only the
+fully prepared valid `Mint` result with `null!`; only that semantic null calls
+the marker assertion.
+All construction, invalid, order, repeat, cancellation, host-exception, and
+assertion paths are marker-free. The exact packet argv is:
+
+```text
+dotnet test tests/dotnet/MeAndAI.Protocol.Conformance.Tests/MeAndAI.Protocol.Conformance.Tests.csproj --configuration Release --no-restore --no-build --nologo --verbosity minimal --results-directory "<fresh-root>" --logger "trx;LogFileName=TEST-0210-C-BEHAVIOR-RED-0008.trx" --filter "ContractSlice=C&FullyQualifiedName=MeAndAI.Protocol.Conformance.Tests.ContractSliceCIntentTests.Mints_exact_intents_findings_and_failures"
+```
+
+The exact eight-path executable allowlist and `2,400/900` normalized line caps
+are owned by the C micro-plan. R=0017 uses a fresh ValidateOnly/Execute runner,
+warning-free Release rebuild, source/runner/HEAD/upstream/status/lock/DLL/PDB
+custody, one fresh secure TRX, native exit `1`, connection timeout `300`, outer
+bound `420s`, exact marker/result/definition/entry/16-counter oracle, and
+irreversible no-retry authority after `InvocationCommitted`. Corrected design
+head [`01ac59bf72226493e0d929ce7c681b7160073abd`](https://github.com/hasanmanzak/meAndAI/commit/01ac59bf72226493e0d929ce7c681b7160073abd) passed exact-head Ubuntu/Windows
+validation with publication verification skipped. Canonical R=0017 is accepted/
+immutable and never reruns; the sole native exit was `1`, runner exit `0`, and
+its exact one-result TRX passed every frozen oracle. Green is focused `1/1`, C
+`10/10`, full Conformance `53/53`, Domain `98/98`, with Release, format, diff,
+locks, structure, reviews, record sync, and one separate unpushed
+`ReviewedLocalGreen` commit. Aggregation remains held until that commit exists.
+Exact artifact and timing evidence is owned by the C evidence ledger; no
+package-hosted claim is made.
+
+### `C-AGGREGATION-01` executable closure
+
+The sole implementation core is internal and shared by both public kernels:
+
+```csharp
+internal static class EvaluationAggregationCore
+{
+    internal static CatalogSliceEvaluation EvaluateSlice(
+        KernelPlanningSession session,
+        EvaluationClosure closure,
+        CancellationToken cancellationToken);
+
+    internal static CompleteCatalogEvaluation EvaluateComplete(
+        KernelPlanningSession session,
+        EvaluationClosure closure,
+        CancellationToken cancellationToken);
+}
+```
+
+Every issued evaluation closure is retained with its exact plan, manifest,
+catalog, profile when complete, acquisition outcomes, terminal evaluations, and
+object-identical planning session. Aggregation accepts only one live closure
+from that session, validates the catalog/profile and the exact complete RuleId/
+revision partition, then mints the final ordered result. Validation,
+cancellation, or a host failure before successful return leaves the closure
+retryable; successful return atomically consumes it, and replay, foreign,
+colliding, or stale input fails `PlanStateInvalid`.
+
+Acquisition outcomes are unique and ordered by SlotKey. Rule evaluations are
+RuleId/revision ordered. Result carriers snapshot both lists. A slice result
+retains its exact activated catalog plus manifest digest, flags violations and
+unresolved required evaluation, and has no verdict. A complete result retains
+the exact complete catalog plus named profile. Its truth table is exact:
+
+| Unresolved required evaluation | Known violation | Verdict |
+| --- | --- | --- |
+| Yes | Either | `Indeterminate` |
+| No | Yes | `NonConforming` |
+| No | No | `Conforming` |
+
+Aggregation owns no report, enforcement, waiver/debt, real Policy, Scenario,
+or workflow authority. The one direct Fact/FQN is
+`ContractSliceCAggregationTests.Aggregates_exact_catalog_evaluation_and_verdict`,
+with only `ContractSlice=C`, no Scenario/Theory/class trait, and marker
+`TEST-0210-C-BEHAVIOR-RED-0009`. R=0018 changed only the fully prepared valid
+complete result to `null!`; only that semantic null called the marker assertion.
+Its exact packet argv and ten-path executable allowlist are owned by the C
+micro-plan. The runner passed ValidateOnly and one Execute; native/runner exits
+were `1/0`, and the sole Failed TRX passed exact identity, marker, counter,
+diagnostic, attachment, source, binary, lock, root, and custody oracles. R=0018
+is accepted/immutable and never reruns.
+
+The semantic null alone was removed for green. Focused `1/1`, C `11/11`, full
+Conformance `54/54`, Domain `98/98`, warning/error-free Release build, format,
+locks, diff, preliminary StructureOnly/publication evidence, and package reviews
+are green. `C-AGGREGATION-01` is captured in its own unpushed
+`ReviewedLocalGreen` commit. `C-CONVERGE-01` follows only as a twelve-record,
+code-free P/R/G-NotApplicable audit; it may not rewrite any immutable red or
+activate D, the parent scenario, final status/owner/workflow, release, or
+publication. Its third separate local commit records `CompletionRecommended`
+only after the full exact-tree cohort validation, and C remains incomplete until
+that commit is pushed once and becomes exact-head hosted green.
+
 ## Internal implementation slices
 
 ContractSlice A's historical delivery is owned by its
 [micro-delivery control plan](subf-0143-micro-delivery-plan.md). ContractSlice
-B is decomposed by the current
+B's completed merged delivery is owned by the
 [B micro-delivery plan](subf-0143-contractslice-b-micro-delivery-plan.md).
 Surface, codec activation, all three wires, B-RESOURCE, B-CACHE, B-ADMISSION,
 and B-SEALED-CONTEXT are hosted green; repository-target R=0004 is diagnostic-only, while canonical
@@ -10409,9 +11002,18 @@ R=0012 and corrected codec-derivation R=0014 are accepted/immutable. B is
 `11/11`, A+B is `43/43`. Admission
 R=0008/R=0009/R=0010 and codec-derivation R=0013 are immutable
 diagnostics/no-success. Corrected R=0014 is exact-head hosted green.
-B-CONVERGE pure audit is complete locally with final-sync hosted pending.
+B-CONVERGE is merged/exact-main green.
+ContractSlice C is decomposed by the current
+[C micro-delivery plan](subf-0143-contractslice-c-micro-delivery-plan.md), whose
+design head is hosted green. Activation, Applicability, and Evaluation are
+exact-head hosted green. Results/closure is locally validated through Intent,
+Aggregation, and Converge as three separate `ReviewedLocalGreen` commits. C is
+`11/11`, current A+B+C/full Conformance is `54/54`, R=0012/R=0013/R=0016 are
+immutable diagnostics, and R=0014/R=0015/R=0017/R=0018 are accepted/immutable.
+`C-CONVERGE-01` records local `CompletionRecommended`; the cohort exact-head
+hosted gate is pending.
 
-B implementation and C/D still require separate future activation, and no
+C implementation and D still require separate packet activation, and no
 packet is active merely from this list. No directive here allocates new stable
 IDs; the four independently reviewable internal slices remain ordered:
 

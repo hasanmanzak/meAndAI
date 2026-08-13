@@ -7,7 +7,12 @@ public sealed class PolicyQualificationSliceExport
         string exportVersion,
         CatalogSliceDeclaration catalog,
         ReleaseSchemaRegistry schemaRegistry,
-        IEnumerable<ComponentTypeIdentity> components)
+        IEnumerable<ICodecRegistration> codecRegistrations,
+        IEnumerable<IParserRegistration> parserRegistrations,
+        IEnumerable<IIndexRegistration> indexRegistrations,
+        IEnumerable<IDemandProjectorRegistration> demandProjectorRegistrations,
+        IEnumerable<ISelectorRegistration> selectorRegistrations,
+        IEnumerable<RuleEvaluatorRegistration> evaluatorRegistrations)
     {
         ExportKey = DeclarationValidation.Token(exportKey, nameof(exportKey));
         ExportVersion = DeclarationValidation.Version(
@@ -18,9 +23,31 @@ public sealed class PolicyQualificationSliceExport
 
         Catalog = catalog;
         SchemaRegistry = schemaRegistry;
-        Components = DeclarationValidation.Snapshot(
-            components,
-            nameof(components));
+        CodecRegistrations = DeclarationValidation.Snapshot(
+            codecRegistrations,
+            nameof(codecRegistrations));
+        ParserRegistrations = DeclarationValidation.Snapshot(
+            parserRegistrations,
+            nameof(parserRegistrations));
+        IndexRegistrations = DeclarationValidation.Snapshot(
+            indexRegistrations,
+            nameof(indexRegistrations));
+        DemandProjectorRegistrations = DeclarationValidation.Snapshot(
+            demandProjectorRegistrations,
+            nameof(demandProjectorRegistrations));
+        SelectorRegistrations = DeclarationValidation.Snapshot(
+            selectorRegistrations,
+            nameof(selectorRegistrations));
+        EvaluatorRegistrations = DeclarationValidation.Snapshot(
+            evaluatorRegistrations,
+            nameof(evaluatorRegistrations));
+        Components = ComponentProjection.Create(
+            CodecRegistrations,
+            ParserRegistrations,
+            IndexRegistrations,
+            DemandProjectorRegistrations,
+            SelectorRegistrations,
+            EvaluatorRegistrations);
     }
 
     public string ExportKey { get; }
@@ -32,4 +59,41 @@ public sealed class PolicyQualificationSliceExport
     public ReleaseSchemaRegistry SchemaRegistry { get; }
 
     public IReadOnlyList<ComponentTypeIdentity> Components { get; }
+
+    internal IReadOnlyList<ICodecRegistration> CodecRegistrations { get; }
+
+    internal IReadOnlyList<IParserRegistration> ParserRegistrations { get; }
+
+    internal IReadOnlyList<IIndexRegistration> IndexRegistrations { get; }
+
+    internal IReadOnlyList<IDemandProjectorRegistration>
+        DemandProjectorRegistrations
+    { get; }
+
+    internal IReadOnlyList<ISelectorRegistration> SelectorRegistrations { get; }
+
+    internal IReadOnlyList<RuleEvaluatorRegistration> EvaluatorRegistrations { get; }
+
+    internal static PolicyQualificationSliceExport Create(
+        string exportKey,
+        string exportVersion,
+        CatalogSliceDeclaration catalog,
+        ReleaseSchemaRegistry schemaRegistry,
+        IEnumerable<ICodecRegistration> codecRegistrations,
+        IEnumerable<IParserRegistration> parserRegistrations,
+        IEnumerable<IIndexRegistration> indexRegistrations,
+        IEnumerable<IDemandProjectorRegistration> demandProjectorRegistrations,
+        IEnumerable<ISelectorRegistration> selectorRegistrations,
+        IEnumerable<RuleEvaluatorRegistration> evaluatorRegistrations) =>
+        new(
+            exportKey,
+            exportVersion,
+            catalog,
+            schemaRegistry,
+            codecRegistrations,
+            parserRegistrations,
+            indexRegistrations,
+            demandProjectorRegistrations,
+            selectorRegistrations,
+            evaluatorRegistrations);
 }

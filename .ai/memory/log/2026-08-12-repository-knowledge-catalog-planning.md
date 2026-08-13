@@ -61,10 +61,10 @@ Date: 2026-08-12
   define the initial authority, projection, inference, acquisition, hostile-input,
   profile, React, and privilege concerns.
 
-The identifiers allocated by
-[open draft PR #181](https://github.com/hasanmanzak/meAndAI/pull/181) remain
-reserved. Reconcile both drafts against current `main` before either later plan
-exits draft status.
+The identifiers allocated by merged
+[PR #181](https://github.com/hasanmanzak/meAndAI/pull/181) remain reserved.
+This branch now incorporates that exact `main` state and preserves both records
+sets; implementation authority remains withheld.
 
 ## Continuation boundary
 
