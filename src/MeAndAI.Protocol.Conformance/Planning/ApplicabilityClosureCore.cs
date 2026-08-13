@@ -167,7 +167,7 @@ internal static class ApplicabilityClosureCore
             references);
     }
 
-    private static AdmissionLeaf ValidateCandidate(
+    internal static AdmissionLeaf ValidateCandidate(
         KernelPlanningSession session,
         AcquisitionInstruction instruction,
         IAdmissionProofCandidate candidate)
@@ -383,7 +383,7 @@ internal static class ApplicabilityClosureCore
             [],
             []);
 
-    private static ExactSha256Digest OutcomeDigest(
+    internal static ExactSha256Digest OutcomeDigest(
         KernelPlanningSession session,
         AcquisitionInstruction instruction,
         SealedAcquisitionAttempt attempt)
@@ -429,7 +429,7 @@ internal static class ApplicabilityClosureCore
         IReadOnlyDictionary<QualifiedEvidenceHandle, QualifiedEvidenceReference>
             References);
 
-    private sealed record AdmissionLeaf(
+    internal sealed record AdmissionLeaf(
         AdmissionProofKind Kind,
         AcquisitionStatus Status,
         EvidenceScope? Scope,

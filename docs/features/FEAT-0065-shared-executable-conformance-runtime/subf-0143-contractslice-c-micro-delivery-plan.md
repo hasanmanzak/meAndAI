@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Gate 2 micro-delivery plan and design freeze |
-| State | Design, Activation, Applicability, and Evaluation design cohorts `ExactHeadHostedGreen`; Evaluation Plan `ReviewedLocalGreen`/unpushed, C `8/11`, current A+B+C `51/51`; R=0006/R=0008/R=0009/R=0010/R=0012/R=0013 diagnostic/no-success, R=0007/R=0011/R=0014 accepted/immutable; Evaluation Advance next/`FrozenDesign`; parent scenario held |
+| State | Design, Activation, Applicability, and Evaluation design cohorts `ExactHeadHostedGreen`; Evaluation Plan and Advance are separate packet-local `ReviewedLocalGreen` commits in one unpushed cohort, C `9/11`, current A+B+C `52/52`; R=0006/R=0008/R=0009/R=0010/R=0012/R=0013 diagnostic/no-success, R=0007/R=0011/R=0014/R=0015 accepted/immutable; Results/closure held pending the Evaluation cohort exact-head hosted gate; parent scenario held |
 | Parent | Owning feature and current subfeature |
 | Scenario | [TEST-0210](test-cases.md#test-0210), retained `Planned` |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
@@ -579,7 +579,11 @@ immutable. Green restored only the semantic result and passed focused `1/1`, C
 `8/8`, full Conformance `51/51`, Domain `98/98`, Release build `0/0`, format/
 diff, locks, StructureOnly, publication evidence, reviews, and record sync. The
 packet is `ReviewedLocalGreen` only in its separate unpushed local commit;
-Evaluation Advance is next/`FrozenDesign`.
+Evaluation Advance is separately `ReviewedLocalGreen` in the same unpushed
+cohort. R=0015 is accepted/immutable; its bounded green is focused `1/1`, C
+`9/9`, full Conformance `52/52`, and Domain `98/98`. Results/closure remains
+held until the full Evaluation cohort gate, single push, and exact-head hosted
+green.
 
 The executable allowlist is exact: modify
 `Activation/ConformanceKernel.cs`, `Activation/CatalogSliceKernel.cs`,
@@ -608,6 +612,57 @@ The design cohort changes exactly the existing twelve C live-route records, no
 new record node, and no product/test/project/lock/workflow path. Fresh design,
 evidence/scope, and traceability reviews plus schema-2 graph validation must be
 `0/0/0` before its focused records commit and single hosted design-gate push.
+
+## Frozen `C-EVALUATION-ADVANCE-01` packet boundary
+
+The sole Fact/FQN is
+`MeAndAI.Protocol.Conformance.Tests.ContractSliceCEvaluationAdvanceTests.Advances_owner_sharded_evaluation_to_closure`,
+with only `ContractSlice=C`, no Scenario, and marker
+`TEST-0210-C-BEHAVIOR-RED-0007`. It consumes exactly the kernel-issued round-0
+plan once, admits one complete proof per instruction by exact instruction
+digest, retains one static outcome, aggregates the two owner-sharded projected
+attempts into one repository-target outcome, invokes the registered target
+index once after aggregate completion, and returns a round-1 closure whose
+context contains the three canonical C evaluation slots. Empty projected
+demand still produces one zero-attempt Complete projected outcome and one
+index invocation; it never manufactures an external acquisition instruction.
+
+Replay, foreign plan, missing/extra/colliding proof, and successful no-progress
+routes fail at their owning integrity boundary. Cancellation before entry and
+a Tests-owned index host exception commit no state and leave the exact
+predecessor retryable; a successful retry consumes it once. The schema-1 graph
+closes after this advance and emits no empty or second plan. Later intent/result
+and aggregation packets retain all rule-evaluation/result ownership.
+
+R changes only the fully prepared valid `AdvanceEvaluation(plan, proofs)`
+result to `null!`; only that semantic null reaches the marker. All negative,
+retry, zero-demand, index, construction, and assertion paths are marker-free.
+The packet-specific command is:
+
+```text
+dotnet test tests/dotnet/MeAndAI.Protocol.Conformance.Tests/MeAndAI.Protocol.Conformance.Tests.csproj --configuration Release --no-restore --no-build --nologo --verbosity minimal --results-directory "<fresh-root>" --logger "trx;LogFileName=TEST-0210-C-BEHAVIOR-RED-0007.trx" --filter "ContractSlice=C&FullyQualifiedName=MeAndAI.Protocol.Conformance.Tests.ContractSliceCEvaluationAdvanceTests.Advances_owner_sharded_evaluation_to_closure"
+```
+
+It uses a fresh external ValidateOnly/Execute runner, one warning-free Release
+`--no-restore` build, one exact `--no-build` child, process-scoped
+`VSTEST_CONNECTION_TIMEOUT=300`, a `420s` monotonic outer bound, exact native
+exit `1`, secure single-TRX marker oracle, source/binary/lock/status custody,
+and irreversible no-retry authority after `InvocationCommitted`.
+
+The exact executable allowlist modifies
+`Activation/CatalogSliceKernel.cs`, `Activation/ConformanceKernel.cs`,
+`Planning/ApplicabilityClosureCore.cs`, `Planning/ApplicabilityPlanningCore.cs`,
+`Planning/EvaluationPlanningCore.cs`, `ContractSliceCActivationTests.cs`,
+`ContractSliceCEvaluationPlanTests.cs`, and
+`ContractSliceCProducerPipelineTests.cs`; it adds
+`Planning/EvaluationAdvanceCore.cs` and
+`ContractSliceCEvaluationAdvanceTests.cs`. No Abstractions, Domain, Policy,
+project/package/lock/workflow file changes are allowed. The normalized cap is
+`1,200` changed lines and the owning test cap is `260`; `1,201` or `261`
+requires redraw. Package green is focused `1/1`, C `9/9`, full Conformance
+`52/52`, Domain `98/98`, Release/format/diff/locks/structure/reviews/record sync
+green, followed by one separate unpushed `ReviewedLocalGreen` commit. Only then
+does the Evaluation cohort run its full boundary and perform its single push.
 
 ## Deferred ContractSlice D cohort plan
 

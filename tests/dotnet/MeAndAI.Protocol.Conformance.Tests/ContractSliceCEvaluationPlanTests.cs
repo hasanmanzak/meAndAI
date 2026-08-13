@@ -95,7 +95,7 @@ public sealed class ContractSliceCEvaluationPlanTests
             cancelled.Kernel.PlanEvaluation(cancelled.Closure, cancellation.Token));
     }
 
-    private static PlanningContext CreateContext(
+    internal static PlanningContext CreateContext(
         IReadOnlyList<RepositoryTargetResolutionDemandCandidate> candidates,
         bool terminalizeEvaluationRule = false)
     {
@@ -119,10 +119,10 @@ public sealed class ContractSliceCEvaluationPlanTests
             profile,
             [fixture.ProviderTarget, fixture.RepositoryTarget]);
         var closure = kernel.CloseApplicability(applicability, fixture.Proofs);
-        return new PlanningContext(fixture, kernel, closure);
+        return new PlanningContext(fixture, proof, kernel, closure);
     }
 
-    private static IReadOnlyList<RepositoryTargetResolutionDemandCandidate>
+    internal static IReadOnlyList<RepositoryTargetResolutionDemandCandidate>
         Candidates(bool permuted)
     {
         var commit = RepositoryTargetResolutionDemandCandidate.CommitObject(
@@ -155,8 +155,9 @@ public sealed class ContractSliceCEvaluationPlanTests
         Assert.Equal(CatalogIntegrityCode.PlanStateInvalid, error.Code);
     }
 
-    private sealed record PlanningContext(
+    internal sealed record PlanningContext(
         ContractSliceCApplicabilityClosureTests.ClosureFixture Fixture,
+        ContractSliceCActivationProof Proof,
         ConformanceKernel Kernel,
         ApplicabilityClosure Closure);
 

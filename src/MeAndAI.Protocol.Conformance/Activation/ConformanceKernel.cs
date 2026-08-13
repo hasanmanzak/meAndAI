@@ -94,7 +94,11 @@ public sealed class ConformanceKernel
         EvaluationPlan plan,
         AcquisitionProofSet proofs,
         CancellationToken cancellationToken = default) =>
-        throw new CatalogIntegrityException(CatalogIntegrityCode.PlanStateInvalid);
+        EvaluationAdvanceCore.Advance(
+            _planningSession,
+            plan,
+            proofs,
+            cancellationToken);
 
     public CompleteCatalogEvaluation Evaluate(
         EvaluationClosure closure,

@@ -369,13 +369,48 @@ internal sealed partial class ProtocolRecordIndexMirror
 
 internal sealed partial class RepositoryTargetIndexMirror
 {
+    private bool _failNext;
+
+    internal int BuildCalls { get; private set; }
+
+    internal void FailNext() => _failNext = true;
+
     public CapabilityIntent<IRepositoryTargetResolutionIndex> Build(
-        ContextIndexInput<IndexInputMirror> input, CancellationToken token) =>
-        ProducerOperationStub.FailedCapability<IRepositoryTargetResolutionIndex>(input);
+        ContextIndexInput<IndexInputMirror> input, CancellationToken token)
+    {
+        ArgumentNullException.ThrowIfNull(input);
+        token.ThrowIfCancellationRequested();
+        BuildCalls++;
+        if (_failNext)
+        {
+            _failNext = false;
+            throw new InvalidOperationException("Synthetic repository-target index failure.");
+        }
+
+        return CapabilityIntent<IRepositoryTargetResolutionIndex>.Produced(
+            CapabilityProduct<IRepositoryTargetResolutionIndex>.Create(
+                new RepositoryTargetResolutionIndexMirror(),
+                [],
+                SemanticResourceLocalUsage.Create(0, 0, 0, 0)));
+    }
+
     public SemanticResourceLocalUsage MeasureLocal(
         ContextIndexInput<IndexInputMirror> input,
         IRepositoryTargetResolutionIndex value,
-        CancellationToken token) => ProducerOperationStub.Meter(input, value);
+        CancellationToken token)
+    {
+        ArgumentNullException.ThrowIfNull(input);
+        ArgumentNullException.ThrowIfNull(value);
+        token.ThrowIfCancellationRequested();
+        return SemanticResourceLocalUsage.Create(0, 0, 0, 0);
+    }
+}
+
+internal sealed class RepositoryTargetResolutionIndexMirror :
+    IRepositoryTargetResolutionIndex
+{
+    public IReadOnlyList<RepositoryTargetResolutionView> Targets { get; } =
+        Array.Empty<RepositoryTargetResolutionView>();
 }
 
 internal sealed partial class RepositoryTreeIndexMirror

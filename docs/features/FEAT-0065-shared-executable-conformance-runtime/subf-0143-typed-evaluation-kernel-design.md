@@ -3,14 +3,14 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted; ContractSlice A and B merged/exact-main green; B is `11/11`, cumulative A+B `43/43`. C Activation and Applicability are `ExactHeadHostedGreen`; Evaluation Plan is `ReviewedLocalGreen`/unpushed, C is `8/11`, current A+B+C `51/51`. R=0007/R=0011/R=0014 are accepted/immutable; R=0012/R=0013 are diagnostics/no-success. Evaluation Advance is next/`FrozenDesign`; [TEST-0210](test-cases.md#test-0210) remains `Planned`, and D/activation/DoD remain held. |
+| Status | Gate 2 accepted; ContractSlice A and B merged/exact-main green; B is `11/11`, cumulative A+B `43/43`. C Activation and Applicability are `ExactHeadHostedGreen`; Evaluation Plan and Advance are separate packet-local `ReviewedLocalGreen` commits in one unpushed cohort, C is `9/11`, current A+B+C `52/52`. R=0007/R=0011/R=0014/R=0015 are accepted/immutable; R=0012/R=0013 are diagnostics/no-success. Results/closure waits for the Evaluation cohort exact-head hosted gate; [TEST-0210](test-cases.md#test-0210) remains `Planned`, and D/activation/DoD remain held. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Test | [TEST-0210](test-cases.md#test-0210) |
 | Gate 3 micro-delivery routing | Historical A delivery remains owned by the [A micro-delivery control plan](subf-0143-micro-delivery-plan.md). Current B design routing is the [ContractSlice B micro-delivery plan](subf-0143-contractslice-b-micro-delivery-plan.md); packet labels refine delivery but activate no executable work. |
 | Exact-main design baseline | Accepted A merge commit [`51623f4d404a95e0f706d72805cf7ddbbbd293b8`](https://github.com/hasanmanzak/meAndAI/commit/51623f4d404a95e0f706d72805cf7ddbbbd293b8), validated by exact-main [run 31304787603](https://github.com/hasanmanzak/meAndAI/actions/runs/31304787603) |
-| Design and Gate 3 authority | Historical A/B directives, accepted reds, diagnostics, and hosted evidence remain immutable. The exact [C micro-delivery plan](subf-0143-contractslice-c-micro-delivery-plan.md) is exact-head hosted-green design authority; Activation and Applicability are `ExactHeadHostedGreen`, Evaluation Plan is packet-local `ReviewedLocalGreen`, diagnostic R=0012/R=0013 are immutable, and R=0014 is accepted/immutable. Evaluation Advance is next/`FrozenDesign`; D, final activation, merge, release, and publication remain outside this authority. |
+| Design and Gate 3 authority | Historical A/B directives, accepted reds, diagnostics, and hosted evidence remain immutable. The exact [C micro-delivery plan](subf-0143-contractslice-c-micro-delivery-plan.md) is exact-head hosted-green design authority; Activation and Applicability are `ExactHeadHostedGreen`, Evaluation Plan and Advance are separate packet-local `ReviewedLocalGreen` commits, diagnostic R=0012/R=0013 are immutable, and R=0014/R=0015 are accepted/immutable. The Evaluation cohort remains unpushed and Results/closure inactive; D, final activation, merge, release, and publication remain outside this authority. |
 | Completed predecessor | [SUBF-0153](README.md#subf-0153) / [TEST-0221](test-cases.md#test-0221), merged through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173) and exact-main validated by [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) |
 
 ## Directive and hard boundary
@@ -1530,102 +1530,10 @@ while the root remains absent and the same process set remains zero. Invoke one 
 hosted-green forty-character head for `<HEAD>`, with exact command
 `& 'C:\Program Files\WindowsApps\Microsoft.PowerShell_7.6.4.0_x64__8wekyb3d8bbwe\pwsh.exe' -NoProfile -File 'D:\Temp\meandai-aconverge-v4-91a7c6e4c5e349a0b22e3f37d5d0f84a.ps1' -ExpectedHead '<HEAD>'; exit $LASTEXITCODE`.
 No wrapper/fallback/retry is permitted; every admitted tool call, including an
-outer admission failure, consumes the attempt. The exact V4 PowerShell script is:
-
-```powershell
-param([Parameter(Mandatory)][ValidatePattern('^[0-9a-f]{40}$')][string] $ExpectedHead)
-$ErrorActionPreference = 'Stop'
-$root = 'D:\Temp\meandai-test-0210-a-converge-v4-91a7c6e4c5e349a0b22e3f37d5d0f84a'
-if (Test-Path -LiteralPath $root) { throw 'Fresh V4 evidence root already exists.' }
-[void][IO.Directory]::CreateDirectory($root)
-$entryPath = Join-Path $root 'entry.json'
-$entry = [ordered]@{ schema = 1; attempt = 'V4'; expectedHead = $ExpectedHead; state = 'Entered'; enteredUtc = [DateTime]::UtcNow.ToString('O'); completedUtc = $null; pid = $PID }
-[IO.File]::WriteAllText($entryPath, (($entry | ConvertTo-Json -Compress) + "`n"), [Text.UTF8Encoding]::new($false))
-Write-Output ('A-CONVERGE-V4-ENTERED=' + $root)
-$expectedPwsh = 'C:\Program Files\WindowsApps\Microsoft.PowerShell_7.6.4.0_x64__8wekyb3d8bbwe\pwsh.exe'
-if ($PSVersionTable.PSVersion -ne [Version]'7.6.4') { throw 'A-CONVERGE V4 requires exact PowerShell 7.6.4.' }
-$pwsh = [IO.Path]::GetFullPath((Join-Path $PSHOME 'pwsh.exe'))
-if ($pwsh -cne $expectedPwsh -or -not [IO.File]::Exists($pwsh)) { throw 'A-CONVERGE V4 PowerShell identity mismatch.' }
-$PSNativeCommandUseErrorActionPreference = $true
-function Assert-SourceIdentity {
-  $head = (& git rev-parse HEAD).Trim()
-  if ($head -cne $ExpectedHead) { throw 'V4 source HEAD mismatch.' }
-  $status = @(& git status --porcelain=v1 --untracked-files=all)
-  if (@($status | Where-Object { $_ -cne '?? MeAndAI.Protocol.v3.ncrunchsolution.user' }).Count) { throw 'V4 tracked source is dirty.' }
-}
-Assert-SourceIdentity
-$c = 'tests/dotnet/MeAndAI.Protocol.Conformance.Tests/MeAndAI.Protocol.Conformance.Tests.csproj'
-$d = 'tests/dotnet/MeAndAI.Protocol.Domain.Tests/MeAndAI.Protocol.Domain.Tests.csproj'
-& dotnet build MeAndAI.Protocol.slnx -c Release --no-restore --nologo
-function Get-Digest([string[]] $v) { [Array]::Sort($v, [StringComparer]::Ordinal); $b = [Text.Encoding]::UTF8.GetBytes(($v -join "`n") + "`n"); [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($b)) }
-function Get-Discovery([string] $p, [string] $f = '') { $a = @('test', $p, '-c', 'Release', '--no-restore', '--no-build', '--list-tests', '--nologo'); if ($f) { $a += @('--filter', $f) }; $o = & dotnet @a 2>&1; [string[]] @($o | ForEach-Object { $_.ToString().Trim() } | Where-Object { $_ -like 'MeAndAI.Protocol.*.Tests.*' }) }
-function Assert-Set([string[]] $v, [int] $n, [string] $h, [string] $name) { if ($v.Count -ne $n -or (Get-Digest $v) -cne $h) { throw "$name discovery mismatch." } }
-$a = @(Get-Discovery $c 'ContractSlice=A')
-$u = @($a | Where-Object { $_ -like '*.ContractSliceAPublicApiTests.*' -or $_ -like '*.ContractSliceAOwnershipTests.*' })
-$domain = @(Get-Discovery $d)
-Assert-Set $a 32 'C42DF0B847DF11078C904346CA5D033084797B5386450527E3F8D99612F08B92' 'A'
-Assert-Set $u 11 'F58C362D6CA12A4C67AFCD1C75573063A89F2909088BA11DFA9BAF247E68B0C6' 'API/ownership'
-Assert-Set $domain 98 'FABE8953F91FC735BCB4A74DF1AD00A01F3B37DE4DAC21841F381BC9845A132B' 'Domain'
-$resource = @('MeAndAI.Protocol.Conformance.Tests.ContractSliceAResourceManifestTests.Enforces_exact_manifest_byte_reachable_depth_and_token_ceilings')
-function Invoke-Run([string] $p, [string] $file, [string] $f = '') { $x = @('test', $p, '-c', 'Release', '--no-restore', '--no-build', '--nologo'); if ($f) { $x += @('--filter', $f) }; $x += @('--logger', "trx;LogFileName=$file", '--results-directory', $root); & dotnet @x }
-Invoke-Run $c 'resource.trx' 'FullyQualifiedName=MeAndAI.Protocol.Conformance.Tests.ContractSliceAResourceManifestTests.Enforces_exact_manifest_byte_reachable_depth_and_token_ceilings'
-Invoke-Run $c 'a.trx' 'ContractSlice=A'
-Invoke-Run $c 'api-ownership.trx' 'FullyQualifiedName~ContractSliceAPublicApiTests|FullyQualifiedName~ContractSliceAOwnershipTests'
-Invoke-Run $c 'conformance.trx'
-Invoke-Run $d 'domain.trx'
-function Assert-Trx([string] $file, [string[]] $expected) {
-  [xml] $trx = Get-Content -LiteralPath (Join-Path $root $file) -Raw
-  $r = @($trx.SelectNodes('//*[local-name()="UnitTestResult"]')); $d = @($trx.SelectNodes('//*[local-name()="UnitTest"]')); $e = @($trx.SelectNodes('//*[local-name()="TestEntry"]'))
-  [string[]] $rn = @($r | ForEach-Object { [string]$_.testName }); [string[]] $dn = @($d | ForEach-Object { [string]$_.name }); $h = Get-Digest $expected
-  if ($r.Count -ne $expected.Count -or $d.Count -ne $expected.Count -or $e.Count -ne $expected.Count -or (Get-Digest $rn) -cne $h -or (Get-Digest $dn) -cne $h) { throw "$file FQN-set mismatch." }
-  if (@($r | ForEach-Object { [string]$_.executionId } | Sort-Object -Unique).Count -ne $expected.Count) { throw "$file result executionId uniqueness mismatch." }
-  foreach ($result in $r) {
-    $definition = @($d | Where-Object { [string]$_.id -ceq [string]$result.testId -and [string]$_.name -ceq [string]$result.testName })
-    $entry = @($e | Where-Object { [string]$_.testId -ceq [string]$result.testId -and [string]$_.executionId -ceq [string]$result.executionId })
-    if ($definition.Count -ne 1 -or $entry.Count -ne 1) { throw "$file definition/entry/result identity mismatch." }
-  }
-  if (@($r | Where-Object { [string]$_.outcome -cne 'Passed' }).Count) { throw "$file has a non-passing result." }
-  $counters = @($trx.SelectNodes('//*[local-name()="Counters"]')); if ($counters.Count -ne 1) { throw "$file Counters cardinality mismatch." }; $k = $counters[0]
-  if ($k.Attributes.Count -ne 16) { throw "$file Counters attribute-count mismatch." }
-  foreach ($n in @('total','executed','passed')) { $x = $k.Attributes.GetNamedItem($n); $v = 0; if ($null -eq $x -or -not [int]::TryParse($x.Value, [ref]$v) -or $v -ne $expected.Count) { throw "$file/$n mismatch." } }
-  foreach ($n in @('failed','error','timeout','aborted','inconclusive','passedButRunAborted','notRunnable','notExecuted','disconnected','warning','completed','inProgress','pending')) { $x = $k.Attributes.GetNamedItem($n); $v = 0; if ($null -eq $x -or -not [int]::TryParse($x.Value, [ref]$v) -or $v -ne 0) { throw "$file/$n mismatch." } }
-  if (@($trx.SelectNodes('//*[local-name()="ResultFiles"]/* | //*[local-name()="CollectorDataEntries"]/* | //*[local-name()="RunInfo"]')).Count) { throw "$file has a diagnostic or attachment." }
-}
-Assert-Trx 'resource.trx' $resource; Assert-Trx 'a.trx' $a; Assert-Trx 'api-ownership.trx' $u; Assert-Trx 'conformance.trx' $a; Assert-Trx 'domain.trx' $domain
-& dotnet format MeAndAI.Protocol.slnx --verify-no-changes --no-restore
-& $pwsh -NoProfile -File tests/protocol.tests.ps1 -StructureOnly
-& $pwsh -NoProfile -File tests/capabilities/publication-evidence/post-publication-evidence.tests.ps1
-$locks = [ordered]@{
-  'src/MeAndAI.Protocol.Domain/packages.lock.json' = '03EEADC5EF377C17F787AB65F41FB4C8A9C936BB7F7F4171111FDEEC8A81CB46'; 'src/MeAndAI.Protocol.Conformance.Abstractions/packages.lock.json' = 'D79FF11818ABFE0B6CA9CAEC111778169AA36A04709BCA3E0EC0AB84325BF799'; 'src/MeAndAI.Protocol.Conformance/packages.lock.json' = '20E6BA80BFB6EDE58228D28560A03B6143F3D163AC5E06720491458FEA9570E7'; 'src/MeAndAI.Protocol.Policy/packages.lock.json' = 'C57F6AFAEBA953E49D3B6D2CB85E82C00E6A40631507426B1616E57B94724309'; 'tests/dotnet/MeAndAI.Protocol.Domain.Tests/packages.lock.json' = 'D2065F11ED7030EE7DFA7A757FBA2A0D420DAC2F32D0105DFA93D3F78F9B00BC'; 'tests/dotnet/MeAndAI.Protocol.Conformance.Tests/packages.lock.json' = 'BA8D8C653CF0CFD2398F9E43F7AB87ED268A9B77EC5FC2E0F81D2BD7849016C0'
-}
-foreach ($x in $locks.GetEnumerator()) { if ((Get-FileHash -LiteralPath $x.Key -Algorithm SHA256).Hash -cne $x.Value) { throw "Lock mismatch: $($x.Key)" } }
-& git diff --check
-Assert-SourceIdentity
-$expectedFiles = @('a.trx','api-ownership.trx','conformance.trx','domain.trx','entry.json','resource.trx')
-function Assert-RootInventory {
-  $items = @(Get-ChildItem -LiteralPath $root -Force)
-  if (@($items | Where-Object { $_.PSIsContainer -or $_ -isnot [IO.FileInfo] -or ($_.Attributes -band [IO.FileAttributes]::ReparsePoint) }).Count) { throw 'V4 evidence root has a non-regular entry.' }
-  [string[]] $actualFiles = @($items | ForEach-Object Name); [Array]::Sort($actualFiles, [StringComparer]::Ordinal)
-  if ($actualFiles.Count -ne $expectedFiles.Count) { throw 'V4 evidence-root inventory count mismatch.' }
-  for ($i = 0; $i -lt $expectedFiles.Count; $i++) { if ($actualFiles[$i] -cne $expectedFiles[$i]) { throw 'V4 evidence-root inventory name mismatch.' } }
-}
-Assert-RootInventory
-$entry['state'] = 'Completed'; $entry['completedUtc'] = [DateTime]::UtcNow.ToString('O')
-$completedText = ($entry | ConvertTo-Json -Compress) + "`n"
-$sealedEntry = $completedText | ConvertFrom-Json -DateKind String
-$names = @($sealedEntry.PSObject.Properties.Name); $expectedNames = @('schema','attempt','expectedHead','state','enteredUtc','completedUtc','pid')
-if ($names.Count -ne $expectedNames.Count) { throw 'V4 completed-entry property count mismatch.' }
-for ($i = 0; $i -lt $expectedNames.Count; $i++) { if ($names[$i] -cne $expectedNames[$i]) { throw 'V4 completed-entry property order mismatch.' } }
-if ([int]$sealedEntry.schema -ne 1 -or [string]$sealedEntry.attempt -cne 'V4' -or [string]$sealedEntry.expectedHead -cne $ExpectedHead -or [string]$sealedEntry.state -cne 'Completed' -or [int]$sealedEntry.pid -ne $PID) { throw 'V4 completed-entry identity mismatch.' }
-$style = [Globalization.DateTimeStyles]::AssumeUniversal -bor [Globalization.DateTimeStyles]::AdjustToUniversal; $pattern = "yyyy-MM-dd'T'HH:mm:ss.fffffff'Z'"; $stamps = @()
-foreach ($name in @('enteredUtc','completedUtc')) { $value = $sealedEntry.$name; $parsed = [DateTimeOffset]::MinValue; if ($value -isnot [string] -or $value -notmatch '^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{7}Z$' -or -not [DateTimeOffset]::TryParseExact($value, $pattern, [Globalization.CultureInfo]::InvariantCulture, $style, [ref]$parsed) -or $value -cne $parsed.UtcDateTime.ToString('O', [Globalization.CultureInfo]::InvariantCulture)) { throw "V4 $name lexical mismatch." }; $stamps += $parsed }
-if ($stamps[1] -lt $stamps[0]) { throw 'V4 completed-entry chronology mismatch.' }
-[IO.File]::WriteAllText($entryPath, $completedText, [Text.UTF8Encoding]::new($false))
-Assert-RootInventory
-$readBack = [IO.File]::ReadAllText($entryPath, [Text.UTF8Encoding]::new($false, $true))
-if ($readBack -cne $completedText) { throw 'V4 completed-entry byte mismatch.' }
-Write-Output ('A-CONVERGE-V4-COMPLETED=' + $root)
-```
+outer admission failure, consumes the attempt. The exact immutable V4 script body
+(identity above) and its final six-file evidence-root inventory are retained by
+the owning convergence ledger; this historical design intentionally omits the
+verbatim copy.
 
 V4 attempt classification is fail closed: absent root means outer/pre-entry
 failure; root without `entry.json` means entry-write failure; a malformed or
@@ -10861,6 +10769,25 @@ green. R=0014 is accepted/immutable; its green is focused `1/1`, C `8/8`, full
 Conformance `51/51`, Domain `98/98`, Release `0/0`, with format/diff,
 StructureOnly, publication evidence, and reviews green.
 
+### `C-EVALUATION-ADVANCE-01` executable freeze
+
+The second Evaluation packet implements only `AdvanceEvaluation`; Evaluate
+remains an integrity failure. It consumes one exact issued plan, admits the
+instruction-digest-bijective proof set, seals static and owner-sharded
+projected outcomes, invokes the target index exactly once after Complete
+aggregate admission, and returns the schema-1 round-1 closure. Zero projected
+demand yields a zero-attempt Complete target outcome and the same single index
+invocation. Cancellation or an index host exception before successful return
+leaves the predecessor retryable; successful return consumes it, and replay or
+foreign/colliding state fails closed. Intent/result and aggregation remain held.
+
+The exact FQN, marker, semantic-null red seam, packet argv, ten-path executable
+allowlist, `1,200/260` caps, one-shot runner custody, and package/cohort green
+gates are normative in the C micro-delivery plan. No Abstractions, Domain,
+Policy, project/package/lock/workflow surface changes. Green advances only to C
+`9/11` and full Conformance `52/52`; it does not activate Results/closure before
+the Evaluation cohort exact-head hosted gate.
+
 ## Internal implementation slices
 
 ContractSlice A's historical delivery is owned by its
@@ -10879,10 +10806,12 @@ ContractSlice C is decomposed by the current
 [C micro-delivery plan](subf-0143-contractslice-c-micro-delivery-plan.md), whose
 design head is hosted green. The three Activation packets and their exact
 cohort head are hosted green; both Applicability packets and their exact cohort
-head are hosted green. Evaluation design is hosted green; Evaluation Plan is
-packet-local `ReviewedLocalGreen` in an unpushed cohort, C is `8/11`, and
-current A+B+C is `51/51`. R=0012/R=0013 are immutable diagnostics and R=0014
-is accepted/immutable. Evaluation Advance is next/`FrozenDesign`.
+head are hosted green. Evaluation design is hosted green; Evaluation Plan and
+Advance are separate packet-local `ReviewedLocalGreen` commits in one unpushed
+cohort, C is `9/11`, and current A+B+C is `52/52`. R=0012/R=0013 are immutable
+diagnostics and R=0014/R=0015 are accepted/immutable. Results/closure remains
+inactive until the Evaluation cohort full local gate, single push, and exact-
+head hosted green.
 
 C implementation and D still require separate packet activation, and no
 packet is active merely from this list. No directive here allocates new stable

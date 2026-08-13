@@ -14,6 +14,12 @@ internal sealed class KernelPlanningSession : IPlanBoundEvidenceSession
         new(ReferenceEqualityComparer.Instance);
     private readonly HashSet<ApplicabilityClosure> _plannedEvaluation =
         new(ReferenceEqualityComparer.Instance);
+    private readonly HashSet<EvaluationPlan> _advancingEvaluation =
+        new(ReferenceEqualityComparer.Instance);
+    private readonly HashSet<EvaluationPlan> _issuedEvaluationPlans =
+        new(ReferenceEqualityComparer.Instance);
+    private readonly HashSet<EvaluationPlan> _advancedEvaluation =
+        new(ReferenceEqualityComparer.Instance);
 
     internal KernelPlanningSession(
         FinalizedPolicyManifest manifest,
@@ -95,12 +101,18 @@ internal sealed class KernelPlanningSession : IPlanBoundEvidenceSession
         }
     }
 
-    internal void CompleteEvaluationPlan(ApplicabilityClosure closure)
+    internal void CompleteEvaluationPlan(
+        ApplicabilityClosure closure,
+        EvaluationAdvanceResult result)
     {
         lock (_stateGate)
         {
             _planningEvaluation.Remove(closure);
             _plannedEvaluation.Add(closure);
+            if (result is EvaluationPlan plan)
+            {
+                _issuedEvaluationPlans.Add(plan);
+            }
         }
     }
 
@@ -109,6 +121,38 @@ internal sealed class KernelPlanningSession : IPlanBoundEvidenceSession
         lock (_stateGate)
         {
             _planningEvaluation.Remove(closure);
+        }
+    }
+
+    internal void BeginEvaluationAdvance(EvaluationPlan plan)
+    {
+        lock (_stateGate)
+        {
+            if (!_issuedEvaluationPlans.Contains(plan) ||
+                _advancedEvaluation.Contains(plan) ||
+                !_advancingEvaluation.Add(plan))
+            {
+                throw new CatalogIntegrityException(
+                    CatalogIntegrityCode.PlanStateInvalid);
+            }
+        }
+    }
+
+    internal void CompleteEvaluationAdvance(EvaluationPlan plan)
+    {
+        lock (_stateGate)
+        {
+            _advancingEvaluation.Remove(plan);
+            _issuedEvaluationPlans.Remove(plan);
+            _advancedEvaluation.Add(plan);
+        }
+    }
+
+    internal void AbandonEvaluationAdvance(EvaluationPlan plan)
+    {
+        lock (_stateGate)
+        {
+            _advancingEvaluation.Remove(plan);
         }
     }
 }

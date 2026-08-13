@@ -109,7 +109,7 @@ internal static class EvaluationPlanningCore
                 return null!;
             }
 
-            session.CompleteEvaluationPlan(closure);
+            session.CompleteEvaluationPlan(closure, result);
             return result;
         }
         catch

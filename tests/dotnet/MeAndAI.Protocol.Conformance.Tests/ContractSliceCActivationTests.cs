@@ -539,7 +539,7 @@ internal sealed class ContractSliceCActivationProof : IPolicyActivationProof
 {
     private readonly FinalizedPolicyManifest _manifest;
     private readonly CompletePolicyPackExport _policy;
-    private readonly IReadOnlyList<IAdmissionProofCandidate> _candidates;
+    private readonly List<IAdmissionProofCandidate> _candidates;
 
     internal ContractSliceCActivationProof(
         FinalizedPolicyManifest manifest,
@@ -558,7 +558,7 @@ internal sealed class ContractSliceCActivationProof : IPolicyActivationProof
                 nameof(candidates));
         }
 
-        _candidates = Array.AsReadOnly(values);
+        _candidates = [.. values];
     }
 
     public string ContractKey => _manifest.ActivationProofContract.ContractKey;
@@ -583,6 +583,23 @@ internal sealed class ContractSliceCActivationProof : IPolicyActivationProof
     public bool Proves(IAdmissionProofCandidate candidate) =>
         candidate is not null &&
         _candidates.Any(item => ReferenceEquals(item, candidate));
+
+    internal void Authorize(IEnumerable<IAdmissionProofCandidate> candidates)
+    {
+        ArgumentNullException.ThrowIfNull(candidates);
+        var values = candidates.ToArray();
+        if (values.Any(candidate => candidate is null) ||
+            values.Concat(_candidates)
+                .Distinct(ReferenceEqualityComparer.Instance).Count() !=
+                values.Length + _candidates.Count)
+        {
+            throw new ArgumentException(
+                "Admission candidates must be new distinct non-null references.",
+                nameof(candidates));
+        }
+
+        _candidates.AddRange(values);
+    }
 }
 
 internal sealed partial class SourceTextModelMirror : IProtocolSemanticModel;

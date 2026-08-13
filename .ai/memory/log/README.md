@@ -11,12 +11,13 @@ ContractSlice A and B are merged/exact-main green; the linked C freeze owns the
 exact B merge and hosted-run closure. B remains
 `11/11`, cumulative A+B `43/43`; its accepted reds and immutable diagnostics
 remain owned by the historical B handoff below. C Activation and Applicability
-are `ExactHeadHostedGreen`; `C-EVALUATION-PLAN-01` is packet-local
-`ReviewedLocalGreen` in an unpushed cohort, C is `8/11`, and current A+B+C is
-`51/51`. R=0006/R=0008/R=0009/R=0010/R=0012/R=0013 are diagnostics/no-success
-and R=0007/R=0011/R=0014 are accepted/immutable. `C-EVALUATION-ADVANCE-01` is
-next/`FrozenDesign`; the parent scenario remains `Planned`, and D/activation
-are held.
+are `ExactHeadHostedGreen`; Evaluation Plan and Evaluation Advance are separate
+packet-local `ReviewedLocalGreen` commits in one unpushed cohort, C is `9/11`,
+and current A+B+C is `52/52`. R=0006/R=0008/R=0009/R=0010/R=0012/R=0013 are
+diagnostics/no-success and R=0007/R=0011/R=0014/R=0015 are accepted/immutable.
+Results/closure remains held until the Evaluation cohort full local gate,
+single push, and exact-head hosted green; the parent scenario remains `Planned`,
+and D/activation are held.
 
 Follow the current
 [instruction-graph capacity handoff](2026-08-09-feat-0069-instruction-graph-capacity.md)
