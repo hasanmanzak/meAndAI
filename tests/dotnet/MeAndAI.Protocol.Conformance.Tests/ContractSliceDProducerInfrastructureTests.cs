@@ -112,7 +112,8 @@ internal static class ContractSliceDProducerInfrastructureFixture
                 registration.Evaluator.EvaluateApplicability(
                     applicability, CancellationToken.None).Kind);
             if (registration.Declaration.RuleId.Value is
-                "RULE-0001" or "RULE-0002" or "RULE-0003" or "RULE-0004")
+                "RULE-0001" or "RULE-0002" or "RULE-0003" or "RULE-0004" or
+                "RULE-0005")
             {
                 Assert.Throws<OperationCanceledException>(() =>
                     registration.Evaluator.Evaluate(

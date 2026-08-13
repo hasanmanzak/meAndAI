@@ -445,4 +445,167 @@ internal sealed class StableFragmentRuleEvaluator : InitialRuleEvaluator
     }
 }
 
-internal sealed class CommitPermalinkRuleEvaluator : InitialRuleEvaluator;
+internal sealed class CommitPermalinkRuleEvaluator : InitialRuleEvaluator
+{
+    private const string RepositorySlot =
+        "protocol.slot.repository-governed-text";
+    private const string ProviderSlot =
+        "protocol.slot.provider-governed-text";
+    private const string TargetSlot =
+        "protocol.slot.repository-target-resolution";
+
+    public override EvaluationIntent Evaluate(
+        RuleEvaluationInput input,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(input);
+        cancellationToken.ThrowIfCancellationRequested();
+        var governedSlot = input.Profile.Surfaces.Values.Contains(
+            MeAndAI.Protocol.Domain.SurfaceKind.Repository)
+            ? RepositorySlot
+            : ProviderSlot;
+        var references = input.GetCapability<IGovernedReferenceIndex>(
+            governedSlot);
+        var targets = input.GetCapability<IRepositoryTargetResolutionIndex>(
+            TargetSlot);
+        var context = input.GetContextProof(governedSlot);
+        var findings = new List<FindingIntent>();
+        var failures = new List<EvaluationFailureIntent>();
+
+        foreach (var reference in references.References)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            if (!reference.Kind.Equals(GovernedReferenceKind.Commit))
+            {
+                continue;
+            }
+
+            var overlays = targets.Targets.Where(item =>
+                ReferenceEquals(item.Reference, reference.Reference)).ToArray();
+            if (overlays.Length > 1)
+            {
+                failures.Add(Failure(
+                    "protocol.evaluator.reference-ambiguity",
+                    reference,
+                    context,
+                    overlays));
+                continue;
+            }
+
+            var overlay = overlays.SingleOrDefault();
+            if (overlay is not null &&
+                !reference.Resolution.Equals(
+                    GovernedReferenceResolution.ExternalEvidenceRequired) &&
+                !reference.Resolution.Equals(overlay.Resolution))
+            {
+                failures.Add(Failure(
+                    "protocol.evaluator.commit-intent-ambiguity",
+                    reference,
+                    context,
+                    overlays));
+                continue;
+            }
+
+            var resolution = overlay?.Resolution ?? reference.Resolution;
+            var code = Finding(reference, resolution, overlay is not null);
+            if (code is not null)
+            {
+                findings.Add(FindingIntent.Create(
+                    FindingCode.Parse(code),
+                    reference.Reference,
+                    Related(reference, context, overlays)));
+            }
+        }
+
+        return EvaluationIntent.Create(findings, failures);
+    }
+
+    private static EvaluationFailureIntent Failure(
+        string code,
+        GovernedReferenceView reference,
+        QualifiedEvidenceHandle context,
+        IEnumerable<RepositoryTargetResolutionView> overlays) =>
+        EvaluationFailureIntent.Create(
+            EvaluationFailureCode.Parse(code),
+            reference.Reference,
+            Related(reference, context, overlays));
+
+    private static string? Finding(
+        GovernedReferenceView reference,
+        GovernedReferenceResolution resolution,
+        bool hasOverlay)
+    {
+        if (!reference.Syntax.Equals(GovernedReferenceSyntax.Clickable) ||
+            reference.OwningRepositoryIdentity is null ||
+            !IsObjectId(reference.CommitObjectId))
+        {
+            return "protocol.commit-reference.not-permalink";
+        }
+
+        if (resolution.Equals(
+                GovernedReferenceResolution.ExternalEvidenceRequired) &&
+            !hasOverlay)
+        {
+            return null;
+        }
+
+        if (resolution.Equals(GovernedReferenceResolution.WrongRepository))
+        {
+            return "protocol.commit-reference.wrong-repository";
+        }
+
+        if (resolution.Equals(GovernedReferenceResolution.Unresolved))
+        {
+            return "protocol.commit-reference.unresolved";
+        }
+
+        if (resolution.Equals(GovernedReferenceResolution.WrongObject))
+        {
+            return "protocol.commit-reference.wrong-object";
+        }
+
+        return null;
+    }
+
+    private static bool IsObjectId(string? value) =>
+        value is { Length: 40 } && value.All(character =>
+            character is >= '0' and <= '9' or >= 'a' and <= 'f');
+
+    private static IReadOnlyList<QualifiedEvidenceHandle> Related(
+        GovernedReferenceView reference,
+        QualifiedEvidenceHandle context,
+        IEnumerable<RepositoryTargetResolutionView> overlays)
+    {
+        var values = new List<QualifiedEvidenceHandle> { context };
+        if (reference.Target is not null)
+        {
+            values.Add(reference.Target);
+        }
+
+        foreach (var overlay in overlays)
+        {
+            values.Add(overlay.ResolutionEvidence);
+            if (overlay.Commit is not null)
+            {
+                values.Add(overlay.Commit);
+            }
+
+            if (overlay.Target is not null)
+            {
+                values.Add(overlay.Target);
+            }
+        }
+
+        var distinct = new List<QualifiedEvidenceHandle>();
+        foreach (var value in values.Where(value =>
+                     !ReferenceEquals(value, reference.Reference)))
+        {
+            if (!distinct.Any(existing => ReferenceEquals(existing, value)))
+            {
+                distinct.Add(value);
+            }
+        }
+
+        return distinct;
+    }
+}

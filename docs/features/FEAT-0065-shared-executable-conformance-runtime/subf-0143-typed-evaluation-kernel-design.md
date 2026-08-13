@@ -3,14 +3,14 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted; ContractSlice A, B, and C are merged/exact-main green. D Policy activation, real producer infrastructure, and the first-rules cohort are `ExactHeadHostedGreen`; RULE-0003 and RULE-0004 are `ReviewedLocalGreen`. D is `8/11` and cumulative A+B+C+D/full Conformance is `62/62`; the specialized-rules cohort is local `2/3` with push held and RULE-0005 next/inactive. [TEST-0210](test-cases.md#test-0210) remains `Planned`; final activation and DoD remain held. |
+| Status | Gate 2 accepted; ContractSlice A, B, and C are merged/exact-main green. D Policy activation, real producer infrastructure, and the first-rules cohort are `ExactHeadHostedGreen`; RULE-0003 through RULE-0005 are `ReviewedLocalGreen`. D is `9/11` and cumulative A+B+C+D/full Conformance is `63/63`; the specialized-rules cohort is local `3/3` with its single push pending and equivalence/closure inactive. [TEST-0210](test-cases.md#test-0210) remains `Planned`; final activation and DoD remain held. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Test | [TEST-0210](test-cases.md#test-0210) |
 | Gate 3 micro-delivery routing | Historical A, B, and C delivery remains owned by their micro plans. Current prospective routing is the [ContractSlice D micro-delivery plan](subf-0143-contractslice-d-micro-delivery-plan.md); packet labels refine delivery but activate no executable work. |
 | Exact-main design baseline | Accepted A merge commit [`51623f4d404a95e0f706d72805cf7ddbbbd293b8`](https://github.com/hasanmanzak/meAndAI/commit/51623f4d404a95e0f706d72805cf7ddbbbd293b8), validated by exact-main [run 31304787603](https://github.com/hasanmanzak/meAndAI/actions/runs/31304787603) |
-| Design and Gate 3 authority | Historical A/B/C directives, accepted reds, diagnostics, and hosted evidence remain immutable. D Policy activation, producer infrastructure, and first-rules cohort are `ExactHeadHostedGreen`; RULE-0003 and RULE-0004 are `ReviewedLocalGreen`, RULE-0005 is next/inactive, and later closure, final activation, merge, release, and publication remain held. |
+| Design and Gate 3 authority | Historical A/B/C directives, accepted reds, diagnostics, and hosted evidence remain immutable. D Policy activation, producer infrastructure, and first-rules cohort are `ExactHeadHostedGreen`; RULE-0003 through RULE-0005 are `ReviewedLocalGreen`, the specialized-rules single push is pending, and equivalence/closure, final activation, merge, release, and publication remain held. |
 | Completed predecessor | [SUBF-0153](README.md#subf-0153) / [TEST-0221](test-cases.md#test-0221), merged through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173) and exact-main validated by [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) |
 
 ## Directive and hard boundary
@@ -10942,6 +10942,28 @@ normalized C# lines. All indexes, parsers, codecs, public declarations, locks,
 projects/workflows, other rules, and held surfaces remain frozen. Canonical red
 is one fresh common Release `--no-build` invocation, immutable after commitment;
 green is focused `1/1`, D `8/8`, and full Conformance `62/62`.
+
+### `D-RULE-0005-01` executable freeze
+
+The packet-local RULE-0005 contract in the D micro-plan is normative. Exact
+local predecessor
+[`e1117ad98e27e32aea4f581f75c2c6ed9eb63d23`](https://github.com/hasanmanzak/meAndAI/commit/e1117ad98e27e32aea4f581f75c2c6ed9eb63d23)
+activates one direct Fact and marker `TEST-0210-D-BEHAVIOR-RED-0007`; no
+intermediate push is allowed. Only Commit rows are specialized. Link syntax
+or absent exact full-lowercase-40-hex identity precedes WrongRepository,
+Unresolved, WrongObject, then Exact. Missing external overlay is NotEvaluated;
+wrong containing target remains RULE-0003-owned. Reference ambiguity and
+inconsistent qualified commit intent use their separate declared failures.
+Primary/related evidence order and independent RULE-0003 co-reporting remain
+exact.
+
+Only `PolicyRuleEvaluators.cs`, the retained evaluator test, and the retained
+infrastructure staging assertion may change, within `700` normalized C# lines.
+Public declarations, indexes, parsers, codecs, locks, projects/workflows,
+other rules, and held surfaces remain frozen. Canonical red is one fresh common
+Release `--no-build` invocation and never reruns after commitment; green is
+focused `1/1`, D `9/9`, and full Conformance `63/63`, followed by the complete
+specialized-cohort local gate and one push of all three focused commits.
 
 ### `C-EVALUATION-PLAN-01` executable freeze
 

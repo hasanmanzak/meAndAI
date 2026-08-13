@@ -12,6 +12,7 @@ public sealed class ContractSliceDPolicyEvaluatorTests
     private const string Rule2Marker = "TEST-0210-D-BEHAVIOR-RED-0004";
     private const string Rule3Marker = "TEST-0210-D-BEHAVIOR-RED-0005";
     private const string Rule4Marker = "TEST-0210-D-BEHAVIOR-RED-0006";
+    private const string Rule5Marker = "TEST-0210-D-BEHAVIOR-RED-0007";
 
     [Fact]
     [Trait("ContractSlice", "D")]
@@ -84,6 +85,24 @@ public sealed class ContractSliceDPolicyEvaluatorTests
         Assert.True(evidence.ExactReferences);
         Assert.True(evidence.CancellationClosed);
     }
+
+    [Fact]
+    [Trait("ContractSlice", "D")]
+    public void Evaluates_rule_0005_with_exact_commit_specialization_and_co_report()
+    {
+        ContractSliceDPolicyEvaluatorEvidence? evidence =
+            ContractSliceDPolicyEvaluatorFixture.EvaluateRule0005(
+                InitialRuleQualificationPolicy.Export);
+        if (evidence is null)
+        {
+            Assert.Fail(Rule5Marker);
+        }
+
+        Assert.Equal(5, evidence.ExercisedFindings);
+        Assert.Equal(11, evidence.ExercisedFixtures);
+        Assert.True(evidence.ExactReferences);
+        Assert.True(evidence.CancellationClosed);
+    }
 }
 
 internal sealed record ContractSliceDPolicyEvaluatorEvidence(
@@ -105,6 +124,7 @@ internal static class ContractSliceDPolicyEvaluatorFixture
     private const string Rule2 = "RULE-0002";
     private const string Rule3 = "RULE-0003";
     private const string Rule4 = "RULE-0004";
+    private const string Rule5 = "RULE-0005";
     private const string RepositoryGovernedSlot =
         "protocol.slot.repository-governed-text";
     private const string ProviderGovernedSlot =
@@ -515,6 +535,108 @@ internal static class ContractSliceDPolicyEvaluatorFixture
             cases.All(item => item.CancellationClosed));
     }
 
+    internal static ContractSliceDPolicyEvaluatorEvidence? EvaluateRule0005(
+        PolicyQualificationSliceExport export)
+    {
+        ArgumentNullException.ThrowIfNull(export);
+        var nonClickableReference = Reference(
+            GovernedReferenceKind.Commit,
+            GovernedReferenceSyntax.NonClickable,
+            GovernedReferenceResolution.Exact);
+        var nonClickable = EvaluateReference(
+            export, nonClickableReference, rule: Rule5);
+        if (nonClickable.Intent.Findings.Count == 0)
+        {
+            return null;
+        }
+
+        AssertReferenceFinding(
+            nonClickable, "protocol.commit-reference.not-permalink");
+        var common = EvaluateReference(export, nonClickableReference);
+        AssertReferenceFinding(common, "protocol.reference.not-clickable");
+        var missingForm = EvaluateReference(export, Reference(
+            GovernedReferenceKind.Commit,
+            GovernedReferenceSyntax.Clickable,
+            GovernedReferenceResolution.Exact,
+            omitCommit: true), rule: Rule5);
+        AssertReferenceFinding(
+            missingForm, "protocol.commit-reference.not-permalink");
+        var wrongRepository = EvaluateReference(export, Reference(
+            GovernedReferenceKind.Commit,
+            GovernedReferenceSyntax.Clickable,
+            GovernedReferenceResolution.WrongRepository), rule: Rule5);
+        AssertReferenceFinding(
+            wrongRepository, "protocol.commit-reference.wrong-repository");
+        var unresolved = EvaluateReference(export, Reference(
+            GovernedReferenceKind.Commit,
+            GovernedReferenceSyntax.Clickable,
+            GovernedReferenceResolution.Unresolved), rule: Rule5);
+        AssertReferenceFinding(
+            unresolved, "protocol.commit-reference.unresolved");
+        var wrongObject = EvaluateReference(export, Reference(
+            GovernedReferenceKind.Commit,
+            GovernedReferenceSyntax.Clickable,
+            GovernedReferenceResolution.WrongObject), rule: Rule5);
+        AssertReferenceFinding(
+            wrongObject, "protocol.commit-reference.wrong-object");
+        var exact = EvaluateReference(export, Reference(
+            GovernedReferenceKind.Commit,
+            GovernedReferenceSyntax.Clickable,
+            GovernedReferenceResolution.Exact), rule: Rule5);
+        AssertReferenceFinding(exact);
+        var external = EvaluateReference(export, Reference(
+            GovernedReferenceKind.Commit,
+            GovernedReferenceSyntax.Clickable,
+            GovernedReferenceResolution.ExternalEvidenceRequired), rule: Rule5);
+        AssertReferenceFinding(external);
+        var qualified = EvaluateReference(export, Reference(
+            GovernedReferenceKind.Commit,
+            GovernedReferenceSyntax.Clickable,
+            GovernedReferenceResolution.ExternalEvidenceRequired),
+            GovernedReferenceResolution.Exact,
+            provider: true,
+            rule: Rule5);
+        AssertReferenceFinding(qualified);
+        var wrongTarget = EvaluateReference(export, Reference(
+            GovernedReferenceKind.Commit,
+            GovernedReferenceSyntax.Clickable,
+            GovernedReferenceResolution.WrongTarget), rule: Rule5);
+        AssertReferenceFinding(wrongTarget);
+        var referenceAmbiguity = EvaluateReference(export, Reference(
+            GovernedReferenceKind.Commit,
+            GovernedReferenceSyntax.Clickable,
+            GovernedReferenceResolution.ExternalEvidenceRequired),
+            GovernedReferenceResolution.Exact,
+            rule: Rule5,
+            secondOverlay: GovernedReferenceResolution.Exact);
+        Assert.Empty(referenceAmbiguity.Intent.Findings);
+        Assert.Equal(
+            "protocol.evaluator.reference-ambiguity",
+            Assert.Single(referenceAmbiguity.Intent.Failures).Code.Value);
+        var intentAmbiguity = EvaluateReference(export, Reference(
+            GovernedReferenceKind.Commit,
+            GovernedReferenceSyntax.Clickable,
+            GovernedReferenceResolution.WrongRepository),
+            GovernedReferenceResolution.Exact,
+            rule: Rule5);
+        Assert.Empty(intentAmbiguity.Intent.Findings);
+        Assert.Equal(
+            "protocol.evaluator.commit-intent-ambiguity",
+            Assert.Single(intentAmbiguity.Intent.Failures).Code.Value);
+
+        var cases = new[]
+        {
+            nonClickable, missingForm, wrongRepository, unresolved, wrongObject,
+            exact, external, qualified, wrongTarget, referenceAmbiguity,
+            intentAmbiguity,
+        };
+        return new(
+            cases.Sum(item => item.Intent.Findings.Count),
+            cases.Length,
+            cases.All(item => item.ExactReferences),
+            cases.All(item => item.CancellationClosed));
+    }
+
     private static ReferenceCase EvaluateReference(
         PolicyQualificationSliceExport export,
         GovernedReferenceView reference,
@@ -604,7 +726,9 @@ internal static class ContractSliceDPolicyEvaluatorFixture
         GovernedReferenceKind kind,
         GovernedReferenceSyntax syntax,
         GovernedReferenceResolution resolution,
-        string? path = "docs/decisions/DEC-0001.md")
+        string? path = "docs/decisions/DEC-0001.md",
+        string? owner = Owner,
+        bool omitCommit = false)
     {
         var reference = QualifiedEvidenceHandle.Create();
         var target = QualifiedEvidenceHandle.Create();
@@ -612,8 +736,10 @@ internal static class ContractSliceDPolicyEvaluatorFixture
             kind,
             syntax,
             resolution,
-            Owner,
-            kind.Equals(GovernedReferenceKind.Commit) ? ObjectIdentity : null,
+            owner,
+            kind.Equals(GovernedReferenceKind.Commit) && !omitCommit
+                ? ObjectIdentity
+                : null,
             null,
             null,
             path,

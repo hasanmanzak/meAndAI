@@ -316,7 +316,7 @@ The lifecycle records-only freeze head is exact-hosted-green: Ubuntu passed in
 `20m44s`, Windows in `46m51s`, and publication verification was correctly
 skipped. The exact lifecycle implementation identity recorded in the canonical
 handoff passed Ubuntu in `19m36s` and Windows in `36m02s`; publication verification was
-correctly skipped. ContractSlice A, B, and C are merged/exact-main green; C is `11/11`. Policy activation, real producer infrastructure, and the first-rules cohort are `ExactHeadHostedGreen`; `D-RULE-0003-01` and `D-RULE-0004-01` are `ReviewedLocalGreen`; D is `8/11` and A+B+C+D/full Conformance is `62/62`. The specialized-rules cohort is local `2/3` with push held; RULE-0005 is next/inactive, and the parent scenario and final activation remain held.
+correctly skipped. ContractSlice A, B, and C are merged/exact-main green; C is `11/11`. Policy activation, real producer infrastructure, and the first-rules cohort are `ExactHeadHostedGreen`; `D-RULE-0003-01` through `D-RULE-0005-01` are `ReviewedLocalGreen`; D is `9/11` and A+B+C+D/full Conformance is `63/63`. The specialized-rules cohort is local `3/3` with its single push pending; equivalence/closure remains inactive, and the parent scenario and final activation remain held.
 The exact record-delivery closure reached the full `4096/4096` instruction-graph
 budget. Ubuntu passed in `19m52s`; Windows reached its exact 45-minute job
 ceiling after every emitted suite result was successful. The bounded correction
