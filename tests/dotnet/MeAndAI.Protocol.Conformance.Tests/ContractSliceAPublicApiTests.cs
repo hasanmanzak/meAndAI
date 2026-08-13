@@ -192,7 +192,7 @@ public sealed class ContractSliceAPublicApiTests
         Assert.Equal("canonicalBytes", canonicalBytes.Name);
         Assert.Equal(typeof(ReadOnlyMemory<byte>), canonicalBytes.ParameterType);
 
-        var forbiddenRegistrationMembers = new[]
+        var internalRegistrationMembers = new[]
         {
             "CodecRegistrations",
             "DemandProjectorRegistrations",
@@ -208,39 +208,26 @@ public sealed class ContractSliceAPublicApiTests
                  })
         {
             var export = RequireType(abstractions, exportName);
-            Assert.DoesNotContain(
-                export.GetProperties(DeclaredNonPublic),
-                property => forbiddenRegistrationMembers.Contains(
-                    property.Name,
-                    StringComparer.Ordinal));
-            Assert.DoesNotContain(
+            Assert.Equal(
+                internalRegistrationMembers,
+                export.GetProperties(DeclaredNonPublic)
+                    .Where(property => internalRegistrationMembers.Contains(
+                        property.Name,
+                        StringComparer.Ordinal))
+                    .Select(property => property.Name)
+                    .Order(StringComparer.Ordinal));
+            Assert.All(
+                export.GetProperties(DeclaredNonPublic)
+                    .Where(property => internalRegistrationMembers.Contains(
+                        property.Name,
+                        StringComparer.Ordinal)),
+                property => Assert.True(property.GetMethod?.IsAssembly));
+            var create = Assert.Single(
                 export.GetMethods(DeclaredNonPublic),
                 method => method.IsStatic && method.Name == "Create");
+            Assert.True(create.IsAssembly);
         }
 
-        foreach (var forbiddenType in new[]
-                 {
-                     "IDemandProjectorRegistration",
-                     "IIndexRegistration",
-                     "IParserRegistration",
-                     "ISelectorRegistration",
-                     "RuleEvaluatorRegistration",
-                 })
-        {
-            Assert.Null(abstractions.GetType(
-                $"MeAndAI.Protocol.Conformance.Abstractions.{forbiddenType}",
-                throwOnError: false,
-                ignoreCase: false));
-        }
-
-        Assert.Null(conformance.GetType(
-            "MeAndAI.Protocol.Conformance.CatalogSliceKernel",
-            throwOnError: false,
-            ignoreCase: false));
-        Assert.Null(conformance.GetType(
-            "MeAndAI.Protocol.Conformance.ConformanceKernel",
-            throwOnError: false,
-            ignoreCase: false));
         Assert.Null(policy.GetType(
             "MeAndAI.Protocol.Policy.InitialRuleQualificationPolicy",
             throwOnError: false,

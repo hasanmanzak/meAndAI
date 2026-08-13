@@ -6,22 +6,19 @@ and follow its canonical links.
 ## Current continuation
 
 Follow the current
-[ContractSlice B codec-activation and wire handoff](2026-08-09-feat-0065-subf-0143-contractslice-b-codec-activation-freeze.md).
-ContractSlice A is merged/exact-main green; `B-SURFACE-01` and
-`B-CODEC-ACTIVATION-01` plus `B-WIRE-REPOSITORY-TREE-01` are exact-head hosted
-green. `B-WIRE-GOVERNED-TEXT-01` is exact-head hosted green;
-Repository-target R=0004 is an immutable oracle-rejected diagnostic with no
-canonical red. Canonical R=0005 is accepted and repository-target is exact-head
-hosted green; its owning B wire ledger retains exact implementation/run custody.
-B-RESOURCE R=0006 is accepted, immutable, and exact-head hosted green. Cache
-R=0007 is accepted/immutable and B-CACHE plus B-ADMISSION are exact-head hosted
-green. Admission R=0008, R=0009, and R=0010 are immutable diagnostic/no-success
-attempts; canonical R=0011 and sealed-context R=0012 are accepted/immutable,
-  and B-SEALED-CONTEXT is exact-head hosted green. Codec-derivation R=0013 is an
-  immutable infrastructure diagnostic/no-success; corrected R=0014 is accepted,
-  immutable, and exact-head hosted green. B is `11/11`, cumulative A+B `43/43`;
-  B-CONVERGE pure audit is complete locally with final-sync exact-head hosted
-  pending. The parent scenario remains `Planned`.
+[ContractSlice C design freeze](2026-08-12-feat-0065-subf-0143-contractslice-c-design-freeze.md).
+ContractSlice A and B are merged/exact-main green; the linked C freeze owns the
+exact B merge and hosted-run closure. B remains
+`11/11`, cumulative A+B `43/43`; its accepted reds and immutable diagnostics
+remain owned by the historical B handoff below. C Activation and Applicability
+and Evaluation are `ExactHeadHostedGreen`; C is `11/11`, and current A+B+C/full
+Conformance is `54/54`. R=0006/R=0008/R=0009/R=0010/R=0012/R=0013/R=0016 are
+diagnostics/no-success and R=0007/R=0011/R=0014/R=0015/R=0017 are
+accepted/immutable; R=0018 is also accepted/immutable. The Results/closure
+cohort is locally validated through three separate `ReviewedLocalGreen` commits;
+`C-CONVERGE-01` records local `CompletionRecommended` while the cohort exact-head
+hosted gate is pending. The parent scenario remains `Planned`, and D/activation
+are held.
 
 Follow the current
 [instruction-graph capacity handoff](2026-08-09-feat-0069-instruction-graph-capacity.md)

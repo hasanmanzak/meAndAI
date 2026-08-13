@@ -2,8 +2,26 @@ namespace MeAndAI.Protocol.Conformance.Abstractions;
 
 internal interface IProtocolSemanticModel;
 
-internal interface ICanonicalPayloadCodec<TModel>
-    where TModel : class, IProtocolSemanticModel;
+internal interface ICanonicalPayloadCodec<TModel> :
+    ISemanticResourceMeter<CodecQualificationInput, TModel>
+    where TModel : class, IProtocolSemanticModel
+{
+    CanonicalPayloadWriteIntent Write(
+        CanonicalPayloadWriteInput input,
+        CancellationToken cancellationToken) =>
+        throw new NotSupportedException("The registered codec does not implement writing.");
+
+    CodecQualificationIntent<TModel> Qualify(
+        CodecQualificationInput input,
+        CancellationToken cancellationToken) =>
+        throw new NotSupportedException("The registered codec does not implement qualification.");
+
+    SemanticResourceLocalUsage ISemanticResourceMeter<CodecQualificationInput, TModel>.MeasureLocal(
+        CodecQualificationInput input,
+        TModel value,
+        CancellationToken cancellationToken) =>
+        throw new NotSupportedException("The registered codec does not implement resource metering.");
+}
 
 internal sealed class ModelTypeToken<TModel>
     where TModel : class, IProtocolSemanticModel
