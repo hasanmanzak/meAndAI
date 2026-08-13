@@ -14,6 +14,15 @@ public sealed class FindingIntent
         RelatedReferences = DeclarationValidation.Snapshot(
             relatedReferences,
             nameof(relatedReferences));
+        if (RelatedReferences.Any(reference =>
+                ReferenceEquals(reference, primaryReference)) ||
+            RelatedReferences.Distinct(ReferenceEqualityComparer.Instance).Count() !=
+                RelatedReferences.Count)
+        {
+            throw new ArgumentException(
+                "Related references must be distinct and must not repeat the primary reference.",
+                nameof(relatedReferences));
+        }
     }
 
     public FindingCode Code { get; }

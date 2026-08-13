@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Gate 2 micro-delivery plan and design freeze |
-| State | Initial design, Activation, Applicability, and Evaluation cohorts `ExactHeadHostedGreen`; C `9/11`, current A+B+C `52/52`; R=0006/R=0008/R=0009/R=0010/R=0012/R=0013/R=0016 diagnostic/no-success, R=0007/R=0011/R=0014/R=0015 accepted/immutable; corrected `C-INTENT-RESULT-01` `FrozenDesign`/inactive with R=0017 pending this corrected records/design head becoming exact-head hosted green; parent scenario held |
+| State | Initial design, Activation, Applicability, and Evaluation cohorts `ExactHeadHostedGreen`; C `10/11`, current A+B+C `53/53`; R=0006/R=0008/R=0009/R=0010/R=0012/R=0013/R=0016 diagnostic/no-success, R=0007/R=0011/R=0014/R=0015/R=0017 accepted/immutable; `C-INTENT-RESULT-01` `ReviewedLocalGreen` in its separate unpushed commit, with `C-AGGREGATION-01` next/`FrozenDesign`; parent scenario held |
 | Parent | Owning feature and current subfeature |
 | Scenario | [TEST-0210](test-cases.md#test-0210), retained `Planned` |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
@@ -675,9 +675,10 @@ traceability loss was observed.
 
 ## Frozen `C-INTENT-RESULT-01` packet boundary
 
-This is the sole next Results/closure packet. It remains `FrozenDesign` and
-inactive until the focused commit containing this exact twelve-record design
-cohort is pushed and exact-head hosted green. Its one direct Fact/FQN is
+This Results/closure predecessor is `ReviewedLocalGreen` in its separate
+unpushed commit after the corrected twelve-record design cohort became
+exact-head hosted green. `C-AGGREGATION-01` is the sole next frozen packet and
+cannot start until this focused intent commit exists. The intent packet's one direct Fact/FQN is
 `MeAndAI.Protocol.Conformance.Tests.ContractSliceCIntentTests.Mints_exact_intents_findings_and_failures`,
 with only `ContractSlice=C`, no Scenario/Theory/class trait, and marker
 `TEST-0210-C-BEHAVIOR-RED-0008`.
@@ -799,6 +800,18 @@ node, executable source, project, package, lock, or workflow surface. Fresh
 design, evidence/scope, traceability, schema-2 graph, StructureOnly, and
 publication-evidence gates must pass before its focused commit, single push,
 and exact-head hosted design gate.
+
+Corrected design head [`01ac59bf72226493e0d929ce7c681b7160073abd`](https://github.com/hasanmanzak/meAndAI/commit/01ac59bf72226493e0d929ce7c681b7160073abd)
+passed exact-head Ubuntu/Windows validation with publication verification
+skipped. Canonical R=0017 is accepted and immutable: its sole child exited `1`,
+the runner exited `0`, and the exact one-result TRX passed the frozen marker,
+identity, counter, diagnostic, attachment, source, binary, lock, and custody
+oracles. The bounded green source is `896/2,400` changed lines and its owning
+test is `299/900`; focused `1/1`, C `10/10`, full Conformance `53/53`, Domain
+`98/98`, warning/error-free Release build, format, locks, and diff are green.
+Exact artifact hashes and final package-local structural/review evidence are
+owned by the C evidence ledger. R=0017 is never rerun, and no package-hosted
+claim is made.
 
 ## Deferred ContractSlice D cohort plan
 

@@ -143,9 +143,11 @@ public sealed class ContractSliceCApplicabilityClosureTests
 
     internal static ClosureFixture CreateFixture(
         bool terminalizeEvaluationRule = false,
-        bool evaluationReady = false)
+        bool evaluationReady = false,
+        IReadOnlyDictionary<string,
+            Func<RuleEvaluationInput, EvaluationIntent>>? evaluationByRule = null)
     {
-        var source = ContractSliceCActivationTests.CreateFixture();
+        var source = ContractSliceCActivationTests.CreateFixture(evaluationByRule);
         var sourceTree = source.Export.Catalog.Rules[0].EvaluationSlots.Single();
         var tree = EvidenceSlotDeclaration.Create(
             sourceTree.SlotKey,
@@ -160,6 +162,25 @@ public sealed class ContractSliceCApplicabilityClosureTests
                 evaluation: rule.EvaluationSlots.Select(slot =>
                     slot.SlotKey == sourceTree.SlotKey ? tree : slot)))
             .ToArray();
+        if (evaluationByRule is not null)
+        {
+            var declaration = rules[1].Findings.Single(finding =>
+                finding.Code.Equals(FindingCode.Parse(
+                    "protocol.decision.record-missing")));
+            var extended = FindingDeclaration.Create(
+                declaration.Code,
+                declaration.Severity,
+                declaration.Remediation,
+                declaration.AllowedPrimaryReferenceKinds
+                    .Append(QualifiedEvidenceReferenceKind.ContextProof)
+                    .Distinct(),
+                declaration.AllowedRelatedReferenceKinds);
+            rules[1] = CloneRule(
+                rules[1],
+                findings: rules[1].Findings.Select(finding =>
+                    finding.Code.Equals(declaration.Code) ? extended : finding));
+        }
+
         rules[2] = CloneRule(rules[2], [tree]);
         rules[3] = CloneRule(rules[3], [tree]);
         var evaluationSlots = rules
@@ -175,6 +196,19 @@ public sealed class ContractSliceCApplicabilityClosureTests
             rules[4],
             applicability: evaluationReady ? [tree] : rules[4].EvaluationSlots,
             evaluation: evaluationReady ? evaluationSlots : rules[4].EvaluationSlots);
+        var profiles = evaluationByRule is null
+            ? source.Export.Catalog.NamedProfiles
+            : source.Export.Catalog.NamedProfiles.Select(profile =>
+                NamedProfileDeclaration.Create(
+                    profile.Name,
+                    ExecutionProfile.Create(
+                        profile.Axes.SubjectRole,
+                        profile.Axes.Operation,
+                        profile.Axes.SnapshotKind,
+                        SurfaceSet.Create(
+                            [SurfaceKind.Repository, SurfaceKind.Provider]),
+                        profile.Axes.EnforcementPhase),
+                    rules.Select(rule => rule.RuleId))).ToArray();
         var catalog = CompleteCatalogDeclaration.Create(
             source.Export.Catalog.ProtocolVersion,
             source.Export.Catalog.CatalogVersion,
@@ -182,24 +216,34 @@ public sealed class ContractSliceCApplicabilityClosureTests
             source.Export.Catalog.BaselineProfileName,
             rules,
             source.Export.Catalog.Transitions,
-            source.Export.Catalog.NamedProfiles);
+            profiles);
         var evaluators = new RuleEvaluatorRegistration[]
         {
-            RuleEvaluatorRegistration.Create(rules[0], new Rule0001EvaluatorMirror()),
-            RuleEvaluatorRegistration.Create(rules[1], new Rule0002EvaluatorMirror()),
+            RuleEvaluatorRegistration.Create(
+                rules[0],
+                new Rule0001EvaluatorMirror(
+                    evaluation: Evaluation(evaluationByRule, rules[0]))),
+            RuleEvaluatorRegistration.Create(
+                rules[1],
+                new Rule0002EvaluatorMirror(
+                    evaluation: Evaluation(evaluationByRule, rules[1]))),
             RuleEvaluatorRegistration.Create(rules[2], new Rule0003EvaluatorMirror(
                 input => ApplicabilityIntent.NotApplicable(
-                    [input.GetContextProof(tree.SlotKey)]))),
+                    [input.GetContextProof(tree.SlotKey)]),
+                Evaluation(evaluationByRule, rules[2]))),
             RuleEvaluatorRegistration.Create(rules[3], new Rule0004EvaluatorMirror(
                 input => ApplicabilityIntent.Unresolved(
-                    [input.GetContextProof(tree.SlotKey)]))),
+                    [input.GetContextProof(tree.SlotKey)]),
+                Evaluation(evaluationByRule, rules[3]))),
             RuleEvaluatorRegistration.Create(
                 rules[4],
                 terminalizeEvaluationRule
                     ? new Rule0005EvaluatorMirror(input =>
                         ApplicabilityIntent.Unresolved(
-                            [input.GetContextProof(tree.SlotKey)]))
-                    : new Rule0005EvaluatorMirror()),
+                            [input.GetContextProof(tree.SlotKey)]),
+                        Evaluation(evaluationByRule, rules[4]))
+                    : new Rule0005EvaluatorMirror(
+                        evaluation: Evaluation(evaluationByRule, rules[4]))),
         };
         var export = CompletePolicyPackExport.Create(
             source.Export.ExportKey,
@@ -287,7 +331,8 @@ public sealed class ContractSliceCApplicabilityClosureTests
     private static RuleDeclaration CloneRule(
         RuleDeclaration rule,
         IEnumerable<EvidenceSlotDeclaration>? applicability = null,
-        IEnumerable<EvidenceSlotDeclaration>? evaluation = null) =>
+        IEnumerable<EvidenceSlotDeclaration>? evaluation = null,
+        IEnumerable<FindingDeclaration>? findings = null) =>
         RuleDeclaration.Create(
             rule.RuleId,
             rule.RuleRevision,
@@ -303,12 +348,21 @@ public sealed class ContractSliceCApplicabilityClosureTests
             rule.Surfaces,
             rule.SnapshotKinds,
             rule.Operations,
-            rule.Findings,
+            findings ?? rule.Findings,
             rule.EvaluationFailureCodes,
             rule.IntroducedIn,
             rule.DeprecatedIn,
             rule.RetiredIn,
             rule.CompatibilityAliases);
+
+    private static Func<RuleEvaluationInput, EvaluationIntent>? Evaluation(
+        IReadOnlyDictionary<string,
+            Func<RuleEvaluationInput, EvaluationIntent>>? evaluationByRule,
+        RuleDeclaration rule) =>
+        evaluationByRule is not null &&
+        evaluationByRule.TryGetValue(rule.RuleId.Value, out var callback)
+            ? callback
+            : null;
 
     private static AcquisitionTarget Target(
         string source,

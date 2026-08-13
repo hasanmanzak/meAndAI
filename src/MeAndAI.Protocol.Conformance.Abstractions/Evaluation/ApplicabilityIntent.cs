@@ -8,6 +8,13 @@ public sealed class ApplicabilityIntent
     {
         Kind = kind;
         References = DeclarationValidation.Snapshot(references, nameof(references));
+        if (References.Distinct(ReferenceEqualityComparer.Instance).Count() !=
+            References.Count)
+        {
+            throw new ArgumentException(
+                "Applicability references must be distinct.",
+                nameof(references));
+        }
     }
 
     public ApplicabilityIntentKind Kind { get; }

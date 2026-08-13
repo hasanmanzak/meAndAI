@@ -95,7 +95,9 @@ public sealed class ContractSliceCActivationTests
             Assert.Same(manifestComponents[component.ComponentKey], component));
     }
 
-    internal static CFixture CreateFixture()
+    internal static CFixture CreateFixture(
+        IReadOnlyDictionary<string,
+            Func<RuleEvaluationInput, EvaluationIntent>>? evaluationByRule = null)
     {
         var manifest = CreateManifest();
         var registry = manifest.SchemaRegistry;
@@ -106,7 +108,7 @@ public sealed class ContractSliceCActivationTests
         var indexes = CreateIndexes(registry);
         var projectors = CreateProjectors(registry);
         var selectors = CreateSelectors(complete);
-        var evaluators = CreateEvaluators(complete);
+        var evaluators = CreateEvaluators(complete, evaluationByRule);
         var export = CompletePolicyPackExport.Create(
             "protocol.policy-pack.synthetic-complete",
             "1",
@@ -507,14 +509,54 @@ public sealed class ContractSliceCActivationTests
     }
 
     private static RuleEvaluatorRegistration[] CreateEvaluators(
-        CompleteCatalogDeclaration catalog) =>
-    [
-        RuleEvaluatorRegistration.Create(catalog.Rules[0], new Rule0001EvaluatorMirror()),
-        RuleEvaluatorRegistration.Create(catalog.Rules[1], new Rule0002EvaluatorMirror()),
-        RuleEvaluatorRegistration.Create(catalog.Rules[2], new Rule0003EvaluatorMirror()),
-        RuleEvaluatorRegistration.Create(catalog.Rules[3], new Rule0004EvaluatorMirror()),
-        RuleEvaluatorRegistration.Create(catalog.Rules[4], new Rule0005EvaluatorMirror()),
-    ];
+        CompleteCatalogDeclaration catalog,
+        IReadOnlyDictionary<string,
+            Func<RuleEvaluationInput, EvaluationIntent>>? evaluationByRule)
+    {
+        if (evaluationByRule is not null &&
+            (evaluationByRule.Any(item => item.Value is null) ||
+             evaluationByRule.Keys.Except(
+                 catalog.Rules.Select(rule => rule.RuleId.Value),
+                 StringComparer.Ordinal).Any()))
+        {
+            throw new ArgumentException(
+                "Evaluation callbacks must name exact catalog rules.",
+                nameof(evaluationByRule));
+        }
+
+        return
+        [
+            RuleEvaluatorRegistration.Create(
+                catalog.Rules[0],
+                new Rule0001EvaluatorMirror(
+                    evaluation: Evaluation(evaluationByRule, catalog.Rules[0]))),
+            RuleEvaluatorRegistration.Create(
+                catalog.Rules[1],
+                new Rule0002EvaluatorMirror(
+                    evaluation: Evaluation(evaluationByRule, catalog.Rules[1]))),
+            RuleEvaluatorRegistration.Create(
+                catalog.Rules[2],
+                new Rule0003EvaluatorMirror(
+                    evaluation: Evaluation(evaluationByRule, catalog.Rules[2]))),
+            RuleEvaluatorRegistration.Create(
+                catalog.Rules[3],
+                new Rule0004EvaluatorMirror(
+                    evaluation: Evaluation(evaluationByRule, catalog.Rules[3]))),
+            RuleEvaluatorRegistration.Create(
+                catalog.Rules[4],
+                new Rule0005EvaluatorMirror(
+                    evaluation: Evaluation(evaluationByRule, catalog.Rules[4]))),
+        ];
+    }
+
+    private static Func<RuleEvaluationInput, EvaluationIntent>? Evaluation(
+        IReadOnlyDictionary<string,
+            Func<RuleEvaluationInput, EvaluationIntent>>? evaluationByRule,
+        RuleDeclaration rule) =>
+        evaluationByRule is not null &&
+        evaluationByRule.TryGetValue(rule.RuleId.Value, out var callback)
+            ? callback
+            : null;
 
     private static PayloadSchemaDeclaration Schema(
         ReleaseSchemaRegistry registry,
@@ -663,12 +705,15 @@ internal sealed partial class FeatureTestCasesSelectorMirror : IExpectedSelector
 internal abstract class RuleEvaluatorMirror : IRuleEvaluator
 {
     private readonly Func<RuleApplicabilityInput, ApplicabilityIntent> _applicability;
+    private readonly Func<RuleEvaluationInput, EvaluationIntent> _evaluation;
 
     protected RuleEvaluatorMirror(
-        Func<RuleApplicabilityInput, ApplicabilityIntent>? applicability = null)
+        Func<RuleApplicabilityInput, ApplicabilityIntent>? applicability = null,
+        Func<RuleEvaluationInput, EvaluationIntent>? evaluation = null)
     {
         _applicability = applicability ??
             (_ => ApplicabilityIntent.Applicable([]));
+        _evaluation = evaluation ?? (_ => EvaluationIntent.Create([], []));
     }
 
     public ApplicabilityIntent EvaluateApplicability(
@@ -681,40 +726,49 @@ internal abstract class RuleEvaluatorMirror : IRuleEvaluator
 
     public EvaluationIntent Evaluate(
         RuleEvaluationInput input,
-        CancellationToken cancellationToken) => EvaluationIntent.Create([], []);
+        CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        return _evaluation(input);
+    }
 }
 
 internal sealed class Rule0001EvaluatorMirror : RuleEvaluatorMirror
 {
     internal Rule0001EvaluatorMirror(
-        Func<RuleApplicabilityInput, ApplicabilityIntent>? applicability = null)
-        : base(applicability) { }
+        Func<RuleApplicabilityInput, ApplicabilityIntent>? applicability = null,
+        Func<RuleEvaluationInput, EvaluationIntent>? evaluation = null)
+        : base(applicability, evaluation) { }
 }
 
 internal sealed class Rule0002EvaluatorMirror : RuleEvaluatorMirror
 {
     internal Rule0002EvaluatorMirror(
-        Func<RuleApplicabilityInput, ApplicabilityIntent>? applicability = null)
-        : base(applicability) { }
+        Func<RuleApplicabilityInput, ApplicabilityIntent>? applicability = null,
+        Func<RuleEvaluationInput, EvaluationIntent>? evaluation = null)
+        : base(applicability, evaluation) { }
 }
 
 internal sealed class Rule0003EvaluatorMirror : RuleEvaluatorMirror
 {
     internal Rule0003EvaluatorMirror(
-        Func<RuleApplicabilityInput, ApplicabilityIntent>? applicability = null)
-        : base(applicability) { }
+        Func<RuleApplicabilityInput, ApplicabilityIntent>? applicability = null,
+        Func<RuleEvaluationInput, EvaluationIntent>? evaluation = null)
+        : base(applicability, evaluation) { }
 }
 
 internal sealed class Rule0004EvaluatorMirror : RuleEvaluatorMirror
 {
     internal Rule0004EvaluatorMirror(
-        Func<RuleApplicabilityInput, ApplicabilityIntent>? applicability = null)
-        : base(applicability) { }
+        Func<RuleApplicabilityInput, ApplicabilityIntent>? applicability = null,
+        Func<RuleEvaluationInput, EvaluationIntent>? evaluation = null)
+        : base(applicability, evaluation) { }
 }
 
 internal sealed class Rule0005EvaluatorMirror : RuleEvaluatorMirror
 {
     internal Rule0005EvaluatorMirror(
-        Func<RuleApplicabilityInput, ApplicabilityIntent>? applicability = null)
-        : base(applicability) { }
+        Func<RuleApplicabilityInput, ApplicabilityIntent>? applicability = null,
+        Func<RuleEvaluationInput, EvaluationIntent>? evaluation = null)
+        : base(applicability, evaluation) { }
 }
