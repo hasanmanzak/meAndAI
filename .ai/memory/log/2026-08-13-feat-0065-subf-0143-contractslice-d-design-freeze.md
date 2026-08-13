@@ -4,7 +4,15 @@
 
 - ContractSlice C is complete and merged at exact main. Its candidate head was [`6c235c4ae7ba41a150a779bdcfb98dd99e63f2d0`](https://github.com/hasanmanzak/meAndAI/commit/6c235c4ae7ba41a150a779bdcfb98dd99e63f2d0); exact-main predecessor for D is [`e9bc3c6f4cc54cc25bfccaa5b4364f2c970e612b`](https://github.com/hasanmanzak/meAndAI/commit/e9bc3c6f4cc54cc25bfccaa5b4364f2c970e612b).
 - The candidate [PR #178](https://github.com/hasanmanzak/meAndAI/pull/178) passed [run 31682227055](https://github.com/hasanmanzak/meAndAI/actions/runs/31682227055): Ubuntu `18m37s`, Windows `18m31s`, publication skipped. Exact main passed [run 31683976710](https://github.com/hasanmanzak/meAndAI/actions/runs/31683976710): Ubuntu `6m56s`, Windows `12m46s`, publication skipped.
-- The D plan is `FrozenDesignCandidate` and inactive. Its exact design-delivery head must pass hosted CI, then receive explicit maintainer acceptance before D implementation.
+- The D design-delivery head is exact [`fae0ff2ccb69f02c1eb11e6d310a2454a4297d63`](https://github.com/hasanmanzak/meAndAI/commit/fae0ff2ccb69f02c1eb11e6d310a2454a4297d63). [Run 31706799393](https://github.com/hasanmanzak/meAndAI/actions/runs/31706799393) passed Ubuntu in `23m39s` and Windows in `14m07s`; publication was skipped. The maintainer accepted the frozen design and explicitly authorized D implementation on 2026-08-13.
+- `D-POLICY-SURFACE-ACTIVATION-01` is `ReviewedLocalGreen`; D is `3/11` and A+B+C+D/full Conformance is `57/57`. The singleton cohort exact-head hosted gate remains pending.
+
+## Policy-activation implementation evidence
+
+- SurfaceRed compiled the exact transient ten-line `ContractSliceD.SurfaceRed.cs` carrier once and failed only `CS0246` at `(5,38)` for `InitialRuleQualificationPolicy`, with `0` warnings and `1` error in `6.28s`; the transient file was removed and never committed.
+- Canonical BehaviorRed R=0001 used the exact external 45,016-byte runner with SHA-256 `017736ECCE18004998D2AF9D2DE72D40C6E434960A97A82D4B0C54644CD7F390`. ValidateOnly closed the exact source/status/lock/tool/fresh-path gates; the sole Execute produced native exit `1`, runner exit `0`, and immutable report `EB6FCB5C2A530502090B73E9BA0AA077BC0120ADFBB62163A0E118B7CEA291AD`.
+- The one-file result root contains only the 4,786-byte TRX with SHA-256 `A95FAA7116C9B6800DC45805E41047EEDF47F00C3F6DE8AE4291B90EBA12B288`. It proves the exact failed FQN, marker-only message, optional marker-free stack, `1/1/1` result-definition-entry bijection, all sixteen counters, one standard echo/RunInfo, and no attachment or collector data. R=0001 is accepted, immutable, and must not rerun.
+- Green binds the public `InitialRuleQualificationPolicy.Export` singleton to the exact real declaration/registration graph. Focused export is `1/1`, D is `3/3`, full Conformance is `57/57`, Domain is `98/98`, Release build is `0` warnings / `0` errors, format and diff checks are clean. Exact-tree StructureOnly passed in `546.622s`; publication evidence passed `7/7` in `369.5s` without a publication claim. Real producer behavior remains held for the next cohort.
 
 ## Frozen delivery model
 
@@ -14,6 +22,13 @@
 - Specialized common rules cohort: `D-RULE-0003-01`, `D-RULE-0004-01`, `D-RULE-0005-01`.
 - Equivalence/closure cohort: `D-REPOSITORY-PROVIDER-EQUIVALENCE-01`, `D-ACTIVATION-TOPOLOGY-01`, then code-free `D-CONVERGE-01`.
 - Every mutating packet owns canonical expected-red, focused/D-cumulative green, relevant Release build, diff/format/structure, independent review, record sync, and a separate unpushed `ReviewedLocalGreen` commit. Cohort push/hosted success yields `ExactHeadHostedGreen`.
+
+## Cohort 1 pre-red boundary
+
+- The exact SurfaceRed remains the ten-line `ContractSliceD.SurfaceRed.cs` compile anchor and the sole accepted `CS0246` for `InitialRuleQualificationPolicy`.
+- BehaviorRed reads the fully prepared `PolicyQualificationSliceExport export = InitialRuleQualificationPolicy.Export`; only a null export calls marker `TEST-0210-D-BEHAVIOR-RED-0001`. The temporary property body is `=> null!` and is never committed.
+- The D plan owns the exact ten-production/five-test allowlist and `3,500` normalized changed-line cap. Four predecessor test edits remove only the successor-expired Policy-absence assertions; their Facts/FQNs/traits remain immutable.
+- Cohort 2 producer behavior, Abstractions, Conformance, Domain, Application, projects, packages, locks, workflows and all held scenario/consumer/release surfaces remain outside this packet.
 
 ## Immutable architecture boundary
 

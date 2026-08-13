@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Gate 2 micro-delivery plan and design freeze |
-| State | `FrozenDesignCandidate` / inactive; exact-head hosted design delivery and explicit maintainer acceptance required before any D implementation |
+| State | Design exact-head hosted green and maintainer accepted; `D-POLICY-SURFACE-ACTIVATION-01` is `ReviewedLocalGreen`; D is `3/11`, A+B+C+D/full Conformance is `57/57`, and the singleton cohort exact-head hosted gate is pending |
 | Parent | [SUBF-0143](README.md#subf-0143) |
 | Scenario | [TEST-0210](test-cases.md#test-0210), retained `Planned` |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
@@ -166,11 +166,56 @@ crossing requires a reviewed pre-red design amendment and cannot silently raise
 the limit. Cohort record sync uses the exact D design cohort and adds no new
 stable ID.
 
+### `D-POLICY-SURFACE-ACTIVATION-01` pre-red freeze
+
+The accepted design-delivery head is exact
+[`fae0ff2ccb69f02c1eb11e6d310a2454a4297d63`](https://github.com/hasanmanzak/meAndAI/commit/fae0ff2ccb69f02c1eb11e6d310a2454a4297d63),
+hosted green in [run 31706799393](https://github.com/hasanmanzak/meAndAI/actions/runs/31706799393): Ubuntu `23m39s`, Windows `14m07s`, publication skipped. The maintainer accepted this design on 2026-08-13 and explicitly authorized D implementation.
+
+The permanent compile observation uses only transient
+`ContractSliceD.SurfaceRed.cs` in the exact ten-line shape and must produce only
+the frozen `CS0246` tuple for `InitialRuleQualificationPolicy`. The retained
+BehaviorRed test reads the fully prepared
+`PolicyQualificationSliceExport export = InitialRuleQualificationPolicy.Export`;
+only `export is null` calls `Assert.Fail("TEST-0210-D-BEHAVIOR-RED-0001")`.
+The transient red implementation is exactly the non-nullable property
+`InitialRuleQualificationPolicy.Export => null!`; construction, structural and
+ownership checks remain marker-free. Canonical red selects only the frozen
+export Fact with Release `--no-restore --no-build`, one fresh root, one TRX and
+the common no-retry oracle. No sentinel enters a commit.
+
+The exact production allowlist is:
+
+```text
+src/MeAndAI.Protocol.Policy/InitialRuleQualificationPolicy.cs
+src/MeAndAI.Protocol.Policy/Declarations/InitialPolicyDeclarations.cs
+src/MeAndAI.Protocol.Policy/Registration/InitialPolicyRegistrationGraph.cs
+src/MeAndAI.Protocol.Policy/Models/PolicyModels.cs
+src/MeAndAI.Protocol.Policy/Codecs/PolicyCodecs.cs
+src/MeAndAI.Protocol.Policy/Parsers/PolicyParsers.cs
+src/MeAndAI.Protocol.Policy/Indexes/PolicyIndexes.cs
+src/MeAndAI.Protocol.Policy/Demands/RepositoryTargetResolutionDemandProjector.cs
+src/MeAndAI.Protocol.Policy/Selectors/PolicySelectorResolvers.cs
+src/MeAndAI.Protocol.Policy/Rules/PolicyRuleEvaluators.cs
+```
+
+The exact retained test allowlist adds only
+`ContractSliceDPolicyExportTests.cs` and modifies only the predecessor-safe
+Policy-absence assertions in `ContractSliceAPublicApiTests.cs`,
+`ContractSliceBStructuralTests.cs`, `ContractSliceCOwnershipTests.cs`, and
+`ContractSliceCStructuralTests.cs`. Their existing Facts, FQNs, traits and A/B/C
+surface assertions remain unchanged; the D Structural/Ownership Facts alone own
+the new Policy export. The packet cap is ten production paths, five test paths,
+and `3,500` normalized changed C# lines. No project, package, lock, workflow,
+Abstractions, Conformance, Domain, Application or other source/test path may
+change. Cohort 2 behavior remains absent: real producers may expose only their
+object-identical registration identities and fail-closed staging behavior here.
+
 ## Cohort measurement ledger
 
 | Cohort | Local work/validation | Hosted CI | Hosted defects | Owner identification | Correction/revalidation | Estimated saving vs package-hosted | Consistency/traceability loss |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Policy activation | `NotMeasured` | `NotMeasured` | `NotMeasured` | `NotMeasured` | `NotMeasured` | Baseline: one avoided intermediate hosted wait | `NotMeasured` |
+| Policy activation | About `45m` local work; exact-tree StructureOnly `546.622s` and publication evidence `7/7` in `369.5s`, run concurrently | Pending singleton-cohort push | `0` locally | Not applicable locally | `0` | Baseline: one avoided intermediate hosted wait | None observed |
 | Real producer infrastructure | `NotMeasured` | `NotMeasured` | `NotMeasured` | `NotMeasured` | `NotMeasured` | No avoided package push; cohort exists for semantic isolation | `NotMeasured` |
 | First common rules | `NotMeasured` | `NotMeasured` | `NotMeasured` | `NotMeasured` | `NotMeasured` | Baseline: one avoided intermediate hosted wait | `NotMeasured` |
 | Specialized common rules | `NotMeasured` | `NotMeasured` | `NotMeasured` | `NotMeasured` | `NotMeasured` | Baseline: two avoided intermediate hosted waits | `NotMeasured` |
@@ -203,9 +248,8 @@ It changes no code, test, project, package, lock, workflow, or general
 diff, format, graph/StructureOnly, and applicable publication-evidence reviews
 must close before one focused design commit/push.
 
-That exact design head must pass Ubuntu and Windows with publication in its
-designed state. The result produces only a hosted-green design candidate.
-ContractSlice D remains inactive until the maintainer explicitly accepts this
-frozen design; acceptance does not activate Scenario/workflow/consumer/release
-scope. No D source, test, expected-red execution, or implementation may begin
-before both gates close.
+That exact design head passed Ubuntu and Windows with publication skipped, and
+the maintainer accepted it. Those gates authorize only the ordered D cohort
+implementation above. Scenario/workflow/consumer/release scope remains held;
+the Policy-activation successor remains blocked until Cohort 1 is pushed once
+and becomes `ExactHeadHostedGreen`.

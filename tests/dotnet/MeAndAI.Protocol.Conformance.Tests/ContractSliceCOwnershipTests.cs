@@ -31,7 +31,6 @@ public sealed class ContractSliceCOwnershipTests
                 attribute.AssemblyName,
                 "MeAndAI.Protocol.Conformance.Tests",
                 StringComparison.Ordinal));
-        Assert.Empty(policy.GetExportedTypes());
         Assert.DoesNotContain(
             abstractions.GetReferencedAssemblies(),
             assembly => string.Equals(

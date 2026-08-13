@@ -893,7 +893,7 @@ C completed through merged [PR #178](https://github.com/hasanmanzak/meAndAI/pull
 [ContractSlice D micro-delivery plan](subf-0143-contractslice-d-micro-delivery-plan.md)
 now freezes the accepted dependency graph, exact package/cohort membership,
 expected-red identities, Fact inventory, ownership, validation, failure-reopen,
-and measurement model. D is still inactive: its design-delivery head must pass
-hosted validation and receive explicit maintainer acceptance before any source,
-test, red, or implementation work begins. C measurements are planning input
+and measurement model. D design delivery is exact-head hosted green and
+maintainer accepted; only the frozen Policy-activation packet is active while
+all later D packets and final activation remain held. C measurements are planning input
 only and are not D product evidence.

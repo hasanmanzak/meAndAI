@@ -3,14 +3,14 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted; ContractSlice A, B, and C are merged/exact-main green. C is `11/11`, cumulative A+B+C/full Conformance `54/54`; its immutable diagnostics and accepted reds remain owned by the C plan. The [D micro-delivery plan](subf-0143-contractslice-d-micro-delivery-plan.md) is `FrozenDesignCandidate`/inactive pending exact-head hosted design delivery and explicit maintainer acceptance. [TEST-0210](test-cases.md#test-0210) remains `Planned`; D implementation, activation, and DoD remain held. |
+| Status | Gate 2 accepted; ContractSlice A, B, and C are merged/exact-main green. D Policy activation is `ReviewedLocalGreen` at `3/11`; cumulative A+B+C+D/full Conformance is `57/57` and the singleton cohort exact-head hosted gate is pending. [TEST-0210](test-cases.md#test-0210) remains `Planned`; final activation and DoD remain held. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Test | [TEST-0210](test-cases.md#test-0210) |
 | Gate 3 micro-delivery routing | Historical A, B, and C delivery remains owned by their micro plans. Current prospective routing is the [ContractSlice D micro-delivery plan](subf-0143-contractslice-d-micro-delivery-plan.md); packet labels refine delivery but activate no executable work. |
 | Exact-main design baseline | Accepted A merge commit [`51623f4d404a95e0f706d72805cf7ddbbbd293b8`](https://github.com/hasanmanzak/meAndAI/commit/51623f4d404a95e0f706d72805cf7ddbbbd293b8), validated by exact-main [run 31304787603](https://github.com/hasanmanzak/meAndAI/actions/runs/31304787603) |
-| Design and Gate 3 authority | Historical A/B/C directives, accepted reds, diagnostics, and hosted evidence remain immutable. C is complete and exact-main hosted green. The D plan freezes design only; D source, tests, expected-red execution, and implementation remain outside authority until its exact design head is hosted green and the maintainer explicitly accepts it. Final activation, merge, release, and publication remain held. |
+| Design and Gate 3 authority | Historical A/B/C directives, accepted reds, diagnostics, and hosted evidence remain immutable. D Policy activation is `ReviewedLocalGreen` under the accepted plan; its singleton cohort exact-head hosted gate must close before the next D cohort. Final activation, merge, release, and publication remain held. |
 | Completed predecessor | [SUBF-0153](README.md#subf-0153) / [TEST-0221](test-cases.md#test-0221), merged through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173) and exact-main validated by [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) |
 
 ## Directive and hard boundary
@@ -10751,9 +10751,10 @@ and full cohort review before one push and exact-head hosted validation. A
 failed cohort alone reopens. C measurements are planning input only; every D
 fixture and real Policy registration proof is fresh.
 
-D remains inactive until the records-only design cohort is committed, pushed,
-exact-head Ubuntu/Windows hosted green, and explicitly accepted by the
-maintainer. [TEST-0210](test-cases.md#test-0210), final Scenario/status/owner/workflow, [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
+The records-only D design cohort is committed, pushed, exact-head Ubuntu/
+Windows hosted green, and explicitly accepted by the maintainer. Only the
+ordered Policy-activation packet and its packet-local freeze are active.
+[TEST-0210](test-cases.md#test-0210), final Scenario/status/owner/workflow, [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
 consumer, merge, release, publication, and DoD remain held.
 
 ### `C-EVALUATION-PLAN-01` executable freeze

@@ -316,7 +316,7 @@ The lifecycle records-only freeze head is exact-hosted-green: Ubuntu passed in
 `20m44s`, Windows in `46m51s`, and publication verification was correctly
 skipped. The exact lifecycle implementation identity recorded in the canonical
 handoff passed Ubuntu in `19m36s` and Windows in `36m02s`; publication verification was
-correctly skipped. ContractSlice A, B, and C are merged/exact-main green; C is `11/11` and A+B+C/full Conformance is `54/54`. Exact C closure and the prospective D route are owned by the current D design handoff. D is `FrozenDesignCandidate`/inactive pending exact-head hosted design delivery and explicit maintainer acceptance. The parent scenario, D implementation, and final activation remain held.
+correctly skipped. ContractSlice A, B, and C are merged/exact-main green; C is `11/11`. Policy activation is `ReviewedLocalGreen`: D is `3/11` and A+B+C+D/full Conformance is `57/57`; the singleton cohort exact-head hosted gate is pending. The parent scenario and final activation remain held.
 The exact record-delivery closure reached the full `4096/4096` instruction-graph
 budget. Ubuntu passed in `19m52s`; Windows reached its exact 45-minute job
 ceiling after every emitted suite result was successful. The bounded correction
