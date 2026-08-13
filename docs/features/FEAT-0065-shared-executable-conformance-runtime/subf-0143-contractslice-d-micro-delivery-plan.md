@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Gate 2 micro-delivery plan and design freeze |
-| State | Design exact-head hosted green and maintainer accepted; `D-POLICY-SURFACE-ACTIVATION-01` is `ReviewedLocalGreen`; D is `3/11`, A+B+C+D/full Conformance is `57/57`, and the singleton cohort exact-head hosted gate is pending |
+| State | Design exact-head hosted green and maintainer accepted; `D-POLICY-SURFACE-ACTIVATION-01` is `ExactHeadHostedGreen`; D is `3/11` and A+B+C+D/full Conformance is `57/57`; `D-REAL-PRODUCER-INFRASTRUCTURE-01` is `FrozenDesign`/inactive pending its exact design-head hosted gate |
 | Parent | [SUBF-0143](README.md#subf-0143) |
 | Scenario | [TEST-0210](test-cases.md#test-0210), retained `Planned` |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
@@ -211,11 +211,80 @@ Abstractions, Conformance, Domain, Application or other source/test path may
 change. Cohort 2 behavior remains absent: real producers may expose only their
 object-identical registration identities and fail-closed staging behavior here.
 
+### `D-REAL-PRODUCER-INFRASTRUCTURE-01` pre-red freeze
+
+The predecessor implementation is exact
+[`f59c927834cee7ddd5d685e5231536898016006d`](https://github.com/hasanmanzak/meAndAI/commit/f59c927834cee7ddd5d685e5231536898016006d).
+[Run 31719641316](https://github.com/hasanmanzak/meAndAI/actions/runs/31719641316)
+passed Ubuntu in `18m53s` and Windows in `18m40s`; publication was skipped.
+That closes the Policy-activation cohort as `ExactHeadHostedGreen` and grants
+no authority beyond this frozen infrastructure packet.
+
+The sole owning Fact constructs fresh repository-tree, governed-text, and
+repository-target payload sources plus fresh parser/index/projector/selector/
+evaluator inputs, then calls
+`ContractSliceDProducerInfrastructureFixture.Activate(InitialRuleQualificationPolicy.Export)`.
+The semantic return is one Tests-owned
+`ContractSliceDProducerInfrastructureEvidence`; only a null return after the
+entire valid call reaches
+`Assert.Fail("TEST-0210-D-BEHAVIOR-RED-0002")`. Invalid construction,
+malformed payloads, budget boundaries, cancellation, wrong result kinds, and
+all exceptions are marker-free. The red changes no production source and the
+green introduces no sentinel.
+
+The fresh fixture repeats, without consuming B/C results or handles: the three
+canonical writers/codecs at golden, empty, malformed, location/identity,
+ordering, equality, and first-one-over boundaries; source-model and target-
+model parser success/failure; repository-tree, record, governed-reference, and
+repository-target index order and empty/nonempty lifecycle; zero/nonzero target
+demand projection; exact selector resolution; four-counter local metering,
+cache/ledger identity and cancellation; and all five registered evaluators as
+concrete callable staging objects. Rule-specific applicability/findings remain
+owned by the later RULE packets, so the infrastructure evaluator staging result
+is only `Applicable([])` plus an empty evaluation intent.
+
+The exact production allowlist is:
+
+```text
+src/MeAndAI.Protocol.Policy/Models/PolicyModels.cs
+src/MeAndAI.Protocol.Policy/Codecs/PolicyCodecs.cs
+src/MeAndAI.Protocol.Policy/Parsers/PolicyParsers.cs
+src/MeAndAI.Protocol.Policy/Indexes/PolicyIndexes.cs
+src/MeAndAI.Protocol.Policy/Demands/RepositoryTargetResolutionDemandProjector.cs
+src/MeAndAI.Protocol.Policy/Selectors/PolicySelectorResolvers.cs
+src/MeAndAI.Protocol.Policy/Rules/PolicyRuleEvaluators.cs
+src/MeAndAI.Protocol.Policy/Registration/InitialPolicyRegistrationGraph.cs
+```
+
+The exact executable test allowlist adds only
+`tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ContractSliceDProducerInfrastructureTests.cs`.
+No Abstractions, Conformance, Domain, Application, declaration, export,
+predecessor test, project, package, lock, workflow, or other source/test path
+may change. The packet cap is eight production paths, one test path, and
+`3,500` normalized changed C# lines; crossing it requires a reviewed pre-red
+amendment. The record cohort is exactly the twelve current D routing surfaces:
+project memory README/project/log index plus the D handoff; architecture
+README/successor/transition; feature index and FEAT record; this plan; typed
+design; and the scenario record. It adds no record node or net unique link
+relation.
+
+Canonical R=0002 uses one fresh external runner/report/log identity, a fresh
+absent result root, warning-free Release `--no-restore` build, exact DLL/PDB and
+six-lock custody, one Release `--no-restore --no-build` child, process-scoped
+`VSTEST_CONNECTION_TIMEOUT=300`, and a `420s` monotonic outer bound. The sole
+TRX must contain exactly the frozen FQN, Failed outcome, marker-only message,
+optional marker-free standard stack/echo/RunInfo, `1/1/1` result-definition-
+entry bijection, all sixteen counters, and no attachment/collector/independent
+diagnostic. Atomic `InvocationCommitted` consumes R=0002 for every process-
+create, timeout, interruption, exit, TRX, or oracle failure; no rerun is
+authorized. The exact freeze cohort must first be committed, pushed, and pass
+same-head Ubuntu/Windows validation before the runner is materialized.
+
 ## Cohort measurement ledger
 
 | Cohort | Local work/validation | Hosted CI | Hosted defects | Owner identification | Correction/revalidation | Estimated saving vs package-hosted | Consistency/traceability loss |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Policy activation | About `45m` local work; exact-tree StructureOnly `546.622s` and publication evidence `7/7` in `369.5s`, run concurrently | Pending singleton-cohort push | `0` locally | Not applicable locally | `0` | Baseline: one avoided intermediate hosted wait | None observed |
+| Policy activation | About `45m` local work; exact-tree StructureOnly `546.622s` and publication evidence `7/7` in `369.5s`, run concurrently | [Run 31719641316](https://github.com/hasanmanzak/meAndAI/actions/runs/31719641316): Ubuntu `18m53s`, Windows `18m40s`, publication skipped | `0` | Not applicable | `0` | Baseline: one avoided intermediate hosted wait | None observed |
 | Real producer infrastructure | `NotMeasured` | `NotMeasured` | `NotMeasured` | `NotMeasured` | `NotMeasured` | No avoided package push; cohort exists for semantic isolation | `NotMeasured` |
 | First common rules | `NotMeasured` | `NotMeasured` | `NotMeasured` | `NotMeasured` | `NotMeasured` | Baseline: one avoided intermediate hosted wait | `NotMeasured` |
 | Specialized common rules | `NotMeasured` | `NotMeasured` | `NotMeasured` | `NotMeasured` | `NotMeasured` | Baseline: two avoided intermediate hosted waits | `NotMeasured` |

@@ -3,14 +3,14 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted; ContractSlice A, B, and C are merged/exact-main green. D Policy activation is `ReviewedLocalGreen` at `3/11`; cumulative A+B+C+D/full Conformance is `57/57` and the singleton cohort exact-head hosted gate is pending. [TEST-0210](test-cases.md#test-0210) remains `Planned`; final activation and DoD remain held. |
+| Status | Gate 2 accepted; ContractSlice A, B, and C are merged/exact-main green. D Policy activation is `ExactHeadHostedGreen` at `3/11`; cumulative A+B+C+D/full Conformance is `57/57`. Real producer infrastructure is `FrozenDesign`/inactive pending its exact design-head hosted gate. [TEST-0210](test-cases.md#test-0210) remains `Planned`; final activation and DoD remain held. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Test | [TEST-0210](test-cases.md#test-0210) |
 | Gate 3 micro-delivery routing | Historical A, B, and C delivery remains owned by their micro plans. Current prospective routing is the [ContractSlice D micro-delivery plan](subf-0143-contractslice-d-micro-delivery-plan.md); packet labels refine delivery but activate no executable work. |
 | Exact-main design baseline | Accepted A merge commit [`51623f4d404a95e0f706d72805cf7ddbbbd293b8`](https://github.com/hasanmanzak/meAndAI/commit/51623f4d404a95e0f706d72805cf7ddbbbd293b8), validated by exact-main [run 31304787603](https://github.com/hasanmanzak/meAndAI/actions/runs/31304787603) |
-| Design and Gate 3 authority | Historical A/B/C directives, accepted reds, diagnostics, and hosted evidence remain immutable. D Policy activation is `ReviewedLocalGreen` under the accepted plan; its singleton cohort exact-head hosted gate must close before the next D cohort. Final activation, merge, release, and publication remain held. |
+| Design and Gate 3 authority | Historical A/B/C directives, accepted reds, diagnostics, and hosted evidence remain immutable. D Policy activation is `ExactHeadHostedGreen`; only the frozen real-producer design may proceed after its own exact design-head hosted gate. Final activation, merge, release, and publication remain held. |
 | Completed predecessor | [SUBF-0153](README.md#subf-0153) / [TEST-0221](test-cases.md#test-0221), merged through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173) and exact-main validated by [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) |
 
 ## Directive and hard boundary
@@ -10752,10 +10752,52 @@ failed cohort alone reopens. C measurements are planning input only; every D
 fixture and real Policy registration proof is fresh.
 
 The records-only D design cohort is committed, pushed, exact-head Ubuntu/
-Windows hosted green, and explicitly accepted by the maintainer. Only the
-ordered Policy-activation packet and its packet-local freeze are active.
+Windows hosted green, and explicitly accepted by the maintainer. Policy
+activation is now exact-head hosted green; only the ordered real-producer
+infrastructure packet and its packet-local freeze may advance after that
+freeze's own exact-head hosted gate.
 [TEST-0210](test-cases.md#test-0210), final Scenario/status/owner/workflow, [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
 consumer, merge, release, publication, and DoD remain held.
+
+### `D-REAL-PRODUCER-INFRASTRUCTURE-01` executable freeze
+
+The packet changes only the existing real Policy model/codec/parser/index/
+projector/selector/evaluator/registration files and adds the one owning D test.
+It introduces no public API, friend, adapter, second producer graph, or
+Application/Conformance/Domain behavior. Registration construction passes each
+concrete producer its exact declaration-owned type token, component identity,
+input tokens, and budget; no producer reconstructs manifest authority from a
+string or ambient service.
+
+The three concrete codecs implement their existing `Write`, `Qualify`, and
+`MeasureLocal` members over immutable Policy models. They preserve the exact B
+wire grammars, strict UTF-8, ordinal ordering, binding/location/embedded-
+identity precedence, declared equality and first-one-over limits, and four-
+counter resource semantics. Parser binders snapshot only declaration-matching
+sealed inputs. The two parsers, four indexes, one demand projector, and three
+selectors produce the exact registered model/capability/reference shapes and
+return closed failed/invalid intents for declared semantic failures; they do
+not perform I/O or inspect a provider. The five evaluator registrations become
+concrete callable staging objects returning only `Applicable([])` and an empty
+evaluation intent; later RULE packets replace that staging result one evaluator
+at a time with fresh rule semantics.
+
+The single test-owned activation probe exercises every registered object by
+generic registration visitors, retaining no B/C runtime result. Its fresh
+golden/empty/malformed/limit fixtures cover all three writers/codecs and its
+fresh sealed model/capability inputs cover both parsers, four indexes, the
+projector, selectors, evaluator lifecycle, cache/ledger identity, cancellation,
+and deterministic order. The final probe returns exactly one
+`ContractSliceDProducerInfrastructureEvidence`; only null after the fully
+prepared call reaches `TEST-0210-D-BEHAVIOR-RED-0002`.
+
+The exact eight-production/one-test allowlist and `3,500` normalized changed-
+line cap are owned by the D micro-plan. Canonical R=0002 is one fresh-root,
+one-child, one-TRX Release `--no-build` run with exact FQN/filter/marker,
+process-scoped timeout, full source/lock/binary/runner custody, exact sixteen-
+counter oracle, and irrevocable no-rerun after `InvocationCommitted`. This
+records-only freeze must itself pass exact-head Ubuntu/Windows validation
+before any test or production source is changed.
 
 ### `C-EVALUATION-PLAN-01` executable freeze
 

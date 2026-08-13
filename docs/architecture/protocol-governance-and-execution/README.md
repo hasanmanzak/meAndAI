@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Architecture design |
-| Status | Accepted architecture; [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143) Gate 2 accepted. ContractSlice A, B, and C are merged/exact-main green; C is `11/11`. Policy activation is `ReviewedLocalGreen`: D is `3/11`, cumulative A+B+C+D/full Conformance is `57/57`, and the singleton cohort exact-head hosted gate is pending. The parent scenario remains inactive and no final D activation or DoD is claimed. |
+| Status | Accepted architecture; [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143) Gate 2 accepted. ContractSlice A, B, and C are merged/exact-main green; C is `11/11`. Policy activation is `ExactHeadHostedGreen`; D is `3/11` and cumulative A+B+C+D/full Conformance is `57/57`. Real producer infrastructure is `FrozenDesign`/inactive pending its exact design-head hosted gate. The parent scenario remains inactive and no final D activation or DoD is claimed. |
 | Owning epic | [EPIC-0002 / issue #163](https://github.com/hasanmanzak/meAndAI/issues/163) |
 | Owning task | [TASK-0003 / issue #164](https://github.com/hasanmanzak/meAndAI/issues/164) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
@@ -11,7 +11,7 @@
 | Successor allocation | [Successor delivery and qualification plan](successor-delivery-plan.md) |
 | Preserved WIP disposition | [Exact extraction ledger](wip-extraction-ledger.md) |
 | Accepted Gate-2 baseline | Exact-main typed-handoff predecessor [`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7) |
-| Current slice boundary | ContractSlice A, B, and C are immutable merged/exact-main-green history. `D-POLICY-SURFACE-ACTIVATION-01` is `ReviewedLocalGreen` at D `3/11`; its singleton cohort exact-head hosted gate and final activation remain held. |
+| Current slice boundary | ContractSlice A, B, and C are immutable merged/exact-main-green history. `D-POLICY-SURFACE-ACTIVATION-01` is `ExactHeadHostedGreen` at D `3/11`; `D-REAL-PRODUCER-INFRASTRUCTURE-01` is frozen/inactive pending its design-head hosted gate, and final activation remains held. |
 | Hosted correction chain | Historical `bfa961d...` / run `30712296217` exposed [TEST-0175](../../features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175), then `43c1800...` / run `30714966450` exposed [TEST-0178](../../features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178). Their exact links remain canonical in the owning findings. The bounded documentation/memory correction at exact [`25e26f9...`](https://github.com/hasanmanzak/meAndAI/commit/25e26f908e1f123640c758e42e1db92d5eea6dde) closes both findings; publication verification was correctly skipped. |
 | Preserved implementation input | [`1873c98638ba4960734aadb188eb8c8d70b4bc52`](https://github.com/hasanmanzak/meAndAI/commit/1873c98638ba4960734aadb188eb8c8d70b4bc52) on [draft PR #160](https://github.com/hasanmanzak/meAndAI/pull/160) |
 | Current authority | The C plan and immutable evidence own completed A/B/C history. The accepted D plan authorizes only the ordered Policy-activation packet and its frozen red/green gates. Final Scenario/status/owner/workflow, runtime-efficiency activation, WIP, consumer, merge, release, publication, authority transfer, and PowerShell retirement remain held. |
