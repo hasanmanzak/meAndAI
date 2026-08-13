@@ -38,6 +38,7 @@
 | [DEC-0036](DEC-0036-prospective-instruction-graph-capacity.md) | [Expand instruction-graph capacity prospectively](DEC-0036-prospective-instruction-graph-capacity.md) | Accepted | 2026-08-09 |
 | [DEC-0037](DEC-0037-explicit-sdlc-and-github-native-workflow-authority.md) | [Use an explicit SDLC with GitHub-native tracking authority](DEC-0037-explicit-sdlc-and-github-native-workflow-authority.md) | Proposed; implementation authority withheld | 2026-08-12 |
 | [DEC-0038](DEC-0038-protocol-owned-workflow-contracts-and-bounded-agent-execution.md) | [Use protocol-owned workflow contracts and bounded agent execution](DEC-0038-protocol-owned-workflow-contracts-and-bounded-agent-execution.md) | Proposed; implementation authority withheld | 2026-08-12 |
+| [DEC-0039](DEC-0039-repository-knowledge-catalog-and-react-explorer.md) | [Add a Repository Knowledge Catalog with a React explorer](DEC-0039-repository-knowledge-catalog-and-react-explorer.md) | Proposed; implementation authority withheld | 2026-08-12 |
 
 The specification-first C# governance draft at
 `docs/decisions/DEC-0033-specification-first-csharp-governance.md` and bounded
@@ -49,6 +50,10 @@ Their identifier positions remain reserved and are not reused. Their compatible
 specification-first and parse-once rationale is incorporated into
 [DEC-0035](DEC-0035-protocol-owned-governance-and-execution-architecture.md)
 without presenting either draft record as default-branch authority.
+
+The [two immediately preceding decision positions](https://github.com/hasanmanzak/meAndAI/pull/181)
+were allocated by merged [PR #181](https://github.com/hasanmanzak/meAndAI/pull/181).
+Their identifier positions remain reserved while that draft is open.
 
 Create future records from the
 [decision template](../../templates/decision.md). A newer decision does not edit

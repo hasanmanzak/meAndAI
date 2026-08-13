@@ -27,6 +27,13 @@ cohort is locally validated through three separate `ReviewedLocalGreen` commits;
 hosted gate is pending. The parent scenario remains `Planned`, and D/activation
 are held.
 
+In parallel, the optional repository-navigation direction is captured as a
+records-only
+[Repository Knowledge Catalog planning handoff](2026-08-12-repository-knowledge-catalog-planning.md).
+It selects a React explorer over a read-only C# query boundary and a rebuildable
+SQLite projection. It does not replace or authorize changes to the active
+ContractSlice continuation, and catalog implementation remains unauthorized.
+
 Follow the current
 [instruction-graph capacity handoff](2026-08-09-feat-0069-instruction-graph-capacity.md)
 for the prospective `v0.17.0` profile and immutable prior-target boundary.
