@@ -5,6 +5,13 @@ and follow its canonical links.
 
 ## Current continuation
 
+Follow the proposed
+[agentic SDLC workflow architecture planning handoff](2026-08-12-agentic-sdlc-workflow-architecture.md)
+for the records-only promotion of the role-based multi-agent idea, the refreshed
+explicit SDLC/backlog scope, workflow/role/context architecture, planned tests,
+open Definition of Ready items, and the ContractSlice-C-first merge order. It
+does not change the active continuation or authorize implementation.
+
 Follow the current
 [ContractSlice D design freeze](2026-08-13-feat-0065-subf-0143-contractslice-d-design-freeze.md).
 ContractSlice A, B, and C are merged/exact-main green; C is `11/11`, and
@@ -13,6 +20,13 @@ the records-only D cohort/package freeze. D is `FrozenDesignCandidate`/inactive
 pending exact-head hosted design delivery and explicit maintainer acceptance.
 The parent scenario remains `Planned`; D implementation and final activation
 are held.
+
+In parallel, the optional repository-navigation direction is captured as a
+records-only
+[Repository Knowledge Catalog planning handoff](2026-08-12-repository-knowledge-catalog-planning.md).
+It selects a React explorer over a read-only C# query boundary and a rebuildable
+SQLite projection. It does not replace or authorize changes to the active
+ContractSlice continuation, and catalog implementation remains unauthorized.
 
 Follow the current
 [instruction-graph capacity handoff](2026-08-09-feat-0069-instruction-graph-capacity.md)
@@ -395,6 +409,7 @@ conversations while disallowing force pushes and deletion.
 ## History
 
 - [2026-08-12 - ContractSlice C design freeze](2026-08-12-feat-0065-subf-0143-contractslice-c-design-freeze.md)
+- [2026-08-12 - Agentic SDLC workflow architecture planning](2026-08-12-agentic-sdlc-workflow-architecture.md)
 - [2026-08-09 - ContractSlice B codec activation and wire packets](2026-08-09-feat-0065-subf-0143-contractslice-b-codec-activation-freeze.md)
 - [2026-08-09 - ContractSlice B structural surface](2026-08-09-feat-0065-subf-0143-contractslice-b-surface-freeze.md)
 - [2026-08-09 - ContractSlice B design freeze](2026-08-09-feat-0065-subf-0143-contractslice-b-design-freeze.md)
