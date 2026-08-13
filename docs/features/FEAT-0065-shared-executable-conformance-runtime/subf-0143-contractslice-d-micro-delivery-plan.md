@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Gate 2 micro-delivery plan and design freeze |
-| State | Design exact-head hosted green and maintainer accepted; Policy activation and producer infrastructure are `ExactHeadHostedGreen`; `D-RULE-0001-01` and `D-RULE-0002-01` are `ReviewedLocalGreen`; D is `6/11` and A+B+C+D/full Conformance is `60/60`; first-rules cohort push/hosted pending; `D-RULE-0003-01` is next/inactive |
+| State | Design exact-head hosted green and maintainer accepted; Policy activation, producer infrastructure, and the first-rules cohort are `ExactHeadHostedGreen`; `D-RULE-0003-01` is `ReviewedLocalGreen`; D is `7/11` and A+B+C+D/full Conformance is `61/61`; specialized-rules cohort is local `1/3` with push held and `D-RULE-0004-01` next/inactive |
 | Parent | [SUBF-0143](README.md#subf-0143) |
 | Scenario | [TEST-0210](test-cases.md#test-0210), retained `Planned` |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
@@ -429,14 +429,63 @@ invocation commitment. Focused green is `1/1`, D is `6/6`, full Conformance is
 `60/60`; the cohort then runs the complete local boundary and only its two
 separate commits are pushed together for exact-head hosted validation.
 
+### `D-RULE-0003-01` pre-red freeze
+
+The predecessor is exact-head hosted-green commit
+[`4b9e8af8083da824b09706674a725ef93b59f467`](https://github.com/hasanmanzak/meAndAI/commit/4b9e8af8083da824b09706674a725ef93b59f467)
+and run [31746252371](https://github.com/hasanmanzak/meAndAI/actions/runs/31746252371):
+Ubuntu passed in `22m36s`, Windows in `20m05s`, and publication verification
+was skipped. This packet adds exactly one direct non-skipped Fact,
+`ContractSliceDPolicyEvaluatorTests.Evaluates_rule_0003_with_exact_target_specialization_and_co_report`,
+with only `ContractSlice=D`, no Scenario/Theory/overload/class trait, and marker
+`TEST-0210-D-BEHAVIOR-RED-0005`.
+
+The fresh fixture parses governed repository/provider Markdown through the
+real fixed Markdig pipeline, builds the real governed-reference index, projects
+repository-target demand, binds real target-resolution evidence, and invokes
+the object-identical registered RULE-0003 evaluator. It covers CrossRecord,
+EmbeddedRecord, and Commit references; clickable, non-clickable, and unsupported
+syntax; local exact/missing/wrong/unresolved targets; qualified historical,
+current, tag, and captured paths; and the RULE-0003 side of specialized
+co-reporting. Unsupported authoring precedes not-clickable; not-clickable or
+incomplete visible target coverage precedes resolution; qualified unresolved
+precedes wrong-target. Embedded missing/wrong fragment is held for RULE-0004;
+Commit wrong repository/object is held for RULE-0005; both remain eligible for
+RULE-0003 common findings when the containing target itself is wrong. Exact
+qualified references emit no finding. Findings use the governed Derived
+reference as primary and retain ordered governed Root/Derived plus qualified
+target evidence as related references.
+
+The nullable semantic seam is
+`ContractSliceDPolicyEvaluatorFixture.EvaluateRule0003(InitialRuleQualificationPolicy.Export)`.
+Only the complete valid first common-finding call returning the predecessor
+empty intent reaches the marker; setup/index/projection/qualification defects,
+wrong codes/order/references, negative fixtures, cancellation, and exceptions
+remain marker-free. The production allowlist modifies only
+`PolicyIndexes.cs`, `RepositoryTargetResolutionDemandProjector.cs`,
+`PolicyRuleEvaluators.cs`, and `InitialPolicyRegistrationGraph.cs`; the test
+allowlist modifies only `ContractSliceDPolicyEvaluatorTests.cs` and may update
+`ContractSliceDProducerInfrastructureTests.cs` solely to retire RULE-0003's
+obsolete empty-intent staging assertion. No public API/declaration, codec/parser,
+project/package/lock/workflow, other rule, Domain, Application, or record node
+may change. The normalized changed-C# cap is `1,800` lines; crossing it requires
+a reviewed pre-red redraw.
+
+Canonical red uses one fresh external result root, exact FQN filter and
+marker-named TRX, one Release `--no-restore --no-build` child, native exit `1`,
+the common sixteen-counter/marker-only/no-diagnostic oracle, and irrevocable
+no-rerun after invocation commitment. Focused green is `1/1`, cumulative D is
+`7/7`, and full Conformance is `61/61`. RULE-0004 remains held until a separate
+`ReviewedLocalGreen` RULE-0003 commit exists.
+
 ## Cohort measurement ledger
 
 | Cohort | Local work/validation | Hosted CI | Hosted defects | Owner identification | Correction/revalidation | Estimated saving vs package-hosted | Consistency/traceability loss |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Policy activation | About `45m` local work; exact-tree StructureOnly `546.622s` and publication evidence `7/7` in `369.5s`, run concurrently | [Run 31719641316](https://github.com/hasanmanzak/meAndAI/actions/runs/31719641316): Ubuntu `18m53s`, Windows `18m40s`, publication skipped | `0` | Not applicable | `0` | Baseline: one avoided intermediate hosted wait | None observed |
 | Real producer infrastructure | About `2h` active implementation/validation; StructureOnly `527.148s`, publication evidence `7/7` in `337.4s` | Pending one cohort push | `0` locally | Not applicable locally | `0` locally | No avoided package push; singleton cohort preserves semantic isolation | None observed locally |
-| First common rules | RULE-0001 about `1h`; RULE-0002 about `1h` active implementation/validation; focused `1/1`, D `6/6`, full `60/60`, Domain `98/98`, API/ownership `15/15`, Release `0/0`, locks/format/diff clean; synchronized StructureOnly `528.328s`, publication evidence `7/7` in `334.7s`; evidence-line recurrence StructureOnly `501.510s`, publication `7/7` in `329.4s` | One cohort push/hosted validation pending | `0` locally | RULE-0001 isolated one registration token-identity defect plus one staging expectation; RULE-0002 isolated one predecessor staging expectation immediately | About `20m` total including rebuild/revalidation | One intermediate hosted wait avoided | None observed |
-| Specialized common rules | `NotMeasured` | `NotMeasured` | `NotMeasured` | `NotMeasured` | `NotMeasured` | Baseline: two avoided intermediate hosted waits | `NotMeasured` |
+| First common rules | RULE-0001 about `1h`; RULE-0002 about `1h` active implementation/validation; focused `1/1`, D `6/6`, full `60/60`, Domain `98/98`, API/ownership `15/15`, Release `0/0`, locks/format/diff clean; synchronized StructureOnly `528.328s`, publication evidence `7/7` in `334.7s`; evidence-line recurrence StructureOnly `501.510s`, publication `7/7` in `329.4s` | Run 31746252371: Ubuntu `22m36s`, Windows `20m05s`, publication skipped | `0` | RULE-0001 isolated one registration token-identity defect plus one staging expectation; RULE-0002 isolated one predecessor staging expectation immediately | About `20m` total including rebuild/revalidation | One intermediate hosted wait avoided | None observed |
+| Specialized common rules | RULE-0003 about `1h` active implementation/validation; focused `1/1`, D `7/7`, full `61/61`, Domain `98/98`, Release `0/0`, format/diff clean; `1,155/1,800` changed C# lines | Not pushed; cohort local `1/3` | `0` locally | One infrastructure staging expectation identified immediately by D cumulative test | Under `10m` including rebuild/revalidation | Baseline: two avoided intermediate hosted waits | None observed locally |
 | Equivalence/closure | `NotMeasured` | `NotMeasured` | `NotMeasured` | `NotMeasured` | `NotMeasured` | Baseline: two avoided intermediate hosted waits | `NotMeasured` |
 
 At D closure, observed duration, hosted duration, hosted defects, owning-package

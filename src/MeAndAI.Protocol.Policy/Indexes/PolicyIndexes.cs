@@ -1,6 +1,8 @@
 using MeAndAI.Protocol.Conformance.Abstractions;
 using MeAndAI.Protocol.Policy.Models;
 using Markdig.Syntax;
+using Markdig.Syntax.Inlines;
+using System.Text.RegularExpressions;
 
 namespace MeAndAI.Protocol.Policy.Indexes;
 
@@ -334,20 +336,521 @@ internal sealed class ProtocolRecordIndex(
         IReadOnlyList<string> MemberKeys);
 }
 
-internal sealed class GovernedReferenceIndex :
-    PolicyIndexer<IGovernedReferenceIndex>,
+internal sealed class GovernedReferenceIndex(
+    ModelTypeToken<MarkdownDocumentModel> inputModel) :
     IContextIndexer<PolicyIndexInput, IGovernedReferenceIndex>
 {
-    protected override IGovernedReferenceIndex CreateValue() =>
-        new GovernedReferenceCapability([]);
+    private static readonly Regex StableId = new(
+        @"\b(?:DEC|TEST|SUBF|FIND|RISK)-[0-9]{4}\b",
+        RegexOptions.CultureInvariant);
+    private static readonly Regex RawHref = new(
+        @"<a\s+[^>]*href\s*=",
+        RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
+    private readonly ModelTypeToken<MarkdownDocumentModel> _inputModel =
+        inputModel ?? throw new ArgumentNullException(nameof(inputModel));
+
+    public CapabilityIntent<IGovernedReferenceIndex> Build(
+        ContextIndexInput<PolicyIndexInput> input,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(input);
+        var rows = new List<GovernedReferenceView>();
+        foreach (var model in input.Value.Reader.RequireModels(_inputModel))
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            AddMarkdownLinks(input, model, rows);
+            AddRawForms(input, model, rows);
+        }
+
+        var value = new GovernedReferenceCapability(rows);
+        return CapabilityIntent<IGovernedReferenceIndex>.Produced(
+            CapabilityProduct<IGovernedReferenceIndex>.Create(
+                value,
+                rows.SelectMany(row => row.Target is null
+                    ? [row.Reference]
+                    : new[] { row.Reference, row.Target }),
+                Usage(rows.Count)));
+    }
+
+    public SemanticResourceLocalUsage MeasureLocal(
+        ContextIndexInput<PolicyIndexInput> input,
+        IGovernedReferenceIndex value,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(input);
+        ArgumentNullException.ThrowIfNull(value);
+        cancellationToken.ThrowIfCancellationRequested();
+        return Usage(value.References.Count);
+    }
+
+    private static void AddMarkdownLinks(
+        ContextIndexInput<PolicyIndexInput> input,
+        SealedModelHandle<MarkdownDocumentModel> model,
+        ICollection<GovernedReferenceView> rows)
+    {
+        foreach (var block in model.Value.Document)
+        {
+            AddBlock(input, model, block, rows);
+        }
+    }
+
+    private static void AddBlock(
+        ContextIndexInput<PolicyIndexInput> input,
+        SealedModelHandle<MarkdownDocumentModel> model,
+        Block block,
+        ICollection<GovernedReferenceView> rows)
+    {
+        if (block is LeafBlock leaf)
+        {
+            for (var inline = leaf.Inline?.FirstChild;
+                 inline is not null;
+                 inline = inline.NextSibling)
+            {
+                AddInline(input, model, inline, rows);
+            }
+        }
+
+        if (block is ContainerBlock container)
+        {
+            foreach (var child in container)
+            {
+                AddBlock(input, model, child, rows);
+            }
+        }
+    }
+
+    private static void AddInline(
+        ContextIndexInput<PolicyIndexInput> input,
+        SealedModelHandle<MarkdownDocumentModel> model,
+        Inline inline,
+        ICollection<GovernedReferenceView> rows)
+    {
+        if (inline is LinkInline { IsImage: false, Url: not null } link)
+        {
+            rows.Add(Create(input, model, link.Url, GovernedReferenceSyntax.Clickable));
+            return;
+        }
+
+        if (inline is ContainerInline container)
+        {
+            for (var child = container.FirstChild;
+                 child is not null;
+                 child = child.NextSibling)
+            {
+                AddInline(input, model, child, rows);
+            }
+        }
+    }
+
+    private static void AddRawForms(
+        ContextIndexInput<PolicyIndexInput> input,
+        SealedModelHandle<MarkdownDocumentModel> model,
+        ICollection<GovernedReferenceView> rows)
+    {
+        var source = model.Value.CanonicalText;
+        foreach (Match match in RawHref.Matches(source))
+        {
+            rows.Add(Create(
+                input,
+                model,
+                $"raw-html:{match.Index}",
+                GovernedReferenceSyntax.UnsupportedAuthoringForm));
+        }
+
+        foreach (var line in source.Split('\n'))
+        {
+            if (line.Contains("](", StringComparison.Ordinal) ||
+                RawHref.IsMatch(line))
+            {
+                continue;
+            }
+
+            foreach (Match match in StableId.Matches(line))
+            {
+                rows.Add(Create(
+                    input,
+                    model,
+                    match.Value,
+                    GovernedReferenceSyntax.NonClickable));
+            }
+        }
+    }
+
+    private static GovernedReferenceView Create(
+        ContextIndexInput<PolicyIndexInput> input,
+        SealedModelHandle<MarkdownDocumentModel> model,
+        string targetText,
+        GovernedReferenceSyntax syntax)
+    {
+        var shape = TargetShape.Parse(targetText, syntax);
+        var reference = input.Derivations.Derive(
+            model.Evidence,
+            "protocol.node.governed-reference",
+            targetText,
+            model.Value.Location);
+        var target = shape.Resolution.Equals(GovernedReferenceResolution.Exact)
+            ? input.Derivations.Derive(
+                reference,
+                "protocol.node.governed-reference-target",
+                shape.Path ?? shape.Fragment ?? targetText,
+                model.Value.Location)
+            : null;
+        return GovernedReferenceView.Create(
+            shape.Kind,
+            syntax,
+            shape.Resolution,
+            shape.Owner,
+            shape.Commit,
+            shape.Tag,
+            shape.Capture,
+            shape.Path,
+            shape.Fragment,
+            reference,
+            target);
+    }
+
+    private static SemanticResourceLocalUsage Usage(int count) =>
+        SemanticResourceLocalUsage.Create(0, count == 0 ? 0 : 1, count, count);
+
+    private sealed record TargetShape(
+        GovernedReferenceKind Kind,
+        GovernedReferenceResolution Resolution,
+        string? Owner,
+        string? Commit,
+        string? Tag,
+        string? Capture,
+        string? Path,
+        string? Fragment)
+    {
+        internal static TargetShape Parse(
+            string value,
+            GovernedReferenceSyntax syntax)
+        {
+            if (!syntax.Equals(GovernedReferenceSyntax.Clickable))
+            {
+                return new(
+                    GovernedReferenceKind.EmbeddedRecord,
+                    GovernedReferenceResolution.Unresolved,
+                    null, null, null, null, null,
+                    StableId.Match(value).Success
+                        ? value.ToLowerInvariant()
+                        : null);
+            }
+
+            const string github = "https://github.com/";
+            var fragmentAt = value.IndexOf('#');
+            var fragment = fragmentAt < 0 ? null : value[(fragmentAt + 1)..];
+            var withoutFragment = fragmentAt < 0 ? value : value[..fragmentAt];
+            if (withoutFragment.StartsWith(github, StringComparison.Ordinal))
+            {
+                var parts = withoutFragment[github.Length..].Split('/');
+                if (parts.Length == 4 && parts[2] == "commit" &&
+                    IsObjectId(parts[3]))
+                {
+                    return new(
+                        GovernedReferenceKind.Commit,
+                        GovernedReferenceResolution.ExternalEvidenceRequired,
+                        github + parts[0] + "/" + parts[1],
+                        parts[3], null, null, null, fragment);
+                }
+
+                if (parts.Length >= 5 && parts[2] == "blob")
+                {
+                    var path = string.Join('/', parts.Skip(4));
+                    return new(
+                        IsStableFragment(fragment)
+                            ? GovernedReferenceKind.EmbeddedRecord
+                            : GovernedReferenceKind.CrossRecord,
+                        GovernedReferenceResolution.ExternalEvidenceRequired,
+                        github + parts[0] + "/" + parts[1],
+                        IsObjectId(parts[3]) ? parts[3] : null,
+                        IsObjectId(parts[3]) ? null : parts[3],
+                        null, path, fragment);
+                }
+
+                return new(
+                    GovernedReferenceKind.CrossRecord,
+                    GovernedReferenceResolution.Unresolved,
+                    null, null, null, null, null, fragment);
+            }
+
+            if (Uri.TryCreate(withoutFragment, UriKind.Absolute, out _))
+            {
+                return new(
+                    GovernedReferenceKind.CrossRecord,
+                    GovernedReferenceResolution.ExternalEvidenceRequired,
+                    null, null, null, null, withoutFragment, fragment);
+            }
+
+            var resolution = string.IsNullOrWhiteSpace(withoutFragment)
+                ? GovernedReferenceResolution.WrongTarget
+                : string.IsNullOrWhiteSpace(fragment)
+                    ? GovernedReferenceResolution.MissingFragment
+                    : GovernedReferenceResolution.Exact;
+            return new(
+                IsStableFragment(fragment)
+                    ? GovernedReferenceKind.EmbeddedRecord
+                    : GovernedReferenceKind.CrossRecord,
+                resolution,
+                null, null, null, null,
+                string.IsNullOrWhiteSpace(withoutFragment)
+                    ? null
+                    : withoutFragment.Replace('\\', '/'),
+                fragment);
+        }
+
+        private static bool IsObjectId(string value) =>
+            value.Length == 40 && value.All(character =>
+                character is >= '0' and <= '9' or >= 'a' and <= 'f');
+
+        private static bool IsStableFragment(string? value) =>
+            value is not null && StableId.IsMatch(value.ToUpperInvariant());
+    }
 }
 
-internal sealed class RepositoryTargetResolutionIndex :
-    PolicyIndexer<IRepositoryTargetResolutionIndex>,
+internal sealed class RepositoryTargetResolutionIndex(
+    CapabilityTypeToken<IGovernedReferenceIndex> governedCapability,
+    ModelTypeToken<RepositoryTargetResolutionModel> targetModel,
+    ModelTypeToken<RepositoryTargetMarkdownDocumentSetModel> targetMarkdownModel) :
     IContextIndexer<PolicyIndexInput, IRepositoryTargetResolutionIndex>
 {
-    protected override IRepositoryTargetResolutionIndex CreateValue() =>
-        new RepositoryTargetResolutionCapability([]);
+    private readonly CapabilityTypeToken<IGovernedReferenceIndex> _governedCapability =
+        governedCapability ?? throw new ArgumentNullException(nameof(governedCapability));
+    private readonly ModelTypeToken<RepositoryTargetResolutionModel> _targetModel =
+        targetModel ?? throw new ArgumentNullException(nameof(targetModel));
+    private readonly ModelTypeToken<RepositoryTargetMarkdownDocumentSetModel>
+        _targetMarkdownModel = targetMarkdownModel ??
+            throw new ArgumentNullException(nameof(targetMarkdownModel));
+
+    public CapabilityIntent<IRepositoryTargetResolutionIndex> Build(
+        ContextIndexInput<PolicyIndexInput> input,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(input);
+        cancellationToken.ThrowIfCancellationRequested();
+        var governed = input.Value.Reader.RequireCapability(_governedCapability).Value;
+        _ = input.Value.Reader.RequireModels(_targetMarkdownModel);
+        var targets = new List<RepositoryTargetResolutionView>();
+        if (governed.References.Count == 0)
+        {
+            var empty = new RepositoryTargetResolutionCapability(targets);
+            return CapabilityIntent<IRepositoryTargetResolutionIndex>.Produced(
+                CapabilityProduct<IRepositoryTargetResolutionIndex>.Create(
+                    empty, [], Usage(0)));
+        }
+
+        foreach (var model in input.Value.Reader.RequireModels(_targetModel))
+        {
+            foreach (var row in model.Value.Rows)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                var binding = input.Value.Reader.RequireDemandBinding(
+                    row.DemandItem.ItemId);
+                if (!governed.References.Any(reference =>
+                        ReferenceEquals(reference.Reference, binding.SourceReference)))
+                {
+                    throw new InvalidOperationException(
+                        "The target row does not bind a governed reference.");
+                }
+
+                var evidence = input.Derivations.Derive(
+                    model.Evidence,
+                    "protocol.node.repository-target-resolution",
+                    row.DemandItem.ItemId.ToString(
+                        System.Globalization.CultureInfo.InvariantCulture),
+                    model.Value.Binding.Location);
+                var shape = row.Accept(new TargetRowVisitor());
+                var target = shape.HasTarget
+                    ? input.Derivations.Derive(
+                        evidence,
+                        "protocol.node.repository-target",
+                        row.DemandItem.NormalizedRepositoryRelativePath ??
+                            row.DemandItem.OwningRepositoryIdentity,
+                        model.Value.Binding.Location)
+                    : null;
+                targets.Add(RepositoryTargetResolutionView.Create(
+                    binding.SourceReference,
+                    shape.Resolution,
+                    evidence,
+                    shape.HasCommit ? evidence : null,
+                    shape.HasTag ? evidence : null,
+                    target));
+            }
+        }
+
+        var value = new RepositoryTargetResolutionCapability(targets);
+        return CapabilityIntent<IRepositoryTargetResolutionIndex>.Produced(
+            CapabilityProduct<IRepositoryTargetResolutionIndex>.Create(
+                value,
+                targets.Select(item => item.ResolutionEvidence),
+                Usage(targets.Count)));
+    }
+
+    public SemanticResourceLocalUsage MeasureLocal(
+        ContextIndexInput<PolicyIndexInput> input,
+        IRepositoryTargetResolutionIndex value,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(input);
+        ArgumentNullException.ThrowIfNull(value);
+        cancellationToken.ThrowIfCancellationRequested();
+        return Usage(value.Targets.Count);
+    }
+
+    private static SemanticResourceLocalUsage Usage(int count) =>
+        SemanticResourceLocalUsage.Create(0, count == 0 ? 0 : 1, count, count);
+
+    private sealed record RowShape(
+        GovernedReferenceResolution Resolution,
+        bool HasCommit,
+        bool HasTag,
+        bool HasTarget);
+
+    private sealed class TargetRowVisitor :
+        IRepositoryTargetResolutionPayloadRowVisitor<RowShape>
+    {
+        public RowShape VisitMissingCommit(
+            RepositoryTargetResolutionDemandItem demandItem) =>
+            new(GovernedReferenceResolution.Unresolved, false, false, false);
+
+        public RowShape VisitPresentCommit(
+            RepositoryTargetResolutionDemandItem demandItem,
+            string observedOwner,
+            string observedType,
+            string observedIdentity) =>
+            Commit(demandItem, observedOwner, observedType, observedIdentity, null);
+
+        public RowShape VisitPresentCommitMissingPath(
+            RepositoryTargetResolutionDemandItem demandItem,
+            string observedOwner,
+            string observedType,
+            string observedIdentity) =>
+            Commit(demandItem, observedOwner, observedType, observedIdentity, false);
+
+        public RowShape VisitPresentCommitPath(
+            RepositoryTargetResolutionDemandItem demandItem,
+            string observedOwner,
+            string observedType,
+            string observedIdentity,
+            string observedPath,
+            string observedPathType,
+            string observedPathIdentity,
+            RepositoryTargetResolutionContent? content)
+        {
+            var commit = Commit(
+                demandItem, observedOwner, observedType, observedIdentity, true);
+            if (!commit.Resolution.Equals(GovernedReferenceResolution.Exact))
+            {
+                return commit;
+            }
+
+            return string.Equals(
+                    demandItem.NormalizedRepositoryRelativePath,
+                    observedPath,
+                    StringComparison.Ordinal)
+                ? commit
+                : new(GovernedReferenceResolution.WrongTarget, true, false, true);
+        }
+
+        public RowShape VisitMissingTag(
+            RepositoryTargetResolutionDemandItem demandItem) =>
+            new(GovernedReferenceResolution.Unresolved, false, false, false);
+
+        public RowShape VisitPresentTag(
+            RepositoryTargetResolutionDemandItem demandItem,
+            string observedOwner,
+            string observedRefName,
+            string observedRefType,
+            string observedRefIdentity,
+            string observedPeeledType,
+            string observedPeeledIdentity)
+        {
+            var expected = "refs/tags/" + demandItem.NormalizedTagName;
+            var exact = string.Equals(
+                    demandItem.OwningRepositoryIdentity,
+                    observedOwner,
+                    StringComparison.Ordinal) &&
+                string.Equals(expected, observedRefName, StringComparison.Ordinal) &&
+                observedPeeledType == "commit";
+            return new(
+                exact ? GovernedReferenceResolution.Exact :
+                    GovernedReferenceResolution.WrongTarget,
+                false, true, exact);
+        }
+
+        public RowShape VisitMissingCapturedPath(
+            RepositoryTargetResolutionDemandItem demandItem) =>
+            new(GovernedReferenceResolution.Unresolved, false, false, false);
+
+        public RowShape VisitPresentCapturedPath(
+            RepositoryTargetResolutionDemandItem demandItem,
+            string observedOwner,
+            string observedCapture,
+            string observedPath,
+            string observedEntryKind,
+            string observedContentIdentity,
+            RepositoryTargetResolutionContent content)
+        {
+            var exact = string.Equals(
+                    demandItem.OwningRepositoryIdentity,
+                    observedOwner,
+                    StringComparison.Ordinal) &&
+                string.Equals(
+                    demandItem.CapturedSnapshotIdentity,
+                    observedCapture,
+                    StringComparison.Ordinal) &&
+                string.Equals(
+                    demandItem.NormalizedRepositoryRelativePath,
+                    observedPath,
+                    StringComparison.Ordinal) &&
+                observedEntryKind == "file";
+            return new(
+                exact ? GovernedReferenceResolution.Exact :
+                    GovernedReferenceResolution.WrongTarget,
+                false, false, exact);
+        }
+
+        private static RowShape Commit(
+            RepositoryTargetResolutionDemandItem demandItem,
+            string owner,
+            string type,
+            string identity,
+            bool? pathPresent)
+        {
+            if (!string.Equals(
+                    demandItem.OwningRepositoryIdentity,
+                    owner,
+                    StringComparison.Ordinal))
+            {
+                return new(
+                    GovernedReferenceResolution.WrongRepository,
+                    true, false, pathPresent == true);
+            }
+
+            if (type != "commit" || !string.Equals(
+                    demandItem.CommitObjectId,
+                    identity,
+                    StringComparison.Ordinal))
+            {
+                return new(
+                    GovernedReferenceResolution.WrongObject,
+                    true, false, pathPresent == true);
+            }
+
+            if (demandItem.NormalizedRepositoryRelativePath is not null &&
+                pathPresent != true)
+            {
+                return new(
+                    GovernedReferenceResolution.Unresolved,
+                    true, false, false);
+            }
+
+            return new(
+                GovernedReferenceResolution.Exact,
+                true, false, pathPresent == true ||
+                    demandItem.NormalizedRepositoryRelativePath is null);
+        }
+    }
 }
 
 internal abstract class PolicyIndexer<TCapability>

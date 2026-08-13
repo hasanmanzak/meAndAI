@@ -11,10 +11,65 @@ internal sealed class RepositoryTargetResolutionDemandProjector :
     {
         ArgumentNullException.ThrowIfNull(input);
         cancellationToken.ThrowIfCancellationRequested();
+        var candidates = new List<RepositoryTargetResolutionDemandCandidate>();
+        for (var index = 0; index < input.Inputs.Count; index++)
+        {
+            var authority = input.SourceReferenceAuthorities[index];
+            foreach (var reference in input.Inputs[index].References)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                if (!reference.Resolution.Equals(
+                        GovernedReferenceResolution.ExternalEvidenceRequired))
+                {
+                    continue;
+                }
+
+                var owner = reference.OwningRepositoryIdentity ??
+                    authority.OwningRepositoryIdentity;
+                var sourceAuthority = authority.AuthorityProof;
+                if (reference.CommitObjectId is not null)
+                {
+                    candidates.Add(
+                        RepositoryTargetResolutionDemandCandidate.CommitObject(
+                            owner,
+                            reference.CommitObjectId,
+                            reference.NormalizedRepositoryRelativePath,
+                            reference.NormalizedFragment,
+                            reference.Reference,
+                            sourceAuthority));
+                }
+                else if (reference.NormalizedTagName is not null)
+                {
+                    candidates.Add(
+                        RepositoryTargetResolutionDemandCandidate.TagRoot(
+                            owner,
+                            reference.NormalizedTagName,
+                            reference.Reference,
+                            sourceAuthority));
+                }
+                else if (reference.CapturedSnapshotIdentity is not null &&
+                    reference.NormalizedRepositoryRelativePath is not null &&
+                    reference.NormalizedFragment is not null &&
+                    authority.CapturedManifestContentIdentity is not null)
+                {
+                    candidates.Add(
+                        RepositoryTargetResolutionDemandCandidate
+                            .CapturedSnapshotPath(
+                                owner,
+                                reference.CapturedSnapshotIdentity,
+                                reference.NormalizedRepositoryRelativePath,
+                                reference.NormalizedFragment,
+                                authority.CapturedManifestContentIdentity,
+                                reference.Reference,
+                                sourceAuthority));
+                }
+            }
+        }
+
         return DemandProjectionIntent.Projected(
             DemandProjectionProduct.Create(
-                [],
-                SemanticResourceLocalUsage.Create(0, 0, 0, 0)));
+                candidates,
+                Usage(candidates.Count)));
     }
 
     public SemanticResourceLocalUsage MeasureLocal(
@@ -25,10 +80,13 @@ internal sealed class RepositoryTargetResolutionDemandProjector :
         ArgumentNullException.ThrowIfNull(input);
         ArgumentNullException.ThrowIfNull(value);
         cancellationToken.ThrowIfCancellationRequested();
-        return SemanticResourceLocalUsage.Create(
-            generatedBytes: 0,
-            layerDepth: value.Count == 0 ? 0 : 1,
-            layerNodes: value.Count,
-            additionalComplexity: value.Count);
+        return Usage(value.Count);
     }
+
+    private static SemanticResourceLocalUsage Usage(int count) =>
+        SemanticResourceLocalUsage.Create(
+            generatedBytes: 0,
+            layerDepth: count == 0 ? 0 : 1,
+            layerNodes: count,
+            additionalComplexity: count);
 }

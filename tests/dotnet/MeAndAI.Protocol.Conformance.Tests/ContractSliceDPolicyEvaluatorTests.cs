@@ -1,6 +1,7 @@
 using MeAndAI.Protocol.Conformance.Abstractions;
 using MeAndAI.Protocol.Domain;
 using MeAndAI.Protocol.Policy;
+using MeAndAI.Protocol.Policy.Models;
 using System.Text;
 
 namespace MeAndAI.Protocol.Conformance.Tests;
@@ -9,6 +10,7 @@ public sealed class ContractSliceDPolicyEvaluatorTests
 {
     private const string Rule1Marker = "TEST-0210-D-BEHAVIOR-RED-0003";
     private const string Rule2Marker = "TEST-0210-D-BEHAVIOR-RED-0004";
+    private const string Rule3Marker = "TEST-0210-D-BEHAVIOR-RED-0005";
 
     [Fact]
     [Trait("ContractSlice", "D")]
@@ -45,6 +47,24 @@ public sealed class ContractSliceDPolicyEvaluatorTests
         Assert.True(evidence.ExactReferences);
         Assert.True(evidence.CancellationClosed);
     }
+
+    [Fact]
+    [Trait("ContractSlice", "D")]
+    public void Evaluates_rule_0003_with_exact_target_specialization_and_co_report()
+    {
+        ContractSliceDPolicyEvaluatorEvidence? evidence =
+            ContractSliceDPolicyEvaluatorFixture.EvaluateRule0003(
+                InitialRuleQualificationPolicy.Export);
+        if (evidence is null)
+        {
+            Assert.Fail(Rule3Marker);
+        }
+
+        Assert.Equal(7, evidence.ExercisedFindings);
+        Assert.Equal(12, evidence.ExercisedFixtures);
+        Assert.True(evidence.ExactReferences);
+        Assert.True(evidence.CancellationClosed);
+    }
 }
 
 internal sealed record ContractSliceDPolicyEvaluatorEvidence(
@@ -64,6 +84,14 @@ internal static class ContractSliceDPolicyEvaluatorFixture
     private const string DecisionSelector = "protocol.selector.decision-record";
     private const string Rule1 = "RULE-0001";
     private const string Rule2 = "RULE-0002";
+    private const string Rule3 = "RULE-0003";
+    private const string RepositoryGovernedSlot =
+        "protocol.slot.repository-governed-text";
+    private const string ProviderGovernedSlot =
+        "protocol.slot.provider-governed-text";
+    private const string TargetSlot =
+        "protocol.slot.repository-target-resolution";
+    private const string Owner = "https://github.com/owner/repo";
     private const string ObjectIdentity =
         "0123456789abcdef0123456789abcdef01234567";
     private const string ReferenceText = "# Feature record\n\nSee DEC-0001.\n";
@@ -274,6 +302,235 @@ internal static class ContractSliceDPolicyEvaluatorFixture
             cases.All(item => item.CancellationClosed));
     }
 
+    internal static ContractSliceDPolicyEvaluatorEvidence? EvaluateRule0003(
+        PolicyQualificationSliceExport export)
+    {
+        ArgumentNullException.ThrowIfNull(export);
+
+        var unsupported = EvaluateReference(export, Reference(
+            GovernedReferenceKind.CrossRecord,
+            GovernedReferenceSyntax.UnsupportedAuthoringForm,
+            GovernedReferenceResolution.Exact));
+        if (unsupported.Intent.Findings.Count == 0 &&
+            unsupported.Intent.Failures.Count == 0)
+        {
+            return null;
+        }
+
+        AssertReferenceFinding(
+            unsupported, "protocol.reference.unsupported-authoring-form");
+        var nonClickable = EvaluateReference(export, Reference(
+            GovernedReferenceKind.CrossRecord,
+            GovernedReferenceSyntax.NonClickable,
+            GovernedReferenceResolution.Unresolved));
+        AssertReferenceFinding(nonClickable, "protocol.reference.not-clickable");
+        var unresolved = EvaluateReference(export, Reference(
+            GovernedReferenceKind.CrossRecord,
+            GovernedReferenceSyntax.Clickable,
+            GovernedReferenceResolution.Unresolved));
+        AssertReferenceFinding(unresolved, "protocol.reference.unresolved-target");
+        var wrongTarget = EvaluateReference(export, Reference(
+            GovernedReferenceKind.CrossRecord,
+            GovernedReferenceSyntax.Clickable,
+            GovernedReferenceResolution.WrongTarget));
+        AssertReferenceFinding(wrongTarget, "protocol.reference.wrong-target");
+        var missingFragment = EvaluateReference(export, Reference(
+            GovernedReferenceKind.CrossRecord,
+            GovernedReferenceSyntax.Clickable,
+            GovernedReferenceResolution.MissingFragment));
+        AssertReferenceFinding(missingFragment, "protocol.reference.wrong-target");
+        var exact = EvaluateReference(export, Reference(
+            GovernedReferenceKind.CrossRecord,
+            GovernedReferenceSyntax.Clickable,
+            GovernedReferenceResolution.Exact));
+        AssertReferenceFinding(exact);
+        var externalUnqualified = EvaluateReference(export, Reference(
+            GovernedReferenceKind.CrossRecord,
+            GovernedReferenceSyntax.Clickable,
+            GovernedReferenceResolution.ExternalEvidenceRequired));
+        AssertReferenceFinding(externalUnqualified);
+        var externalExact = EvaluateReference(export, Reference(
+            GovernedReferenceKind.CrossRecord,
+            GovernedReferenceSyntax.Clickable,
+            GovernedReferenceResolution.ExternalEvidenceRequired),
+            GovernedReferenceResolution.Exact);
+        AssertReferenceFinding(externalExact);
+        var embeddedFragment = EvaluateReference(export, Reference(
+            GovernedReferenceKind.EmbeddedRecord,
+            GovernedReferenceSyntax.Clickable,
+            GovernedReferenceResolution.WrongFragment));
+        AssertReferenceFinding(embeddedFragment);
+        var commitOwner = EvaluateReference(export, Reference(
+            GovernedReferenceKind.Commit,
+            GovernedReferenceSyntax.Clickable,
+            GovernedReferenceResolution.WrongRepository));
+        AssertReferenceFinding(commitOwner);
+        var embeddedContainingTarget = EvaluateReference(export, Reference(
+            GovernedReferenceKind.EmbeddedRecord,
+            GovernedReferenceSyntax.Clickable,
+            GovernedReferenceResolution.WrongTarget));
+        AssertReferenceFinding(
+            embeddedContainingTarget, "protocol.reference.wrong-target");
+        var commitContainingTarget = EvaluateReference(export, Reference(
+            GovernedReferenceKind.Commit,
+            GovernedReferenceSyntax.Clickable,
+            GovernedReferenceResolution.WrongTarget),
+            GovernedReferenceResolution.WrongTarget,
+            provider: true);
+        AssertReferenceFinding(
+            commitContainingTarget, "protocol.reference.wrong-target");
+
+        AssertRealReferencePipeline(export);
+        var cases = new[]
+        {
+            unsupported, nonClickable, unresolved, wrongTarget, missingFragment,
+            exact, externalUnqualified, externalExact, embeddedFragment,
+            commitOwner, embeddedContainingTarget, commitContainingTarget,
+        };
+        return new(
+            cases.Sum(item => item.Intent.Findings.Count),
+            cases.Length,
+            cases.All(item => item.ExactReferences),
+            cases.All(item => item.CancellationClosed));
+    }
+
+    private static ReferenceCase EvaluateReference(
+        PolicyQualificationSliceExport export,
+        GovernedReferenceView reference,
+        GovernedReferenceResolution? overlay = null,
+        bool provider = false)
+    {
+        var referenceIndex = new ReferenceIndexFixture([reference]);
+        var targetEvidence = QualifiedEvidenceHandle.Create();
+        var targets = overlay is null
+            ? Array.Empty<RepositoryTargetResolutionView>()
+            :
+            [
+                RepositoryTargetResolutionView.Create(
+                    reference.Reference,
+                    overlay,
+                    targetEvidence,
+                    null,
+                    null,
+                    reference.Target),
+            ];
+        var targetIndex = new TargetIndexFixture(targets);
+        var referenceHandle = CapabilityHandle<IGovernedReferenceIndex>.Create(
+            CapabilityTypeToken<IGovernedReferenceIndex>.Create(
+                export.SchemaRegistry.Indexes.Single(item =>
+                    item.IndexKey == "protocol.index.governed-reference")
+                    .OutputCapability),
+            referenceIndex,
+            [reference.Reference],
+            SemanticResourceUsage.Create(0, 0, 0, 0),
+            SemanticResourceLedger.Create([]));
+        var targetHandle = CapabilityHandle<IRepositoryTargetResolutionIndex>.Create(
+            CapabilityTypeToken<IRepositoryTargetResolutionIndex>.Create(
+                export.SchemaRegistry.Indexes.Single(item =>
+                    item.IndexKey == "protocol.index.repository-target-resolution")
+                    .OutputCapability),
+            targetIndex,
+            targets.Select(item => item.ResolutionEvidence),
+            SemanticResourceUsage.Create(0, 0, 0, 0),
+            SemanticResourceLedger.Create([]));
+        var governedSlot = provider ? ProviderGovernedSlot : RepositoryGovernedSlot;
+        var context = QualifiedEvidenceHandle.Create();
+        var access = RuleInputAccess.Create(
+            [
+                SlotCapabilityBinding.Create(governedSlot, referenceHandle),
+                SlotCapabilityBinding.Create(TargetSlot, targetHandle),
+            ],
+            new Dictionary<string, QualifiedEvidenceHandle>
+            {
+                [governedSlot] = context,
+                [TargetSlot] = targetEvidence,
+            },
+            ExpectedReferences.Rejecting);
+        var registration = export.EvaluatorRegistrations.Single(item =>
+            item.Declaration.RuleId.Value == Rule3);
+        var input = RuleEvaluationInput.Create(
+            registration.Declaration.RuleId,
+            registration.Declaration.RuleRevision,
+            ExecutionProfile.Create(
+                SubjectRole.Consumer,
+                ProtocolOperation.Conformance,
+                SnapshotKind.ExactCommit,
+                SurfaceSet.Create([
+                    provider ? SurfaceKind.Provider : SurfaceKind.Repository,
+                ]),
+                EnforcementPhase.Audit),
+            access);
+        var intent = registration.Evaluator.Evaluate(input, CancellationToken.None);
+        Assert.Throws<OperationCanceledException>(() =>
+            registration.Evaluator.Evaluate(input, new CancellationToken(true)));
+        return new(intent, reference, context, overlay is null ? null : targetEvidence,
+            true, true);
+    }
+
+    private static GovernedReferenceView Reference(
+        GovernedReferenceKind kind,
+        GovernedReferenceSyntax syntax,
+        GovernedReferenceResolution resolution)
+    {
+        var reference = QualifiedEvidenceHandle.Create();
+        var target = QualifiedEvidenceHandle.Create();
+        return GovernedReferenceView.Create(
+            kind,
+            syntax,
+            resolution,
+            Owner,
+            kind.Equals(GovernedReferenceKind.Commit) ? ObjectIdentity : null,
+            null,
+            null,
+            "docs/decisions/DEC-0001.md",
+            "dec-0001",
+            reference,
+            target);
+    }
+
+    private static void AssertReferenceFinding(
+        ReferenceCase actual,
+        params string[] codes)
+    {
+        Assert.Empty(actual.Intent.Failures);
+        Assert.Equal(codes, actual.Intent.Findings.Select(item => item.Code.Value));
+        foreach (var finding in actual.Intent.Findings)
+        {
+            Assert.Same(actual.Reference.Reference, finding.PrimaryReference);
+            Assert.Contains(actual.Context, finding.RelatedReferences);
+            Assert.Contains(actual.Reference.Target!, finding.RelatedReferences);
+            if (actual.TargetEvidence is not null)
+            {
+                Assert.Contains(actual.TargetEvidence, finding.RelatedReferences);
+            }
+        }
+    }
+
+    private static void AssertRealReferencePipeline(
+        PolicyQualificationSliceExport export)
+    {
+        var text = $"- [commit](https://github.com/owner/repo/commit/{ObjectIdentity})";
+        var source = export.CodecRegistrations
+            .Single(item => item.Declaration.SchemaKey == "protocol.governed-text")
+            .Accept(new TextCodecVisitor(export, "docs/reference.md", text));
+        var model = export.ParserRegistrations
+            .Single(item => item.Declaration.ParserKey == "protocol.parser.markdown")
+            .Accept(new MarkdownParserVisitor(source));
+        var indexed = export.IndexRegistrations
+            .Single(item => item.Declaration.IndexKey ==
+                "protocol.index.governed-reference")
+            .Accept(new GovernedIndexVisitor([model]));
+        var reference = Assert.Single(indexed.Index.References);
+        Assert.Equal(GovernedReferenceKind.Commit, reference.Kind);
+        Assert.Equal(GovernedReferenceSyntax.Clickable, reference.Syntax);
+        var projected = export.DemandProjectorRegistrations.Single()
+            .Accept(new ReferenceProjectionVisitor(export, indexed.Index));
+        var candidate = Assert.Single(projected);
+        Assert.Equal(Owner, candidate.OwningRepositoryIdentity);
+        Assert.Equal(ObjectIdentity, candidate.CommitObjectId);
+        Assert.Same(reference.Reference, candidate.SourceReference);
+    }
+
     private static EvaluationCase Evaluate(
         PolicyQualificationSliceExport export,
         params RepositoryTreePayloadEntry[] entries)
@@ -457,6 +714,14 @@ internal static class ContractSliceDPolicyEvaluatorFixture
         bool ExactReferences,
         bool CancellationClosed);
 
+    private sealed record ReferenceCase(
+        EvaluationIntent Intent,
+        GovernedReferenceView Reference,
+        QualifiedEvidenceHandle Context,
+        QualifiedEvidenceHandle? TargetEvidence,
+        bool ExactReferences,
+        bool CancellationClosed);
+
     private sealed record IndexedTree(
         IRepositoryTree Tree,
         CapabilityHandle<IRepositoryTree> Handle);
@@ -464,6 +729,106 @@ internal static class ContractSliceDPolicyEvaluatorFixture
     private sealed record IndexedRecords(
         IProtocolRecordIndex Index,
         CapabilityHandle<IProtocolRecordIndex> Handle);
+
+    private sealed record IndexedReferences(
+        IGovernedReferenceIndex Index,
+        CapabilityHandle<IGovernedReferenceIndex> Handle);
+
+    private sealed class ReferenceIndexFixture(
+        IEnumerable<GovernedReferenceView> references) : IGovernedReferenceIndex
+    {
+        public IReadOnlyList<GovernedReferenceView> References { get; } =
+            Array.AsReadOnly(references.ToArray());
+    }
+
+    private sealed class TargetIndexFixture(
+        IEnumerable<RepositoryTargetResolutionView> targets) :
+        IRepositoryTargetResolutionIndex
+    {
+        public IReadOnlyList<RepositoryTargetResolutionView> Targets { get; } =
+            Array.AsReadOnly(targets.ToArray());
+    }
+
+    private sealed class GovernedIndexVisitor(
+        IReadOnlyList<ISealedModelHandle> models) :
+        IIndexRegistrationVisitor<IndexedReferences>
+    {
+        public IndexedReferences Visit<TInput, TCapability>(
+            IndexRegistration<TInput, TCapability> registration)
+            where TInput : class, IComponentInput
+            where TCapability : class, IEvidenceCapability
+        {
+            var input = ContextIndexInput<TInput>.Create(
+                registration.Binder.Bind(TypedInputReader.Create(
+                    models, [],
+                    new Dictionary<string, QualifiedEvidenceHandle>(),
+                    ExpectedReferences.Rejecting, [], [])),
+                Allowance(registration.Declaration.Budget),
+                Derivations.Instance);
+            var product = registration.Indexer.Build(input, CancellationToken.None)
+                .Accept(CapabilityObserver<TCapability>.Instance);
+            var index = Assert.IsAssignableFrom<IGovernedReferenceIndex>(
+                product.Value);
+            return new IndexedReferences(
+                index,
+                CapabilityHandle<IGovernedReferenceIndex>.Create(
+                    CapabilityTypeToken<IGovernedReferenceIndex>.Create(
+                        registration.Declaration.OutputCapability),
+                    index,
+                    product.Evidence,
+                    SemanticResourceUsage.Create(0, 0, 0, 0),
+                    SemanticResourceLedger.Create([])));
+        }
+    }
+
+    private sealed class ReferenceProjectionVisitor(
+        PolicyQualificationSliceExport export,
+        IGovernedReferenceIndex index) :
+        IDemandProjectorRegistrationVisitor<
+            IReadOnlyList<RepositoryTargetResolutionDemandCandidate>>
+    {
+        public IReadOnlyList<RepositoryTargetResolutionDemandCandidate>
+            Visit<TCapability>(DemandProjectorRegistration<TCapability> registration)
+            where TCapability : class, IEvidenceCapability
+        {
+            var typed = Assert.IsAssignableFrom<TCapability>(index);
+            var authority = SourceReferenceResolutionAuthority.Create(
+                index.References[0].Reference,
+                QualifiedEvidenceHandle.Create(),
+                Owner,
+                ObjectIdentity,
+                null,
+                null,
+                null,
+                null);
+            var slot = export.Catalog.Rules.Single(item =>
+                    item.RuleId.Value == Rule3).EvaluationSlots.Single(item =>
+                    item.SlotKey == TargetSlot);
+            var input = DemandProjectionInput<TCapability>.Create(
+                slot,
+                ContractSliceDProducerInfrastructureFixture.RepositoryScope().Target,
+                [typed],
+                [0],
+                [authority],
+                [0],
+                Allowance(registration.Declaration.Budget));
+            return registration.Projector.Project(input, CancellationToken.None)
+                .Accept(ProjectionObserver.Instance).Candidates;
+        }
+    }
+
+    private sealed class ProjectionObserver :
+        IDemandProjectionIntentVisitor<DemandProjectionProduct>
+    {
+        internal static ProjectionObserver Instance { get; } = new();
+
+        public DemandProjectionProduct VisitProjected(
+            DemandProjectionProduct product) => product;
+
+        public DemandProjectionProduct VisitFailed(
+            SemanticFailureIntent failure) =>
+            throw new InvalidOperationException(failure.Code.Value);
+    }
 
     private sealed class TextCodecVisitor(
         PolicyQualificationSliceExport export,
