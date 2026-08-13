@@ -155,7 +155,7 @@ Last verified: **2026-08-13**
   Ubuntu in `20m44s` and Windows in `46m51s`; publication verification was
   correctly skipped. The exact lifecycle implementation identity recorded in
   the canonical handoff passed Ubuntu in `19m36s` and Windows in `36m02s`; publication verification was
-  correctly skipped. ContractSlice A and B are merged/exact-main green; exact B closure evidence remains owned by the current C handoff and immutable B history. B is `11/11`, cumulative A+B `43/43`. C Activation, Applicability, and Evaluation are `ExactHeadHostedGreen`; the Results/closure cohort is locally validated through three separate `ReviewedLocalGreen` commits. C is `11/11` and current A+B+C/full Conformance is `54/54`. R=0006/R=0008/R=0009/R=0010/R=0012/R=0013/R=0016 are diagnostics/no-success and R=0007/R=0011/R=0014/R=0015/R=0017/R=0018 are accepted/immutable. `C-CONVERGE-01` records local `CompletionRecommended`; the cohort exact-head hosted gate is pending. The parent scenario, D, and final activation remain held. Follow the current [canonical log index](log/README.md). The
+  correctly skipped. ContractSlice A, B, and C are merged/exact-main green; C is `11/11` and A+B+C/full Conformance is `54/54`. Exact C closure and the prospective D route are owned by the current D design handoff. D is `FrozenDesignCandidate`/inactive pending exact-head hosted design delivery and explicit maintainer acceptance. The parent scenario, D implementation, and final activation remain held. Follow the current [canonical log index](log/README.md). The
   predecessor-manifest exact-head hosted-green handoff indexed there is
   immutable history; the admission-proof reviewed-local-green handoff,
   the selector reviewed-local-green handoff in the canonical log index,

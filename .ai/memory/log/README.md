@@ -6,18 +6,12 @@ and follow its canonical links.
 ## Current continuation
 
 Follow the current
-[ContractSlice C design freeze](2026-08-12-feat-0065-subf-0143-contractslice-c-design-freeze.md).
-ContractSlice A and B are merged/exact-main green; the linked C freeze owns the
-exact B merge and hosted-run closure. B remains
-`11/11`, cumulative A+B `43/43`; its accepted reds and immutable diagnostics
-remain owned by the historical B handoff below. C Activation and Applicability
-and Evaluation are `ExactHeadHostedGreen`; C is `11/11`, and current A+B+C/full
-Conformance is `54/54`. R=0006/R=0008/R=0009/R=0010/R=0012/R=0013/R=0016 are
-diagnostics/no-success and R=0007/R=0011/R=0014/R=0015/R=0017 are
-accepted/immutable; R=0018 is also accepted/immutable. The Results/closure
-cohort is locally validated through three separate `ReviewedLocalGreen` commits;
-`C-CONVERGE-01` records local `CompletionRecommended` while the cohort exact-head
-hosted gate is pending. The parent scenario remains `Planned`, and D/activation
+[ContractSlice D design freeze](2026-08-13-feat-0065-subf-0143-contractslice-d-design-freeze.md).
+ContractSlice A, B, and C are merged/exact-main green; C is `11/11`, and
+A+B+C/full Conformance is `54/54`. The linked handoff owns exact C closure and
+the records-only D cohort/package freeze. D is `FrozenDesignCandidate`/inactive
+pending exact-head hosted design delivery and explicit maintainer acceptance.
+The parent scenario remains `Planned`; D implementation and final activation
 are held.
 
 Follow the current
@@ -400,6 +394,7 @@ conversations while disallowing force pushes and deletion.
 
 ## History
 
+- [2026-08-12 - ContractSlice C design freeze](2026-08-12-feat-0065-subf-0143-contractslice-c-design-freeze.md)
 - [2026-08-09 - ContractSlice B codec activation and wire packets](2026-08-09-feat-0065-subf-0143-contractslice-b-codec-activation-freeze.md)
 - [2026-08-09 - ContractSlice B structural surface](2026-08-09-feat-0065-subf-0143-contractslice-b-surface-freeze.md)
 - [2026-08-09 - ContractSlice B design freeze](2026-08-09-feat-0065-subf-0143-contractslice-b-design-freeze.md)

@@ -3,14 +3,14 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted; ContractSlice A and B merged/exact-main green; B is `11/11`, cumulative A+B `43/43`. C Activation, Applicability, and Evaluation are `ExactHeadHostedGreen`; Results/closure is locally validated through three separate `ReviewedLocalGreen` commits. C is `11/11`, current A+B+C/full Conformance `54/54`. R=0007/R=0011/R=0014/R=0015/R=0017/R=0018 are accepted/immutable; R=0012/R=0013/R=0016 are diagnostics/no-success. `C-CONVERGE-01` records local `CompletionRecommended` while the cohort exact-head hosted gate is pending; [TEST-0210](test-cases.md#test-0210) remains `Planned`, and D/activation/DoD remain held. |
+| Status | Gate 2 accepted; ContractSlice A, B, and C are merged/exact-main green. C is `11/11`, cumulative A+B+C/full Conformance `54/54`; its immutable diagnostics and accepted reds remain owned by the C plan. The [D micro-delivery plan](subf-0143-contractslice-d-micro-delivery-plan.md) is `FrozenDesignCandidate`/inactive pending exact-head hosted design delivery and explicit maintainer acceptance. [TEST-0210](test-cases.md#test-0210) remains `Planned`; D implementation, activation, and DoD remain held. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Test | [TEST-0210](test-cases.md#test-0210) |
-| Gate 3 micro-delivery routing | Historical A delivery remains owned by the [A micro-delivery control plan](subf-0143-micro-delivery-plan.md). Current B design routing is the [ContractSlice B micro-delivery plan](subf-0143-contractslice-b-micro-delivery-plan.md); packet labels refine delivery but activate no executable work. |
+| Gate 3 micro-delivery routing | Historical A, B, and C delivery remains owned by their micro plans. Current prospective routing is the [ContractSlice D micro-delivery plan](subf-0143-contractslice-d-micro-delivery-plan.md); packet labels refine delivery but activate no executable work. |
 | Exact-main design baseline | Accepted A merge commit [`51623f4d404a95e0f706d72805cf7ddbbbd293b8`](https://github.com/hasanmanzak/meAndAI/commit/51623f4d404a95e0f706d72805cf7ddbbbd293b8), validated by exact-main [run 31304787603](https://github.com/hasanmanzak/meAndAI/actions/runs/31304787603) |
-| Design and Gate 3 authority | Historical A/B directives, accepted reds, diagnostics, and hosted evidence remain immutable. The exact [C micro-delivery plan](subf-0143-contractslice-c-micro-delivery-plan.md) is exact-head hosted-green design authority; Activation, Applicability, and Evaluation are `ExactHeadHostedGreen`, diagnostic R=0012/R=0013/R=0016 are immutable, and R=0014/R=0015/R=0017/R=0018 are accepted/immutable. Results/closure is locally validated through three separate `ReviewedLocalGreen` commits; `C-CONVERGE-01` records local `CompletionRecommended` while the cohort exact-head hosted gate is pending. D, final activation, merge, release, and publication remain outside this authority. |
+| Design and Gate 3 authority | Historical A/B/C directives, accepted reds, diagnostics, and hosted evidence remain immutable. C is complete and exact-main hosted green. The D plan freezes design only; D source, tests, expected-red execution, and implementation remain outside authority until its exact design head is hosted green and the maintainer explicitly accepts it. Final activation, merge, release, and publication remain held. |
 | Completed predecessor | [SUBF-0153](README.md#subf-0153) / [TEST-0221](test-cases.md#test-0221), merged through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173) and exact-main validated by [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) |
 
 ## Directive and hard boundary
@@ -10711,15 +10711,50 @@ traceability loss. C completion still requires final convergence, atomic record
 sync, and exact-head hosted green; `CompletionRecommended` or a local commit is
 insufficient.
 
-After C is merged and exact-main hosted green, a separate D micro plan may use
-those measured delivery results but no C product evidence. Accepted D topology
-must be frozen by pre-D D/RT into roughly two-to-four-package cohorts without
-combining distinct expected-red or ownership boundaries. Separate cohorts must
-retain real Policy export/registration activation; real codec/parser/index/
-projector infrastructure; RULE-0001/0002; RULE-0003/0004/0005 with
-specialization/co-report; and repository/provider equivalence plus D-CONVERGE.
-D remains inactive here and must freshly prove required B/C behavior against
-real Policy registrations.
+C is merged and exact-main hosted green. The separate
+[D micro-delivery plan](subf-0143-contractslice-d-micro-delivery-plan.md)
+freezes the accepted topology into five cohorts without changing architecture,
+rule semantics, public inventories, or ownership:
+
+1. Policy activation: the atomic `D-POLICY-SURFACE-ACTIVATION-01` SurfaceRed,
+   first Export BehaviorRed, and green boundary. No intermediate sentinel is
+   committed.
+2. Real producer infrastructure: the single integrated
+   `D-REAL-PRODUCER-INFRASTRUCTURE-01` boundary. It is not split merely to meet
+   a numeric cohort size because the accepted graph has one expected-red and
+   ownership boundary.
+3. First common rules: `D-RULE-0001-01` then `D-RULE-0002-01`.
+4. Specialized common rules: `D-RULE-0003-01`, `D-RULE-0004-01`, then
+   `D-RULE-0005-01`, retaining specialization and co-report semantics.
+5. Equivalence/closure: `D-REPOSITORY-PROVIDER-EQUIVALENCE-01`,
+   `D-ACTIVATION-TOPOLOGY-01`, then code-free `D-CONVERGE-01`.
+
+The Policy activation and infrastructure cohorts are deliberate singleton
+cohorts: splitting the first would commit a forbidden sentinel or pre-green its
+red, while splitting the second would invent a producer-graph ownership/red
+boundary. The final D test inventory is the exact eleven-FQN ordinal set in the D plan.
+Its first red remains
+`ContractSliceDPolicyExportTests.Exports_exact_real_registration_graph` /
+`TEST-0210-D-BEHAVIOR-RED-0001`; the accepted planned RULE-0001 FQN remains
+`ContractSliceDPolicyEvaluatorTests.Evaluates_rule_0001_against_fresh_qualified_fixture`.
+Later markers are ordinal `0002` through `0009` and are bound one-to-one to the
+infrastructure, RULE-0001..0005, equivalence, and topology Facts listed by the
+plan. Final D is `11/11`, A+B+C+D/full Conformance is `65/65`, and Domain
+remains `98/98`.
+
+Each mutating packet retains canonical expected-red, focused and D-cumulative
+green, relevant Release build, diff/format/structural checks, independent
+review, synchronized records, and a separate unpushed `ReviewedLocalGreen`
+commit. Only the cohort boundary runs the full D, A-D union, Conformance,
+Domain, build/format/locks/API/ownership/graph/StructureOnly/publication suite
+and full cohort review before one push and exact-head hosted validation. A
+failed cohort alone reopens. C measurements are planning input only; every D
+fixture and real Policy registration proof is fresh.
+
+D remains inactive until the records-only design cohort is committed, pushed,
+exact-head Ubuntu/Windows hosted green, and explicitly accepted by the
+maintainer. [TEST-0210](test-cases.md#test-0210), final Scenario/status/owner/workflow, [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
+consumer, merge, release, publication, and DoD remain held.
 
 ### `C-EVALUATION-PLAN-01` executable freeze
 
