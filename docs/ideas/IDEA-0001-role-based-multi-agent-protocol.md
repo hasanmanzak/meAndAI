@@ -1,11 +1,11 @@
 # IDEA-0001 - Role-Based Multi-Agent Protocol
 
-Status: **Promoted**
+Status: **Parked**
 Created: **2026-07-15**
-Promoted proposal: **[issue #179](https://github.com/hasanmanzak/meAndAI/issues/179)**
+Related proposal: **[issue #179](https://github.com/hasanmanzak/meAndAI/issues/179)**
 
-Promotion creates durable planning authority; it does not authorize
-implementation or satisfy Definition of Ready.
+This parked idea does not authorize implementation or satisfy Definition of
+Ready.
 
 ## Observation
 
@@ -37,22 +37,21 @@ evidence would return to the existing SDLC gate assessment.
 - Recursive delegation can create unbounded review and bootstrap behavior.
 - Fixed roles may become ceremony unless activation rules are narrow.
 
-## Promotion condition
+## Reconsideration condition
 
-Satisfied on 2026-08-12 by the maintainer's explicit records directive. The
-promoted [architecture](../architecture/agentic-sdlc-workflows/README.md),
+The records-only [architecture](../architecture/agentic-sdlc-workflows/README.md),
 proposed [DEC-0038](../decisions/DEC-0038-protocol-owned-workflow-contracts-and-bounded-agent-execution.md),
 [FEAT-0057](../features/FEAT-0057-explicit-sdlc-backlog-governance/README.md),
 and [FEAT-0070](../features/FEAT-0070-agentic-sdlc-workflow-capabilities/README.md)
 define optional activation, role/grant separation, first-release concurrency,
 exact handoffs, recursive-delegation denial, evidence, and open Definition of
-Ready gaps.
+Ready gaps. The idea remains parked until an accepted decision and separately
+authorized delivery satisfy those gates.
 
 ## Outcome
 
-Promoted to [issue #179](https://github.com/hasanmanzak/meAndAI/issues/179)
-for records-only architecture and future gated delivery. The two linked
-features and proposed decisions preserve accepted conclusions, open choices,
-risks, planned scenarios, and successor slices. No agent configuration,
-protocol behavior, production/test implementation, consumer change, merge,
-release, or authority transfer is authorized by this promotion.
+Parked with [issue #179](https://github.com/hasanmanzak/meAndAI/issues/179) as a
+records-only proposal. The two linked features and proposed decisions preserve
+open choices, risks, planned scenarios, and successor slices. No agent
+configuration, protocol behavior, production/test implementation, consumer
+change, merge, release, or authority transfer is authorized by this record.
