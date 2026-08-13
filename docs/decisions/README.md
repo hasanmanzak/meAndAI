@@ -36,6 +36,8 @@
 | [DEC-0032](DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md) | [Use separate C# operational applications with portable JIT distribution](DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md) | Accepted; partially superseded by [DEC-0035](DEC-0035-protocol-owned-governance-and-execution-architecture.md) | 2026-07-27 |
 | [DEC-0035](DEC-0035-protocol-owned-governance-and-execution-architecture.md) | [Make the executable protocol the governance and execution authority](DEC-0035-protocol-owned-governance-and-execution-architecture.md) | Accepted; implementation authority withheld | 2026-07-29 |
 | [DEC-0036](DEC-0036-prospective-instruction-graph-capacity.md) | [Expand instruction-graph capacity prospectively](DEC-0036-prospective-instruction-graph-capacity.md) | Accepted | 2026-08-09 |
+| [DEC-0037](DEC-0037-explicit-sdlc-and-github-native-workflow-authority.md) | [Use an explicit SDLC with GitHub-native tracking authority](DEC-0037-explicit-sdlc-and-github-native-workflow-authority.md) | Proposed; implementation authority withheld | 2026-08-12 |
+| [DEC-0038](DEC-0038-protocol-owned-workflow-contracts-and-bounded-agent-execution.md) | [Use protocol-owned workflow contracts and bounded agent execution](DEC-0038-protocol-owned-workflow-contracts-and-bounded-agent-execution.md) | Proposed; implementation authority withheld | 2026-08-12 |
 
 The specification-first C# governance draft at
 `docs/decisions/DEC-0033-specification-first-csharp-governance.md` and bounded
