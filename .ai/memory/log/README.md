@@ -12,10 +12,10 @@ exact B merge and hosted-run closure. B remains
 `11/11`, cumulative A+B `43/43`; its accepted reds and immutable diagnostics
 remain owned by the historical B handoff below. C Activation and Applicability
 and Evaluation are `ExactHeadHostedGreen`; C is `9/11`, and current A+B+C is
-`52/52`. R=0006/R=0008/R=0009/R=0010/R=0012/R=0013 are
+`52/52`. R=0006/R=0008/R=0009/R=0010/R=0012/R=0013/R=0016 are
 diagnostics/no-success and R=0007/R=0011/R=0014/R=0015 are accepted/immutable.
-`C-INTENT-RESULT-01` is `FrozenDesign`/inactive pending its synchronized
-records/design head becoming exact-head hosted green; the parent scenario remains `Planned`,
+Corrected `C-INTENT-RESULT-01` is `FrozenDesign`/inactive with R=0017 held
+pending its corrected records/design exact-head hosted gate; the parent scenario remains `Planned`,
 and D/activation are held.
 
 Follow the current

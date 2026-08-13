@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Gate 2 micro-delivery plan and design freeze |
-| State | Initial design, Activation, Applicability, and Evaluation cohorts `ExactHeadHostedGreen`; C `9/11`, current A+B+C `52/52`; R=0006/R=0008/R=0009/R=0010/R=0012/R=0013 diagnostic/no-success, R=0007/R=0011/R=0014/R=0015 accepted/immutable; `C-INTENT-RESULT-01` `FrozenDesign`/inactive pending this synchronized records/design head becoming exact-head hosted green; parent scenario held |
+| State | Initial design, Activation, Applicability, and Evaluation cohorts `ExactHeadHostedGreen`; C `9/11`, current A+B+C `52/52`; R=0006/R=0008/R=0009/R=0010/R=0012/R=0013/R=0016 diagnostic/no-success, R=0007/R=0011/R=0014/R=0015 accepted/immutable; corrected `C-INTENT-RESULT-01` `FrozenDesign`/inactive with R=0017 pending this corrected records/design head becoming exact-head hosted green; parent scenario held |
 | Parent | Owning feature and current subfeature |
 | Scenario | [TEST-0210](test-cases.md#test-0210), retained `Planned` |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
@@ -711,7 +711,10 @@ related kinds, duplicate intent tuples, or evaluator-registration mismatch to
 Reference and result ordering is ordinal by code and then the full qualified-
 reference tuple; output evaluations are RuleId/revision ordered.
 
-The exact Tests-owned fixture starts from `evaluationReady: true`. RULE-0001
+The exact Tests-owned fixture starts from `evaluationReady: true`. Its cloned
+synthetic profile has the exact `Repository+Provider` surface union so all five
+fixture rules remain compatible with their accepted declarations; real Policy
+profiles remain unchanged. RULE-0001
 returns no intent items and becomes `Satisfied`; RULE-0002 returns exact
 finding `protocol.decision.record-missing` over the admitted repository-tree
 context proof and becomes `Violated`;
@@ -740,8 +743,15 @@ ordinal RuleId-value-to-evaluation-delegate dictionary, reject unknown keys,
 and bind each callback only to its object-identical registration. No production
 factory or delegate seam is added.
 
-Canonical R=0016 changes only the fully prepared valid `Mint` result to
-`null!`; only that semantic null reaches the marker. Setup, invalid-intent,
+The sole R=0016 invocation is immutable diagnostic/no-success. Its exact test
+failed before the prepared `Mint` seam because the synthetic named profile was
+Provider-only while RULE-0001/RULE-0002 were Repository-scoped. The sole TRX
+therefore contained zero marker occurrences and the exact setup exception
+`A named profile must contain exactly its compatible rules. (Parameter
+'profiles')`; R=0016 is never rerun or reused as product evidence.
+
+Corrected canonical R=0017 changes only the fully prepared valid `Mint` result
+to `null!`; only that semantic null reaches the marker. Setup, invalid-intent,
 cancellation, exception, repeat, order, and assertion paths are marker-free.
 The packet-specific child argv is:
 
@@ -754,7 +764,7 @@ runner, HEAD/upstream/status, six locks, warning-free Release build, rebuilt
 DLL/PDB, fresh root, secure one-TRX result/definition/entry and 16-counter
 oracle, process-scoped `VSTEST_CONNECTION_TIMEOUT=300`, `420s` monotonic outer
 bound, and exact native exit `1`. `InvocationCommitted` irrevocably consumes
-R=0016 for process-create failure, timeout, unexpected exit, interruption,
+R=0017 for process-create failure, timeout, unexpected exit, interruption,
 missing/malformed/extra TRX, or oracle rejection; no retry or replacement is
 authorized. Only pre-commit validation/build failure may be corrected under a
 newly reviewed runner state.
