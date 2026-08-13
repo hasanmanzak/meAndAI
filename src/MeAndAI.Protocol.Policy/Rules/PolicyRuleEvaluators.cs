@@ -315,6 +315,134 @@ internal sealed class ClickableExactTargetRuleEvaluator : InitialRuleEvaluator
     }
 }
 
-internal sealed class StableFragmentRuleEvaluator : InitialRuleEvaluator;
+internal sealed class StableFragmentRuleEvaluator : InitialRuleEvaluator
+{
+    private const string RepositorySlot =
+        "protocol.slot.repository-governed-text";
+    private const string ProviderSlot =
+        "protocol.slot.provider-governed-text";
+    private const string TargetSlot =
+        "protocol.slot.repository-target-resolution";
+
+    public override EvaluationIntent Evaluate(
+        RuleEvaluationInput input,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(input);
+        cancellationToken.ThrowIfCancellationRequested();
+        var governedSlot = input.Profile.Surfaces.Values.Contains(
+            MeAndAI.Protocol.Domain.SurfaceKind.Repository)
+            ? RepositorySlot
+            : ProviderSlot;
+        var references = input.GetCapability<IGovernedReferenceIndex>(
+            governedSlot);
+        var targets = input.GetCapability<IRepositoryTargetResolutionIndex>(
+            TargetSlot);
+        var context = input.GetContextProof(governedSlot);
+        var findings = new List<FindingIntent>();
+        var failures = new List<EvaluationFailureIntent>();
+
+        foreach (var reference in references.References)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            if (!reference.Kind.Equals(GovernedReferenceKind.EmbeddedRecord))
+            {
+                continue;
+            }
+
+            var overlays = targets.Targets.Where(item =>
+                ReferenceEquals(item.Reference, reference.Reference)).ToArray();
+            if (overlays.Length > 1)
+            {
+                failures.Add(EvaluationFailureIntent.Create(
+                    EvaluationFailureCode.Parse(
+                        "protocol.evaluator.reference-ambiguity"),
+                    reference.Reference,
+                    Related(reference, context, overlays)));
+                continue;
+            }
+
+            var overlay = overlays.SingleOrDefault();
+            var resolution = overlay?.Resolution ?? reference.Resolution;
+            var code = Finding(reference, resolution, overlay is not null);
+            if (code is not null)
+            {
+                findings.Add(FindingIntent.Create(
+                    FindingCode.Parse(code),
+                    reference.Reference,
+                    Related(reference, context, overlays)));
+            }
+        }
+
+        return EvaluationIntent.Create(findings, failures);
+    }
+
+    private static string? Finding(
+        GovernedReferenceView reference,
+        GovernedReferenceResolution resolution,
+        bool hasOverlay)
+    {
+        if (resolution.Equals(
+                GovernedReferenceResolution.ExternalEvidenceRequired) &&
+            !hasOverlay)
+        {
+            return null;
+        }
+
+        if (reference.NormalizedRepositoryRelativePath is null)
+        {
+            return resolution.Equals(GovernedReferenceResolution.MissingFragment)
+                ? "protocol.record.anchor-missing"
+                : resolution.Equals(GovernedReferenceResolution.WrongFragment)
+                    ? "protocol.record.anchor-duplicate"
+                    : null;
+        }
+
+        if (resolution.Equals(GovernedReferenceResolution.MissingFragment))
+        {
+            return "protocol.reference.fragment-missing";
+        }
+
+        if (resolution.Equals(GovernedReferenceResolution.WrongFragment))
+        {
+            return "protocol.reference.fragment-wrong";
+        }
+
+        return null;
+    }
+
+    private static IReadOnlyList<QualifiedEvidenceHandle> Related(
+        GovernedReferenceView reference,
+        QualifiedEvidenceHandle context,
+        IEnumerable<RepositoryTargetResolutionView> overlays)
+    {
+        var values = new List<QualifiedEvidenceHandle> { context };
+        if (reference.Target is not null)
+        {
+            values.Add(reference.Target);
+        }
+
+        foreach (var overlay in overlays)
+        {
+            values.Add(overlay.ResolutionEvidence);
+            if (overlay.Target is not null)
+            {
+                values.Add(overlay.Target);
+            }
+        }
+
+        var distinct = new List<QualifiedEvidenceHandle>();
+        foreach (var value in values.Where(value =>
+                     !ReferenceEquals(value, reference.Reference)))
+        {
+            if (!distinct.Any(existing => ReferenceEquals(existing, value)))
+            {
+                distinct.Add(value);
+            }
+        }
+
+        return distinct;
+    }
+}
 
 internal sealed class CommitPermalinkRuleEvaluator : InitialRuleEvaluator;

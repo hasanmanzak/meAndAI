@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Gate 2 micro-delivery plan and design freeze |
-| State | Design exact-head hosted green and maintainer accepted; Policy activation, producer infrastructure, and the first-rules cohort are `ExactHeadHostedGreen`; `D-RULE-0003-01` is `ReviewedLocalGreen`; D is `7/11` and A+B+C+D/full Conformance is `61/61`; specialized-rules cohort is local `1/3` with push held and `D-RULE-0004-01` next/inactive |
+| State | Design exact-head hosted green and maintainer accepted; Policy activation, producer infrastructure, and the first-rules cohort are `ExactHeadHostedGreen`; `D-RULE-0003-01` and `D-RULE-0004-01` are `ReviewedLocalGreen`; D is `8/11` and A+B+C+D/full Conformance is `62/62`; specialized-rules cohort is local `2/3` with push held and `D-RULE-0005-01` next/inactive |
 | Parent | [SUBF-0143](README.md#subf-0143) |
 | Scenario | [TEST-0210](test-cases.md#test-0210), retained `Planned` |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
@@ -478,6 +478,37 @@ no-rerun after invocation commitment. Focused green is `1/1`, cumulative D is
 `7/7`, and full Conformance is `61/61`. RULE-0004 remains held until a separate
 `ReviewedLocalGreen` RULE-0003 commit exists.
 
+### `D-RULE-0004-01` pre-red freeze
+
+The exact local predecessor is focused commit
+[`978b990206d00aac2f4f8084c758d5d4b7a64768`](https://github.com/hasanmanzak/meAndAI/commit/978b990206d00aac2f4f8084c758d5d4b7a64768); it is not pushed
+independently. This packet adds only the direct Fact
+`ContractSliceDPolicyEvaluatorTests.Evaluates_rule_0004_with_exact_fragment_specialization_and_co_report`,
+with marker `TEST-0210-D-BEHAVIOR-RED-0006`, only `ContractSlice=D`, and no
+Scenario/Theory/overload/class trait. Declaration rows have no repository path:
+`MissingFragment`, `WrongFragment`, and `Exact` map respectively to
+`protocol.record.anchor-missing`, `protocol.record.anchor-duplicate`, and no
+finding. Proven EmbeddedRecord reference rows with an exact containing target
+map missing and wrong fragment to `protocol.reference.fragment-missing` and
+`protocol.reference.fragment-wrong`; exact emits nothing. Multiple overlays
+fail with `protocol.evaluator.reference-ambiguity`. Unresolved/wrong containing
+targets, unavailable external overlays, and CrossRecord/Commit rows emit no
+fabricated RULE-0004 specialization and remain owned by RULE-0003/RULE-0005.
+The governed Derived handle is primary and context/target evidence is related;
+unsupported/non-clickable syntax may co-report its independent RULE-0003
+finding only when the fragment state is otherwise proven.
+
+The nullable seam is `EvaluateRule0004(InitialRuleQualificationPolicy.Export)`;
+only a fully prepared valid predecessor outcome returning null reaches the
+marker. The production allowlist is only `PolicyRuleEvaluators.cs`; tests may
+modify only `ContractSliceDPolicyEvaluatorTests.cs` and the infrastructure
+test solely to retire RULE-0004 empty-intent staging. No API/declaration/index/
+parser/codec/project/package/lock/workflow/other-rule surface changes. The
+normalized changed-C# cap is `700` lines. Canonical red uses the common fresh
+one-shot Release `--no-build` oracle and becomes immutable after invocation
+commitment. Green is focused `1/1`, D `8/8`, full `62/62`; RULE-0005 remains
+held until RULE-0004 has its separate `ReviewedLocalGreen` commit.
+
 ## Cohort measurement ledger
 
 | Cohort | Local work/validation | Hosted CI | Hosted defects | Owner identification | Correction/revalidation | Estimated saving vs package-hosted | Consistency/traceability loss |
@@ -485,7 +516,7 @@ no-rerun after invocation commitment. Focused green is `1/1`, cumulative D is
 | Policy activation | About `45m` local work; exact-tree StructureOnly `546.622s` and publication evidence `7/7` in `369.5s`, run concurrently | [Run 31719641316](https://github.com/hasanmanzak/meAndAI/actions/runs/31719641316): Ubuntu `18m53s`, Windows `18m40s`, publication skipped | `0` | Not applicable | `0` | Baseline: one avoided intermediate hosted wait | None observed |
 | Real producer infrastructure | About `2h` active implementation/validation; StructureOnly `527.148s`, publication evidence `7/7` in `337.4s` | Pending one cohort push | `0` locally | Not applicable locally | `0` locally | No avoided package push; singleton cohort preserves semantic isolation | None observed locally |
 | First common rules | RULE-0001 about `1h`; RULE-0002 about `1h` active implementation/validation; focused `1/1`, D `6/6`, full `60/60`, Domain `98/98`, API/ownership `15/15`, Release `0/0`, locks/format/diff clean; synchronized StructureOnly `528.328s`, publication evidence `7/7` in `334.7s`; evidence-line recurrence StructureOnly `501.510s`, publication `7/7` in `329.4s` | Run 31746252371: Ubuntu `22m36s`, Windows `20m05s`, publication skipped | `0` | RULE-0001 isolated one registration token-identity defect plus one staging expectation; RULE-0002 isolated one predecessor staging expectation immediately | About `20m` total including rebuild/revalidation | One intermediate hosted wait avoided | None observed |
-| Specialized common rules | RULE-0003 about `1h` active implementation/validation; focused `1/1`, D `7/7`, full `61/61`, Domain `98/98`, Release `0/0`, format/diff clean; `1,155/1,800` changed C# lines | Not pushed; cohort local `1/3` | `0` locally | One infrastructure staging expectation identified immediately by D cumulative test | Under `10m` including rebuild/revalidation | Baseline: two avoided intermediate hosted waits | None observed locally |
+| Specialized common rules | RULE-0003 about `1h` and RULE-0004 about `30m` active implementation/validation; focused `1/1`, D `8/8`, full `62/62`, Domain `98/98`, Release `0/0`, format/diff clean; RULE-0004 `298/700` changed C# lines | Not pushed; cohort local `2/3` | `0` locally | RULE-0003 infrastructure staging expectation and one RULE-0004 compile-time comparer defect identified immediately | Under `15m` total including rebuild/revalidation | Baseline: two avoided intermediate hosted waits | None observed locally |
 | Equivalence/closure | `NotMeasured` | `NotMeasured` | `NotMeasured` | `NotMeasured` | `NotMeasured` | Baseline: two avoided intermediate hosted waits | `NotMeasured` |
 
 At D closure, observed duration, hosted duration, hosted defects, owning-package

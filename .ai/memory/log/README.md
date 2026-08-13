@@ -18,9 +18,9 @@ ContractSlice A, B, and C are merged/exact-main green; C is `11/11`, and
 A+B+C/full Conformance is `54/54`. The linked handoff owns exact C closure and
 the records-only D cohort/package freeze. D design delivery is exact-head hosted
 green and maintainer accepted. Policy activation, real producer infrastructure,
-and the first-rules cohort are exact-head hosted green. RULE-0003 is
-`ReviewedLocalGreen`; D is `7/11` and full Conformance is `61/61`. The
-specialized-rules cohort is local `1/3` with push held; RULE-0004 is
+and the first-rules cohort are exact-head hosted green. RULE-0003 and RULE-0004
+are `ReviewedLocalGreen`; D is `8/11` and full Conformance is `62/62`. The
+specialized-rules cohort is local `2/3` with push held; RULE-0005 is
 next/inactive.
 The parent scenario remains `Planned`; later D cohorts and final activation
 are held.

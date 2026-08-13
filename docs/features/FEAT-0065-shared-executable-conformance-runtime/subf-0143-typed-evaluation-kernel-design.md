@@ -3,14 +3,14 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted; ContractSlice A, B, and C are merged/exact-main green. D Policy activation, real producer infrastructure, and the first-rules cohort are `ExactHeadHostedGreen`; RULE-0003 is `ReviewedLocalGreen`. D is `7/11` and cumulative A+B+C+D/full Conformance is `61/61`; the specialized-rules cohort is local `1/3` with push held and RULE-0004 next/inactive. [TEST-0210](test-cases.md#test-0210) remains `Planned`; final activation and DoD remain held. |
+| Status | Gate 2 accepted; ContractSlice A, B, and C are merged/exact-main green. D Policy activation, real producer infrastructure, and the first-rules cohort are `ExactHeadHostedGreen`; RULE-0003 and RULE-0004 are `ReviewedLocalGreen`. D is `8/11` and cumulative A+B+C+D/full Conformance is `62/62`; the specialized-rules cohort is local `2/3` with push held and RULE-0005 next/inactive. [TEST-0210](test-cases.md#test-0210) remains `Planned`; final activation and DoD remain held. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Test | [TEST-0210](test-cases.md#test-0210) |
 | Gate 3 micro-delivery routing | Historical A, B, and C delivery remains owned by their micro plans. Current prospective routing is the [ContractSlice D micro-delivery plan](subf-0143-contractslice-d-micro-delivery-plan.md); packet labels refine delivery but activate no executable work. |
 | Exact-main design baseline | Accepted A merge commit [`51623f4d404a95e0f706d72805cf7ddbbbd293b8`](https://github.com/hasanmanzak/meAndAI/commit/51623f4d404a95e0f706d72805cf7ddbbbd293b8), validated by exact-main [run 31304787603](https://github.com/hasanmanzak/meAndAI/actions/runs/31304787603) |
-| Design and Gate 3 authority | Historical A/B/C directives, accepted reds, diagnostics, and hosted evidence remain immutable. D Policy activation, producer infrastructure, and first-rules cohort are `ExactHeadHostedGreen`; RULE-0003 is `ReviewedLocalGreen`, RULE-0004 is next/inactive, and later rules, final activation, merge, release, and publication remain held. |
+| Design and Gate 3 authority | Historical A/B/C directives, accepted reds, diagnostics, and hosted evidence remain immutable. D Policy activation, producer infrastructure, and first-rules cohort are `ExactHeadHostedGreen`; RULE-0003 and RULE-0004 are `ReviewedLocalGreen`, RULE-0005 is next/inactive, and later closure, final activation, merge, release, and publication remain held. |
 | Completed predecessor | [SUBF-0153](README.md#subf-0153) / [TEST-0221](test-cases.md#test-0221), merged through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173) and exact-main validated by [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) |
 
 ## Directive and hard boundary
@@ -10920,6 +10920,28 @@ parsers, projects/packages/locks/workflows, other rules, and all held surfaces
 remain frozen. Canonical red is the common fresh one-shot Release `--no-build`
 oracle and cannot rerun after invocation commitment. RULE-0004 stays inactive
 until RULE-0003 has its own `ReviewedLocalGreen` commit.
+
+### `D-RULE-0004-01` executable freeze
+
+The packet-local RULE-0004 contract in the D micro-plan is normative. Exact
+local predecessor
+[`978b990206d00aac2f4f8084c758d5d4b7a64768`](https://github.com/hasanmanzak/meAndAI/commit/978b990206d00aac2f4f8084c758d5d4b7a64768) activates one direct Fact and marker
+`TEST-0210-D-BEHAVIOR-RED-0006`; no intermediate push is allowed. A declaration
+row is distinguished by a null repository path and maps MissingFragment/
+WrongFragment/Exact to anchor-missing/anchor-duplicate/no finding. A reference
+row specializes only EmbeddedRecord with a proven exact containing target:
+MissingFragment/WrongFragment/Exact maps to fragment-missing/fragment-wrong/no
+finding. Multiple overlays produce the declared ambiguity failure. Unresolved,
+wrong-target/repository/object, unavailable external evidence, CrossRecord and
+Commit inputs never fabricate a RULE-0004 finding. Related-reference ordering
+and independent RULE-0003 co-report semantics remain exact.
+
+Only `PolicyRuleEvaluators.cs`, the retained evaluator test, and the retained
+infrastructure test's RULE-0004 staging assertion may change, within `700`
+normalized C# lines. All indexes, parsers, codecs, public declarations, locks,
+projects/workflows, other rules, and held surfaces remain frozen. Canonical red
+is one fresh common Release `--no-build` invocation, immutable after commitment;
+green is focused `1/1`, D `8/8`, and full Conformance `62/62`.
 
 ### `C-EVALUATION-PLAN-01` executable freeze
 

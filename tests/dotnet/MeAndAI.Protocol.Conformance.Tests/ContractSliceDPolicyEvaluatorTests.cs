@@ -11,6 +11,7 @@ public sealed class ContractSliceDPolicyEvaluatorTests
     private const string Rule1Marker = "TEST-0210-D-BEHAVIOR-RED-0003";
     private const string Rule2Marker = "TEST-0210-D-BEHAVIOR-RED-0004";
     private const string Rule3Marker = "TEST-0210-D-BEHAVIOR-RED-0005";
+    private const string Rule4Marker = "TEST-0210-D-BEHAVIOR-RED-0006";
 
     [Fact]
     [Trait("ContractSlice", "D")]
@@ -65,6 +66,24 @@ public sealed class ContractSliceDPolicyEvaluatorTests
         Assert.True(evidence.ExactReferences);
         Assert.True(evidence.CancellationClosed);
     }
+
+    [Fact]
+    [Trait("ContractSlice", "D")]
+    public void Evaluates_rule_0004_with_exact_fragment_specialization_and_co_report()
+    {
+        ContractSliceDPolicyEvaluatorEvidence? evidence =
+            ContractSliceDPolicyEvaluatorFixture.EvaluateRule0004(
+                InitialRuleQualificationPolicy.Export);
+        if (evidence is null)
+        {
+            Assert.Fail(Rule4Marker);
+        }
+
+        Assert.Equal(5, evidence.ExercisedFindings);
+        Assert.Equal(12, evidence.ExercisedFixtures);
+        Assert.True(evidence.ExactReferences);
+        Assert.True(evidence.CancellationClosed);
+    }
 }
 
 internal sealed record ContractSliceDPolicyEvaluatorEvidence(
@@ -85,6 +104,7 @@ internal static class ContractSliceDPolicyEvaluatorFixture
     private const string Rule1 = "RULE-0001";
     private const string Rule2 = "RULE-0002";
     private const string Rule3 = "RULE-0003";
+    private const string Rule4 = "RULE-0004";
     private const string RepositoryGovernedSlot =
         "protocol.slot.repository-governed-text";
     private const string ProviderGovernedSlot =
@@ -394,26 +414,139 @@ internal static class ContractSliceDPolicyEvaluatorFixture
             cases.All(item => item.CancellationClosed));
     }
 
+    internal static ContractSliceDPolicyEvaluatorEvidence? EvaluateRule0004(
+        PolicyQualificationSliceExport export)
+    {
+        ArgumentNullException.ThrowIfNull(export);
+        var declarationMissing = EvaluateReference(export, Reference(
+            GovernedReferenceKind.EmbeddedRecord,
+            GovernedReferenceSyntax.Clickable,
+            GovernedReferenceResolution.MissingFragment,
+            path: null), rule: Rule4);
+        if (declarationMissing.Intent.Findings.Count == 0)
+        {
+            return null;
+        }
+
+        AssertReferenceFinding(
+            declarationMissing, "protocol.record.anchor-missing");
+        var declarationDuplicate = EvaluateReference(export, Reference(
+            GovernedReferenceKind.EmbeddedRecord,
+            GovernedReferenceSyntax.Clickable,
+            GovernedReferenceResolution.WrongFragment,
+            path: null), rule: Rule4);
+        AssertReferenceFinding(
+            declarationDuplicate, "protocol.record.anchor-duplicate");
+        var declarationExact = EvaluateReference(export, Reference(
+            GovernedReferenceKind.EmbeddedRecord,
+            GovernedReferenceSyntax.Clickable,
+            GovernedReferenceResolution.Exact,
+            path: null), rule: Rule4);
+        AssertReferenceFinding(declarationExact);
+        var fragmentMissing = EvaluateReference(export, Reference(
+            GovernedReferenceKind.EmbeddedRecord,
+            GovernedReferenceSyntax.Clickable,
+            GovernedReferenceResolution.MissingFragment), rule: Rule4);
+        AssertReferenceFinding(
+            fragmentMissing, "protocol.reference.fragment-missing");
+        var fragmentWrong = EvaluateReference(export, Reference(
+            GovernedReferenceKind.EmbeddedRecord,
+            GovernedReferenceSyntax.Clickable,
+            GovernedReferenceResolution.WrongFragment), rule: Rule4);
+        AssertReferenceFinding(
+            fragmentWrong, "protocol.reference.fragment-wrong");
+        var fragmentExact = EvaluateReference(export, Reference(
+            GovernedReferenceKind.EmbeddedRecord,
+            GovernedReferenceSyntax.Clickable,
+            GovernedReferenceResolution.Exact), rule: Rule4);
+        AssertReferenceFinding(fragmentExact);
+        var coReport = Reference(
+            GovernedReferenceKind.EmbeddedRecord,
+            GovernedReferenceSyntax.UnsupportedAuthoringForm,
+            GovernedReferenceResolution.MissingFragment);
+        var common = EvaluateReference(export, coReport);
+        AssertReferenceFinding(
+            common, "protocol.reference.unsupported-authoring-form");
+        var specialized = EvaluateReference(export, coReport, rule: Rule4);
+        AssertReferenceFinding(
+            specialized, "protocol.reference.fragment-missing");
+        var wrongTarget = EvaluateReference(export, Reference(
+            GovernedReferenceKind.EmbeddedRecord,
+            GovernedReferenceSyntax.Clickable,
+            GovernedReferenceResolution.WrongTarget), rule: Rule4);
+        AssertReferenceFinding(wrongTarget);
+        var unresolved = EvaluateReference(export, Reference(
+            GovernedReferenceKind.EmbeddedRecord,
+            GovernedReferenceSyntax.Clickable,
+            GovernedReferenceResolution.Unresolved), rule: Rule4);
+        AssertReferenceFinding(unresolved);
+        var external = EvaluateReference(export, Reference(
+            GovernedReferenceKind.EmbeddedRecord,
+            GovernedReferenceSyntax.Clickable,
+            GovernedReferenceResolution.ExternalEvidenceRequired), rule: Rule4);
+        AssertReferenceFinding(external);
+        var crossRecord = EvaluateReference(export, Reference(
+            GovernedReferenceKind.CrossRecord,
+            GovernedReferenceSyntax.Clickable,
+            GovernedReferenceResolution.WrongFragment), rule: Rule4);
+        AssertReferenceFinding(crossRecord);
+        var ambiguity = EvaluateReference(export, Reference(
+            GovernedReferenceKind.EmbeddedRecord,
+            GovernedReferenceSyntax.Clickable,
+            GovernedReferenceResolution.ExternalEvidenceRequired),
+            GovernedReferenceResolution.Exact,
+            rule: Rule4,
+            secondOverlay: GovernedReferenceResolution.Exact);
+        Assert.Empty(ambiguity.Intent.Findings);
+        Assert.Equal(
+            "protocol.evaluator.reference-ambiguity",
+            Assert.Single(ambiguity.Intent.Failures).Code.Value);
+
+        var cases = new[]
+        {
+            declarationMissing, declarationDuplicate, declarationExact,
+            fragmentMissing, fragmentWrong, fragmentExact, specialized,
+            wrongTarget, unresolved, external, crossRecord, ambiguity,
+        };
+        return new(
+            cases.Sum(item => item.Intent.Findings.Count),
+            cases.Length,
+            cases.All(item => item.ExactReferences),
+            cases.All(item => item.CancellationClosed));
+    }
+
     private static ReferenceCase EvaluateReference(
         PolicyQualificationSliceExport export,
         GovernedReferenceView reference,
         GovernedReferenceResolution? overlay = null,
-        bool provider = false)
+        bool provider = false,
+        string rule = Rule3,
+        GovernedReferenceResolution? secondOverlay = null)
     {
         var referenceIndex = new ReferenceIndexFixture([reference]);
         var targetEvidence = QualifiedEvidenceHandle.Create();
-        var targets = overlay is null
-            ? Array.Empty<RepositoryTargetResolutionView>()
-            :
-            [
-                RepositoryTargetResolutionView.Create(
-                    reference.Reference,
-                    overlay,
-                    targetEvidence,
-                    null,
-                    null,
-                    reference.Target),
-            ];
+        var targets = new List<RepositoryTargetResolutionView>();
+        if (overlay is not null)
+        {
+            targets.Add(RepositoryTargetResolutionView.Create(
+                reference.Reference,
+                overlay,
+                targetEvidence,
+                null,
+                null,
+                reference.Target));
+        }
+
+        if (secondOverlay is not null)
+        {
+            targets.Add(RepositoryTargetResolutionView.Create(
+                reference.Reference,
+                secondOverlay,
+                QualifiedEvidenceHandle.Create(),
+                null,
+                null,
+                reference.Target));
+        }
         var targetIndex = new TargetIndexFixture(targets);
         var referenceHandle = CapabilityHandle<IGovernedReferenceIndex>.Create(
             CapabilityTypeToken<IGovernedReferenceIndex>.Create(
@@ -447,7 +580,7 @@ internal static class ContractSliceDPolicyEvaluatorFixture
             },
             ExpectedReferences.Rejecting);
         var registration = export.EvaluatorRegistrations.Single(item =>
-            item.Declaration.RuleId.Value == Rule3);
+            item.Declaration.RuleId.Value == rule);
         var input = RuleEvaluationInput.Create(
             registration.Declaration.RuleId,
             registration.Declaration.RuleRevision,
@@ -470,7 +603,8 @@ internal static class ContractSliceDPolicyEvaluatorFixture
     private static GovernedReferenceView Reference(
         GovernedReferenceKind kind,
         GovernedReferenceSyntax syntax,
-        GovernedReferenceResolution resolution)
+        GovernedReferenceResolution resolution,
+        string? path = "docs/decisions/DEC-0001.md")
     {
         var reference = QualifiedEvidenceHandle.Create();
         var target = QualifiedEvidenceHandle.Create();
@@ -482,7 +616,7 @@ internal static class ContractSliceDPolicyEvaluatorFixture
             kind.Equals(GovernedReferenceKind.Commit) ? ObjectIdentity : null,
             null,
             null,
-            "docs/decisions/DEC-0001.md",
+            path,
             "dec-0001",
             reference,
             target);

@@ -155,7 +155,7 @@ Last verified: **2026-08-13**
   Ubuntu in `20m44s` and Windows in `46m51s`; publication verification was
   correctly skipped. The exact lifecycle implementation identity recorded in
   the canonical handoff passed Ubuntu in `19m36s` and Windows in `36m02s`; publication verification was
-  correctly skipped. ContractSlice A, B, and C are merged/exact-main green; C is `11/11`. Policy activation, real producer infrastructure, and the first-rules cohort are `ExactHeadHostedGreen`; `D-RULE-0003-01` is `ReviewedLocalGreen`; D is `7/11` and A+B+C+D/full Conformance is `61/61`. The specialized-rules cohort is local `1/3` with push held; RULE-0004 is next/inactive, and the parent scenario and final activation remain held. Follow the current [canonical log index](log/README.md). The
+  correctly skipped. ContractSlice A, B, and C are merged/exact-main green; C is `11/11`. Policy activation, real producer infrastructure, and the first-rules cohort are `ExactHeadHostedGreen`; `D-RULE-0003-01` and `D-RULE-0004-01` are `ReviewedLocalGreen`; D is `8/11` and A+B+C+D/full Conformance is `62/62`. The specialized-rules cohort is local `2/3` with push held; RULE-0005 is next/inactive, and the parent scenario and final activation remain held. Follow the current [canonical log index](log/README.md). The
   predecessor-manifest exact-head hosted-green handoff indexed there is
   immutable history; the admission-proof reviewed-local-green handoff,
   the selector reviewed-local-green handoff in the canonical log index,
