@@ -20,7 +20,7 @@ the records-only D cohort/package freeze. D design delivery is exact-head hosted
 green and maintainer accepted. Policy activation is `ExactHeadHostedGreen`;
 real producer infrastructure is `ReviewedLocalGreen`: D is `4/11` and
 A+B+C+D/full Conformance is `58/58`. Real producer infrastructure is
-locally green; Cohort 2 exact-head hosted validation remains pending.
+exact-head hosted green. RULE-0001 is `ReviewedLocalGreen`; D is `5/11` and full Conformance is `59/59`; RULE-0002 is next/inactive.
 The parent scenario remains `Planned`; later D cohorts and final activation
 are held.
 

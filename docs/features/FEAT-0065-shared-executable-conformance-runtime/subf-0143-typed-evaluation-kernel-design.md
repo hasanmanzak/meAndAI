@@ -3,14 +3,14 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted; ContractSlice A, B, and C are merged/exact-main green. D Policy activation is `ExactHeadHostedGreen`; real producer infrastructure is `ReviewedLocalGreen`; D is `4/11` and cumulative A+B+C+D/full Conformance is `58/58`. Cohort 2 exact-head hosted validation is pending. [TEST-0210](test-cases.md#test-0210) remains `Planned`; final activation and DoD remain held. |
+| Status | Gate 2 accepted; ContractSlice A, B, and C are merged/exact-main green. D Policy activation and real producer infrastructure are `ExactHeadHostedGreen`; RULE-0001 is `ReviewedLocalGreen`; D is `5/11` and cumulative A+B+C+D/full Conformance is `59/59`. RULE-0002 is next/inactive. [TEST-0210](test-cases.md#test-0210) remains `Planned`; final activation and DoD remain held. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Test | [TEST-0210](test-cases.md#test-0210) |
 | Gate 3 micro-delivery routing | Historical A, B, and C delivery remains owned by their micro plans. Current prospective routing is the [ContractSlice D micro-delivery plan](subf-0143-contractslice-d-micro-delivery-plan.md); packet labels refine delivery but activate no executable work. |
 | Exact-main design baseline | Accepted A merge commit [`51623f4d404a95e0f706d72805cf7ddbbbd293b8`](https://github.com/hasanmanzak/meAndAI/commit/51623f4d404a95e0f706d72805cf7ddbbbd293b8), validated by exact-main [run 31304787603](https://github.com/hasanmanzak/meAndAI/actions/runs/31304787603) |
-| Design and Gate 3 authority | Historical A/B/C directives, accepted reds, diagnostics, and hosted evidence remain immutable. D Policy activation is `ExactHeadHostedGreen`; producer infrastructure is `ReviewedLocalGreen` pending its cohort exact-head hosted gate. RULE-0001, final activation, merge, release, and publication remain held. |
+| Design and Gate 3 authority | Historical A/B/C directives, accepted reds, diagnostics, and hosted evidence remain immutable. D Policy activation and producer infrastructure are `ExactHeadHostedGreen`; RULE-0001 is `ReviewedLocalGreen`. RULE-0002 is next/inactive; later rules, final activation, merge, release, and publication remain held. |
 | Completed predecessor | [SUBF-0153](README.md#subf-0153) / [TEST-0221](test-cases.md#test-0221), merged through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173) and exact-main validated by [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) |
 
 ## Directive and hard boundary
@@ -10798,6 +10798,60 @@ process-scoped timeout, full source/lock/binary/runner custody, exact sixteen-
 counter oracle, and irrevocable no-rerun after `InvocationCommitted`. This
 records-only freeze must itself pass exact-head Ubuntu/Windows validation
 before any test or production source is changed.
+
+### `D-RULE-0001-01` executable freeze
+
+The exact predecessor is the hosted-green producer-infrastructure commit and
+run owned by the D micro-plan. This packet adds the one direct D evaluator Fact,
+changes only the real repository-tree index, its registration binding, and
+`FeaturePacketRuleEvaluator`, and updates the predecessor infrastructure Fact
+only to retire RULE-0001's empty-intent staging assertion while retaining
+registration/applicability/cancellation ownership. The exact five-path
+allowlist and `950`-line cap
+are normative in that plan. Public API, declarations, other producers/rules,
+projects, packages, locks, workflows, and held activation surfaces are frozen.
+
+The fresh fixture writes and qualifies one canonical repository-tree payload,
+indexes it through the object-identical registered tree index, binds its exact
+capability/context proof and selector references, then invokes the
+object-identical RULE-0001 evaluator. Canonical directory grammar is ordinal
+`docs/features/FEAT-` plus exactly four digits, one hyphen, and a nonempty
+suffix; only a Directory terminal creates a feature root. Child membership is
+exactly `<root>/README.md` and `<root>/test-cases.md`, and only File terminals
+satisfy it. Feature roots and findings are ordinal; duplicate input rows are
+already rejected by the canonical repository-tree codec.
+
+For each feature root, README absence precedes test-cases absence. A missing or
+non-File child emits its exact declared finding with the matching
+ExpectedSelector as primary and only the feature-root Derived proof as related;
+both File children emit nothing. Selector lookup uses the exact parent handle,
+never a path-only reconstruction. Cancellation is checked before reading the
+capability. Inputs/outputs are immutable snapshots and findings are ordinal;
+the canonical codec's strict input-order rule remains unchanged. Unrelated or
+case-drifted paths cannot become feature roots.
+
+The semantic red seam is the Tests-owned nullable
+`ContractSliceDPolicyEvaluatorEvidence` returned by
+`EvaluateRule0001(InitialRuleQualificationPolicy.Export)`. The complete valid
+missing-README call returns null only while the registered evaluator still
+produces the predecessor empty intent; only that null reaches
+`TEST-0210-D-BEHAVIOR-RED-0003`. Wrong findings, references, order, setup,
+negative/boundary cases, cancellation, and exceptions remain marker-free.
+Canonical red is the common one-child fresh-root Release `--no-build` oracle
+and never reruns after invocation commitment. Green is focused `1/1`, D `5/5`,
+and full Conformance `59/59`; RULE-0002 remains held until the separate
+`ReviewedLocalGreen` commit exists.
+
+Diagnostic `R=0003` is immutable no-success/no-retry: the sole result failed
+before the marker because the real tree index could not bind a semantically
+equal but separately minted model-contract object. The correction is confined
+to the frozen registration path: the codec-owned repository-tree model token is
+created once and supplied object-identically to both codec and index. One
+distinct corrected fresh-root invocation retains the exact FQN, marker,
+semantic-null seam, filter, counters and no-diagnostic oracle; no artifact from
+the diagnostic run is reusable.
+The first cumulative green exposed and closed only that obsolete infrastructure
+test expectation; the new Fact remains the sole owner of RULE-0001 findings.
 
 ### `C-EVALUATION-PLAN-01` executable freeze
 

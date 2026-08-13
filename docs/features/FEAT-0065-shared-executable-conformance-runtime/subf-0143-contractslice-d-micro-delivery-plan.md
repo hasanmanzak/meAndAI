@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Gate 2 micro-delivery plan and design freeze |
-| State | Design exact-head hosted green and maintainer accepted; `D-POLICY-SURFACE-ACTIVATION-01` is `ExactHeadHostedGreen`; `D-REAL-PRODUCER-INFRASTRUCTURE-01` is `ReviewedLocalGreen`; D is `4/11` and A+B+C+D/full Conformance is `58/58`; the Cohort 2 exact-head hosted gate is pending and RULE-0001 remains inactive |
+| State | Design exact-head hosted green and maintainer accepted; Policy activation and producer infrastructure are `ExactHeadHostedGreen`; `D-RULE-0001-01` is `ReviewedLocalGreen`; D is `5/11` and A+B+C+D/full Conformance is `59/59`; `D-RULE-0002-01` is next/inactive |
 | Parent | [SUBF-0143](README.md#subf-0143) |
 | Scenario | [TEST-0210](test-cases.md#test-0210), retained `Planned` |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
@@ -280,13 +280,83 @@ create, timeout, interruption, exit, TRX, or oracle failure; no rerun is
 authorized. The exact freeze cohort must first be committed, pushed, and pass
 same-head Ubuntu/Windows validation before the runner is materialized.
 
+### `D-RULE-0001-01` pre-red freeze
+
+The producer-infrastructure predecessor is exact commit
+[`9d596d984f9921ba48e466d3e41984a9f34fb1c3`](https://github.com/hasanmanzak/meAndAI/commit/9d596d984f9921ba48e466d3e41984a9f34fb1c3).
+[Run 31735781705](https://github.com/hasanmanzak/meAndAI/actions/runs/31735781705)
+passed Ubuntu in `21m32s` and Windows in `15m08s`; publication was skipped.
+This closes Cohort 2 as `ExactHeadHostedGreen` and activates only the frozen
+RULE-0001 package.
+
+The sole Fact/FQN/marker are
+`ContractSliceDPolicyEvaluatorTests.Evaluates_rule_0001_against_fresh_qualified_fixture`
+and `TEST-0210-D-BEHAVIOR-RED-0003`, with only `ContractSlice=D` and no
+Scenario, Theory, overload, class trait, or second Fact. The fully prepared
+call is
+`ContractSliceDPolicyEvaluatorFixture.EvaluateRule0001(InitialRuleQualificationPolicy.Export)`;
+its semantic return is `ContractSliceDPolicyEvaluatorEvidence?`. The transient
+predecessor runs the real repository-tree writer, codec, index, selector and
+registered evaluator over one canonical feature directory containing a File
+`test-cases.md` and no `README.md`; only the resulting empty evaluation intent
+returns null and reaches the exact marker. Construction, qualification,
+cancellation, wrong findings/references/order, negative/boundary fixtures, and
+all exceptions remain marker-free.
+
+Green requires exactly one `protocol.feature.readme-missing` finding whose
+primary handle is the exact `protocol.selector.feature-readme` ExpectedSelector
+for the feature-directory Derived proof and whose only related handle is that
+proof. The same Fact proves: complete README/test-cases yields no finding;
+README-only yields exactly `protocol.feature.test-cases-missing`; neither child
+yields README then test-cases findings; non-File child terminals count as
+missing; noncanonical/case-drifted/unrelated directories are ignored; findings
+are ordinal while the canonical codec retains its strict input-order contract;
+caller collections are copied; and cancellation closes before evaluation. No B/C handle, cache, result,
+assertion, or TRX is consumed.
+
+The exact production allowlist modifies only:
+
+```text
+src/MeAndAI.Protocol.Policy/Indexes/PolicyIndexes.cs
+src/MeAndAI.Protocol.Policy/Registration/InitialPolicyRegistrationGraph.cs
+src/MeAndAI.Protocol.Policy/Rules/PolicyRuleEvaluators.cs
+```
+
+The test allowlist adds
+`tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ContractSliceDPolicyEvaluatorTests.cs`.
+It may also modify
+`tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ContractSliceDProducerInfrastructureTests.cs`
+only to retire RULE-0001's predecessor empty-intent staging assertion while
+retaining registration and cancellation ownership.
+No other production/test path, declaration, public API, project, package, lock,
+workflow, or record node may change. The cap is three production paths, one
+new plus one retained test path, and `950` normalized changed C# lines. Canonical red uses one fresh
+external result root, the exact full-FQN filter and marker-named TRX, one child,
+Release `--no-restore --no-build`, exact native exit `1`, the common sixteen-
+counter/marker-only/no-diagnostic oracle, and no rerun after invocation commit.
+Focused green is `1/1`, D is `5/5`, and full Conformance is `59/59`.
+
+Diagnostic `R=0003` executed once and is immutable no-success/no-retry. Its
+sole Failed result never reached the marker: the real tree index rejected the
+qualified tree model with `Sequence contains no elements` because codec and
+index registrations held semantically equal but non-object-identical model
+contracts. The bounded correction reuses the exact codec-owned tree model token
+when constructing the tree index registration. Corrected canonical red keeps
+the same packet/FQN/marker/null seam/oracle, but uses one distinct fresh result
+root and is authorized exactly once; it cannot reuse diagnostic artifacts.
+The first cumulative green then proved that the immutable infrastructure Fact
+still required every evaluator's predecessor empty intent. Its bounded test-only
+correction skips that obsolete normal-call assertion for RULE-0001 while keeping
+its registration/applicability/cancellation checks; semantic outcomes remain
+owned solely by the new RULE-0001 Fact.
+
 ## Cohort measurement ledger
 
 | Cohort | Local work/validation | Hosted CI | Hosted defects | Owner identification | Correction/revalidation | Estimated saving vs package-hosted | Consistency/traceability loss |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Policy activation | About `45m` local work; exact-tree StructureOnly `546.622s` and publication evidence `7/7` in `369.5s`, run concurrently | [Run 31719641316](https://github.com/hasanmanzak/meAndAI/actions/runs/31719641316): Ubuntu `18m53s`, Windows `18m40s`, publication skipped | `0` | Not applicable | `0` | Baseline: one avoided intermediate hosted wait | None observed |
 | Real producer infrastructure | About `2h` active implementation/validation; StructureOnly `527.148s`, publication evidence `7/7` in `337.4s` | Pending one cohort push | `0` locally | Not applicable locally | `0` locally | No avoided package push; singleton cohort preserves semantic isolation | None observed locally |
-| First common rules | `NotMeasured` | `NotMeasured` | `NotMeasured` | `NotMeasured` | `NotMeasured` | Baseline: one avoided intermediate hosted wait | `NotMeasured` |
+| First common rules | RULE-0001 about `1h` active implementation/validation; focused `1/1`, D `5/5`, full `59/59`, Release `0/0`, StructureOnly `479.695s`, publication evidence `7/7` in `302.5s`; RULE-0002 pending | Held until RULE-0002 and the full cohort gate | `0` locally | One registration token-identity defect in diagnostic red and one predecessor staging-test expectation were isolated to RULE-0001 immediately | About `15m` including rebuild/revalidation | Baseline: one avoided intermediate hosted wait | None observed |
 | Specialized common rules | `NotMeasured` | `NotMeasured` | `NotMeasured` | `NotMeasured` | `NotMeasured` | Baseline: two avoided intermediate hosted waits | `NotMeasured` |
 | Equivalence/closure | `NotMeasured` | `NotMeasured` | `NotMeasured` | `NotMeasured` | `NotMeasured` | Baseline: two avoided intermediate hosted waits | `NotMeasured` |
 

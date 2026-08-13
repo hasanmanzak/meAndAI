@@ -111,6 +111,14 @@ internal static class ContractSliceDProducerInfrastructureFixture
             Assert.Equal(ApplicabilityIntentKind.Applicable,
                 registration.Evaluator.EvaluateApplicability(
                     applicability, CancellationToken.None).Kind);
+            if (registration.Declaration.RuleId.Value == "RULE-0001")
+            {
+                Assert.Throws<OperationCanceledException>(() =>
+                    registration.Evaluator.Evaluate(
+                        evaluation, new CancellationToken(true)));
+                continue;
+            }
+
             var result = registration.Evaluator.Evaluate(
                 evaluation, CancellationToken.None);
             Assert.Empty(result.Findings);

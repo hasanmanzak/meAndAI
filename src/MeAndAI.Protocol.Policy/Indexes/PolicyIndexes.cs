@@ -11,12 +11,52 @@ internal sealed class PolicyIndexInput : IComponentInput
     internal TypedInputReader Reader { get; }
 }
 
-internal sealed class RepositoryTreeIndex :
-    PolicyIndexer<IRepositoryTree>,
+internal sealed class RepositoryTreeIndex(
+    ModelTypeToken<RepositoryTreeModel> inputModel) :
     IContextIndexer<PolicyIndexInput, IRepositoryTree>
 {
-    protected override IRepositoryTree CreateValue() =>
-        new RepositoryTreeCapability([]);
+    private readonly ModelTypeToken<RepositoryTreeModel> _inputModel =
+        inputModel ?? throw new ArgumentNullException(nameof(inputModel));
+
+    public CapabilityIntent<IRepositoryTree> Build(
+        ContextIndexInput<PolicyIndexInput> input,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(input);
+        cancellationToken.ThrowIfCancellationRequested();
+        var model = input.Value.Reader.RequireModel(_inputModel);
+        var entries = model.Value.Entries.Select(entry => RepositoryEntryView.Create(
+            entry.RepositoryRelativePath,
+            entry.Kind,
+            input.Derivations.Derive(
+                model.Evidence,
+                "repository-entry",
+                entry.RepositoryRelativePath,
+                model.Value.Binding.Location))).ToArray();
+        return CapabilityIntent<IRepositoryTree>.Produced(
+            CapabilityProduct<IRepositoryTree>.Create(
+                new RepositoryTreeCapability(entries),
+                entries.Select(entry => entry.Evidence),
+                Usage(entries.Length)));
+    }
+
+    public SemanticResourceLocalUsage MeasureLocal(
+        ContextIndexInput<PolicyIndexInput> input,
+        IRepositoryTree value,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(input);
+        ArgumentNullException.ThrowIfNull(value);
+        cancellationToken.ThrowIfCancellationRequested();
+        return Usage(value.Entries.Count);
+    }
+
+    private static SemanticResourceLocalUsage Usage(int nodes) =>
+        SemanticResourceLocalUsage.Create(
+            generatedBytes: 0,
+            layerDepth: nodes == 0 ? 0 : 1,
+            layerNodes: nodes,
+            additionalComplexity: nodes);
 }
 
 internal sealed class ProtocolRecordIndex :

@@ -18,22 +18,25 @@ internal static class InitialPolicyRegistrationGraph
         ArgumentNullException.ThrowIfNull(declarations);
         var registry = declarations.SchemaRegistry;
         var catalog = declarations.Catalog;
+        var treeModel = ModelTypeToken<RepositoryTreeModel>.Create(
+            Schema(registry, "protocol.repository-tree").OutputModel);
 
         return PolicyQualificationSliceExport.Create(
             "protocol.policy.initial-rule-qualification",
             "1",
             catalog,
             registry,
-            CreateCodecs(registry),
+            CreateCodecs(registry, treeModel),
             CreateParsers(registry),
-            CreateIndexes(registry),
+            CreateIndexes(registry, treeModel),
             CreateProjectors(registry),
             CreateSelectors(catalog),
             CreateEvaluators(catalog));
     }
 
     private static ICodecRegistration[] CreateCodecs(
-        ReleaseSchemaRegistry registry)
+        ReleaseSchemaRegistry registry,
+        ModelTypeToken<RepositoryTreeModel> treeModel)
     {
         var governed = Schema(registry, "protocol.governed-text");
         var target = Schema(registry, "protocol.repository-target-resolution");
@@ -42,8 +45,6 @@ internal static class InitialPolicyRegistrationGraph
             governed.OutputModel);
         var targetModel = ModelTypeToken<RepositoryTargetResolutionModel>.Create(
             target.OutputModel);
-        var treeModel = ModelTypeToken<RepositoryTreeModel>.Create(
-            tree.OutputModel);
         return
         [
             CodecRegistration<SourceTextModel>.Create(
@@ -97,7 +98,8 @@ internal static class InitialPolicyRegistrationGraph
     }
 
     private static IIndexRegistration[] CreateIndexes(
-        ReleaseSchemaRegistry registry) =>
+        ReleaseSchemaRegistry registry,
+        ModelTypeToken<RepositoryTreeModel> treeModel) =>
     [
         CreateIndex<IGovernedReferenceIndex, GovernedReferenceIndex>(
             registry,
@@ -112,11 +114,23 @@ internal static class InitialPolicyRegistrationGraph
                 registry,
                 "protocol.index.repository-target-resolution",
                 new RepositoryTargetResolutionIndex()),
-        CreateIndex<IRepositoryTree, RepositoryTreeIndex>(
-            registry,
-            "protocol.index.repository-tree",
-            new RepositoryTreeIndex()),
+        CreateRepositoryTreeIndex(registry, treeModel),
     ];
+
+    private static IIndexRegistration CreateRepositoryTreeIndex(
+        ReleaseSchemaRegistry registry,
+        ModelTypeToken<RepositoryTreeModel> inputModel)
+    {
+        var declaration = Index(registry, "protocol.index.repository-tree");
+        return IndexRegistration<PolicyIndexInput, IRepositoryTree>.Create(
+            declaration,
+            new PolicyInputBinder<PolicyIndexInput>(
+                declaration.Inputs,
+                reader => new PolicyIndexInput(reader)),
+            CapabilityTypeToken<IRepositoryTree>.Create(
+                declaration.OutputCapability),
+            new RepositoryTreeIndex(inputModel));
+    }
 
     private static IIndexRegistration CreateIndex<TCapability, TIndexer>(
         ReleaseSchemaRegistry registry,
