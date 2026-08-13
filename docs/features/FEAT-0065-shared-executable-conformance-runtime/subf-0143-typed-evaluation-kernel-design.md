@@ -3,14 +3,14 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted; ContractSlice A and B merged/exact-main green; B is `11/11`, cumulative A+B `43/43`. C Activation and Applicability are `ExactHeadHostedGreen`; Evaluation Plan and Advance are separate packet-local `ReviewedLocalGreen` commits in one unpushed cohort, C is `9/11`, current A+B+C `52/52`. R=0007/R=0011/R=0014/R=0015 are accepted/immutable; R=0012/R=0013 are diagnostics/no-success. Results/closure waits for the Evaluation cohort exact-head hosted gate; [TEST-0210](test-cases.md#test-0210) remains `Planned`, and D/activation/DoD remain held. |
+| Status | Gate 2 accepted; ContractSlice A and B merged/exact-main green; B is `11/11`, cumulative A+B `43/43`. C Activation, Applicability, and Evaluation are `ExactHeadHostedGreen`; C is `9/11`, current A+B+C `52/52`. R=0007/R=0011/R=0014/R=0015 are accepted/immutable; R=0012/R=0013 are diagnostics/no-success. `C-INTENT-RESULT-01` is `FrozenDesign`/inactive pending this synchronized records/design exact-head hosted gate; [TEST-0210](test-cases.md#test-0210) remains `Planned`, and D/activation/DoD remain held. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Test | [TEST-0210](test-cases.md#test-0210) |
 | Gate 3 micro-delivery routing | Historical A delivery remains owned by the [A micro-delivery control plan](subf-0143-micro-delivery-plan.md). Current B design routing is the [ContractSlice B micro-delivery plan](subf-0143-contractslice-b-micro-delivery-plan.md); packet labels refine delivery but activate no executable work. |
 | Exact-main design baseline | Accepted A merge commit [`51623f4d404a95e0f706d72805cf7ddbbbd293b8`](https://github.com/hasanmanzak/meAndAI/commit/51623f4d404a95e0f706d72805cf7ddbbbd293b8), validated by exact-main [run 31304787603](https://github.com/hasanmanzak/meAndAI/actions/runs/31304787603) |
-| Design and Gate 3 authority | Historical A/B directives, accepted reds, diagnostics, and hosted evidence remain immutable. The exact [C micro-delivery plan](subf-0143-contractslice-c-micro-delivery-plan.md) is exact-head hosted-green design authority; Activation and Applicability are `ExactHeadHostedGreen`, Evaluation Plan and Advance are separate packet-local `ReviewedLocalGreen` commits, diagnostic R=0012/R=0013 are immutable, and R=0014/R=0015 are accepted/immutable. The Evaluation cohort remains unpushed and Results/closure inactive; D, final activation, merge, release, and publication remain outside this authority. |
+| Design and Gate 3 authority | Historical A/B directives, accepted reds, diagnostics, and hosted evidence remain immutable. The exact [C micro-delivery plan](subf-0143-contractslice-c-micro-delivery-plan.md) is exact-head hosted-green design authority; Activation, Applicability, and Evaluation are `ExactHeadHostedGreen`, diagnostic R=0012/R=0013 are immutable, and R=0014/R=0015 are accepted/immutable. `C-INTENT-RESULT-01` is the sole next frozen packet and remains inactive until this synchronized records/design head becomes exact-head hosted green; D, final activation, merge, release, and publication remain outside this authority. |
 | Completed predecessor | [SUBF-0153](README.md#subf-0153) / [TEST-0221](test-cases.md#test-0221), merged through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173) and exact-main validated by [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) |
 
 ## Directive and hard boundary
@@ -10788,6 +10788,132 @@ Policy, project/package/lock/workflow surface changes. Green advances only to C
 `9/11` and full Conformance `52/52`; it does not activate Results/closure before
 the Evaluation cohort exact-head hosted gate.
 
+The Evaluation cohort is now immutable `ExactHeadHostedGreen` at exact
+[`18a8e3fa28160ec2e622752005b964e0ca98b838`](https://github.com/hasanmanzak/meAndAI/commit/18a8e3fa28160ec2e622752005b964e0ca98b838)
+through [run 31660382684](https://github.com/hasanmanzak/meAndAI/actions/runs/31660382684):
+Ubuntu `21m26s`, Windows `17m52s`, publication skipped, hosted defects `0`.
+
+### `C-INTENT-RESULT-01` executable freeze
+
+This packet introduces one internal pure transformation and no public member:
+
+```csharp
+internal static class EvaluationIntentCore
+{
+    internal static IReadOnlyList<RuleEvaluation> Mint(
+        EvaluationClosure closure,
+        CancellationToken cancellationToken);
+}
+```
+
+`Mint` requires a closure backed by the object-identical `KernelPlanningSession`
+and accepted manifest/catalog/export. The closure must contain every catalog
+rule exactly once across terminal and evaluation-ready partitions. Every ready
+rule's evaluation slot must have exactly one retained acquisition outcome. A
+Complete outcome must have one context proof; Incomplete/Failed produces an
+ordinal unresolved slot and suppresses that rule's evaluator. Only a rule whose
+outcomes are all Complete is evaluation-ready. The core creates one opaque
+`QualifiedEvidenceHandle` per Complete proof and an internal handle-to-reference
+map, creates `RuleEvaluationInput` with the exact rule identity/profile and
+proof map, invokes the object-identical registered evaluator once, and validates
+its returned `EvaluationIntent`. It
+is deterministic and idempotent and performs no session mutation; the later
+aggregation packet alone owns atomic public-kernel consumption.
+
+Intent carrier invariants are final here. Every applicability-reference list
+is a defensive unique snapshot; NotApplicable/Unresolved remain non-empty.
+Finding/failure related-reference
+sequences are defensive snapshots, contain no null or duplicate handle, and do
+not repeat their primary handle. An `EvaluationIntent` snapshots both
+collections and contains no duplicate semantic tuple. A finding code must map
+to exactly one declaration on its rule; its primary and every related reference
+kind must be allowed by that declaration. A failure code must occur in the
+rule's exact `EvaluationFailureCodes`. Every handle must have been minted for
+the same closure. Foreign/stale closure identity, a missing/duplicate outcome,
+partition mismatch, or a Complete outcome without proof is
+`CatalogIntegrityException(PlanStateInvalid)`. A null intent, unknown/foreign
+handle or code, duplicate, disallowed reference kind, or evaluator-registration
+mismatch is `CatalogIntegrityException(IntentInvalid)`. Evaluator
+exceptions propagate without partial result; cancellation is observed before
+each evaluator and before return.
+
+The core converts a valid ready intent by this closed truth table:
+
+| Intent shape | Minted status | Minted payload |
+| --- | --- | --- |
+| zero findings, zero failures | `Satisfied` | no findings/failures; applicability resolved |
+| one or more findings, zero failures | `Violated` | kernel-owned rule identity plus declaration-owned severity/remediation and exact references |
+| any failures | `NotEvaluated` | validated failures and any partial findings; applicability resolved, no unresolved slots |
+| any Incomplete/Failed evaluation outcome | `NotEvaluated` | evaluator not invoked; no findings/failures; applicability resolved; ordinal unresolved slot keys |
+
+Existing terminal `NotApplicable` and applicability-unresolved `NotEvaluated`
+results are preserved value-for-value and merged with ready results in ordinal
+RuleId/revision order. Within a result, findings and failures are ordered by
+code, primary reference, then related-reference sequence. The reference tuple
+is kind, slot key, requirement key, scope target/surface/snapshot identities,
+qualification digest, and any root/location/derivation/selector identity.
+
+The exact project-neutral fixture uses the Evaluation-ready closure. Synthetic
+RULE-0001 is empty/Satisfied; synthetic RULE-0002 emits exact finding
+`protocol.decision.record-missing` over the repository-tree context proof and
+is Violated; synthetic RULE-0003 remains terminal
+NotApplicable; synthetic RULE-0004 remains terminal applicability-unresolved
+NotEvaluated; synthetic RULE-0005 emits exact failure
+`protocol.evaluator.reference-ambiguity` and is NotEvaluated. Only
+the cloned synthetic RULE-0002 finding declaration extends its existing first
+finding's allowed primary kinds with `ContextProof`; code, severity,
+remediation, and every real Policy declaration remain unchanged. A second
+fixture variant makes one evaluation acquisition Incomplete and proves the
+exact unresolved-slot result plus zero evaluator invocation. Expected-
+selector resolution, capability-backed rule semantics, real Policy RULE-0001
+through RULE-0005, aggregation/verdict, and session consumption remain owned by
+later packets/D.
+
+The test fixture callback shape is closed rather than invented during red.
+`RuleEvaluatorMirror` owns optional applicability and evaluation delegates,
+checks cancellation in both methods, and defaults evaluation to the empty
+intent. Each derived RULE mirror forwards those two delegates. The activation
+and applicability-closure fixture factories accept an optional ordinal map from
+RuleId value to evaluation delegate, reject an unknown key, and bind it only to
+the matching object-identical `RuleEvaluatorRegistration`. This seam is Tests-
+owned and never appears in production or public API.
+
+```csharp
+internal static CFixture CreateFixture(
+    IReadOnlyDictionary<string,
+        Func<RuleEvaluationInput, EvaluationIntent>>? evaluationByRule = null);
+
+internal static ClosureFixture CreateFixture(
+    bool terminalizeEvaluationRule = false,
+    bool evaluationReady = false,
+    IReadOnlyDictionary<string,
+        Func<RuleEvaluationInput, EvaluationIntent>>? evaluationByRule = null);
+```
+
+The one Fact is
+`ContractSliceCIntentTests.Mints_exact_intents_findings_and_failures`, with only
+`ContractSlice=C`, no Scenario/Theory/class trait, and sole marker
+`TEST-0210-C-BEHAVIOR-RED-0008`. R=0016 replaces only the fully prepared valid
+`Mint` result with `null!`; only that semantic null calls the marker assertion.
+All construction, invalid, order, repeat, cancellation, host-exception, and
+assertion paths are marker-free. The exact packet argv is:
+
+```text
+dotnet test tests/dotnet/MeAndAI.Protocol.Conformance.Tests/MeAndAI.Protocol.Conformance.Tests.csproj --configuration Release --no-restore --no-build --nologo --verbosity minimal --results-directory "<fresh-root>" --logger "trx;LogFileName=TEST-0210-C-BEHAVIOR-RED-0008.trx" --filter "ContractSlice=C&FullyQualifiedName=MeAndAI.Protocol.Conformance.Tests.ContractSliceCIntentTests.Mints_exact_intents_findings_and_failures"
+```
+
+The exact eight-path executable allowlist and `2,400/900` normalized line caps
+are owned by the C micro-plan. R=0016 uses a fresh ValidateOnly/Execute runner,
+warning-free Release rebuild, source/runner/HEAD/upstream/status/lock/DLL/PDB
+custody, one fresh secure TRX, native exit `1`, connection timeout `300`, outer
+bound `420s`, exact marker/result/definition/entry/16-counter oracle, and
+irreversible no-retry authority after `InvocationCommitted`. Green is focused
+`1/1`, C `10/10`, full Conformance `53/53`, Domain `98/98`, with Release,
+format, diff, locks, StructureOnly, publication evidence, reviews, record sync,
+and one separate unpushed `ReviewedLocalGreen` commit. Aggregation remains held
+until that commit exists; canonical R=0016 remains held until this exact twelve-
+record design head is committed, pushed, and exact-head hosted green.
+
 ## Internal implementation slices
 
 ContractSlice A's historical delivery is owned by its
@@ -10804,14 +10930,11 @@ diagnostics/no-success. Corrected R=0014 is exact-head hosted green.
 B-CONVERGE is merged/exact-main green.
 ContractSlice C is decomposed by the current
 [C micro-delivery plan](subf-0143-contractslice-c-micro-delivery-plan.md), whose
-design head is hosted green. The three Activation packets and their exact
-cohort head are hosted green; both Applicability packets and their exact cohort
-head are hosted green. Evaluation design is hosted green; Evaluation Plan and
-Advance are separate packet-local `ReviewedLocalGreen` commits in one unpushed
-cohort, C is `9/11`, and current A+B+C is `52/52`. R=0012/R=0013 are immutable
-diagnostics and R=0014/R=0015 are accepted/immutable. Results/closure remains
-inactive until the Evaluation cohort full local gate, single push, and exact-
-head hosted green.
+design head is hosted green. Activation, Applicability, and Evaluation are
+exact-head hosted green. C is `9/11`, current A+B+C is `52/52`, R=0012/R=0013
+are immutable diagnostics, and R=0014/R=0015 are accepted/immutable.
+`C-INTENT-RESULT-01` is `FrozenDesign`/inactive until this synchronized
+records/design head becomes exact-head hosted green.
 
 C implementation and D still require separate packet activation, and no
 packet is active merely from this list. No directive here allocates new stable

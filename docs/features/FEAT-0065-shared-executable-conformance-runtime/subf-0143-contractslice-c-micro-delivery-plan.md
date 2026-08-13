@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Gate 2 micro-delivery plan and design freeze |
-| State | Design, Activation, Applicability, and Evaluation design cohorts `ExactHeadHostedGreen`; Evaluation Plan and Advance are separate packet-local `ReviewedLocalGreen` commits in one unpushed cohort, C `9/11`, current A+B+C `52/52`; R=0006/R=0008/R=0009/R=0010/R=0012/R=0013 diagnostic/no-success, R=0007/R=0011/R=0014/R=0015 accepted/immutable; Results/closure held pending the Evaluation cohort exact-head hosted gate; parent scenario held |
+| State | Initial design, Activation, Applicability, and Evaluation cohorts `ExactHeadHostedGreen`; C `9/11`, current A+B+C `52/52`; R=0006/R=0008/R=0009/R=0010/R=0012/R=0013 diagnostic/no-success, R=0007/R=0011/R=0014/R=0015 accepted/immutable; `C-INTENT-RESULT-01` `FrozenDesign`/inactive pending this synchronized records/design head becoming exact-head hosted green; parent scenario held |
 | Parent | Owning feature and current subfeature |
 | Scenario | [TEST-0210](test-cases.md#test-0210), retained `Planned` |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
@@ -140,7 +140,7 @@ sequence with a push and Ubuntu/Windows wait after every package.
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Activation | `3h10m` measured from the first package commit through the final synchronized exact-tree gate | Ubuntu `22m23s`; Windows `18m57s`; publication skipped | `0` | `NotApplicable` | `NotApplicable` | About `44m46s` of hosted critical-path wait from the two avoided intermediate pushes, using this cohort's `22m23s` longest job as the comparison basis | None observed; the local commit-reference recurrence caught the only record defect before push |
 | Applicability | About `63m` active package/validation time | `20m37s` critical hosted duration (`13m46s` Windows) | `0` | `NotApplicable` | `NotApplicable` | About `14-21m` by avoiding a second hosted round | `No`; separate package commits and exact FQN/runner evidence remained intact |
-| Evaluation | `NotMeasured` | `NotMeasured` | `NotMeasured` | `NotApplicable` until a defect | `NotApplicable` until a defect | `NotMeasured` | `NotObserved` initially |
+| Evaluation | `1h14m46s` observed Plan-to-Advance commit interval, including package-local validation and final cohort gates | `21m26s` critical hosted duration (`17m52s` Windows) | `0` | `NotApplicable` | `NotApplicable` | About `18-22m` by avoiding a second hosted round | `No`; separate package commits, exact red identities, and traceability remained intact |
 | Results/closure | `NotMeasured` | `NotMeasured` | `NotMeasured` | `NotApplicable` until a defect | `NotApplicable` until a defect | `NotMeasured` | `NotObserved` initially |
 
 C closure reports elapsed time, isolation cost, estimated saved time, and any
@@ -663,6 +663,132 @@ requires redraw. Package green is focused `1/1`, C `9/9`, full Conformance
 `52/52`, Domain `98/98`, Release/format/diff/locks/structure/reviews/record sync
 green, followed by one separate unpushed `ReviewedLocalGreen` commit. Only then
 does the Evaluation cohort run its full boundary and perform its single push.
+
+The two Evaluation commits remained separate and the cohort is immutable
+`ExactHeadHostedGreen` at
+[`18a8e3fa28160ec2e622752005b964e0ca98b838`](https://github.com/hasanmanzak/meAndAI/commit/18a8e3fa28160ec2e622752005b964e0ca98b838).
+[Run 31660382684](https://github.com/hasanmanzak/meAndAI/actions/runs/31660382684)
+passed Ubuntu in `21m26s` and Windows in `17m52s`; publication was skipped and
+no hosted defect occurred. The Plan-to-Advance commit interval was `1h14m46s`,
+an estimated `18-22m` package-hosted round was avoided, and no consistency or
+traceability loss was observed.
+
+## Frozen `C-INTENT-RESULT-01` packet boundary
+
+This is the sole next Results/closure packet. It remains `FrozenDesign` and
+inactive until the focused commit containing this exact twelve-record design
+cohort is pushed and exact-head hosted green. Its one direct Fact/FQN is
+`MeAndAI.Protocol.Conformance.Tests.ContractSliceCIntentTests.Mints_exact_intents_findings_and_failures`,
+with only `ContractSlice=C`, no Scenario/Theory/class trait, and marker
+`TEST-0210-C-BEHAVIOR-RED-0008`.
+
+The internal, pure, idempotent seam is exactly
+`EvaluationIntentCore.Mint(EvaluationClosure closure, CancellationToken
+cancellationToken)`. It validates the closure's plan-bound session, catalog,
+manifest, terminal/ready partition, exact evaluation-slot outcome set, and
+registered evaluator identity; it creates one opaque handle for each retained
+complete context proof. A rule with any Incomplete/Failed evaluation outcome is
+minted `NotEvaluated` with the ordinal unresolved slot keys and is not invoked;
+otherwise the core invokes its evaluator once in RuleId/revision order,
+validates its intent, and alone mints `RuleFinding`,
+`RuleEvaluationFailure`, and `RuleEvaluation`. It does not consume the planning
+session: `C-AGGREGATION-01` owns the later atomic public-kernel consumption.
+Cancellation before return and any evaluator host exception produce no result
+or committed state.
+
+All `ApplicabilityIntent` factories snapshot a unique handle sequence;
+`.NotApplicable` and `.Unresolved` additionally retain the existing non-empty
+rule. `FindingIntent.Create` and
+`EvaluationFailureIntent.Create` snapshot the caller sequence,
+reject a null/duplicate handle, and reject the primary handle repeated as
+related. `EvaluationIntent.Create` snapshots both lists and rejects duplicate
+semantic finding or failure tuples. The core maps a foreign/stale closure,
+missing/duplicate outcome, terminal/ready partition mismatch, or Complete
+outcome without proof to `CatalogIntegrityCode.PlanStateInvalid`. It maps null
+intents, foreign/unknown handles, unknown codes, disallowed finding primary/
+related kinds, duplicate intent tuples, or evaluator-registration mismatch to
+`CatalogIntegrityCode.IntentInvalid`.
+Reference and result ordering is ordinal by code and then the full qualified-
+reference tuple; output evaluations are RuleId/revision ordered.
+
+The exact Tests-owned fixture starts from `evaluationReady: true`. RULE-0001
+returns no intent items and becomes `Satisfied`; RULE-0002 returns exact
+finding `protocol.decision.record-missing` over the admitted repository-tree
+context proof and becomes `Violated`;
+RULE-0003 remains terminal `NotApplicable`; RULE-0004 remains terminal
+applicability-unresolved `NotEvaluated`; RULE-0005 returns exact declared
+failure `protocol.evaluator.reference-ambiguity` over that proof and becomes
+`NotEvaluated` while retaining no unresolved slot. The cloned synthetic
+RULE-0002 declaration preserves that finding's severity/remediation and permits
+`ContextProof` as its primary kind solely
+for this project-neutral fixture; no production or real Policy declaration is
+changed. A second acquisition-incomplete variant proves evaluator suppression
+and ordinal unresolved-slot ownership. The Fact proves all four status shapes,
+exact rule identity,
+severity/remediation/reference projection, defensive snapshots, deterministic
+repeat output, cancellation, host exception, and the complete invalid matrix.
+Expected-selector resolution, real capabilities, real Policy evaluators,
+aggregation/verdict, and session consumption remain held for their owning
+packets/D.
+
+The Tests-owned callback seam is exact: `RuleEvaluatorMirror` stores optional
+applicability and evaluation delegates, checks the passed token in both methods,
+and defaults evaluation to `EvaluationIntent.Create([], [])`; each five derived
+mirror constructors forwards those two optional delegates. Activation
+`CreateFixture` and applicability-closure `CreateFixture` accept an optional
+ordinal RuleId-value-to-evaluation-delegate dictionary, reject unknown keys,
+and bind each callback only to its object-identical registration. No production
+factory or delegate seam is added.
+
+Canonical R=0016 changes only the fully prepared valid `Mint` result to
+`null!`; only that semantic null reaches the marker. Setup, invalid-intent,
+cancellation, exception, repeat, order, and assertion paths are marker-free.
+The packet-specific child argv is:
+
+```text
+dotnet test tests/dotnet/MeAndAI.Protocol.Conformance.Tests/MeAndAI.Protocol.Conformance.Tests.csproj --configuration Release --no-restore --no-build --nologo --verbosity minimal --results-directory "<fresh-root>" --logger "trx;LogFileName=TEST-0210-C-BEHAVIOR-RED-0008.trx" --filter "ContractSlice=C&FullyQualifiedName=MeAndAI.Protocol.Conformance.Tests.ContractSliceCIntentTests.Mints_exact_intents_findings_and_failures"
+```
+
+It uses the common fresh external ValidateOnly/Execute runner: exact source,
+runner, HEAD/upstream/status, six locks, warning-free Release build, rebuilt
+DLL/PDB, fresh root, secure one-TRX result/definition/entry and 16-counter
+oracle, process-scoped `VSTEST_CONNECTION_TIMEOUT=300`, `420s` monotonic outer
+bound, and exact native exit `1`. `InvocationCommitted` irrevocably consumes
+R=0016 for process-create failure, timeout, unexpected exit, interruption,
+missing/malformed/extra TRX, or oracle rejection; no retry or replacement is
+authorized. Only pre-commit validation/build failure may be corrected under a
+newly reviewed runner state.
+
+The exact executable allowlist modifies
+`Evaluation/ApplicabilityIntent.cs`, `Evaluation/FindingIntent.cs`,
+`Evaluation/EvaluationFailureIntent.cs`, and `Evaluation/EvaluationIntent.cs`
+in Conformance.Abstractions; adds
+`Evaluation/EvaluationIntentCore.cs` in Conformance; modifies
+`ContractSliceCActivationTests.cs` and
+`ContractSliceCApplicabilityClosureTests.cs`; and adds
+`ContractSliceCIntentTests.cs`. No other source/test path and no Domain,
+Policy, public API, project/package/lock/workflow file may change. The normalized
+packet cap is `2,400` changed lines and the owning test cap is `900`; `2,401`
+or `901` requires redraw. Package green is focused `1/1`, C `10/10`, full
+Conformance `53/53`, Domain `98/98`, Release/format/diff/locks/structure/reviews
+and record sync green, then one separate unpushed `ReviewedLocalGreen` commit.
+Only then may `C-AGGREGATION-01` start inside the same Results/closure cohort.
+
+The design cohort allowlist is exactly
+[memory index](../../../.ai/memory/README.md),
+[project memory](../../../.ai/memory/project.md),
+[memory log index](../../../.ai/memory/log/README.md),
+[C evidence ledger](../../../.ai/memory/log/2026-08-12-feat-0065-subf-0143-contractslice-c-design-freeze.md),
+[architecture record](../../architecture/protocol-governance-and-execution/README.md),
+[successor plan](../../architecture/protocol-governance-and-execution/successor-delivery-plan.md),
+[transition register](../../architecture/protocol-governance-and-execution/transition-register.md),
+[feature record](README.md), this micro-plan,
+[typed design](subf-0143-typed-evaluation-kernel-design.md),
+[test cases](test-cases.md), and the [feature index](../README.md). It adds no
+node, executable source, project, package, lock, or workflow surface. Fresh
+design, evidence/scope, traceability, schema-2 graph, StructureOnly, and
+publication-evidence gates must pass before its focused commit, single push,
+and exact-head hosted design gate.
 
 ## Deferred ContractSlice D cohort plan
 
