@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Gate 2 micro-delivery plan and design freeze |
-| State | Initial design, Activation, Applicability, and Evaluation cohorts `ExactHeadHostedGreen`; C `11/11`, current A+B+C/full Conformance `54/54`; R=0006/R=0008/R=0009/R=0010/R=0012/R=0013/R=0016 diagnostic/no-success, R=0007/R=0011/R=0014/R=0015/R=0017/R=0018 accepted/immutable; `C-INTENT-RESULT-01` and `C-AGGREGATION-01` are separate unpushed `ReviewedLocalGreen` commits, with `C-CONVERGE-01` next/pure audit; parent scenario held |
+| State | Initial design, Activation, Applicability, and Evaluation cohorts `ExactHeadHostedGreen`; C `11/11`, current A+B+C/full Conformance `54/54`; R=0006/R=0008/R=0009/R=0010/R=0012/R=0013/R=0016 diagnostic/no-success, R=0007/R=0011/R=0014/R=0015/R=0017/R=0018 accepted/immutable; Results/closure is locally validated through three separate `ReviewedLocalGreen` commits, `C-CONVERGE-01` records local `CompletionRecommended`, and the cohort exact-head hosted gate is pending; parent scenario held |
 | Parent | Owning feature and current subfeature |
 | Scenario | [TEST-0210](test-cases.md#test-0210), retained `Planned` |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
@@ -141,7 +141,7 @@ sequence with a push and Ubuntu/Windows wait after every package.
 | Activation | `3h10m` measured from the first package commit through the final synchronized exact-tree gate | Ubuntu `22m23s`; Windows `18m57s`; publication skipped | `0` | `NotApplicable` | `NotApplicable` | About `44m46s` of hosted critical-path wait from the two avoided intermediate pushes, using this cohort's `22m23s` longest job as the comparison basis | None observed; the local commit-reference recurrence caught the only record defect before push |
 | Applicability | About `63m` active package/validation time | `20m37s` critical hosted duration (`13m46s` Windows) | `0` | `NotApplicable` | `NotApplicable` | About `14-21m` by avoiding a second hosted round | `No`; separate package commits and exact FQN/runner evidence remained intact |
 | Evaluation | `1h14m46s` observed Plan-to-Advance commit interval, including package-local validation and final cohort gates | `21m26s` critical hosted duration (`17m52s` Windows) | `0` | `NotApplicable` | `NotApplicable` | About `18-22m` by avoiding a second hosted round | `No`; separate package commits, exact red identities, and traceability remained intact |
-| Results/closure | About `44m` from the Intent commit through Aggregation record preparation; final converge validation pending | `NotMeasured` until the single cohort push | `0` locally | `NotApplicable` | One fixture-only zero-demand setup correction was isolated in under `2m` and revalidated in about `3m` | Two intermediate hosted rounds avoided; exact saving finalized after cohort hosted closure | `No`; separate commits, immutable red evidence, and ownership remained traceable |
+| Results/closure | About `1h29m` observed from the Intent commit through pre-final Converge gates; final structural recurrences follow | `NotMeasured` until the single cohort push | `0` hosted so far; two local record recurrences and one fixture correction | Each local owner isolated in under `2m` | Fixture correction/revalidation under `5m`; both record corrections edge-neutral and under `2m` each, excluding recurrence time | Two intermediate hosted rounds avoided; exact saving finalized after cohort hosted closure | `No`; separate commits, immutable red evidence, ownership, and full traceability remained intact |
 
 C closure reports elapsed time, isolation cost, estimated saved time, and any
 consistency or traceability loss for these four cohorts separately from D.
@@ -865,8 +865,27 @@ ownership was isolated in under `2m`, the canonical non-empty candidate set was
 restored, and revalidation cost about `3m`. Preliminary StructureOnly passed in
 `487.011s`; publication evidence passed `7/7` in `321s` with no publication
 claim. Exact-tree recurrences and final reviews remain the focused commit gate.
-No package push or hosted claim exists. `C-CONVERGE-01` is next and may change
-only the twelve records, with P/R/G `NotApplicable` and no executable delta.
+No package push or hosted claim exists.
+
+## `C-CONVERGE-01` local audit boundary
+
+Aggregation is captured in exact local commit
+[`22ef6e26263818350df61c4af83491bc7c413cd9`](https://github.com/hasanmanzak/meAndAI/commit/22ef6e26263818350df61c4af83491bc7c413cd9)
+as the second Results/closure package. `C-CONVERGE-01` changes only the frozen
+twelve records. P/R/G are `NotApplicable`; it adds no Fact/FQN/marker and no
+source, test, project, package, lock, workflow, public API, or ownership surface.
+It revalidates C `11/11`, A+B+C/full Conformance `54/54`, Domain `98/98`, API/
+ownership, Release build, format, locks, diff, schema-2 graph/StructureOnly,
+publication evidence, complete three-commit cohort diff, and independent code/
+test, evidence/scope, and traceability reviews.
+
+The convergence commit is the third separate `ReviewedLocalGreen` package and
+records only local `CompletionRecommended`. Intent, Aggregation, and Converge
+remain unpushed until those exact-tree gates pass; then all three commits are
+sent in one push. C remains incomplete until that pushed exact head passes both
+stable hosted jobs with publication in its designed state. The parent scenario,
+final status/owner/workflow filters, runtime-efficiency activation, D, DoD,
+merge, release, and publication remain held.
 
 ## Deferred ContractSlice D cohort plan
 

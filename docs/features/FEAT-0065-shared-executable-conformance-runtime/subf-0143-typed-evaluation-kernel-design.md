@@ -3,14 +3,14 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted; ContractSlice A and B merged/exact-main green; B is `11/11`, cumulative A+B `43/43`. C Activation, Applicability, and Evaluation are `ExactHeadHostedGreen`; C Intent and Aggregation are separate unpushed `ReviewedLocalGreen` commits. C is `11/11`, current A+B+C/full Conformance `54/54`. R=0007/R=0011/R=0014/R=0015/R=0017/R=0018 are accepted/immutable; R=0012/R=0013/R=0016 are diagnostics/no-success. `C-CONVERGE-01` is the next code-free audit; [TEST-0210](test-cases.md#test-0210) remains `Planned`, and D/activation/DoD remain held. |
+| Status | Gate 2 accepted; ContractSlice A and B merged/exact-main green; B is `11/11`, cumulative A+B `43/43`. C Activation, Applicability, and Evaluation are `ExactHeadHostedGreen`; Results/closure is locally validated through three separate `ReviewedLocalGreen` commits. C is `11/11`, current A+B+C/full Conformance `54/54`. R=0007/R=0011/R=0014/R=0015/R=0017/R=0018 are accepted/immutable; R=0012/R=0013/R=0016 are diagnostics/no-success. `C-CONVERGE-01` records local `CompletionRecommended` while the cohort exact-head hosted gate is pending; [TEST-0210](test-cases.md#test-0210) remains `Planned`, and D/activation/DoD remain held. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Test | [TEST-0210](test-cases.md#test-0210) |
 | Gate 3 micro-delivery routing | Historical A delivery remains owned by the [A micro-delivery control plan](subf-0143-micro-delivery-plan.md). Current B design routing is the [ContractSlice B micro-delivery plan](subf-0143-contractslice-b-micro-delivery-plan.md); packet labels refine delivery but activate no executable work. |
 | Exact-main design baseline | Accepted A merge commit [`51623f4d404a95e0f706d72805cf7ddbbbd293b8`](https://github.com/hasanmanzak/meAndAI/commit/51623f4d404a95e0f706d72805cf7ddbbbd293b8), validated by exact-main [run 31304787603](https://github.com/hasanmanzak/meAndAI/actions/runs/31304787603) |
-| Design and Gate 3 authority | Historical A/B directives, accepted reds, diagnostics, and hosted evidence remain immutable. The exact [C micro-delivery plan](subf-0143-contractslice-c-micro-delivery-plan.md) is exact-head hosted-green design authority; Activation, Applicability, and Evaluation are `ExactHeadHostedGreen`, diagnostic R=0012/R=0013/R=0016 are immutable, and R=0014/R=0015/R=0017/R=0018 are accepted/immutable. `C-INTENT-RESULT-01` and `C-AGGREGATION-01` are separate unpushed `ReviewedLocalGreen` commits; `C-CONVERGE-01` is the next pure audit. D, final activation, merge, release, and publication remain outside this authority. |
+| Design and Gate 3 authority | Historical A/B directives, accepted reds, diagnostics, and hosted evidence remain immutable. The exact [C micro-delivery plan](subf-0143-contractslice-c-micro-delivery-plan.md) is exact-head hosted-green design authority; Activation, Applicability, and Evaluation are `ExactHeadHostedGreen`, diagnostic R=0012/R=0013/R=0016 are immutable, and R=0014/R=0015/R=0017/R=0018 are accepted/immutable. Results/closure is locally validated through three separate `ReviewedLocalGreen` commits; `C-CONVERGE-01` records local `CompletionRecommended` while the cohort exact-head hosted gate is pending. D, final activation, merge, release, and publication remain outside this authority. |
 | Completed predecessor | [SUBF-0153](README.md#subf-0153) / [TEST-0221](test-cases.md#test-0221), merged through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173) and exact-main validated by [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) |
 
 ## Directive and hard boundary
@@ -10982,10 +10982,12 @@ The semantic null alone was removed for green. Focused `1/1`, C `11/11`, full
 Conformance `54/54`, Domain `98/98`, warning/error-free Release build, format,
 locks, diff, preliminary StructureOnly/publication evidence, and package reviews
 are green. `C-AGGREGATION-01` is captured in its own unpushed
-`ReviewedLocalGreen` commit. `C-CONVERGE-01` alone may follow as a twelve-record,
+`ReviewedLocalGreen` commit. `C-CONVERGE-01` follows only as a twelve-record,
 code-free P/R/G-NotApplicable audit; it may not rewrite any immutable red or
 activate D, the parent scenario, final status/owner/workflow, release, or
-publication.
+publication. Its third separate local commit records `CompletionRecommended`
+only after the full exact-tree cohort validation, and C remains incomplete until
+that commit is pushed once and becomes exact-head hosted green.
 
 ## Internal implementation slices
 
@@ -11004,11 +11006,12 @@ B-CONVERGE is merged/exact-main green.
 ContractSlice C is decomposed by the current
 [C micro-delivery plan](subf-0143-contractslice-c-micro-delivery-plan.md), whose
 design head is hosted green. Activation, Applicability, and Evaluation are
-exact-head hosted green. C Intent and Aggregation are separate unpushed
-`ReviewedLocalGreen` commits. C is `11/11`, current A+B+C/full Conformance is
-`54/54`, R=0012/R=0013/R=0016 are immutable diagnostics, and R=0014/R=0015/
-R=0017/R=0018 are accepted/immutable. `C-CONVERGE-01` is the sole next pure
-audit.
+exact-head hosted green. Results/closure is locally validated through Intent,
+Aggregation, and Converge as three separate `ReviewedLocalGreen` commits. C is
+`11/11`, current A+B+C/full Conformance is `54/54`, R=0012/R=0013/R=0016 are
+immutable diagnostics, and R=0014/R=0015/R=0017/R=0018 are accepted/immutable.
+`C-CONVERGE-01` records local `CompletionRecommended`; the cohort exact-head
+hosted gate is pending.
 
 C implementation and D still require separate packet activation, and no
 packet is active merely from this list. No directive here allocates new stable
