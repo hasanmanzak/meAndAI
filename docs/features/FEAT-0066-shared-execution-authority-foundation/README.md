@@ -3,18 +3,25 @@
 | Field | Value |
 | --- | --- |
 | Classification | Feature |
-| Status | Proposed under accepted architecture; implementation not authorized |
+| Status | [SUBF-0145](#subf-0145) `DesignFreezeCandidate`; implementation conditionally authorized only after `AcceptedFrozenDesign` exact-head hosted green |
 | Target version | 0.17.0 |
 | Issue | [#166](https://github.com/hasanmanzak/meAndAI/issues/166) |
-| Pull request | Not created; development not authorized |
+| Pull request | Design checkpoint not yet created |
 | Decisions | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md), [DEC-0011](../../decisions/DEC-0011-qualified-evidence-and-closure.md), [DEC-0013](../../decisions/DEC-0013-trusted-adoption-and-recoverable-evidence.md), and [DEC-0017](../../decisions/DEC-0017-idempotent-consumer-lifecycle.md) |
 | Tests | [TEST-0212](test-cases.md#test-0212) and [TEST-0213](test-cases.md#test-0213) |
 
-## Implementation hold
+## Conditional implementation boundary
 
 This record owns boundary 2 in the accepted
 [successor plan](../../architecture/protocol-governance-and-execution/successor-delivery-plan.md#1-capability-ownership).
-No implementation, mutation, publication, or authority transfer is authorized.
+The current maintainer directive authorizes the
+[SUBF-0145](#subf-0145) [design freeze](subf-0145-authority-grant-activation-design.md) and
+conditionally authorizes only its four implementation packages after the exact
+[AcceptedFrozenDesign gate](subf-0145-micro-delivery-plan.md#acceptedfrozendesign-gate)
+is green. Until then no production or executable-test implementation is active.
+After that gate, the package sequence proceeds without another confirmation.
+Merge, release, publication, consumer mutation, credentials, authority
+transfer, and [SUBF-0146](#subf-0146) implementation remain separately held.
 The preserved [draft PR #160](https://github.com/hasanmanzak/meAndAI/pull/160)
 contains no directly reusable implementation for this foundation.
 
@@ -67,6 +74,11 @@ reconstruction, and explicit recovery grants for every mutating application.
   confirms this is new work rather than a renamed WIP authority-state enum.
 - Verification approach: pure domain/unit tests first, followed by durable
   store, crash, replay, concurrency, and real-adapter integration fixtures.
+- Selected-slice Gate 2 contracts and exact package controls:
+  [selected design](subf-0145-authority-grant-activation-design.md),
+  [exact public API contract](subf-0145-public-api-contract.md),
+  [exact value/error contract](subf-0145-value-error-contract.md), and
+  [micro-delivery plan](subf-0145-micro-delivery-plan.md).
 
 ## Risks
 
@@ -78,14 +90,14 @@ reconstruction, and explicit recovery grants for every mutating application.
 | Test readiness | Gate 1 state | Evidence |
 | --- | --- | --- |
 | Scenarios | Defined | [Test scenarios](test-cases.md) |
-| Test code | Not started | Implementation is not authorized |
+| Test code | Not started | Activates only after the `AcceptedFrozenDesign` gate |
 | Baseline run | Not run | No prior same-contract implementation exists |
 
 ## Decomposition and subfeature gates
 
 | ID | Slice | Tracking | Tests/run | Self-review/findings | Status |
 | --- | --- | --- | --- | --- | --- |
-| `SUBF-0145` <a name="subf-0145"></a> | Authority snapshots, role separation, grants, activation CAS, and publication envelopes | [#166](https://github.com/hasanmanzak/meAndAI/issues/166) | [TEST-0212](test-cases.md#test-0212) / not started | Pending | Proposed |
+| `SUBF-0145` <a name="subf-0145"></a> | Authority snapshots, role separation, grants, activation CAS, and publication envelopes | [#166](https://github.com/hasanmanzak/meAndAI/issues/166) | [TEST-0212](test-cases.md#test-0212) / not started | Design reviews pending | `DesignFreezeCandidate`; [design](subf-0145-authority-grant-activation-design.md) / [API](subf-0145-public-api-contract.md) / [values/errors](subf-0145-value-error-contract.md) / [micro plan](subf-0145-micro-delivery-plan.md) |
 | `SUBF-0146` <a name="subf-0146"></a> | Leases, fences, journal, receipts, retention, reconstruction, and recovery grants | [#166](https://github.com/hasanmanzak/meAndAI/issues/166) | [TEST-0213](test-cases.md#test-0213) / not started | Pending | Proposed |
 
 ## Decisions and relationships
@@ -98,10 +110,11 @@ reconstruction, and explicit recovery grants for every mutating application.
 
 - [x] Stable ID, linked issue, accepted decision, problem, outcome, scope, non-goals, consumers, risks, and reviewable decomposition.
 - [x] Numbered planning scenarios and explicit WIP absence finding.
-- [ ] Exact authority/grant/journal schemas and store/adapter contracts for the selected slice.
-- [ ] Expected-red concurrency, crash, replay, corruption, and recovery fixtures.
+- [x] Exact authority/grant/activation schemas and store-port contracts for selected [SUBF-0145](#subf-0145).
+- [x] Exact [TEST-0212](test-cases.md#test-0212) expected-red FQNs, replay, role, publication, and concurrent-CAS fixture plan.
+- [ ] [SUBF-0146](#subf-0146) journal, crash, corruption, retention, reconstruction, and recovery schema/fixture freeze.
 - [ ] Gate 2 design review for the selected dependency-closed slice.
-- [ ] Separate maintainer implementation directive.
+- [x] Maintainer implementation directive exists conditionally; activates only after `AcceptedFrozenDesign` exact-head hosted green.
 
 ## Acceptance criteria
 
