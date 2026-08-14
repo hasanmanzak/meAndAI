@@ -79,6 +79,14 @@ snapshot test. The
 accepted grant red remains immutable and is not invoked again; implementation
 resumes only after the correction exact head passes Ubuntu and Windows.
 
+The activation canonical red later exposed one package-local allowlist defect:
+the two existing exact port-test doubles must implement the activation members
+added to the frozen ports. The repeated design gate therefore permits only the
+two package-4 test carveouts below. The accepted activation red source and TRX
+remain immutable, are hash-reverified after reconciliation, and are never
+invoked again before bounded green. This correction changes no product API,
+behavior, rejection, expected-red identity, package order, or budget.
+
 ## Package matrix
 
 | Package | Canonical expected red | Smallest green | Cumulative gate | Local handoff |
@@ -191,6 +199,12 @@ Allowed tests:
 
 - `tests/dotnet/MeAndAI.Operations.Architecture.Tests/ExtensionActivationContractTests.cs`
 - `tests/dotnet/MeAndAI.Operations.Architecture.Tests/ExecutionAuthorityPublicApiTests.cs`
+- `tests/dotnet/MeAndAI.Operations.Architecture.Tests/ExecutionAuthorityPortTests.cs`,
+  only to add the frozen activation read/mutation members to the exact method
+  inventory, parameter-name routing, and fail-closed stub
+- `tests/dotnet/MeAndAI.Operations.Architecture.Tests/ExecutionGrantContractTests.cs`,
+  only to add compile-safe fail-closed stubs for the same two activation port
+  members; no existing grant test body or fake-store behavior may change
 
 Budget: production `<=700`, tests `<=700`, combined normalized changed lines
 `<=1300`; every single file `<=550` lines.
@@ -225,7 +239,13 @@ freeze. For the resumed grant package, steps 2-4 are replaced by an ordinal
 verification of the frozen source and TRX SHA-256 values after correction
 reconciliation; neither the R command nor the original oracle is invoked.
 Grant step 6 therefore begins with the transformed final-source exact FQN, then
-runs the cumulative gates. Publication and activation use the full procedure:
+runs the cumulative gates. The activation R was accepted before its allowlist
+correction; activation therefore also replaces steps 2-4 with ordinal
+verification of its frozen source and TRX SHA-256 after reconciliation and
+invokes neither R nor the original oracle at that point. It then performs step
+5, and step 6 begins with the not-yet-consumed source-identical original-oracle
+pass exactly once before the typed final-source FQN. Publication alone uses the
+full procedure:
 
 1. verify predecessor local commit and the exact allowlist;
 2. write only the canonical expected-red source;
