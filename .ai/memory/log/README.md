@@ -19,9 +19,9 @@ A+B+C/full Conformance is `54/54`. The linked handoff owns exact C closure and
 the records-only D cohort/package freeze. D design delivery is exact-head hosted
 green and maintainer accepted. Policy activation, real producer infrastructure,
 the first-rules cohort, and the specialized-rules cohort are exact-head hosted
-green. Repository/provider equivalence and activation topology are
-`ReviewedLocalGreen`; D is `11/11` and full Conformance is `65/65`. Code-free
-D-CONVERGE is active locally.
+green. The final equivalence/closure cohort is local `3/3` with D-CONVERGE
+`ReviewedLocalGreen`; D is `11/11` and full Conformance is `65/65`. One
+final-cohort push and exact-head hosted CI remain pending.
 The parent scenario remains `Planned`; later D cohorts and final activation
 are held.
 

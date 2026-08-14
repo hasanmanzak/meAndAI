@@ -3,14 +3,14 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted; ContractSlice A, B, and C are merged/exact-main green. D predecessor cohorts are `ExactHeadHostedGreen`; repository/provider equivalence and activation topology are `ReviewedLocalGreen`. D is `11/11` and cumulative A+B+C+D/full Conformance is `65/65`; code-free D-CONVERGE is active locally. [TEST-0210](test-cases.md#test-0210) remains `Planned`; final activation and DoD remain held. |
+| Status | Gate 2 accepted; ContractSlice A, B, and C are merged/exact-main green. D predecessor cohorts are `ExactHeadHostedGreen`; the final equivalence/closure cohort is local `3/3` with D-CONVERGE `ReviewedLocalGreen`. D is `11/11` and cumulative A+B+C+D/full Conformance is `65/65`; one final-cohort push and exact-head hosted CI remain pending. [TEST-0210](test-cases.md#test-0210) remains `Planned`; final activation and DoD remain held. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Test | [TEST-0210](test-cases.md#test-0210) |
 | Gate 3 micro-delivery routing | Historical A, B, and C delivery remains owned by their micro plans. Current prospective routing is the [ContractSlice D micro-delivery plan](subf-0143-contractslice-d-micro-delivery-plan.md); packet labels refine delivery but activate no executable work. |
 | Exact-main design baseline | Accepted A merge commit [`51623f4d404a95e0f706d72805cf7ddbbbd293b8`](https://github.com/hasanmanzak/meAndAI/commit/51623f4d404a95e0f706d72805cf7ddbbbd293b8), validated by exact-main [run 31304787603](https://github.com/hasanmanzak/meAndAI/actions/runs/31304787603) |
-| Design and Gate 3 authority | Historical A/B/C directives, accepted reds, diagnostics, and hosted evidence remain immutable. D predecessor cohorts are `ExactHeadHostedGreen`; repository/provider equivalence and activation topology are `ReviewedLocalGreen`; code-free D-CONVERGE is the sole active local packet, while final activation, merge, release, and publication remain held. |
+| Design and Gate 3 authority | Historical A/B/C directives, accepted reds, diagnostics, and hosted evidence remain immutable. D predecessor cohorts are `ExactHeadHostedGreen`; the final equivalence/closure cohort is local `3/3` with D-CONVERGE `ReviewedLocalGreen`; one final-cohort push and exact-head hosted CI remain pending, while final activation, merge, release, and publication remain held. |
 | Completed predecessor | [SUBF-0153](README.md#subf-0153) / [TEST-0221](test-cases.md#test-0221), merged through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173) and exact-main validated by [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) |
 
 ## Directive and hard boundary
@@ -10967,8 +10967,8 @@ specialized-cohort local gate and one push of all three focused commits.
 
 ### `D-REPOSITORY-PROVIDER-EQUIVALENCE-01` executable freeze
 
-The D micro-plan is normative. Exact hosted predecessor `68755ff58da0c80d0bbe65bbb518b9b53077d8c5`
-activates one direct Fact and marker `TEST-0210-D-BEHAVIOR-RED-0008`. Only
+The D micro-plan owns the exact hosted predecessor and activates one direct Fact
+and marker `TEST-0210-D-BEHAVIOR-RED-0008`. Only
 `ContractSliceDPolicyEvaluatorTests.cs` changes, within `220` normalized lines;
 production and every other executable surface remain frozen. Separate fresh
 repository/provider references, contexts, target evidence, capability handles,
@@ -10982,8 +10982,8 @@ focused local commit without push.
 
 ### `D-ACTIVATION-TOPOLOGY-01` executable freeze
 
-The D micro-plan is normative. Exact local predecessor `386b431` activates the
-sole FQN `ContractSliceActivationTopologyTests.Matches_exact_contract_slice_scenario_inventory`
+The D micro-plan owns the exact local predecessor and activates the sole FQN
+`ContractSliceActivationTopologyTests.Matches_exact_contract_slice_scenario_inventory`
 and marker `TEST-0210-D-BEHAVIOR-RED-0009`. Only the new topology test file may
 change, within `170` normalized lines. Its reflected ordinal exact map is the
 frozen final `32 A + 11 B + 11 C + 11 D = 65` direct-Fact inventory, including

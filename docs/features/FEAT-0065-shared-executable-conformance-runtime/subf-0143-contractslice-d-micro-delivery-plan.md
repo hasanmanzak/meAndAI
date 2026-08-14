@@ -3,7 +3,16 @@
 | Field | Value |
 | --- | --- |
 | Classification | Gate 2 micro-delivery plan and design freeze |
-| State | Design exact-head hosted green and maintainer accepted; D predecessor cohorts are `ExactHeadHostedGreen`; repository/provider equivalence and activation topology are `ReviewedLocalGreen`; D is `11/11` and A+B+C+D/full Conformance is `65/65`; code-free D-CONVERGE is active locally |
+| State | Design exact-head hosted green and maintainer accepted; D predecessor cohorts are `ExactHeadHostedGreen`; final equivalence/closure cohort is local `3/3` with D-CONVERGE `ReviewedLocalGreen`; D is `11/11` and A+B+C+D/full Conformance is `65/65`; one final-cohort push and exact-head hosted CI remain pending |
+
+`D-CONVERGE-01` is code-free: P/R/G are `NotApplicable`, no new Fact or
+executable path exists, and all R0001..R0009 evidence remains immutable. Its
+local closure requires the exact final cohort diff plus D `11/11`, full
+Conformance `65/65`, Domain `98/98`, API/ownership, Release build, format,
+locks, StructureOnly/graph, publication-evidence, and fresh scope/traceability
+reviews. Passing those gates authorizes only the cohort's single push and
+exact-head hosted CI; the parent scenario remains Planned and all held surfaces
+stay held.
 | Parent | [SUBF-0143](README.md#subf-0143) |
 | Scenario | [TEST-0210](test-cases.md#test-0210), retained `Planned` |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
@@ -574,8 +583,8 @@ warning-free Release build; the packet is `ReviewedLocalGreen`.
 
 ### `D-ACTIVATION-TOPOLOGY-01` pre-red freeze
 
-The exact local predecessor is equivalence commit `386b431`; it remains
-unpushed until final cohort closure. This packet adds only
+The exact local predecessor is the immediately preceding focused equivalence
+commit; it remains unpushed until final cohort closure. This packet adds only
 `ContractSliceActivationTopologyTests.cs`, capped at `170` normalized lines,
 with one direct Fact/FQN, marker `TEST-0210-D-BEHAVIOR-RED-0009`, only
 `ContractSlice=D`, and no Scenario/Theory/overload/class trait. Production,
@@ -610,7 +619,7 @@ was isolated before child start; activation topology is `ReviewedLocalGreen`.
 | Real producer infrastructure | About `2h` active implementation/validation; StructureOnly `527.148s`, publication evidence `7/7` in `337.4s` | Pending one cohort push | `0` locally | Not applicable locally | `0` locally | No avoided package push; singleton cohort preserves semantic isolation | None observed locally |
 | First common rules | RULE-0001 about `1h`; RULE-0002 about `1h` active implementation/validation; focused `1/1`, D `6/6`, full `60/60`, Domain `98/98`, API/ownership `15/15`, Release `0/0`, locks/format/diff clean; synchronized StructureOnly `528.328s`, publication evidence `7/7` in `334.7s`; evidence-line recurrence StructureOnly `501.510s`, publication `7/7` in `329.4s` | Run 31746252371: Ubuntu `22m36s`, Windows `20m05s`, publication skipped | `0` | RULE-0001 isolated one registration token-identity defect plus one staging expectation; RULE-0002 isolated one predecessor staging expectation immediately | About `20m` total including rebuild/revalidation | One intermediate hosted wait avoided | None observed |
 | Specialized common rules | RULE-0003 about `1h`, RULE-0004 about `30m`, and RULE-0005 about `25m` active implementation/validation; focused `1/1`, D `9/9`, full `63/63`, Domain `98/98`, Release `0/0`, format/diff clean; RULE-0005 `300/700` changed C# lines | Run 31754385239: Ubuntu `18m01s`, Windows `19m33s`, publication skipped | `0` | RULE-0003 infrastructure staging expectation and one RULE-0004 compile-time comparer defect identified immediately; RULE-0005 needed no correction | Under `15m` total including rebuild/revalidation | Two intermediate hosted waits avoided | None observed |
-| Equivalence/closure | `NotMeasured` | `NotMeasured` | `NotMeasured` | `NotMeasured` | `NotMeasured` | Baseline: two avoided intermediate hosted waits | `NotMeasured` |
+| Equivalence/closure | About `1h15m` active implementation/review plus focused `1/1`, D `11/11`, full `65/65`, Domain `98/98`, API/ownership `15/15`, Release `0/0`, format/diff clean; exact-tree StructureOnly `484.587s`, publication evidence `7/7` in `318.4s` | Pending one final-cohort push | `0` locally | Topology's pre-child attribute-cast compile defect isolated immediately; no product defect | Under `5m`, then full local revalidation | Two intermediate hosted waits avoided | None observed locally |
 
 At D closure, observed duration, hosted duration, hosted defects, owning-package
 isolation time, correction/revalidation cost, estimated saving, and any
