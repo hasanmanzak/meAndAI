@@ -3,7 +3,8 @@
 | Field | Value |
 | --- | --- |
 | Classification | Selected Gate 2 design for the first [FEAT-0066](README.md) slice |
-| Status | `DesignFreezeCandidate`; no implementation active |
+| Status | `DesignCorrectionCandidate`; grant production paused after canonical red |
+| Correction | Add independent expected lease/fence coordinates and close protected grant-store failure mapping without changing type inventory, rejection set/order, FQNs, package identities/order/budgets, or ownership |
 | Public API | [Exact public API contract](subf-0145-public-api-contract.md) |
 | Values/errors | [Exact value and error contract](subf-0145-value-error-contract.md) |
 | Delivery | [Micro-delivery plan](subf-0145-micro-delivery-plan.md) |
@@ -85,6 +86,9 @@ immutable generation/owner/fencing coordinates carried by a grant and their
 exact equality rejection during authorization. [SUBF-0146](README.md#subf-0146)
 owns lease issue, acquisition, renewal, expiry, fencing lifecycle, durable
 journal/receipt behavior, reconstruction, and recovery.
+`GrantValidationRequest` and `ExtensionActivationCommand` each carry an
+independent expected `LeaseFenceBinding`; neither service may compare the grant
+to itself or derive owner/fence equality from an unfrozen field.
 
 ## Scope and non-goals
 
@@ -108,6 +112,13 @@ Out of scope:
   memory/logs, locks, packages, project files, or workflows; and
 - granting `release.publish` or `authority.transfer` through a generic or
   caller-matched binding.
+
+Every intermediate fact uses only the exact `Trait("Subfeature", value)` shape
+with value [SUBF-0145](README.md#subf-0145) for cohort selection. It must not
+assert [Scenario=TEST-0212](test-cases.md#test-0212) while the canonical
+scenario authority remains `PlannedDocumentation`. Exact FQNs, markers, and
+documentation links retain [TEST-0212](test-cases.md#test-0212) traceability;
+scenario trait/status/owner activation is a separately authorized final atom.
 
 ## Protected authority semantics
 
@@ -177,10 +188,12 @@ not permit fallback or partial mutation.
 
 `ExecutionGrantAuthorizer.AuthorizeAndConsumeAsync` receives no caller-supplied
 current snapshot. It resolves the protected snapshot, validates in the frozen
-first-failure order, then calls the mutation port once. The mutation compares
-the exact authority binding, expected grant-store head, grant ID, and
-idempotency before atomically consuming. A post-read authority/store drift
-fails closed.
+first-failure order, compares grant/lease/request/expected-fence generation,
+then exact lease owner/fencing token, and rejects an unapproved journal store
+or null resolved head as `GrantStoreDrift` without mutation. For an approved
+store with a non-null head, the mutation compares the exact authority binding,
+expected grant-store head, grant ID, and idempotency before atomically consuming.
+A post-read authority/store drift fails closed.
 
 ## Publication envelope
 
@@ -217,7 +230,8 @@ candidate content cannot create protected genesis.
 1. re-resolves the protected authority snapshot and activation record;
 2. rejects a missing record or any mismatch with the command's expected
    current record;
-3. validates the grant, typed activation binding, actor, time, proposed record,
+3. validates the grant against the command's independent expected lease/fence,
+   typed activation binding, actor, time, proposed record,
    transition/closure evidence, and successor invariants; and
 4. makes one `TryActivateExtensionAsync` mutation call.
 
@@ -245,8 +259,9 @@ identities:
 | `EA-PUBLICATION-ENVELOPE-01` | [`TEST-0212-PUBLICATION-RED-0003`](test-cases.md#test-0212) | `MeAndAI.Operations.Architecture.Tests.PublicationEnvelopeContractTests.TEST_0212_envelope_binds_sealed_report_and_publication_grant` |
 | `EA-EXTENSION-ACTIVATION-01` | [`TEST-0212-ACTIVATION-RED-0004`](test-cases.md#test-0212) | `MeAndAI.Operations.Architecture.Tests.ExtensionActivationContractTests.TEST_0212_only_fresh_winning_cas_activates_extension` |
 
-Each red file is compile-safe before the public surface exists. It has one
-`[Fact]`, one [Scenario=TEST-0212](test-cases.md#test-0212) trait, one marker, and an ordinal
+Each corrected-freeze red file is compile-safe before the public surface
+exists. It has one `[Fact]`, one [Subfeature=SUBF-0145](README.md#subf-0145)
+trait, one marker, and an ordinal
 reflection absence oracle using assembly-qualified type/member names frozen in
 the API appendix. The oracle first proves the owning assembly loads, then fails
 only because the package's first required type/member is absent. Build failure,
@@ -254,10 +269,18 @@ zero discovery, a sibling failure, skip, infrastructure abort, or any other
 message is not accepted red.
 
 The source and accepted TRX SHA-256 are frozen before product work. The R
-command has one pre-green attempt and no unchanged retry. After changed product
-evidence exists, the frozen original-oracle source is run exactly once and must
-pass unchanged; typed final behavior tests then replace the working copy and
-pass the same FQN. No sleep, network, or real provider/store is allowed.
+command has one pre-green attempt and no unchanged retry. For a future package,
+after changed product evidence exists, the frozen original-oracle source is run
+exactly once and must pass unchanged; typed final behavior tests then replace
+the working copy and pass the same FQN. No sleep, network, or real
+provider/store is allowed.
+The already accepted snapshot and grant red artifacts retain their frozen
+pre-correction source digests even though those historical bytes carry
+[Scenario=TEST-0212](test-cases.md#test-0212). The active grant source remains byte-identical through
+design-correction reconciliation; green transformation then replaces the
+working trait, and the committed snapshot facts' traits, with
+[Subfeature=SUBF-0145](README.md#subf-0145). The grant source hash is reverified, but its original
+oracle is not invoked again; neither accepted R is rerun.
 
 Focused negatives cover empty/partial/extra approval roles, all five separated
 identities and exact solo exception, stale revision/epoch/digest, executing

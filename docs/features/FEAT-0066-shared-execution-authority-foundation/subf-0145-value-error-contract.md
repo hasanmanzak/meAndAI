@@ -3,7 +3,8 @@
 | Field | Value |
 | --- | --- |
 | Classification | Normative value/error appendix to the [selected design](subf-0145-authority-grant-activation-design.md) |
-| Status | `DesignFreezeCandidate`; no implementation active |
+| Status | `DesignCorrectionCandidate`; grant production paused after canonical red |
+| Correction | Preserve independent lease/fence negative states and map unapproved/missing protected grant-store state exactly |
 | Public signatures | [Exact public API contract](subf-0145-public-api-contract.md) |
 | Test | [TEST-0212](test-cases.md#test-0212) |
 
@@ -80,6 +81,21 @@ remain constructible security inputs; only the authorizer returns
 `CapabilityMismatch`. Binding factories validate only their own kind, scope,
 role-floor, grammar, and intrinsic field shape.
 
+`GrantValidationRequest.Create` and `ExtensionActivationCommand.Create`
+require a non-null independent `expectedLeaseFence` but do not compare it with
+the grant. They preserve generation, owner, and fencing-token mismatch inputs
+for the services. Any inequality among grant generation, grant lease
+generation, expected generation, and expected lease generation maps to
+`GenerationMismatch`; the first owner/token inequality then maps to
+`LeaseFenceMismatch`.
+
+If the grant journal store is absent from the protected snapshot's approved
+stores, or `ReadGrantStoreHeadAsync` returns null, the service returns
+`GrantStoreDrift` without invoking a mutation port. An approved non-null head
+is copied into the mutation request. Atomic mutation orders a consumed grant
+ID/idempotency as `Replayed` before a post-read head mismatch as
+`GrantStoreDrift`.
+
 Supplied digests are immutable external content identities; a factory validates
 their exact SHA-256 shape but does not claim the referenced bytes exist or are
 trusted. Real authority comes only from protected-store re-resolution and exact
@@ -139,7 +155,8 @@ The service applies this fixed order:
 2. missing protected record -> `ActivationRecordUnavailable`;
 3. protected record unequal to `ExpectedCurrent` -> `ActivationRecordDrift`;
 4. ordinary grant validation runs in the API's frozen first-mismatch order,
-   using required `extension.activate` and a service-derived expected binding;
+   using required `extension.activate`, the command's independent expected
+   lease/fence, and a service-derived expected binding;
 5. binding current digest/CAS unequal to expected current, binding target
    unequal to grant target/current repository/proposed repository, binding
    policy identity/digest/activating commit/proposed snapshot/transition/closure

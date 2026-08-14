@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Feature |
-| Status | [SUBF-0145](#subf-0145) `DesignFreezeCandidate`; implementation conditionally authorized only after `AcceptedFrozenDesign` exact-head hosted green |
+| Status | [SUBF-0145](#subf-0145) `DesignCorrectionCandidate`; implementation paused after the grant expected-red while the narrow lease/fence and grant-store correction repeats `AcceptedFrozenDesign` exact-head hosted validation |
 | Target version | 0.17.0 |
 | Issue | [#166](https://github.com/hasanmanzak/meAndAI/issues/166) |
 | Pull request | Design checkpoint not yet created |
@@ -18,8 +18,17 @@ The current maintainer directive authorizes the
 [SUBF-0145](#subf-0145) [design freeze](subf-0145-authority-grant-activation-design.md) and
 conditionally authorizes only its four implementation packages after the exact
 [AcceptedFrozenDesign gate](subf-0145-micro-delivery-plan.md#acceptedfrozendesign-gate)
-is green. Until then no production or executable-test implementation is active.
-After that gate, the package sequence proceeds without another confirmation.
+is green. The initial gate activated implementation; the authority-snapshot
+package reached `ReviewedLocalGreen` and the grant canonical red was accepted.
+That red exposed a missing independent expected lease/fence coordinate and an
+unmapped protected grant-store absence, so grant production is paused until
+the synchronized correction repeats the same gate. The accepted red is not rerun.
+After correction green, the package sequence resumes without another confirmation.
+Every intermediate implementation fact remains subfeature-scoped with the exact
+[Subfeature=SUBF-0145](#subf-0145) trait. [Scenario=TEST-0212](test-cases.md#test-0212), its executable owner, and
+its `Passing` status remain held for a separate atomic final-activation gate;
+the canonical [TEST-0212](test-cases.md#test-0212) record therefore stays
+`PlannedDocumentation`/`Planned` throughout these packages.
 Merge, release, publication, consumer mutation, credentials, authority
 transfer, and [SUBF-0146](#subf-0146) implementation remain separately held.
 The preserved [draft PR #160](https://github.com/hasanmanzak/meAndAI/pull/160)
@@ -90,14 +99,14 @@ reconstruction, and explicit recovery grants for every mutating application.
 | Test readiness | Gate 1 state | Evidence |
 | --- | --- | --- |
 | Scenarios | Defined | [Test scenarios](test-cases.md) |
-| Test code | Not started | Activates only after the `AcceptedFrozenDesign` gate |
-| Baseline run | Not run | No prior same-contract implementation exists |
+| Test code | In progress, production paused | Snapshot package is `ReviewedLocalGreen`; grant canonical red is accepted and immutable during design correction |
+| Baseline run | Canonical reds captured through grant | No prior same-contract implementation exists; the correction adds no product evidence |
 
 ## Decomposition and subfeature gates
 
 | ID | Slice | Tracking | Tests/run | Self-review/findings | Status |
 | --- | --- | --- | --- | --- | --- |
-| `SUBF-0145` <a name="subf-0145"></a> | Authority snapshots, role separation, grants, activation CAS, and publication envelopes | [#166](https://github.com/hasanmanzak/meAndAI/issues/166) | [TEST-0212](test-cases.md#test-0212) / not started | Design reviews pending | `DesignFreezeCandidate`; [design](subf-0145-authority-grant-activation-design.md) / [API](subf-0145-public-api-contract.md) / [values/errors](subf-0145-value-error-contract.md) / [micro plan](subf-0145-micro-delivery-plan.md) |
+| `SUBF-0145` <a name="subf-0145"></a> | Authority snapshots, role separation, grants, activation CAS, and publication envelopes | [#166](https://github.com/hasanmanzak/meAndAI/issues/166) | [TEST-0212](test-cases.md#test-0212) / snapshot local green; grant red accepted | Narrow correction reviews active | `DesignCorrectionCandidate`; [design](subf-0145-authority-grant-activation-design.md) / [API](subf-0145-public-api-contract.md) / [values/errors](subf-0145-value-error-contract.md) / [micro plan](subf-0145-micro-delivery-plan.md) |
 | `SUBF-0146` <a name="subf-0146"></a> | Leases, fences, journal, receipts, retention, reconstruction, and recovery grants | [#166](https://github.com/hasanmanzak/meAndAI/issues/166) | [TEST-0213](test-cases.md#test-0213) / not started | Pending | Proposed |
 
 ## Decisions and relationships
@@ -112,8 +121,11 @@ reconstruction, and explicit recovery grants for every mutating application.
 - [x] Numbered planning scenarios and explicit WIP absence finding.
 - [x] Exact authority/grant/activation schemas and store-port contracts for selected [SUBF-0145](#subf-0145).
 - [x] Exact [TEST-0212](test-cases.md#test-0212) expected-red FQNs, replay, role, publication, and concurrent-CAS fixture plan.
+- [ ] Narrow expected lease/fence and protected grant-store correction repeats the exact `AcceptedFrozenDesign` local and hosted gates.
 - [ ] [SUBF-0146](#subf-0146) journal, crash, corruption, retention, reconstruction, and recovery schema/fixture freeze.
-- [ ] Gate 2 design review for the selected dependency-closed slice.
+- [x] Gate 2 design review for the selected dependency-closed slice; accepted at
+  [`8616aa1f4fe198b666b3abf5934b31e80d9498b8`](https://github.com/hasanmanzak/meAndAI/commit/8616aa1f4fe198b666b3abf5934b31e80d9498b8)
+  with exact-head hosted [run 31810451377](https://github.com/hasanmanzak/meAndAI/actions/runs/31810451377).
 - [x] Maintainer implementation directive exists conditionally; activates only after `AcceptedFrozenDesign` exact-head hosted green.
 
 ## Acceptance criteria
