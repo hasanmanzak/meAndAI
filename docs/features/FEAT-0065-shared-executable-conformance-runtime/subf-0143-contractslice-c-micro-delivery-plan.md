@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Gate 2 micro-delivery plan and design freeze |
-| State | Initial design, Activation, Applicability, and Evaluation cohorts `ExactHeadHostedGreen`; C `11/11`, current A+B+C/full Conformance `54/54`; R=0006/R=0008/R=0009/R=0010/R=0012/R=0013/R=0016 diagnostic/no-success, R=0007/R=0011/R=0014/R=0015/R=0017/R=0018 accepted/immutable; Results/closure is locally validated through three separate `ReviewedLocalGreen` commits, `C-CONVERGE-01` records local `CompletionRecommended`, and the cohort exact-head hosted gate is pending; parent scenario held |
+| State | Complete: all four cohorts `ExactHeadHostedGreen`; C `11/11`, A+B+C/full Conformance `54/54`; R=0006/R=0008/R=0009/R=0010/R=0012/R=0013/R=0016 diagnostic/no-success and R=0007/R=0011/R=0014/R=0015/R=0017/R=0018 accepted/immutable; merged through [PR #178](https://github.com/hasanmanzak/meAndAI/pull/178) and exact-main hosted green; parent scenario held |
 | Parent | Owning feature and current subfeature |
 | Scenario | [TEST-0210](test-cases.md#test-0210), retained `Planned` |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
@@ -141,7 +141,7 @@ sequence with a push and Ubuntu/Windows wait after every package.
 | Activation | `3h10m` measured from the first package commit through the final synchronized exact-tree gate | Ubuntu `22m23s`; Windows `18m57s`; publication skipped | `0` | `NotApplicable` | `NotApplicable` | About `44m46s` of hosted critical-path wait from the two avoided intermediate pushes, using this cohort's `22m23s` longest job as the comparison basis | None observed; the local commit-reference recurrence caught the only record defect before push |
 | Applicability | About `63m` active package/validation time | `20m37s` critical hosted duration (`13m46s` Windows) | `0` | `NotApplicable` | `NotApplicable` | About `14-21m` by avoiding a second hosted round | `No`; separate package commits and exact FQN/runner evidence remained intact |
 | Evaluation | `1h14m46s` observed Plan-to-Advance commit interval, including package-local validation and final cohort gates | `21m26s` critical hosted duration (`17m52s` Windows) | `0` | `NotApplicable` | `NotApplicable` | About `18-22m` by avoiding a second hosted round | `No`; separate package commits, exact red identities, and traceability remained intact |
-| Results/closure | About `1h29m` observed from the Intent commit through pre-final Converge gates; final structural recurrences follow | `NotMeasured` until the single cohort push | `0` hosted so far; two local record recurrences and one fixture correction | Each local owner isolated in under `2m` | Fixture correction/revalidation under `5m`; both record corrections edge-neutral and under `2m` each, excluding recurrence time | Two intermediate hosted rounds avoided; exact saving finalized after cohort hosted closure | `No`; separate commits, immutable red evidence, ownership, and full traceability remained intact |
+| Results/closure | About `1h42m22s` observed from Intent through final Converge validation | Ubuntu `18m37s`; Windows `18m31s`; publication skipped | `0` | Local fixture/record owners were isolated in under `2m` | Fixture revalidation under `5m`; record corrections under `2m` each, excluding recurrence time | About `37m14s` from the two avoided intermediate hosted waits using the longest observed job | `No`; separate commits, immutable red evidence, ownership, and full traceability remained intact |
 
 C closure reports elapsed time, isolation cost, estimated saved time, and any
 consistency or traceability loss for these four cohorts separately from D.
@@ -887,22 +887,13 @@ stable hosted jobs with publication in its designed state. The parent scenario,
 final status/owner/workflow filters, runtime-efficiency activation, D, DoD,
 merge, release, and publication remain held.
 
-## Deferred ContractSlice D cohort plan
+## ContractSlice D handoff
 
-D is not activated and no final D package/cohort membership is frozen here.
-Only after C completes its final convergence, record synchronization, merge,
-and exact-main hosted predecessor may a separate D micro-delivery plan use the
-observed C cohort measurements. Its pre-D D/RT and micro-plan review must freeze
-the accepted dependency graph into approximately two-to-four-package cohorts
-while keeping these semantic boundaries separate: real Policy export and
-registration activation; real codec/parser/index/projector infrastructure;
-RULE-0001 plus RULE-0002; RULE-0003 through RULE-0005 with specialization and
-co-report behavior; repository/provider equivalence plus D-CONVERGE. Distinct
-expected-red or ownership boundaries may not be merged for speed.
-
-D must use fresh fixtures and tests against real Policy registrations to repeat
-the accepted B/C behaviors. C results inform delivery estimates only and are
-not D product evidence. D uses the same package-local commit, cohort-local full
-validation, single-push, exact-hosted, failure-reopen, status, and measurement
-rules. Its closure reports cohort timing, isolation, savings, and consistency
-separately, without activating Scenario/workflow/consumer/release scope.
+C completed through merged [PR #178](https://github.com/hasanmanzak/meAndAI/pull/178) and exact-main hosted green. The separate
+[ContractSlice D micro-delivery plan](subf-0143-contractslice-d-micro-delivery-plan.md)
+now freezes the accepted dependency graph, exact package/cohort membership,
+expected-red identities, Fact inventory, ownership, validation, failure-reopen,
+and measurement model. D design delivery is exact-head hosted green and
+maintainer accepted; only the frozen Policy-activation packet is active while
+all later D packets and final activation remain held. C measurements are planning input
+only and are not D product evidence.

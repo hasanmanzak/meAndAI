@@ -3,14 +3,14 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted; ContractSlice A and B merged/exact-main green; B is `11/11`, cumulative A+B `43/43`. C Activation, Applicability, and Evaluation are `ExactHeadHostedGreen`; Results/closure is locally validated through three separate `ReviewedLocalGreen` commits. C is `11/11`, current A+B+C/full Conformance `54/54`. R=0007/R=0011/R=0014/R=0015/R=0017/R=0018 are accepted/immutable; R=0012/R=0013/R=0016 are diagnostics/no-success. `C-CONVERGE-01` records local `CompletionRecommended` while the cohort exact-head hosted gate is pending; [TEST-0210](test-cases.md#test-0210) remains `Planned`, and D/activation/DoD remain held. |
+| Status | Gate 2 accepted; ContractSlice A, B, and C are merged/exact-main green. D predecessor cohorts are `ExactHeadHostedGreen`; the final equivalence/closure cohort is local `3/3` with D-CONVERGE `ReviewedLocalGreen`. D is `11/11` and cumulative A+B+C+D/full Conformance is `65/65`; one final-cohort push and exact-head hosted CI remain pending. [TEST-0210](test-cases.md#test-0210) remains `Planned`; final activation and DoD remain held. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Test | [TEST-0210](test-cases.md#test-0210) |
-| Gate 3 micro-delivery routing | Historical A delivery remains owned by the [A micro-delivery control plan](subf-0143-micro-delivery-plan.md). Current B design routing is the [ContractSlice B micro-delivery plan](subf-0143-contractslice-b-micro-delivery-plan.md); packet labels refine delivery but activate no executable work. |
+| Gate 3 micro-delivery routing | Historical A, B, and C delivery remains owned by their micro plans. Current prospective routing is the [ContractSlice D micro-delivery plan](subf-0143-contractslice-d-micro-delivery-plan.md); packet labels refine delivery but activate no executable work. |
 | Exact-main design baseline | Accepted A merge commit [`51623f4d404a95e0f706d72805cf7ddbbbd293b8`](https://github.com/hasanmanzak/meAndAI/commit/51623f4d404a95e0f706d72805cf7ddbbbd293b8), validated by exact-main [run 31304787603](https://github.com/hasanmanzak/meAndAI/actions/runs/31304787603) |
-| Design and Gate 3 authority | Historical A/B directives, accepted reds, diagnostics, and hosted evidence remain immutable. The exact [C micro-delivery plan](subf-0143-contractslice-c-micro-delivery-plan.md) is exact-head hosted-green design authority; Activation, Applicability, and Evaluation are `ExactHeadHostedGreen`, diagnostic R=0012/R=0013/R=0016 are immutable, and R=0014/R=0015/R=0017/R=0018 are accepted/immutable. Results/closure is locally validated through three separate `ReviewedLocalGreen` commits; `C-CONVERGE-01` records local `CompletionRecommended` while the cohort exact-head hosted gate is pending. D, final activation, merge, release, and publication remain outside this authority. |
+| Design and Gate 3 authority | Historical A/B/C directives, accepted reds, diagnostics, and hosted evidence remain immutable. D predecessor cohorts are `ExactHeadHostedGreen`; the final equivalence/closure cohort is local `3/3` with D-CONVERGE `ReviewedLocalGreen`; one final-cohort push and exact-head hosted CI remain pending, while final activation, merge, release, and publication remain held. |
 | Completed predecessor | [SUBF-0153](README.md#subf-0153) / [TEST-0221](test-cases.md#test-0221), merged through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173) and exact-main validated by [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) |
 
 ## Directive and hard boundary
@@ -10711,15 +10711,287 @@ traceability loss. C completion still requires final convergence, atomic record
 sync, and exact-head hosted green; `CompletionRecommended` or a local commit is
 insufficient.
 
-After C is merged and exact-main hosted green, a separate D micro plan may use
-those measured delivery results but no C product evidence. Accepted D topology
-must be frozen by pre-D D/RT into roughly two-to-four-package cohorts without
-combining distinct expected-red or ownership boundaries. Separate cohorts must
-retain real Policy export/registration activation; real codec/parser/index/
-projector infrastructure; RULE-0001/0002; RULE-0003/0004/0005 with
-specialization/co-report; and repository/provider equivalence plus D-CONVERGE.
-D remains inactive here and must freshly prove required B/C behavior against
-real Policy registrations.
+C is merged and exact-main hosted green. The separate
+[D micro-delivery plan](subf-0143-contractslice-d-micro-delivery-plan.md)
+freezes the accepted topology into five cohorts without changing architecture,
+rule semantics, public inventories, or ownership:
+
+1. Policy activation: the atomic `D-POLICY-SURFACE-ACTIVATION-01` SurfaceRed,
+   first Export BehaviorRed, and green boundary. No intermediate sentinel is
+   committed.
+2. Real producer infrastructure: the single integrated
+   `D-REAL-PRODUCER-INFRASTRUCTURE-01` boundary. It is not split merely to meet
+   a numeric cohort size because the accepted graph has one expected-red and
+   ownership boundary.
+3. First common rules: `D-RULE-0001-01` then `D-RULE-0002-01`.
+4. Specialized common rules: `D-RULE-0003-01`, `D-RULE-0004-01`, then
+   `D-RULE-0005-01`, retaining specialization and co-report semantics.
+5. Equivalence/closure: `D-REPOSITORY-PROVIDER-EQUIVALENCE-01`,
+   `D-ACTIVATION-TOPOLOGY-01`, then code-free `D-CONVERGE-01`.
+
+The Policy activation and infrastructure cohorts are deliberate singleton
+cohorts: splitting the first would commit a forbidden sentinel or pre-green its
+red, while splitting the second would invent a producer-graph ownership/red
+boundary. The final D test inventory is the exact eleven-FQN ordinal set in the D plan.
+Its first red remains
+`ContractSliceDPolicyExportTests.Exports_exact_real_registration_graph` /
+`TEST-0210-D-BEHAVIOR-RED-0001`; the accepted planned RULE-0001 FQN remains
+`ContractSliceDPolicyEvaluatorTests.Evaluates_rule_0001_against_fresh_qualified_fixture`.
+Later markers are ordinal `0002` through `0009` and are bound one-to-one to the
+infrastructure, RULE-0001..0005, equivalence, and topology Facts listed by the
+plan. Final D is `11/11`, A+B+C+D/full Conformance is `65/65`, and Domain
+remains `98/98`.
+
+Each mutating packet retains canonical expected-red, focused and D-cumulative
+green, relevant Release build, diff/format/structural checks, independent
+review, synchronized records, and a separate unpushed `ReviewedLocalGreen`
+commit. Only the cohort boundary runs the full D, A-D union, Conformance,
+Domain, build/format/locks/API/ownership/graph/StructureOnly/publication suite
+and full cohort review before one push and exact-head hosted validation. A
+failed cohort alone reopens. C measurements are planning input only; every D
+fixture and real Policy registration proof is fresh.
+
+The records-only D design cohort is committed, pushed, exact-head Ubuntu/
+Windows hosted green, and explicitly accepted by the maintainer. Policy
+activation is now exact-head hosted green; only the ordered real-producer
+infrastructure packet and its packet-local freeze may advance after that
+freeze's own exact-head hosted gate.
+[TEST-0210](test-cases.md#test-0210), final Scenario/status/owner/workflow, [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
+consumer, merge, release, publication, and DoD remain held.
+
+### `D-REAL-PRODUCER-INFRASTRUCTURE-01` executable freeze
+
+The packet changes only the existing real Policy model/codec/parser/index/
+projector/selector/evaluator/registration files and adds the one owning D test.
+It introduces no public API, friend, adapter, second producer graph, or
+Application/Conformance/Domain behavior. Registration construction passes each
+concrete producer its exact declaration-owned type token, component identity,
+input tokens, and budget; no producer reconstructs manifest authority from a
+string or ambient service.
+
+The three concrete codecs implement their existing `Write`, `Qualify`, and
+`MeasureLocal` members over immutable Policy models. They preserve the exact B
+wire grammars, strict UTF-8, ordinal ordering, binding/location/embedded-
+identity precedence, declared equality and first-one-over limits, and four-
+counter resource semantics. Parser binders snapshot only declaration-matching
+sealed inputs. The two parsers, four indexes, one demand projector, and three
+selectors produce the exact registered model/capability/reference shapes and
+return closed failed/invalid intents for declared semantic failures; they do
+not perform I/O or inspect a provider. The five evaluator registrations become
+concrete callable staging objects returning only `Applicable([])` and an empty
+evaluation intent; later RULE packets replace that staging result one evaluator
+at a time with fresh rule semantics.
+
+The single test-owned activation probe exercises every registered object by
+generic registration visitors, retaining no B/C runtime result. Its fresh
+golden/empty/malformed/limit fixtures cover all three writers/codecs and its
+fresh sealed model/capability inputs cover both parsers, four indexes, the
+projector, selectors, evaluator lifecycle, cache/ledger identity, cancellation,
+and deterministic order. The final probe returns exactly one
+`ContractSliceDProducerInfrastructureEvidence`; only null after the fully
+prepared call reaches `TEST-0210-D-BEHAVIOR-RED-0002`.
+
+The exact eight-production/one-test allowlist and `3,500` normalized changed-
+line cap are owned by the D micro-plan. Canonical R=0002 is one fresh-root,
+one-child, one-TRX Release `--no-build` run with exact FQN/filter/marker,
+process-scoped timeout, full source/lock/binary/runner custody, exact sixteen-
+counter oracle, and irrevocable no-rerun after `InvocationCommitted`. This
+records-only freeze must itself pass exact-head Ubuntu/Windows validation
+before any test or production source is changed.
+
+### `D-RULE-0001-01` executable freeze
+
+The exact predecessor is the hosted-green producer-infrastructure commit and
+run owned by the D micro-plan. This packet adds the one direct D evaluator Fact,
+changes only the real repository-tree index, its registration binding, and
+`FeaturePacketRuleEvaluator`, and updates the predecessor infrastructure Fact
+only to retire RULE-0001's empty-intent staging assertion while retaining
+registration/applicability/cancellation ownership. The exact five-path
+allowlist and `950`-line cap
+are normative in that plan. Public API, declarations, other producers/rules,
+projects, packages, locks, workflows, and held activation surfaces are frozen.
+
+The fresh fixture writes and qualifies one canonical repository-tree payload,
+indexes it through the object-identical registered tree index, binds its exact
+capability/context proof and selector references, then invokes the
+object-identical RULE-0001 evaluator. Canonical directory grammar is ordinal
+`docs/features/FEAT-` plus exactly four digits, one hyphen, and a nonempty
+suffix; only a Directory terminal creates a feature root. Child membership is
+exactly `<root>/README.md` and `<root>/test-cases.md`, and only File terminals
+satisfy it. Feature roots and findings are ordinal; duplicate input rows are
+already rejected by the canonical repository-tree codec.
+
+For each feature root, README absence precedes test-cases absence. A missing or
+non-File child emits its exact declared finding with the matching
+ExpectedSelector as primary and only the feature-root Derived proof as related;
+both File children emit nothing. Selector lookup uses the exact parent handle,
+never a path-only reconstruction. Cancellation is checked before reading the
+capability. Inputs/outputs are immutable snapshots and findings are ordinal;
+the canonical codec's strict input-order rule remains unchanged. Unrelated or
+case-drifted paths cannot become feature roots.
+
+The semantic red seam is the Tests-owned nullable
+`ContractSliceDPolicyEvaluatorEvidence` returned by
+`EvaluateRule0001(InitialRuleQualificationPolicy.Export)`. The complete valid
+missing-README call returns null only while the registered evaluator still
+produces the predecessor empty intent; only that null reaches
+`TEST-0210-D-BEHAVIOR-RED-0003`. Wrong findings, references, order, setup,
+negative/boundary cases, cancellation, and exceptions remain marker-free.
+Canonical red is the common one-child fresh-root Release `--no-build` oracle
+and never reruns after invocation commitment. Green is focused `1/1`, D `5/5`,
+and full Conformance `59/59`; RULE-0002 remains held until the separate
+`ReviewedLocalGreen` commit exists.
+
+Diagnostic `R=0003` is immutable no-success/no-retry: the sole result failed
+before the marker because the real tree index could not bind a semantically
+equal but separately minted model-contract object. The correction is confined
+to the frozen registration path: the codec-owned repository-tree model token is
+created once and supplied object-identically to both codec and index. One
+distinct corrected fresh-root invocation retains the exact FQN, marker,
+semantic-null seam, filter, counters and no-diagnostic oracle; no artifact from
+the diagnostic run is reusable.
+The first cumulative green exposed and closed only that obsolete infrastructure
+test expectation; the new Fact remains the sole owner of RULE-0001 findings.
+
+### `D-RULE-0002-01` executable freeze
+
+The packet-local contract in the D micro-plan is normative. The separate
+RULE-0001 `ReviewedLocalGreen` commit activates only this packet; the cohort is
+not pushed before RULE-0002 closes. One fresh repository-tree/governed-text
+fixture traverses the real codec, frozen Markdig parser, object-identical
+protocol-record index and registered RULE-0002 evaluator. The record index
+retains ordinal immutable decision and decision-reference rows; the evaluator
+owns the exact missing-record/required-structure precedence and reference
+identities from the initial-rule truth table. Its sole nullable semantic seam,
+FQN and marker are respectively
+`EvaluateRule0002(InitialRuleQualificationPolicy.Export)`,
+`ContractSliceDPolicyEvaluatorTests.Evaluates_rule_0002_against_fresh_qualified_fixture`,
+and `TEST-0210-D-BEHAVIOR-RED-0004`; only the complete valid empty predecessor
+intent reaches the marker.
+
+The exact allowlist is `PolicyModels.cs`, `PolicyParsers.cs`,
+`PolicyIndexes.cs`, `InitialPolicyRegistrationGraph.cs`,
+`PolicyRuleEvaluators.cs`, the retained evaluator test, and the retained
+infrastructure test only for RULE-0002 staging retirement. The cap is `1,500`
+normalized changed C# lines. Public API, declarations, projects/packages/
+locks/workflows, other producers/rules and all downstream surfaces remain
+frozen. Canonical red uses the common fresh one-shot Release `--no-build`
+oracle and becomes immutable after invocation commitment; green is focused
+`1/1`, D `6/6`, full Conformance `60/60`, followed by the complete first-rules
+cohort gate and one push of the two separate package commits.
+
+### `D-RULE-0003-01` executable freeze
+
+The packet-local contract in the D micro-plan is normative. Exact predecessor
+[`4b9e8af8083da824b09706674a725ef93b59f467`](https://github.com/hasanmanzak/meAndAI/commit/4b9e8af8083da824b09706674a725ef93b59f467) is hosted green in
+[run 31746252371](https://github.com/hasanmanzak/meAndAI/actions/runs/31746252371); no earlier package artifact is consumed as RULE-0003 product
+evidence. The one new Fact, marker, nullable semantic seam, `1/1`, D `7/7`, and
+full `61/61` counts are exactly those frozen by the micro-plan.
+
+The real governed-reference index emits one immutable ordinal row per governed
+reference intent from the object-identical parsed Markdown models. Each row
+retains exact kind, syntax, visible target coordinates, initial local resolution,
+Derived reference handle, and optional target handle. The real demand projector
+emits only externally qualified Commit, tag-root, or captured-snapshot candidates
+and preserves the reference/authority handle pair. The target-resolution index
+requires object-identical demand items and authority bindings, maps canonical
+target rows to the same reference handle, and never upgrades missing, mismatched,
+or ambiguous qualified evidence to Exact.
+
+RULE-0003 evaluates each governed row once in ordinal order. Its exact precedence
+is `UnsupportedAuthoringForm -> protocol.reference.unsupported-authoring-form`;
+else `NonClickable` or incomplete visible path/fragment coverage ->
+`protocol.reference.not-clickable`; else an `ExternalEvidenceRequired` row with
+no exact overlay is NotEvaluated; else qualified `Unresolved` ->
+`protocol.reference.unresolved-target`; else `WrongTarget`, non-Commit
+`WrongRepository`/`WrongObject`, or CrossRecord missing/wrong fragment ->
+`protocol.reference.wrong-target`; else Exact emits nothing. EmbeddedRecord
+missing/wrong fragment is left to RULE-0004, and Commit wrong repository/object
+to RULE-0005. A proven specialized reference may therefore co-report the
+RULE-0003 common finding and its later specialized finding; ambiguity fabricates
+neither. The governed Derived handle is primary; ordered context/authority/target
+Derived handles are related and copied immutably.
+
+Only `PolicyIndexes.cs`, `RepositoryTargetResolutionDemandProjector.cs`,
+`PolicyRuleEvaluators.cs`, `InitialPolicyRegistrationGraph.cs`, the retained
+evaluator test, and the infrastructure test's RULE-0003 staging assertion may
+change, within `1,800` normalized C# lines. Public API/declarations, codecs,
+parsers, projects/packages/locks/workflows, other rules, and all held surfaces
+remain frozen. Canonical red is the common fresh one-shot Release `--no-build`
+oracle and cannot rerun after invocation commitment. RULE-0004 stays inactive
+until RULE-0003 has its own `ReviewedLocalGreen` commit.
+
+### `D-RULE-0004-01` executable freeze
+
+The packet-local RULE-0004 contract in the D micro-plan is normative. Exact
+local predecessor
+[`978b990206d00aac2f4f8084c758d5d4b7a64768`](https://github.com/hasanmanzak/meAndAI/commit/978b990206d00aac2f4f8084c758d5d4b7a64768) activates one direct Fact and marker
+`TEST-0210-D-BEHAVIOR-RED-0006`; no intermediate push is allowed. A declaration
+row is distinguished by a null repository path and maps MissingFragment/
+WrongFragment/Exact to anchor-missing/anchor-duplicate/no finding. A reference
+row specializes only EmbeddedRecord with a proven exact containing target:
+MissingFragment/WrongFragment/Exact maps to fragment-missing/fragment-wrong/no
+finding. Multiple overlays produce the declared ambiguity failure. Unresolved,
+wrong-target/repository/object, unavailable external evidence, CrossRecord and
+Commit inputs never fabricate a RULE-0004 finding. Related-reference ordering
+and independent RULE-0003 co-report semantics remain exact.
+
+Only `PolicyRuleEvaluators.cs`, the retained evaluator test, and the retained
+infrastructure test's RULE-0004 staging assertion may change, within `700`
+normalized C# lines. All indexes, parsers, codecs, public declarations, locks,
+projects/workflows, other rules, and held surfaces remain frozen. Canonical red
+is one fresh common Release `--no-build` invocation, immutable after commitment;
+green is focused `1/1`, D `8/8`, and full Conformance `62/62`.
+
+### `D-RULE-0005-01` executable freeze
+
+The packet-local RULE-0005 contract in the D micro-plan is normative. Exact
+local predecessor
+[`e1117ad98e27e32aea4f581f75c2c6ed9eb63d23`](https://github.com/hasanmanzak/meAndAI/commit/e1117ad98e27e32aea4f581f75c2c6ed9eb63d23)
+activates one direct Fact and marker `TEST-0210-D-BEHAVIOR-RED-0007`; no
+intermediate push is allowed. Only Commit rows are specialized. Link syntax
+or absent exact full-lowercase-40-hex identity precedes WrongRepository,
+Unresolved, WrongObject, then Exact. Missing external overlay is NotEvaluated;
+wrong containing target remains RULE-0003-owned. Reference ambiguity and
+inconsistent qualified commit intent use their separate declared failures.
+Primary/related evidence order and independent RULE-0003 co-reporting remain
+exact.
+
+Only `PolicyRuleEvaluators.cs`, the retained evaluator test, and the retained
+infrastructure staging assertion may change, within `700` normalized C# lines.
+Public declarations, indexes, parsers, codecs, locks, projects/workflows,
+other rules, and held surfaces remain frozen. Canonical red is one fresh common
+Release `--no-build` invocation and never reruns after commitment; green is
+focused `1/1`, D `9/9`, and full Conformance `63/63`, followed by the complete
+specialized-cohort local gate and one push of all three focused commits.
+
+### `D-REPOSITORY-PROVIDER-EQUIVALENCE-01` executable freeze
+
+The D micro-plan owns the exact hosted predecessor and activates one direct Fact
+and marker `TEST-0210-D-BEHAVIOR-RED-0008`. Only
+`ContractSliceDPolicyEvaluatorTests.cs` changes, within `220` normalized lines;
+production and every other executable surface remain frozen. Separate fresh
+repository/provider references, contexts, target evidence, capability handles,
+and profiles exercise real RULE-0003 non-clickable/wrong-target and RULE-0005
+wrong-repository/exact cases. Ordered findings and failures must match while all
+qualified handles remain distinct; neither side may consume the other's result.
+Only a null complete equivalence result reaches the marker. Canonical red is one
+fresh common Release `--no-build` invocation and is immutable after child start;
+green is focused `1/1`, D `10/10`, and full Conformance `64/64` before one
+focused local commit without push.
+
+### `D-ACTIVATION-TOPOLOGY-01` executable freeze
+
+The D micro-plan owns the exact local predecessor and activates the sole FQN
+`ContractSliceActivationTopologyTests.Matches_exact_contract_slice_scenario_inventory`
+and marker `TEST-0210-D-BEHAVIOR-RED-0009`. Only the new topology test file may
+change, within `170` normalized lines. Its reflected ordinal exact map is the
+frozen final `32 A + 11 B + 11 C + 11 D = 65` direct-Fact inventory, including
+itself; every row owns exactly one matching ContractSlice trait and zero Scenario
+traits. Only a null complete expected map reaches the marker. One fresh common
+Release `--no-build` red becomes immutable after child start; green is focused
+`1/1`, D `11/11`, and full `65/65`, followed by one focused local commit without
+push. No production or activation/workflow surface changes.
 
 ### `C-EVALUATION-PLAN-01` executable freeze
 

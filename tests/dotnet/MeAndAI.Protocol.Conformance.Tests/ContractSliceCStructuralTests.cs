@@ -54,9 +54,6 @@ public sealed class ContractSliceCStructuralTests
             95,
             abstractions.GetExportedTypes().Length +
             conformance.GetExportedTypes().Length);
-        Assert.Empty(Assembly.Load(
-            new AssemblyName("MeAndAI.Protocol.Policy")).GetExportedTypes());
-
         foreach (var type in AbstractionsC
             .Select(name => RequireType(abstractions, name))
             .Concat(ConformanceC.Select(name => RequireType(conformance, name))))

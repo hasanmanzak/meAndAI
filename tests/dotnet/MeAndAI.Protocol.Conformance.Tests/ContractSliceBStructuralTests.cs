@@ -118,7 +118,6 @@ public sealed class ContractSliceBPublicApiTests
             conformance,
             "MeAndAI.Protocol.Conformance",
             ConformanceA.Concat(ConformanceB));
-        Assert.Empty(LoadAssembly("MeAndAI.Protocol.Policy").GetExportedTypes());
         Assert.Equal(72, AbstractionsA.Length + AbstractionsB.Length +
             ConformanceA.Length + ConformanceB.Length);
 
@@ -839,7 +838,6 @@ public sealed class ContractSliceBOwnershipTests
                 ignoreCase: false));
         }
 
-        Assert.Empty(LoadAssembly("MeAndAI.Protocol.Policy").GetExportedTypes());
     }
 
     private static void AssertFactory(

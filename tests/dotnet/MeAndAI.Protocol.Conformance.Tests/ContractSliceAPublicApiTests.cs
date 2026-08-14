@@ -87,8 +87,6 @@ public sealed class ContractSliceAPublicApiTests
             LoadAssembly("MeAndAI.Protocol.Conformance"),
             "MeAndAI.Protocol.Conformance",
             ConformanceInventory);
-        Assert.Empty(
-            LoadAssembly("MeAndAI.Protocol.Policy").GetExportedTypes());
     }
 
     [Fact]
@@ -179,7 +177,6 @@ public sealed class ContractSliceAPublicApiTests
         var abstractions = LoadAssembly(
             "MeAndAI.Protocol.Conformance.Abstractions");
         var conformance = LoadAssembly("MeAndAI.Protocol.Conformance");
-        var policy = LoadAssembly("MeAndAI.Protocol.Policy");
         var manifest = RequireType(abstractions, "FinalizedPolicyManifest");
         var parseCanonical = Assert.Single(
             manifest.GetMethods(DeclaredNonPublic),
@@ -228,11 +225,6 @@ public sealed class ContractSliceAPublicApiTests
             Assert.True(create.IsAssembly);
         }
 
-        Assert.Null(policy.GetType(
-            "MeAndAI.Protocol.Policy.InitialRuleQualificationPolicy",
-            throwOnError: false,
-            ignoreCase: false));
-        Assert.Empty(policy.GetExportedTypes());
     }
 
     private static IReadOnlyList<string> BuildExpectedSurface()
