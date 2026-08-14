@@ -15,6 +15,7 @@ public sealed class ContractSliceBQualifiedReferenceTests
 
     [Fact]
     [Trait("ContractSlice", "B")]
+    [Trait("Scenario", "TEST-0210")]
     public void Seals_exact_codec_derived_reference_and_location_narrowing()
     {
         var fixture = CreateFixture();

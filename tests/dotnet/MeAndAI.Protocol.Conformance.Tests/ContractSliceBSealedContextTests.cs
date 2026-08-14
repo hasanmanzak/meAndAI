@@ -15,6 +15,7 @@ public sealed class ContractSliceBSealedContextTests
 
     [Fact]
     [Trait("ContractSlice", "B")]
+    [Trait("Scenario", "TEST-0210")]
     public void Seals_exact_context_proof_and_root_references()
     {
         var manifest =

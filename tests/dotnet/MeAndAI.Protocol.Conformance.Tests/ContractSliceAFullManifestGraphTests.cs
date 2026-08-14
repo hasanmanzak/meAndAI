@@ -51,6 +51,7 @@ public sealed class ContractSliceAFullManifestGraphTests
 
     [Fact]
     [Trait("ContractSlice", "A")]
+    [Trait("Scenario", "TEST-0210")]
     public void Full_declaration_graph_equals_the_exact_five_rule_six_artifact_thirty_five_component_snapshot()
     {
         var bytes = CanonicalManifestWriter.Write(CreateManifest());

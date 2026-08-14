@@ -17,6 +17,7 @@ public sealed class ContractSliceCEvaluationPlanTests
 
     [Fact]
     [Trait("ContractSlice", "C")]
+    [Trait("Scenario", "TEST-0210")]
     public void Plans_exact_projected_evaluation_round()
     {
         var context = CreateContext(Candidates(permuted: true));

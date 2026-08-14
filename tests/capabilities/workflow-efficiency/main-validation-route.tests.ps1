@@ -435,15 +435,23 @@ try {
         ))
         $protocolVocabularyScenarioId = 'TEST-' + '0220'
         $protocolEvidenceScenarioId = 'TEST-' + '0221'
+        $protocolKernelScenarioId = 'TEST-' + '0210'
         $protocolScenarioFilter =
-            'Scenario={0}|Scenario={1}' -f
+            'Scenario={0}|Scenario={1}|Scenario={2}|ContractSlice=A|ContractSlice=B|ContractSlice=C|ContractSlice=D|FullyQualifiedName=MeAndAI.Protocol.Conformance.Tests.ContractSliceActivationTopologyTests.Matches_exact_contract_slice_scenario_inventory' -f
                 $protocolVocabularyScenarioId,
-                $protocolEvidenceScenarioId
+                $protocolEvidenceScenarioId,
+                $protocolKernelScenarioId
         $protocolTestCommand =
-            'dotnet test tests/dotnet/MeAndAI.Protocol.Domain.Tests/MeAndAI.Protocol.Domain.Tests.csproj --configuration Release --no-restore --nologo --verbosity minimal --filter "{0}"' -f $protocolScenarioFilter
-        $expectedProtocolCommands = @(
-            'dotnet restore MeAndAI.Protocol.slnx --configfile NuGet.Config --locked-mode',
-            $protocolTestCommand
+            'dotnet test MeAndAI.Protocol.slnx --configuration Release --no-restore --nologo --verbosity minimal --filter "{0}"' -f $protocolScenarioFilter
+        $expectedProtocolSteps = @(
+            [pscustomobject]@{
+                Command = 'dotnet restore MeAndAI.Protocol.slnx --configfile NuGet.Config --locked-mode'
+                RunForm = '>-'
+            },
+            [pscustomobject]@{
+                Command = $protocolTestCommand
+                RunForm = '|'
+            }
         )
         foreach ($stableJobId in @('linux-validation', 'windows-validation')) {
             $matchingJobs = @($jobMatches | Where-Object {
@@ -557,8 +565,8 @@ try {
             $protocolRestoreTargetReferences = [regex]::Matches(
                 $jobSource,
                 '(?i)\bMeAndAI\.Protocol\.slnx\b')
-            if ($protocolRestoreTargetReferences.Count -ne 1) {
-                Add-Failure "TEST-0146 stable job '$stableJobId' must reference MeAndAI.Protocol.slnx exactly once."
+            if ($protocolRestoreTargetReferences.Count -ne 2) {
+                Add-Failure "TEST-0146 stable job '$stableJobId' must reference MeAndAI.Protocol.slnx exactly twice."
             }
 
             $allDotNetRestoreInvocations = @(
@@ -589,8 +597,8 @@ try {
             $protocolTestTargetReferences = [regex]::Matches(
                 $jobSource,
                 '(?i)\bMeAndAI\.Protocol\.Domain\.Tests[\\/]MeAndAI\.Protocol\.Domain\.Tests\.csproj\b')
-            if ($protocolTestTargetReferences.Count -ne 1) {
-                Add-Failure "TEST-0146 stable job '$stableJobId' must reference the Domain test project exactly once."
+            if ($protocolTestTargetReferences.Count -ne 0) {
+                Add-Failure "TEST-0146 stable job '$stableJobId' must not retain a Domain-project test target."
             }
 
             $allDotNetTestInvocations = @(
@@ -607,7 +615,7 @@ try {
             $protocolTestInvocations = @(
                 $steps | Where-Object {
                     $_.Command -match
-                        '(?i)\bMeAndAI\.Protocol\.Domain\.Tests[\\/]MeAndAI\.Protocol\.Domain\.Tests\.csproj\b'
+                        '(?i)\bMeAndAI\.Protocol\.slnx\b'
                 } | ForEach-Object {
                     [regex]::Matches(
                         $_.Command,
@@ -615,10 +623,11 @@ try {
                 }
             )
             if ($protocolTestInvocations.Count -ne 1) {
-                Add-Failure "TEST-0146 stable job '$stableJobId' must contain exactly one Domain test invocation."
+                Add-Failure "TEST-0146 stable job '$stableJobId' must contain exactly one Protocol solution test invocation."
             }
 
-            foreach ($expectedCommand in $expectedProtocolCommands) {
+            foreach ($expectedStep in $expectedProtocolSteps) {
+                $expectedCommand = $expectedStep.Command
                 $matchingSteps = @($steps | Where-Object {
                     $_.Command -ceq $expectedCommand
                 })
@@ -628,7 +637,7 @@ try {
                 }
 
                 $candidateSource = $matchingSteps[0].Source
-                if ($matchingSteps[0].RunForm -cne '>-') {
+                if ($matchingSteps[0].RunForm -cne $expectedStep.RunForm) {
                     Add-Failure "TEST-0146 protocol step in '$stableJobId' uses an alternate run form: '$expectedCommand'."
                 }
                 $ifLines = [regex]::Matches(

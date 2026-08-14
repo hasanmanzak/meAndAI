@@ -14,6 +14,7 @@ public sealed class ContractSliceCEvaluationAdvanceTests
 
     [Fact]
     [Trait("ContractSlice", "C")]
+    [Trait("Scenario", "TEST-0210")]
     public void Advances_owner_sharded_evaluation_to_closure()
     {
         var context = ContractSliceCEvaluationPlanTests.CreateContext(

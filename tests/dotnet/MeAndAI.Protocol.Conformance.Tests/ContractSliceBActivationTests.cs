@@ -11,6 +11,7 @@ public sealed class ContractSliceBActivationTests
 
     [Fact]
     [Trait("ContractSlice", "B")]
+    [Trait("Scenario", "TEST-0210")]
     public void Activates_exact_codec_mirror()
     {
         var manifest = CreateManifest();

@@ -18,6 +18,7 @@ public sealed class ContractSliceATransitionManifestTests
 
     [Fact]
     [Trait("ContractSlice", "A")]
+    [Trait("Scenario", "TEST-0210")]
     public void Enforces_exact_unchanged_added_revised_and_retired_transition_shapes()
     {
         var parsedExisting = CreateMixedTransitionManifest();

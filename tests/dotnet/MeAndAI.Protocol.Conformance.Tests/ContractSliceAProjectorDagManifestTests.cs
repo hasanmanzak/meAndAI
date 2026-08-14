@@ -48,6 +48,7 @@ public sealed class ContractSliceAProjectorDagManifestTests
     ];
     [Fact]
     [Trait("ContractSlice", "A")]
+    [Trait("Scenario", "TEST-0210")]
     public void Enforces_exact_projector_bindings_and_global_producer_graph()
     {
         var bytes = CanonicalManifestWriter.Write(CreateManifest(includeProjector: true));

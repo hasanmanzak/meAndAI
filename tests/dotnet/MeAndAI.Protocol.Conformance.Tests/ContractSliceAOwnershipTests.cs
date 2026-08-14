@@ -133,6 +133,7 @@ public sealed class ContractSliceAOwnershipTests
 
     [Fact]
     [Trait("ContractSlice", "A")]
+    [Trait("Scenario", "TEST-0210")]
     public void DomainExportsEqualTheOrdinalUnionOfPredecessorInventories()
     {
         var expected = PredecessorInventory
@@ -153,6 +154,7 @@ public sealed class ContractSliceAOwnershipTests
 
     [Fact]
     [Trait("ContractSlice", "A")]
+    [Trait("Scenario", "TEST-0210")]
     public void SolutionAndProjectReferencesEqualTheContractSliceAGraph()
     {
         var solution = XDocument.Load(
@@ -180,6 +182,7 @@ public sealed class ContractSliceAOwnershipTests
 
     [Fact]
     [Trait("ContractSlice", "A")]
+    [Trait("Scenario", "TEST-0210")]
     public void PackageReferencesEqualTheContractSliceAGraph()
     {
         var centralPackages = XDocument.Load(
@@ -216,6 +219,7 @@ public sealed class ContractSliceAOwnershipTests
 
     [Fact]
     [Trait("ContractSlice", "A")]
+    [Trait("Scenario", "TEST-0210")]
     public void LocksEqualTheContractSliceATotalGraph()
     {
         Assert.Equal(
@@ -252,6 +256,7 @@ public sealed class ContractSliceAOwnershipTests
 
     [Fact]
     [Trait("ContractSlice", "A")]
+    [Trait("Scenario", "TEST-0210")]
     public void EffectiveRestoreGraphsEqualTheContractSliceATotalGraph()
     {
         foreach (var project in ExpectedProjects)
@@ -348,6 +353,7 @@ public sealed class ContractSliceAOwnershipTests
 
     [Fact]
     [Trait("ContractSlice", "A")]
+    [Trait("Scenario", "TEST-0210")]
     public void FriendAssembliesEqualTheCurrentContractSliceAMatrix()
     {
         var expected = new[]

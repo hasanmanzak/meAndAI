@@ -39,6 +39,7 @@ public sealed class ContractSliceCStructuralTests
 
     [Fact]
     [Trait("ContractSlice", "C")]
+    [Trait("Scenario", "TEST-0210")]
     public void Matches_exact_cumulative_c_public_surface()
     {
         var abstractions = typeof(IRuleEvaluator).Assembly;

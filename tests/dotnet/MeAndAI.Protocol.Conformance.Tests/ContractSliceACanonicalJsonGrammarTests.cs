@@ -36,6 +36,7 @@ public sealed class ContractSliceACanonicalJsonGrammarTests
 
     [Fact]
     [Trait("ContractSlice", "A")]
+    [Trait("Scenario", "TEST-0210")]
     public void Enforces_exact_document_and_slice_structural_grammar()
     {
         var baselineBytes = StrictUtf8.GetBytes(BaselineManifest);

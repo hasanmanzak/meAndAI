@@ -40,6 +40,7 @@ public sealed class ContractSliceAParserRecordSlotManifestTests
         "protocol.type.model.source-text"];
     [Fact]
     [Trait("ContractSlice", "A")]
+    [Trait("Scenario", "TEST-0210")]
     public void Enforces_exact_markdown_parser_protocol_record_index_and_slot_capability_closure()
     {
         var source = CreateManifest();

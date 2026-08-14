@@ -27,6 +27,7 @@ public sealed class ContractSliceACanonicalStringTests
 
     [Fact]
     [Trait("ContractSlice", "A")]
+    [Trait("Scenario", "TEST-0210")]
     public void Enforces_exact_canonical_manifest_string_encoding()
     {
         var actualProbe =

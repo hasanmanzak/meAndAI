@@ -12,6 +12,7 @@ public sealed class ContractSliceBResourceLedgerTests
 
     [Fact]
     [Trait("ContractSlice", "B")]
+    [Trait("Scenario", "TEST-0210")]
     public void Enforces_exact_codec_local_four_counter_ledger()
     {
         AssertConstructionBoundaries();

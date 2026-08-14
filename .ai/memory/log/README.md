@@ -23,9 +23,9 @@ green and maintainer accepted. Policy activation, real producer infrastructure,
 the first-rules cohort, and the specialized-rules cohort are exact-head hosted
 green. ContractSlice D is merged and exact-main green at `11/11`; cumulative
 A-D/full Conformance is `65/65`, Domain is `98/98`, and API/ownership is
-`15/15`. The [TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) final atomic-activation design is `FrozenDesign` and
-inactive pending its records-only exact-head hosted gate and maintainer
-acceptance. The parent scenario remains `Planned`; implementation, activation,
+`15/15`. The [TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) final atomic activation is `ReviewedLocalGreen`: Scenario and
+ContractSlice each pass the same `65/65` FQNs and the combined route is
+`163/163`; its exact-head hosted implementation gate is pending. Feature
 completion/DoD, merge, release, and publication remain held.
 
 In parallel, the optional repository-navigation direction is captured as a

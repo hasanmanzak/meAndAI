@@ -17,6 +17,7 @@ public sealed class ContractSliceCApplicabilityPlanTests
 
     [Fact]
     [Trait("ContractSlice", "C")]
+    [Trait("Scenario", "TEST-0210")]
     public void Plans_exact_static_applicability_instructions()
     {
         var fixture = ContractSliceCActivationTests.CreateFixture();

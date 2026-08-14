@@ -104,6 +104,7 @@ public sealed class ContractSliceBPublicApiTests
 
     [Fact]
     [Trait("ContractSlice", "B")]
+    [Trait("Scenario", "TEST-0210")]
     public void Matches_exact_cumulative_b_public_surface()
     {
         var abstractions = LoadAssembly(
@@ -744,6 +745,7 @@ public sealed class ContractSliceBOwnershipTests
 
     [Fact]
     [Trait("ContractSlice", "B")]
+    [Trait("Scenario", "TEST-0210")]
     public void Enforces_exact_friend_factory_and_negative_surface()
     {
         AssertFriendAssemblies("MeAndAI.Protocol.Domain", []);

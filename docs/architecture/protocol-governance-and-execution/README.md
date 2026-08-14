@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Architecture design |
-| Status | Accepted architecture; [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143) Gate 2 accepted. ContractSlice A-D are merged and exact-main green at `65/65`; Domain is `98/98` and API/ownership is `15/15`. The final [TEST-0210](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) atomic-activation design is `FrozenDesign`/inactive pending its records-only exact-head hosted gate and maintainer acceptance; the scenario remains `Planned` and no activation or DoD is claimed. |
+| Status | Accepted architecture; [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143) Gate 2 accepted. ContractSlice A-D are merged and exact-main green at `65/65`; Domain is `98/98` and API/ownership is `15/15`. The final [TEST-0210](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) atomic activation is `ReviewedLocalGreen`: Scenario and ContractSlice pass the same `65/65` FQNs and the combined route is `163/163`; exact-head hosted implementation gate pending, no feature DoD. |
 | Owning epic | [EPIC-0002 / issue #163](https://github.com/hasanmanzak/meAndAI/issues/163) |
 | Owning task | [TASK-0003 / issue #164](https://github.com/hasanmanzak/meAndAI/issues/164) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
@@ -11,10 +11,10 @@
 | Successor allocation | [Successor delivery and qualification plan](successor-delivery-plan.md) |
 | Preserved WIP disposition | [Exact extraction ledger](wip-extraction-ledger.md) |
 | Accepted Gate-2 baseline | Exact-main typed-handoff predecessor [`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7) |
-| Current slice boundary | ContractSlice A-D are immutable merged/exact-main-green history at `A32/B11/C11/D11`, cumulative/full Conformance `65/65`. The final [TEST-0210](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) atomic-activation design is frozen but inactive until its design checkpoint is exact-head hosted green and accepted; implementation and final activation remain held. |
+| Current slice boundary | ContractSlice A-D are immutable merged/exact-main-green history at `A32/B11/C11/D11`, cumulative/full Conformance `65/65`. The final [TEST-0210](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) atomic activation is locally green and awaits only its exact-head hosted implementation gate; no later subfeature or feature DoD is activated. |
 | Hosted correction chain | Historical `bfa961d...` / run `30712296217` exposed [TEST-0175](../../features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175), then `43c1800...` / run `30714966450` exposed [TEST-0178](../../features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178). Their exact links remain canonical in the owning findings. The bounded documentation/memory correction at exact [`25e26f9...`](https://github.com/hasanmanzak/meAndAI/commit/25e26f908e1f123640c758e42e1db92d5eea6dde) closes both findings; publication verification was correctly skipped. |
 | Preserved implementation input | [`1873c98638ba4960734aadb188eb8c8d70b4bc52`](https://github.com/hasanmanzak/meAndAI/commit/1873c98638ba4960734aadb188eb8c8d70b4bc52) on [draft PR #160](https://github.com/hasanmanzak/meAndAI/pull/160) |
-| Current authority | The C plan and immutable evidence own completed A/B/C history. The accepted D plan authorizes only the ordered Policy-activation packet and its frozen red/green gates. Final Scenario/status/owner/workflow, runtime-efficiency activation, WIP, consumer, merge, release, publication, authority transfer, and PowerShell retirement remain held. |
+| Current authority | Historical A-D plans and immutable evidence own the completed slices. The accepted final-activation contract owns only the exact Scenario/status/owner/workflow and runtime-efficiency candidate now `ReviewedLocalGreen`; exact-head hosted proof, feature DoD, WIP, consumer, merge, release, publication, authority transfer, and PowerShell retirement remain held. |
 
 ## 1. Outcome
 

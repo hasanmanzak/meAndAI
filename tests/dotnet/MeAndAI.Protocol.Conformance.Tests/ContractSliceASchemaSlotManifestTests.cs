@@ -21,6 +21,7 @@ public sealed class ContractSliceASchemaSlotManifestTests
 
     [Fact]
     [Trait("ContractSlice", "A")]
+    [Trait("Scenario", "TEST-0210")]
     public void Enforces_exact_schema_and_zero_capability_evidence_slot_closure()
     {
         var source = CreateManifest();

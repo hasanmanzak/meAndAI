@@ -9,6 +9,7 @@ public sealed class ContractSliceCOwnershipTests
 {
     [Fact]
     [Trait("ContractSlice", "C")]
+    [Trait("Scenario", "TEST-0210")]
     public void Retains_exact_friend_project_and_policy_ownership_boundary()
     {
         var abstractions = typeof(IRuleEvaluator).Assembly;

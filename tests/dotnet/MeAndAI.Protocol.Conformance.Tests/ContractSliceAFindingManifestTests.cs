@@ -68,6 +68,7 @@ public sealed class ContractSliceAFindingManifestTests
     ];
     [Fact]
     [Trait("ContractSlice", "A")]
+    [Trait("Scenario", "TEST-0210")]
     public void Enforces_finding_declarations_with_exact_reference_roles()
     {
         var primaryInput = PrimaryKinds.Reverse().Select(QualifiedEvidenceReferenceKind.Parse).ToList();

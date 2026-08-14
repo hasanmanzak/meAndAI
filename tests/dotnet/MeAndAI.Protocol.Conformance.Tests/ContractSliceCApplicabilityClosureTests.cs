@@ -16,6 +16,7 @@ public sealed class ContractSliceCApplicabilityClosureTests
 
     [Fact]
     [Trait("ContractSlice", "C")]
+    [Trait("Scenario", "TEST-0210")]
     public void Closes_applicability_with_exact_terminal_shapes()
     {
         var fixture = CreateFixture();

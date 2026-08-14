@@ -11,6 +11,7 @@ public sealed class ContractSliceCAggregationTests
 
     [Fact]
     [Trait("ContractSlice", "C")]
+    [Trait("Scenario", "TEST-0210")]
     public void Aggregates_exact_catalog_evaluation_and_verdict()
     {
         var indeterminate = CompleteContext(

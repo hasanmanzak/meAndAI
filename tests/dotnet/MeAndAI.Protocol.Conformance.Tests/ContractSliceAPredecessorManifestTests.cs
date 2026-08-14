@@ -19,6 +19,7 @@ public sealed class ContractSliceAPredecessorManifestTests
 
     [Fact]
     [Trait("ContractSlice", "A")]
+    [Trait("Scenario", "TEST-0210")]
     public void Enforces_existing_predecessor_version_and_exact_digests()
     {
         var basis = ContractSliceAFullManifestGraphTests.CreateManifest();

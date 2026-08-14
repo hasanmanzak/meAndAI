@@ -3,22 +3,22 @@
 | Field | Value |
 | --- | --- |
 | Classification | Gate 2 micro-delivery plan and design freeze |
-| State | Complete and immutable: all D cohorts are `ExactHeadHostedGreen`; D is merged through [PR #184](https://github.com/hasanmanzak/meAndAI/pull/184) and exact-main green at `11/11`, cumulative/full Conformance `65/65`; [TEST-0210](test-cases.md#test-0210) final atomic activation is a separate frozen design and remains inactive |
+| State | Complete and immutable: all D cohorts are `ExactHeadHostedGreen`; D is merged through [PR #184](https://github.com/hasanmanzak/meAndAI/pull/184) and exact-main green at `11/11`, cumulative/full Conformance `65/65`; the separate [TEST-0210](test-cases.md#test-0210) final atomic activation is `ReviewedLocalGreen` and exact-head hosted pending |
 
 `D-CONVERGE-01` is code-free: P/R/G are `NotApplicable`, no new Fact or
 executable path exists, and all R0001..R0009 evidence remains immutable. Its
 local closure requires the exact final cohort diff plus D `11/11`, full
 Conformance `65/65`, Domain `98/98`, API/ownership, Release build, format,
 locks, StructureOnly/graph, publication-evidence, and fresh scope/traceability
-reviews. Passing those gates authorizes only the cohort's single push and
-exact-head hosted CI; the parent scenario remains Planned and all held surfaces
-stay held.
+reviews. Passing those gates authorized only the cohort's single push and
+exact-head hosted CI; at D closure the parent scenario remained Planned and
+all held surfaces stayed held.
 | Parent | [SUBF-0143](README.md#subf-0143) |
-| Scenario | [TEST-0210](test-cases.md#test-0210), retained `Planned` |
+| Scenario | [TEST-0210](test-cases.md#test-0210), now `Passing` locally through the separate final atomic-activation candidate |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Accepted predecessor | C merged at exact main [`e9bc3c6f4cc54cc25bfccaa5b4364f2c970e612b`](https://github.com/hasanmanzak/meAndAI/commit/e9bc3c6f4cc54cc25bfccaa5b4364f2c970e612b); exact-main Ubuntu/Windows green and publication verification skipped; immutable linked evidence is owned by the D design handoff |
 | Normative owner | [Typed evaluation kernel design](subf-0143-typed-evaluation-kernel-design.md) |
-| Implementation language | C# only; final Scenario/status/owner/workflow activation, consumer, merge, release, publication, and other subfeatures remain held |
+| Implementation language | D implementation was C# only; the separate final Scenario/status/owner/workflow candidate is `ReviewedLocalGreen`, while consumer, merge, release, publication, and other subfeatures remain held |
 
 ## Authority and non-goals
 

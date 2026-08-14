@@ -29,6 +29,7 @@ public sealed class ContractSliceAGovernedReferenceSlotsManifestTests
     ];
     [Fact]
     [Trait("ContractSlice", "A")]
+    [Trait("Scenario", "TEST-0210")]
     public void Enforces_exact_governed_reference_index_and_dual_governed_text_slot_capability_closure()
     {
         var registry = CreateRegistry();

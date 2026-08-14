@@ -15,6 +15,7 @@ public sealed class ContractSliceACanonicalNumberTests
 
     [Fact]
     [Trait("ContractSlice", "A")]
+    [Trait("Scenario", "TEST-0210")]
     public void Enforces_exact_integer_grammar_and_range()
     {
         var minimumBytes = AsBytes(BaselineManifest);

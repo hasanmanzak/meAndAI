@@ -27,6 +27,7 @@ public sealed class ContractSliceBRepositoryTargetCodecTests
 
     [Fact]
     [Trait("ContractSlice", "B")]
+    [Trait("Scenario", "TEST-0210")]
     public void Round_trips_exact_repository_target_resolution_wire()
     {
         var fixture = CreateFixture();

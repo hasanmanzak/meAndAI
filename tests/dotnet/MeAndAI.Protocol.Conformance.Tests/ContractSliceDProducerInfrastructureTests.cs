@@ -12,6 +12,7 @@ public sealed class ContractSliceDProducerInfrastructureTests
 
     [Fact]
     [Trait("ContractSlice", "D")]
+    [Trait("Scenario", "TEST-0210")]
     public void Activates_exact_real_codec_parser_index_projector_selector_evaluator_graph()
     {
         ContractSliceDProducerInfrastructureEvidence? evidence =

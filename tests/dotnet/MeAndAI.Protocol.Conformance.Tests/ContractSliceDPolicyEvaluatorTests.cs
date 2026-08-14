@@ -16,6 +16,7 @@ public sealed class ContractSliceDPolicyEvaluatorTests
 
     [Fact]
     [Trait("ContractSlice", "D")]
+    [Trait("Scenario", "TEST-0210")]
     public void Evaluates_rule_0001_against_fresh_qualified_fixture()
     {
         ContractSliceDPolicyEvaluatorEvidence? evidence =
@@ -34,6 +35,7 @@ public sealed class ContractSliceDPolicyEvaluatorTests
 
     [Fact]
     [Trait("ContractSlice", "D")]
+    [Trait("Scenario", "TEST-0210")]
     public void Evaluates_rule_0002_against_fresh_qualified_fixture()
     {
         ContractSliceDPolicyEvaluatorEvidence? evidence =
@@ -52,6 +54,7 @@ public sealed class ContractSliceDPolicyEvaluatorTests
 
     [Fact]
     [Trait("ContractSlice", "D")]
+    [Trait("Scenario", "TEST-0210")]
     public void Evaluates_rule_0003_with_exact_target_specialization_and_co_report()
     {
         ContractSliceDPolicyEvaluatorEvidence? evidence =
@@ -70,6 +73,7 @@ public sealed class ContractSliceDPolicyEvaluatorTests
 
     [Fact]
     [Trait("ContractSlice", "D")]
+    [Trait("Scenario", "TEST-0210")]
     public void Evaluates_rule_0004_with_exact_fragment_specialization_and_co_report()
     {
         ContractSliceDPolicyEvaluatorEvidence? evidence =
@@ -88,6 +92,7 @@ public sealed class ContractSliceDPolicyEvaluatorTests
 
     [Fact]
     [Trait("ContractSlice", "D")]
+    [Trait("Scenario", "TEST-0210")]
     public void Evaluates_rule_0005_with_exact_commit_specialization_and_co_report()
     {
         ContractSliceDPolicyEvaluatorEvidence? evidence =
@@ -111,6 +116,7 @@ public sealed class ContractSliceDRepositoryProviderEquivalenceTests
 
     [Fact]
     [Trait("ContractSlice", "D")]
+    [Trait("Scenario", "TEST-0210")]
     public void Produces_equivalent_results_from_fresh_repository_and_provider_fixtures()
     {
         ContractSliceDRepositoryProviderEquivalenceEvidence? evidence =

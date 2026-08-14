@@ -3,14 +3,14 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted; ContractSlice A-D are merged and exact-main green at `A32/B11/C11/D11`, cumulative/full Conformance `65/65`. [TEST-0210](test-cases.md#test-0210) remains `Planned`; its final atomic-activation design is `FrozenDesign`/inactive pending the records-only exact-head hosted gate and maintainer acceptance. Implementation, activation, and DoD remain held. |
+| Status | Gate 2 accepted; ContractSlice A-D are merged and exact-main green at `A32/B11/C11/D11`, cumulative/full Conformance `65/65`. [TEST-0210](test-cases.md#test-0210) is `Passing` locally: its atomic activation is `ReviewedLocalGreen`, Scenario and ContractSlice pass the same `65/65` FQNs, and the combined route is `163/163`; exact-head hosted implementation gate pending, no feature DoD. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Test | [TEST-0210](test-cases.md#test-0210) |
-| Gate 3 micro-delivery routing | Historical A-D delivery remains owned by its micro plans and merged PR evidence. Current prospective routing is the final atomic-activation freeze below; it activates no executable work before the design checkpoint is exact-head hosted green and accepted. |
+| Gate 3 micro-delivery routing | Historical A-D delivery remains owned by its micro plans and merged PR evidence. The final atomic-activation design checkpoint became exact-head hosted green and was accepted; the exact candidate below is now `ReviewedLocalGreen` and awaits its own hosted gate. |
 | Exact-main design baseline | Accepted A merge commit [`51623f4d404a95e0f706d72805cf7ddbbbd293b8`](https://github.com/hasanmanzak/meAndAI/commit/51623f4d404a95e0f706d72805cf7ddbbbd293b8), validated by exact-main [run 31304787603](https://github.com/hasanmanzak/meAndAI/actions/runs/31304787603) |
-| Design and Gate 3 authority | Historical A-D directives, accepted reds, diagnostics, cohort evidence, and exact-main closure remain immutable. Only the records-only final atomic-activation design is current; implementation remains held until its exact-head hosted design gate and maintainer acceptance. Merge, release, publication, and later subfeatures remain held. |
+| Design and Gate 3 authority | Historical A-D directives, accepted reds, diagnostics, cohort evidence, and exact-main closure remain immutable. Authority is limited to the accepted final atomic-activation allowlist; local implementation gates are green, while exact-head hosted proof, feature DoD, merge, release, publication, and later subfeatures remain held. |
 | Completed predecessor | [SUBF-0153](README.md#subf-0153) / [TEST-0221](test-cases.md#test-0221), merged through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173) and exact-main validated by [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) |
 
 ## Directive and hard boundary
@@ -9545,7 +9545,9 @@ production block.
 
 ### [TEST-0210](test-cases.md#test-0210) final atomic activation freeze <a name="test-0210-final-atomic-activation-freeze"></a>
 
-This freeze is records-only and inactive. Its exact parent is commit
+The records-only design checkpoint became exact-head hosted green and was
+explicitly accepted; its exact identities are retained by the owning final
+activation ledger. The immutable pre-design parent is commit
 [`fba0180cedb6faa9fb26d57d2279013704b83f38`](https://github.com/hasanmanzak/meAndAI/commit/fba0180cedb6faa9fb26d57d2279013704b83f38), git tree identity: `e182c857a429b33df18b6a3918fcb923a9705955`. ContractSlice A-D are merged and
 exact-main green; the parent Conformance inventory is `65/65` with
 `A32/B11/C11/D11`, Domain is `98/98`, and API/ownership is `15/15`.
@@ -9635,7 +9637,7 @@ custody, not activation evidence.
 
 The activation candidate has one unpublished atomic mutation boundary:
 
-1. In exactly the existing `49` tracked Conformance test source files that
+1. In exactly the existing `48` tracked Conformance test source files that
    directly declare the `65` rows of `E`, add one and only one direct
    Scenario trait whose value is the canonical [TEST-0210](test-cases.md#test-0210)
    identity to each `E` method. Keep every existing
@@ -9710,12 +9712,11 @@ single atomic mutation it must prove:
   command cardinalities, and two independent fresh-diff design/evidence/
   traceability reviews at `0/0/0`.
 
-The design checkpoint must be committed and pushed as records-only, then pass
-Ubuntu and Windows at its exact head with publication skipped. Only after that
-hosted gate and explicit maintainer acceptance may implementation begin. A
-green implementation yields [TEST-0210](test-cases.md#test-0210) activation only after its own complete
-local gates, single focused commit/push, and exact-head hosted green. Until
-then [TEST-0210](test-cases.md#test-0210) is `Planned`; feature completion/DoD,
+The design checkpoint passed Ubuntu and Windows at its exact head with
+publication skipped and was explicitly accepted. The resulting atomic
+implementation candidate is `ReviewedLocalGreen`; it yields final
+[TEST-0210](test-cases.md#test-0210) closure only after its single focused commit/push and exact-head hosted
+green. Until then the test is Passing only as local candidate evidence; feature completion/DoD,
 [SUBF-0144](README.md#subf-0144)/[SUBF-0154](README.md#subf-0154),
 consumer work, merge, release, and publication remain held.
 
@@ -10328,8 +10329,8 @@ errors. A separate non-gating severity-info full scan exposed pre-existing flat-
 namespace/informational backlog and suggestions; this record does not claim
 that scan clean.
 
-This evidence closes only the canonical-string coverage `Important` and this
-second A increment. [TEST-0210](test-cases.md#test-0210) remains `Planned` and
+This evidence closed only the canonical-string coverage `Important` and this
+second A increment. At that checkpoint [TEST-0210](test-cases.md#test-0210) remained `Planned` and
 remaining A is pending. ContractSlice B/C/D, workflow/scenario-trait/scenario-owner/
 [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146), root,
 combined, hosted, WIP extraction, consumer, release, and publication scope
