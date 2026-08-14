@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Gate 2 micro-delivery plan and design freeze |
-| State | Design exact-head hosted green and maintainer accepted; Policy activation, producer infrastructure, first-rules, and specialized-rules cohorts are `ExactHeadHostedGreen`; repository/provider equivalence is `ReviewedLocalGreen`; D is `10/11` and A+B+C+D/full Conformance is `64/64`; activation topology is frozen and active locally, with D-CONVERGE inactive |
+| State | Design exact-head hosted green and maintainer accepted; D predecessor cohorts are `ExactHeadHostedGreen`; repository/provider equivalence and activation topology are `ReviewedLocalGreen`; D is `11/11` and A+B+C+D/full Conformance is `65/65`; code-free D-CONVERGE is active locally |
 | Parent | [SUBF-0143](README.md#subf-0143) |
 | Scenario | [TEST-0210](test-cases.md#test-0210), retained `Planned` |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
@@ -571,6 +571,36 @@ other thirteen zero, one marker-free stack and one RunInfo were present, and no
 attachment/collector node existed. The red never reruns. Removing only the null
 seam produced focused `1/1`, D `10/10`, full `64/64`, Domain `98/98`, and a
 warning-free Release build; the packet is `ReviewedLocalGreen`.
+
+### `D-ACTIVATION-TOPOLOGY-01` pre-red freeze
+
+The exact local predecessor is equivalence commit `386b431`; it remains
+unpushed until final cohort closure. This packet adds only
+`ContractSliceActivationTopologyTests.cs`, capped at `170` normalized lines,
+with one direct Fact/FQN, marker `TEST-0210-D-BEHAVIOR-RED-0009`, only
+`ContractSlice=D`, and no Scenario/Theory/overload/class trait. Production,
+other tests, projects, packages, locks, workflows, and record ownership are
+immutable. The Fact reflects the current Conformance.Tests assembly and compares
+the ordinal exact method-FQN-to-slice map against the frozen `32 A + 11 B + 11 C
++ 11 D = 65` planned inventory, including itself. It also proves exactly one
+direct Fact and one exact ContractSlice trait per row, with zero Scenario traits.
+Only a null complete expected map reaches the marker. Canonical red uses one
+fresh common Release `--no-build` invocation and becomes immutable after child
+start. Green is focused `1/1`, D `11/11`, and full `65/65`; records then
+synchronize and one focused local commit closes the mutating packet without
+push. D-CONVERGE remains code-free and inactive until that commit is green.
+
+Canonical R0009 is immutable at external root
+`D:\Temp\meandai-test-0210-d-r0009-28564af6e2034c0bb620948165e93689`.
+Its sole TRX is `4,900` bytes with SHA-256
+`60B0F0E2A0EBEB3DB2D6D35C167F57E0C1188E2D0D76E5FA9AB689F33730D899`;
+native exit was `1`, the sole result/definition/entry was the exact Failed FQN
+with marker-only message, counters were `total/executed/failed=1/1/1` and all
+other thirteen zero, one marker-free stack and one RunInfo were present, and no
+attachment/collector node existed. The red never reruns. Binding only the null
+expected-map seam produced focused `1/1`, D `11/11`, full `65/65`, and a
+warning-free Release build. The compile-time CustomAttributeData cast correction
+was isolated before child start; activation topology is `ReviewedLocalGreen`.
 
 ## Cohort measurement ledger
 

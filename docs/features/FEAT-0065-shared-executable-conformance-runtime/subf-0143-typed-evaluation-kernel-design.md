@@ -3,14 +3,14 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted; ContractSlice A, B, and C are merged/exact-main green. D Policy activation, real producer infrastructure, first-rules, and specialized-rules cohorts are `ExactHeadHostedGreen`; repository/provider equivalence is `ReviewedLocalGreen`. D is `10/11` and cumulative A+B+C+D/full Conformance is `64/64`; activation topology is frozen and active locally, with D-CONVERGE inactive. [TEST-0210](test-cases.md#test-0210) remains `Planned`; final activation and DoD remain held. |
+| Status | Gate 2 accepted; ContractSlice A, B, and C are merged/exact-main green. D predecessor cohorts are `ExactHeadHostedGreen`; repository/provider equivalence and activation topology are `ReviewedLocalGreen`. D is `11/11` and cumulative A+B+C+D/full Conformance is `65/65`; code-free D-CONVERGE is active locally. [TEST-0210](test-cases.md#test-0210) remains `Planned`; final activation and DoD remain held. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Test | [TEST-0210](test-cases.md#test-0210) |
 | Gate 3 micro-delivery routing | Historical A, B, and C delivery remains owned by their micro plans. Current prospective routing is the [ContractSlice D micro-delivery plan](subf-0143-contractslice-d-micro-delivery-plan.md); packet labels refine delivery but activate no executable work. |
 | Exact-main design baseline | Accepted A merge commit [`51623f4d404a95e0f706d72805cf7ddbbbd293b8`](https://github.com/hasanmanzak/meAndAI/commit/51623f4d404a95e0f706d72805cf7ddbbbd293b8), validated by exact-main [run 31304787603](https://github.com/hasanmanzak/meAndAI/actions/runs/31304787603) |
-| Design and Gate 3 authority | Historical A/B/C directives, accepted reds, diagnostics, and hosted evidence remain immutable. D Policy activation, producer infrastructure, first-rules, and specialized-rules cohorts are `ExactHeadHostedGreen`; repository/provider equivalence is `ReviewedLocalGreen`; activation topology is the sole active local packet, while D-CONVERGE, final activation, merge, release, and publication remain held. |
+| Design and Gate 3 authority | Historical A/B/C directives, accepted reds, diagnostics, and hosted evidence remain immutable. D predecessor cohorts are `ExactHeadHostedGreen`; repository/provider equivalence and activation topology are `ReviewedLocalGreen`; code-free D-CONVERGE is the sole active local packet, while final activation, merge, release, and publication remain held. |
 | Completed predecessor | [SUBF-0153](README.md#subf-0153) / [TEST-0221](test-cases.md#test-0221), merged through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173) and exact-main validated by [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) |
 
 ## Directive and hard boundary
@@ -10979,6 +10979,19 @@ Only a null complete equivalence result reaches the marker. Canonical red is one
 fresh common Release `--no-build` invocation and is immutable after child start;
 green is focused `1/1`, D `10/10`, and full Conformance `64/64` before one
 focused local commit without push.
+
+### `D-ACTIVATION-TOPOLOGY-01` executable freeze
+
+The D micro-plan is normative. Exact local predecessor `386b431` activates the
+sole FQN `ContractSliceActivationTopologyTests.Matches_exact_contract_slice_scenario_inventory`
+and marker `TEST-0210-D-BEHAVIOR-RED-0009`. Only the new topology test file may
+change, within `170` normalized lines. Its reflected ordinal exact map is the
+frozen final `32 A + 11 B + 11 C + 11 D = 65` direct-Fact inventory, including
+itself; every row owns exactly one matching ContractSlice trait and zero Scenario
+traits. Only a null complete expected map reaches the marker. One fresh common
+Release `--no-build` red becomes immutable after child start; green is focused
+`1/1`, D `11/11`, and full `65/65`, followed by one focused local commit without
+push. No production or activation/workflow surface changes.
 
 ### `C-EVALUATION-PLAN-01` executable freeze
 
