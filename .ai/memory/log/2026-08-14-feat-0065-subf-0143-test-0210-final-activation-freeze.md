@@ -82,3 +82,21 @@ implementation gate is complete; the single commit/push and its exact-head
 hosted proof remain pending. No production source, Fact/FQN/slice mapping,
 project/package/lock graph, job, shell, unrelated scenario, feature DoD,
 merge, release, or publication claim is introduced.
+
+## Hosted correction
+
+Implementation head [`d0344d5ec0cb5aef74552884c29a0e34063e248f`](https://github.com/hasanmanzak/meAndAI/commit/d0344d5ec0cb5aef74552884c29a0e34063e248f)
+passed Ubuntu in `23m05s` in [run `31787150891`](https://github.com/hasanmanzak/meAndAI/actions/runs/31787150891), with publication skipped. Windows failed only the pre-existing
+[TEST-0106](../../../docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0106)
+fixture because its parent/child PID startup observation was hidden at `10s`.
+The exact committed owner passed focused Windows PowerShell 5.1 in `15.6s`,
+classifying a load-sensitive test-harness false negative rather than a
+Scenario/topology regression. The owning correction names a bounded `30s`
+observation inside the unchanged `120s` process limit; focused Windows
+PowerShell 5.1 passed both streaming scenarios in `13.1s`. The replacement
+Windows PowerShell 5.1 Full profile passed the streaming owner and reached the
+later governance stage, which caught only one non-clickable identifier in this
+ledger. The edge-neutral wording correction then passed exact-tree
+StructureOnly with suite `elapsedMs=518605` and publication evidence `7/7` in
+`331s`, with no publication claim. Only the replacement exact-head hosted gate
+remains pending; no failed-head closure is claimed.
