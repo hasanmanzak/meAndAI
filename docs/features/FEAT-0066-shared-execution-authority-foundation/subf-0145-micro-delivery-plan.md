@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Dependency-ordered delivery control for [TEST-0212](test-cases.md#test-0212) |
-| Status | `DesignFreezeCandidate`; no implementation package is active |
+| Status | `DesignCorrectionCandidate`; snapshot is `ReviewedLocalGreen`, grant red is accepted, and production is paused pending repeated exact-head design gates |
 | Design | [Authority, grant, publication, and activation design](subf-0145-authority-grant-activation-design.md) |
 | Public API | [Exact public API contract](subf-0145-public-api-contract.md) |
 | Values/errors | [Exact value and error contract](subf-0145-value-error-contract.md) |
@@ -27,7 +27,7 @@ AcceptedFrozenDesign
 ~~~
 
 Each implementation package runs canonical expected red, the exact focused
-test, slice-cumulative [Scenario=TEST-0212](test-cases.md#test-0212), the cumulative operational
+test, slice-cumulative [Subfeature=SUBF-0145](README.md#subf-0145), the cumulative operational
 foundation filter, the relevant Release build, format/diff/locks and structural
 checks, a fresh package-local independent review, record synchronization, and a
 separate focused local commit. Intermediate commits are not pushed and no
@@ -64,30 +64,51 @@ confirmation is requested. Merge, release, publication, consumer mutation,
 credentials, real authority effects, [SUBF-0146](README.md#subf-0146), and
 authority transfer remain unauthorized.
 
+The grant canonical red exposed an implementability defect after the initial
+gate: no independent expected lease/fence existed, and unapproved/null
+grant-store states lacked exact mapping. The synchronized six-record correction
+adds those coordinates to `GrantValidationRequest` and
+`ExtensionActivationCommand`, maps the store states to `GrantStoreDrift`, and
+repeats all six gate steps. It also freezes removal of the governance-invalid
+intermediate [Scenario=TEST-0212](test-cases.md#test-0212) traits in favor of
+[Subfeature=SUBF-0145](README.md#subf-0145); exact FQNs and documentation traceability remain. It
+changes no type inventory, rejection set/order, expected-red identity/FQN,
+package sequence/budget, or scenario owner/status. The one exact package-2
+allowlist carveout below permits only this trait correction in the committed
+snapshot test. The
+accepted grant red remains immutable and is not invoked again; implementation
+resumes only after the correction exact head passes Ubuntu and Windows.
+
 ## Package matrix
 
 | Package | Canonical expected red | Smallest green | Cumulative gate | Local handoff |
 | --- | --- | --- | --- | --- |
-| `EA-AUTHORITY-SNAPSHOT-01` | [`TEST-0212-SNAPSHOT-RED-0001`](test-cases.md#test-0212) / `MeAndAI.Operations.Architecture.Tests.ExecutionAuthoritySnapshotTests.TEST_0212_snapshot_and_role_separation_are_exact` | Frozen identity, role, member, separation, exception, digest, revision, journal-store, and snapshot contracts | exact FQN; [Scenario=TEST-0212](test-cases.md#test-0212); operational cumulative filter | `ReviewedLocalGreen` commit 1 |
-| `EA-EXECUTION-GRANT-01` | [`TEST-0212-GRANT-RED-0002`](test-cases.md#test-0212) / `MeAndAI.Operations.Architecture.Tests.ExecutionGrantContractTests.TEST_0212_grant_is_fresh_exact_non_transitive_and_single_use` | Exact subject/target/binding/grant validation plus one-time fake-store consumption and least-authority ports | exact FQN; [Scenario=TEST-0212](test-cases.md#test-0212); operational cumulative filter | `ReviewedLocalGreen` commit 2 |
-| `EA-PUBLICATION-ENVELOPE-01` | [`TEST-0212-PUBLICATION-RED-0003`](test-cases.md#test-0212) / `MeAndAI.Operations.Architecture.Tests.PublicationEnvelopeContractTests.TEST_0212_envelope_binds_sealed_report_and_publication_grant` | Cycle-free sealed-report/publication-grant envelope with mismatch negatives | exact FQN; [Scenario=TEST-0212](test-cases.md#test-0212); operational cumulative filter | `ReviewedLocalGreen` commit 3 |
-| `EA-EXTENSION-ACTIVATION-01` | [`TEST-0212-ACTIVATION-RED-0004`](test-cases.md#test-0212) / `MeAndAI.Operations.Architecture.Tests.ExtensionActivationContractTests.TEST_0212_only_fresh_winning_cas_activates_extension` | Protected record/transition/command plus two-contender single-winning CAS | exact FQN; [Scenario=TEST-0212](test-cases.md#test-0212); operational cumulative filter | `ReviewedLocalGreen` commit 4 |
+| `EA-AUTHORITY-SNAPSHOT-01` | [`TEST-0212-SNAPSHOT-RED-0001`](test-cases.md#test-0212) / `MeAndAI.Operations.Architecture.Tests.ExecutionAuthoritySnapshotTests.TEST_0212_snapshot_and_role_separation_are_exact` | Frozen identity, role, member, separation, exception, digest, revision, journal-store, and snapshot contracts | exact FQN; [Subfeature=SUBF-0145](README.md#subf-0145); operational cumulative filter | `ReviewedLocalGreen` commit 1 |
+| `EA-EXECUTION-GRANT-01` | [`TEST-0212-GRANT-RED-0002`](test-cases.md#test-0212) / `MeAndAI.Operations.Architecture.Tests.ExecutionGrantContractTests.TEST_0212_grant_is_fresh_exact_non_transitive_and_single_use` | Exact subject/target/binding/grant validation plus one-time fake-store consumption and least-authority ports | exact FQN; [Subfeature=SUBF-0145](README.md#subf-0145); operational cumulative filter | `ReviewedLocalGreen` commit 2 |
+| `EA-PUBLICATION-ENVELOPE-01` | [`TEST-0212-PUBLICATION-RED-0003`](test-cases.md#test-0212) / `MeAndAI.Operations.Architecture.Tests.PublicationEnvelopeContractTests.TEST_0212_envelope_binds_sealed_report_and_publication_grant` | Cycle-free sealed-report/publication-grant envelope with mismatch negatives | exact FQN; [Subfeature=SUBF-0145](README.md#subf-0145); operational cumulative filter | `ReviewedLocalGreen` commit 3 |
+| `EA-EXTENSION-ACTIVATION-01` | [`TEST-0212-ACTIVATION-RED-0004`](test-cases.md#test-0212) / `MeAndAI.Operations.Architecture.Tests.ExtensionActivationContractTests.TEST_0212_only_fresh_winning_cas_activates_extension` | Protected record/transition/command plus two-contender single-winning CAS | exact FQN; [Subfeature=SUBF-0145](README.md#subf-0145); operational cumulative filter | `ReviewedLocalGreen` commit 4 |
 | `EA-CONVERGE-01` | `R=NotApplicable`; no new behavior or marker | Records, exact API inventory, full local cohort gates, independent cohort diff review | all gates below | records-only local commit 5, one cohort push, exact-head hosted gate |
 
-Each red source has one `[Fact]`, only the canonical
-[Scenario=TEST-0212](test-cases.md#test-0212)
-trait, and no sleep/retry/network/real-store dependency. The accepted TRX and
+Each corrected-freeze red source has one `[Fact]`, only the cohort trait
+[Subfeature=SUBF-0145](README.md#subf-0145), and no sleep/retry/network/real-store dependency. The accepted TRX and
 source SHA-256 are recorded before green. Infrastructure abort, zero discovery,
 unexpected sibling failure, skip, or same-FQN pass is not red. An accepted red
 is immutable; its R command has one pre-green attempt and no unchanged retry.
+The already accepted snapshot and grant source digests remain immutable
+historical evidence of their pre-correction [Scenario=TEST-0212](test-cases.md#test-0212) bytes. Only
+their working typed facts are transformed to [Subfeature=SUBF-0145](README.md#subf-0145); neither R
+is rerun.
 
 The first red in each package is compile-safe: it resolves the owning assembly,
 uses ordinal reflection against the package's first frozen assembly-qualified
 type/member name from the API appendix, and fails only on that absence with the
 exact package marker. It contains no compile-time reference to the absent API.
-After changed product evidence exists, an immutable source copy of that absence
-oracle is run exactly once and passes unchanged; the working test is then
-replaced by typed behavior coverage under the same FQN. Build failure is never
+For the publication and activation packages, after changed product evidence
+exists, an immutable source copy of that absence oracle is run exactly once and
+passes unchanged; the working test is then replaced by typed behavior coverage
+under the same FQN. The completed snapshot package has already consumed this
+step. The grant source is hash-reverified after reconciliation but is never
+invoked again before its working green transformation. Build failure is never
 the expected failure.
 
 ## Exact package allowlists and budgets
@@ -136,6 +157,9 @@ Allowed tests:
 - `tests/dotnet/MeAndAI.Operations.Architecture.Tests/ExecutionGrantContractTests.cs`
 - `tests/dotnet/MeAndAI.Operations.Architecture.Tests/ExecutionAuthorityPortTests.cs`
 - `tests/dotnet/MeAndAI.Operations.Architecture.Tests/ExecutionAuthorityPublicApiTests.cs`
+- `tests/dotnet/MeAndAI.Operations.Architecture.Tests/ExecutionAuthoritySnapshotTests.cs`,
+  only to replace each [Scenario=TEST-0212](test-cases.md#test-0212) attribute with
+  [Subfeature=SUBF-0145](README.md#subf-0145); no test body or public-API assertion may change
 
 Budget: production `<=850`, tests `<=850`, combined normalized changed lines
 `<=1600`; every single file `<=550` lines. The wider package budget is required
@@ -196,7 +220,12 @@ consumer repositories, or preserved WIP.
 
 ## Per-package procedure
 
-For each of the first four packages:
+The snapshot package has already completed this procedure under the initial
+freeze. For the resumed grant package, steps 2-4 are replaced by an ordinal
+verification of the frozen source and TRX SHA-256 values after correction
+reconciliation; neither the R command nor the original oracle is invoked.
+Grant step 6 therefore begins with the transformed final-source exact FQN, then
+runs the cumulative gates. Publication and activation use the full procedure:
 
 1. verify predecessor local commit and the exact allowlist;
 2. write only the canonical expected-red source;
@@ -319,7 +348,7 @@ Ubuntu and Windows jobs before status becomes `AcceptedFrozenDesign`.
 From repository root, with exact test paths and no package restore drift:
 
 ~~~powershell
-$scenario0212 = 'TEST-' + '0212'
+$subfeature0145 = 'SUBF-' + '0145'
 $scenario0191 = 'TEST-' + '0191'
 $scenario0192 = 'TEST-' + '0192'
 $scenario0193 = 'TEST-' + '0193'
@@ -328,8 +357,8 @@ dotnet test .\tests\dotnet\MeAndAI.Operations.Architecture.Tests\MeAndAI.Operati
 dotnet test .\tests\dotnet\MeAndAI.Operations.Architecture.Tests\MeAndAI.Operations.Architecture.Tests.csproj --no-restore --configuration Release --filter "FullyQualifiedName=MeAndAI.Operations.Architecture.Tests.ExecutionGrantContractTests.TEST_0212_grant_is_fresh_exact_non_transitive_and_single_use"
 dotnet test .\tests\dotnet\MeAndAI.Operations.Architecture.Tests\MeAndAI.Operations.Architecture.Tests.csproj --no-restore --configuration Release --filter "FullyQualifiedName=MeAndAI.Operations.Architecture.Tests.PublicationEnvelopeContractTests.TEST_0212_envelope_binds_sealed_report_and_publication_grant"
 dotnet test .\tests\dotnet\MeAndAI.Operations.Architecture.Tests\MeAndAI.Operations.Architecture.Tests.csproj --no-restore --configuration Release --filter "FullyQualifiedName=MeAndAI.Operations.Architecture.Tests.ExtensionActivationContractTests.TEST_0212_only_fresh_winning_cas_activates_extension"
-dotnet test .\tests\dotnet\MeAndAI.Operations.Architecture.Tests\MeAndAI.Operations.Architecture.Tests.csproj --no-restore --configuration Release --filter "Scenario=$scenario0212"
-dotnet test .\tests\dotnet\MeAndAI.Operations.Architecture.Tests\MeAndAI.Operations.Architecture.Tests.csproj --no-restore --configuration Release --filter "Scenario=$scenario0191|Scenario=$scenario0192|Scenario=$scenario0212"
+dotnet test .\tests\dotnet\MeAndAI.Operations.Architecture.Tests\MeAndAI.Operations.Architecture.Tests.csproj --no-restore --configuration Release --filter "Subfeature=$subfeature0145"
+dotnet test .\tests\dotnet\MeAndAI.Operations.Architecture.Tests\MeAndAI.Operations.Architecture.Tests.csproj --no-restore --configuration Release --filter "Scenario=$scenario0191|Scenario=$scenario0192|Subfeature=$subfeature0145"
 dotnet test .\tests\dotnet\MeAndAI.Operations.Packaging.Tests\MeAndAI.Operations.Packaging.Tests.csproj --no-restore --configuration Release --filter "Scenario=$scenario0193"
 dotnet build .\MeAndAI.Operations.slnx --no-restore --configuration Release
 dotnet format .\MeAndAI.Operations.slnx --no-restore --verify-no-changes --severity info
@@ -346,7 +375,8 @@ The expected-red process receives no loop or automatic retry.
 After commit 5 and before the single push:
 
 - rerun all four exact FQNs and
-  [Scenario=TEST-0212](test-cases.md#test-0212);
+  [Subfeature=SUBF-0145](README.md#subf-0145); the canonical [TEST-0212](test-cases.md#test-0212)
+  scenario remains `Planned` and is not asserted;
 - rerun the complete Operations architecture test project and
   the complete `MeAndAI.Operations.Packaging.Tests` project, including
   [TEST-0193](../FEAT-0059-csharp-operational-foundation/test-cases.md#test-0193),
@@ -382,8 +412,9 @@ For each package and the final cohort record:
 - estimated savings versus four package-level hosted pushes, plus any observed
   consistency or traceability loss.
 
-The final [TEST-0212](test-cases.md#test-0212) completion claim requires the
+The final [SUBF-0145](README.md#subf-0145) cohort completion claim requires the
 `EA-CONVERGE-01` audit, final record synchronization, remote-equal exact-head
-Ubuntu/Windows green, and no unresolved B/I/M. It does not imply feature merge,
-release, publication, consumer activation, or [SUBF-0146](README.md#subf-0146)
-implementation.
+Ubuntu/Windows green, and no unresolved B/I/M. It does not claim
+[TEST-0212](test-cases.md#test-0212) completion while that scenario remains
+`Planned`; nor does it imply feature merge, release, publication, consumer
+activation, or [SUBF-0146](README.md#subf-0146) implementation.

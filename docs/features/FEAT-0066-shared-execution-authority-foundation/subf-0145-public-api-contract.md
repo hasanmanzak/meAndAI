@@ -3,7 +3,8 @@
 | Field | Value |
 | --- | --- |
 | Classification | Normative API appendix to the [selected design](subf-0145-authority-grant-activation-design.md) |
-| Status | `DesignFreezeCandidate`; no implementation active |
+| Status | `DesignCorrectionCandidate`; grant production paused after canonical red |
+| Correction | Independent expected lease/fence coordinates plus exact unapproved/missing grant-store mapping; no inventory, rejection, FQN, order, package identity/order/budget, or ownership change |
 | Parent | [FEAT-0066](README.md) |
 | Test | [TEST-0212](test-cases.md#test-0212) |
 | Values/errors | [Exact value and error contract](subf-0145-value-error-contract.md) |
@@ -505,6 +506,7 @@ public sealed class GrantValidationRequest : IEquatable<GrantValidationRequest>
     public ExecutionTarget ExpectedTarget { get; }
     public AuthorityOperationId ExpectedOperation { get; }
     public GrantGeneration ExpectedGeneration { get; }
+    public LeaseFenceBinding ExpectedLeaseFence { get; }
     public ExecutionGrantBinding ExpectedBinding { get; }
     public AuthorityActorId ExecutingActor { get; }
     public DateTimeOffset ObservedAtUtc { get; }
@@ -512,6 +514,7 @@ public sealed class GrantValidationRequest : IEquatable<GrantValidationRequest>
         ExecutionGrant grant, ExecutionCapability requiredCapability,
         ExecutionSubject expectedSubject, ExecutionTarget expectedTarget,
         AuthorityOperationId expectedOperation, GrantGeneration expectedGeneration,
+        LeaseFenceBinding expectedLeaseFence,
         ExecutionGrantBinding expectedBinding, AuthorityActorId executingActor,
         DateTimeOffset observedAtUtc);
 }
@@ -609,11 +612,13 @@ public sealed class ExtensionActivationCommand : IEquatable<ExtensionActivationC
     public ExtensionActivationRecord ExpectedCurrent { get; }
     public AuthorityDigest TransitionEvidenceDigest { get; }
     public ExecutionGrant Grant { get; }
+    public LeaseFenceBinding ExpectedLeaseFence { get; }
     public ExtensionActivationRecord Proposed { get; }
     public static ExtensionActivationCommand Create(
         ExtensionActivationRecord expectedCurrent,
         AuthorityDigest transitionEvidenceDigest,
         ExecutionGrant grant,
+        LeaseFenceBinding expectedLeaseFence,
         ExtensionActivationRecord proposed);
 }
 
@@ -691,8 +696,14 @@ public interface IExecutionAuthorityMutationPort : IProviderMutationPort
 
 - The grant journal store occurs exactly once in the protected authority
   snapshot's approved nonempty store list. The public use cases resolve its
-  current head through the read port; callers cannot supply that head. Grant
-  and lease generations are equal. UTC timestamps satisfy
+  current head through the read port; callers cannot supply that head. An
+  unapproved store or null resolved head is `GrantStoreDrift` with no mutation.
+  `GrantValidationRequest` and `ExtensionActivationCommand` carry independent
+  expected lease/fence coordinates. Any inequality among grant generation,
+  grant lease generation, expected generation, and expected lease generation
+  is `GenerationMismatch`; only after equality, owner or fencing-token
+  inequality is `LeaseFenceMismatch`. Factories preserve these constructible
+  mismatch states. UTC timestamps satisfy
   `IssuedAtUtc <= NotBeforeUtc < ExpiresAtUtc`; authorization is valid exactly
   when `NotBeforeUtc <= ObservedAtUtc < ExpiresAtUtc`.
 - Mandatory approval-role floors are: `evidence.read` -> `EnvelopeReviewer`;
@@ -735,11 +746,17 @@ public interface IExecutionAuthorityMutationPort : IProviderMutationPort
   `GenerationMismatch`; owner/fence -> `LeaseFenceMismatch`; capability ->
   `CapabilityMismatch`; typed binding or any binding field ->
   `BindingMismatch`; early observation -> `NotYetValid`; expiry edge or later ->
-  `Expired`; consumed grant ID or idempotency -> `Replayed`; grant-store head ->
-  `GrantStoreDrift`. The distinct `ExtensionActivationService` order and its
+  `Expired`. After those ordinary checks, an unapproved journal store or null
+  resolved head is a pre-mutation `GrantStoreDrift`. For an approved store with
+  a non-null resolved head, the atomic mutation orders consumed grant ID or
+  idempotency -> `Replayed` before post-read grant-store head drift ->
+  `GrantStoreDrift`.
+  The distinct `ExtensionActivationService` order and its
   activation-only rejections are frozen in the
   [value/error appendix](subf-0145-value-error-contract.md#exact-activation-equality-and-rejection-ownership).
 - The authorizer always resolves the protected snapshot itself, validates, and
+  rejects an unapproved journal store or null resolved head without mutation,
+  then
   asks the mutation port to atomically compare that exact authority binding,
   the grant-store head, grant ID, and idempotency key while consuming. The
   activation service separately re-reads the protected authority snapshot and
