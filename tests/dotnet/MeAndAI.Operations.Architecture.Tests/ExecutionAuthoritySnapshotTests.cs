@@ -6,7 +6,7 @@ public sealed class ExecutionAuthoritySnapshotTests
 {
     private static readonly AuthorityRole[] Roles = [AuthorityRole.ProposalActor, AuthorityRole.EnvelopeReviewer, AuthorityRole.FinalPlanReviewer, AuthorityRole.GrantIssuer, AuthorityRole.Executor];
     [Fact]
-    [Trait("Scenario", "TEST-0212")]
+    [Trait("Subfeature", "SUBF-0145")]
     public void TEST_0212_snapshot_and_role_separation_are_exact()
     {
         List<AuthoritySetMember> members = DistinctMembers();
@@ -50,7 +50,7 @@ public sealed class ExecutionAuthoritySnapshotTests
         Assert.Equal(binding, AuthoritySetBinding.From(equivalent));
     }
     [Fact]
-    [Trait("Scenario", "TEST-0212")]
+    [Trait("Subfeature", "SUBF-0145")]
     public void TEST_0212_scalar_values_are_canonical_and_closed()
     {
         AuthorityActorId actor = AuthorityActorId.Parse("actor.alpha-2");
@@ -101,7 +101,7 @@ public sealed class ExecutionAuthoritySnapshotTests
         Assert.Throws<FormatException>(() => AuthorityRole.Parse("reader"));
     }
     [Fact]
-    [Trait("Scenario", "TEST-0212")]
+    [Trait("Subfeature", "SUBF-0145")]
     public void TEST_0212_snapshot_rejects_incomplete_or_ambiguous_authority()
     {
         ArgumentException missingRole = Assert.Throws<ArgumentException>(() =>
@@ -140,7 +140,7 @@ public sealed class ExecutionAuthoritySnapshotTests
                 [AuthorityRole.Executor])).ParamName);
     }
     [Fact]
-    [Trait("Scenario", "TEST-0212")]
+    [Trait("Subfeature", "SUBF-0145")]
     public void TEST_0212_solo_maintainer_exception_is_exact_and_pair_scoped()
     {
         AuthorityActorId solo = AuthorityActorId.Parse("actor.solo");
@@ -186,7 +186,7 @@ public sealed class ExecutionAuthoritySnapshotTests
                 ])).ParamName);
     }
     [Fact]
-    [Trait("Scenario", "TEST-0212")]
+    [Trait("Subfeature", "SUBF-0145")]
     public void TEST_0212_approval_floors_and_solo_crossings_fail_closed()
     {
         (string Kind, AuthorityRole[] Floor)[] floors =
