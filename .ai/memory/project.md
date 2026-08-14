@@ -1,6 +1,6 @@
 # Project Snapshot
 
-Last verified: **2026-08-13**
+Last verified: **2026-08-14**
 
 ## Verified facts
 
@@ -155,7 +155,7 @@ Last verified: **2026-08-13**
   Ubuntu in `20m44s` and Windows in `46m51s`; publication verification was
   correctly skipped. The exact lifecycle implementation identity recorded in
   the canonical handoff passed Ubuntu in `19m36s` and Windows in `36m02s`; publication verification was
-  correctly skipped. ContractSlice A-D are merged and exact-main green at `A32/B11/C11/D11`, cumulative/full Conformance `65/65`, Domain `98/98`, and API/ownership `15/15`. The final [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) atomic activation is `ReviewedLocalGreen`: Scenario and ContractSlice each pass the same `65/65` FQNs and the combined route is `163/163`; its exact-head hosted implementation gate is pending. Feature completion/DoD, merge, release, and publication remain held. Follow the current [canonical log index](log/README.md). The
+  correctly skipped. ContractSlice A-D and the final [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) atomic activation are merged and exact-main hosted green at `A32/B11/C11/D11`, cumulative/full Conformance `65/65`, Domain `98/98`, API/ownership `15/15`, Scenario/ContractSlice `65/65`, and combined `163/163`. [SUBF-0144](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0144) is `FrozenDesign` with fresh reviews and local StructureOnly/graph/publication gates green; implementation remains inactive pending exact design-head hosted green. [TEST-0211](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0211), feature completion/DoD, release, and publication remain held. Follow the current [canonical log index](log/README.md). The
   predecessor-manifest exact-head hosted-green handoff indexed there is
   immutable history; the admission-proof reviewed-local-green handoff,
   the selector reviewed-local-green handoff in the canonical log index,

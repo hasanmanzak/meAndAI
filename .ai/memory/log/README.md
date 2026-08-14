@@ -13,20 +13,22 @@ open Definition of Ready items, and the ContractSlice-C-first merge order. It
 does not change the active continuation or authorize implementation.
 
 Follow the current
+[design handoff](2026-08-14-feat-0065-subf-0144-design-freeze.md).
+The immutable
 [ContractSlice D design freeze](2026-08-13-feat-0065-subf-0143-contractslice-d-design-freeze.md)
-for immutable D design custody and the current
-[final atomic activation freeze](2026-08-14-feat-0065-subf-0143-test-0210-final-activation-freeze.md).
-ContractSlice A, B, and C are merged/exact-main green; C is `11/11`, and
-A+B+C/full Conformance is `54/54`. The linked handoff owns exact C closure and
-the records-only D cohort/package freeze. D design delivery is exact-head hosted
-green and maintainer accepted. Policy activation, real producer infrastructure,
-the first-rules cohort, and the specialized-rules cohort are exact-head hosted
-green. ContractSlice D is merged and exact-main green at `11/11`; cumulative
-A-D/full Conformance is `65/65`, Domain is `98/98`, and API/ownership is
-`15/15`. The [TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) final atomic activation is `ReviewedLocalGreen`: Scenario and
-ContractSlice each pass the same `65/65` FQNs and the combined route is
-`163/163`; its exact-head hosted implementation gate is pending. Feature
-completion/DoD, merge, release, and publication remain held.
+and
+[final atomic activation freeze](2026-08-14-feat-0065-subf-0143-test-0210-final-activation-freeze.md)
+retain exact predecessor custody.
+ContractSlice A-D and the final
+[TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
+atomic activation are immutable merged/exact-main-hosted-green predecessor
+evidence at full Conformance `65/65`, Domain `98/98`, API/ownership `15/15`,
+Scenario/ContractSlice `65/65`, and combined `163/163`. The current handoff owns
+the frozen extension/waiver/debt/self-consumption design with fresh reviews
+`0/0/0` and keeps implementation inactive pending local StructureOnly/graph/
+publication gates plus exact design-head hosted green.
+[TEST-0211](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0211), feature
+completion/DoD, release, and publication remain held.
 
 In parallel, the optional repository-navigation direction is captured as a
 records-only
