@@ -6,7 +6,7 @@
 | Parent epic | [EPIC-0002 / issue #163](https://github.com/hasanmanzak/meAndAI/issues/163) |
 | Architecture task | [TASK-0003 / issue #164](https://github.com/hasanmanzak/meAndAI/issues/164) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
-| Current authority | ContractSlice A, B, and C are merged/exact-main green; C is `11/11`. D predecessor cohorts are `ExactHeadHostedGreen`; final equivalence/closure cohort is local `3/3` with D-CONVERGE `ReviewedLocalGreen`; D is `11/11` and A+B+C+D/full Conformance is `65/65`. One final-cohort push and exact-head hosted CI remain pending. Final D activation, merge, release, and publication remain held. |
+| Current authority | ContractSlice A-D are merged and exact-main green at cumulative/full Conformance `65/65`. The final [TEST-0210](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) atomic-activation design is `FrozenDesign`/inactive pending its records-only exact-head hosted gate and maintainer acceptance. Scenario activation, completion/DoD, merge, release, and publication remain held. |
 
 This plan allocates the accepted architecture to stable delivery records. It
 did not itself authorize implementation. The later

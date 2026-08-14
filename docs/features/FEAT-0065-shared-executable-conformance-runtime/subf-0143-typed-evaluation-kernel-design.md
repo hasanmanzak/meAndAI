@@ -3,14 +3,14 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted; ContractSlice A, B, and C are merged/exact-main green. D predecessor cohorts are `ExactHeadHostedGreen`; the final equivalence/closure cohort is local `3/3` with D-CONVERGE `ReviewedLocalGreen`. D is `11/11` and cumulative A+B+C+D/full Conformance is `65/65`; one final-cohort push and exact-head hosted CI remain pending. [TEST-0210](test-cases.md#test-0210) remains `Planned`; final activation and DoD remain held. |
+| Status | Gate 2 accepted; ContractSlice A-D are merged and exact-main green at `A32/B11/C11/D11`, cumulative/full Conformance `65/65`. [TEST-0210](test-cases.md#test-0210) remains `Planned`; its final atomic-activation design is `FrozenDesign`/inactive pending the records-only exact-head hosted gate and maintainer acceptance. Implementation, activation, and DoD remain held. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Test | [TEST-0210](test-cases.md#test-0210) |
-| Gate 3 micro-delivery routing | Historical A, B, and C delivery remains owned by their micro plans. Current prospective routing is the [ContractSlice D micro-delivery plan](subf-0143-contractslice-d-micro-delivery-plan.md); packet labels refine delivery but activate no executable work. |
+| Gate 3 micro-delivery routing | Historical A-D delivery remains owned by its micro plans and merged PR evidence. Current prospective routing is the final atomic-activation freeze below; it activates no executable work before the design checkpoint is exact-head hosted green and accepted. |
 | Exact-main design baseline | Accepted A merge commit [`51623f4d404a95e0f706d72805cf7ddbbbd293b8`](https://github.com/hasanmanzak/meAndAI/commit/51623f4d404a95e0f706d72805cf7ddbbbd293b8), validated by exact-main [run 31304787603](https://github.com/hasanmanzak/meAndAI/actions/runs/31304787603) |
-| Design and Gate 3 authority | Historical A/B/C directives, accepted reds, diagnostics, and hosted evidence remain immutable. D predecessor cohorts are `ExactHeadHostedGreen`; the final equivalence/closure cohort is local `3/3` with D-CONVERGE `ReviewedLocalGreen`; one final-cohort push and exact-head hosted CI remain pending, while final activation, merge, release, and publication remain held. |
+| Design and Gate 3 authority | Historical A-D directives, accepted reds, diagnostics, cohort evidence, and exact-main closure remain immutable. Only the records-only final atomic-activation design is current; implementation remains held until its exact-head hosted design gate and maintainer acceptance. Merge, release, publication, and later subfeatures remain held. |
 | Completed predecessor | [SUBF-0153](README.md#subf-0153) / [TEST-0221](test-cases.md#test-0221), merged through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173) and exact-main validated by [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) |
 
 ## Directive and hard boundary
@@ -9542,6 +9542,182 @@ this design.
 Each slice follows its own red/review/green gate after a later implementation
 directive. Do not prewrite all four red groups and then implement one large
 production block.
+
+### [TEST-0210](test-cases.md#test-0210) final atomic activation freeze <a name="test-0210-final-atomic-activation-freeze"></a>
+
+This freeze is records-only and inactive. Its exact parent is commit
+[`fba0180cedb6faa9fb26d57d2279013704b83f38`](https://github.com/hasanmanzak/meAndAI/commit/fba0180cedb6faa9fb26d57d2279013704b83f38), git tree identity: `e182c857a429b33df18b6a3918fcb923a9705955`. ContractSlice A-D are merged and
+exact-main green; the parent Conformance inventory is `65/65` with
+`A32/B11/C11/D11`, Domain is `98/98`, and API/ownership is `15/15`.
+
+The parent `ContractSliceActivationTopologyTests.cs` is `139` lines and has
+SHA-256 `5CD6BE05BC92E68394DF2798D1E44408EB504C9019300A2E01AA922B6BC8A336`.
+Its direct-Fact inventory `E: FQN -> slice` is the following ordinal map. The
+LF plus one terminal LF digest of the FQN column is
+`8128BBC5650119BE7BB5FC07E065E7C638103461CE3B17E84757C05F4523DAB0`;
+the digest of the tab-separated FQN/slice rows with the same framing is
+`DA41D29B689E96B400876016202F2744E14E861C035A50C5CF4129855FE8A436`.
+
+```text
+MeAndAI.Protocol.Conformance.Tests.ContractSliceAAdmissionProofManifestTests.Enforces_admission_proof_declarations_with_exact_kind_component_and_artifact_closure	A
+MeAndAI.Protocol.Conformance.Tests.ContractSliceAArtifactComponentGraphTests.Enforces_exact_binding_runtime_anchor_and_reachability_graph	A
+MeAndAI.Protocol.Conformance.Tests.ContractSliceACanonicalJsonGrammarTests.Enforces_exact_document_and_slice_structural_grammar	A
+MeAndAI.Protocol.Conformance.Tests.ContractSliceACanonicalNumberTests.Enforces_exact_integer_grammar_and_range	A
+MeAndAI.Protocol.Conformance.Tests.ContractSliceACanonicalStringTests.Enforces_exact_canonical_manifest_string_encoding	A
+MeAndAI.Protocol.Conformance.Tests.ContractSliceACompleteCatalogProfileTests.Enforces_exact_provider_profile_genesis_catalog_inventory_digest_and_added_transitions	A
+MeAndAI.Protocol.Conformance.Tests.ContractSliceAFindingManifestTests.Enforces_finding_declarations_with_exact_reference_roles	A
+MeAndAI.Protocol.Conformance.Tests.ContractSliceAFullManifestGraphTests.Full_declaration_graph_equals_the_exact_five_rule_six_artifact_thirty_five_component_snapshot	A
+MeAndAI.Protocol.Conformance.Tests.ContractSliceAGovernedReferenceSlotsManifestTests.Enforces_exact_governed_reference_index_and_dual_governed_text_slot_capability_closure	A
+MeAndAI.Protocol.Conformance.Tests.ContractSliceAIndexSlotManifestTests.Enforces_exact_repository_tree_index_and_slot_capability_closure	A
+MeAndAI.Protocol.Conformance.Tests.ContractSliceALifecycleManifestTests.Enforces_rule_lifecycle_against_transitions_and_active_profiles	A
+MeAndAI.Protocol.Conformance.Tests.ContractSliceAManifestTests.Parses_minimal_canonical_qualification_manifest	A
+MeAndAI.Protocol.Conformance.Tests.ContractSliceAOwnershipTests.DomainExportsEqualTheOrdinalUnionOfPredecessorInventories	A
+MeAndAI.Protocol.Conformance.Tests.ContractSliceAOwnershipTests.EffectiveRestoreGraphsEqualTheContractSliceATotalGraph	A
+MeAndAI.Protocol.Conformance.Tests.ContractSliceAOwnershipTests.FriendAssembliesEqualTheCurrentContractSliceAMatrix	A
+MeAndAI.Protocol.Conformance.Tests.ContractSliceAOwnershipTests.LocksEqualTheContractSliceATotalGraph	A
+MeAndAI.Protocol.Conformance.Tests.ContractSliceAOwnershipTests.PackageReferencesEqualTheContractSliceAGraph	A
+MeAndAI.Protocol.Conformance.Tests.ContractSliceAOwnershipTests.SolutionAndProjectReferencesEqualTheContractSliceAGraph	A
+MeAndAI.Protocol.Conformance.Tests.ContractSliceAParserRecordSlotManifestTests.Enforces_exact_markdown_parser_protocol_record_index_and_slot_capability_closure	A
+MeAndAI.Protocol.Conformance.Tests.ContractSliceAPredecessorManifestTests.Enforces_existing_predecessor_version_and_exact_digests	A
+MeAndAI.Protocol.Conformance.Tests.ContractSliceAProjectorDagManifestTests.Enforces_exact_projector_bindings_and_global_producer_graph	A
+MeAndAI.Protocol.Conformance.Tests.ContractSliceAPublicApiTests.DeclaredPublicSurfaceEqualsTheContractSliceASnapshot	A
+MeAndAI.Protocol.Conformance.Tests.ContractSliceAPublicApiTests.ExportedTypesEqualTheContractSliceAInventories	A
+MeAndAI.Protocol.Conformance.Tests.ContractSliceAPublicApiTests.FriendAssembliesEqualTheCurrentContractSliceAAllowlist	A
+MeAndAI.Protocol.Conformance.Tests.ContractSliceAPublicApiTests.PublicTypesHaveNoConstructionOrSerializationLeak	A
+MeAndAI.Protocol.Conformance.Tests.ContractSliceAPublicApiTests.StagedExportsExposeOnlyTheContractSliceASeam	A
+MeAndAI.Protocol.Conformance.Tests.ContractSliceAResourceManifestTests.Enforces_exact_manifest_byte_reachable_depth_and_token_ceilings	A
+MeAndAI.Protocol.Conformance.Tests.ContractSliceARuleDeclarationTests.Enforces_canonical_multi_fragment_rule_provenance	A
+MeAndAI.Protocol.Conformance.Tests.ContractSliceASchemaSlotManifestTests.Enforces_exact_schema_and_zero_capability_evidence_slot_closure	A
+MeAndAI.Protocol.Conformance.Tests.ContractSliceASelectorManifestTests.Enforces_expected_selectors_with_exact_slot_schema_resolver_and_finding_closure	A
+MeAndAI.Protocol.Conformance.Tests.ContractSliceATargetParserIndexSlotManifestTests.Enforces_exact_repository_target_schema_parser_index_and_slot_capability_closure	A
+MeAndAI.Protocol.Conformance.Tests.ContractSliceATransitionManifestTests.Enforces_exact_unchanged_added_revised_and_retired_transition_shapes	A
+MeAndAI.Protocol.Conformance.Tests.ContractSliceActivationTopologyTests.Matches_exact_contract_slice_scenario_inventory	D
+MeAndAI.Protocol.Conformance.Tests.ContractSliceBActivationTests.Activates_exact_codec_mirror	B
+MeAndAI.Protocol.Conformance.Tests.ContractSliceBAdmissionProofTests.Admits_exact_observed_failed_and_no_input_proofs	B
+MeAndAI.Protocol.Conformance.Tests.ContractSliceBDecodeModelCacheTests.Enforces_exact_codec_cache_single_flight_collision_and_eviction	B
+MeAndAI.Protocol.Conformance.Tests.ContractSliceBGovernedTextCodecTests.Round_trips_exact_governed_text_wire	B
+MeAndAI.Protocol.Conformance.Tests.ContractSliceBOwnershipTests.Enforces_exact_friend_factory_and_negative_surface	B
+MeAndAI.Protocol.Conformance.Tests.ContractSliceBPublicApiTests.Matches_exact_cumulative_b_public_surface	B
+MeAndAI.Protocol.Conformance.Tests.ContractSliceBQualifiedReferenceTests.Seals_exact_codec_derived_reference_and_location_narrowing	B
+MeAndAI.Protocol.Conformance.Tests.ContractSliceBRepositoryTargetCodecTests.Round_trips_exact_repository_target_resolution_wire	B
+MeAndAI.Protocol.Conformance.Tests.ContractSliceBRepositoryTreeCodecTests.Round_trips_exact_repository_tree_wire	B
+MeAndAI.Protocol.Conformance.Tests.ContractSliceBResourceLedgerTests.Enforces_exact_codec_local_four_counter_ledger	B
+MeAndAI.Protocol.Conformance.Tests.ContractSliceBSealedContextTests.Seals_exact_context_proof_and_root_references	B
+MeAndAI.Protocol.Conformance.Tests.ContractSliceCActivationTests.Activates_exact_synthetic_registration_graph	C
+MeAndAI.Protocol.Conformance.Tests.ContractSliceCAggregationTests.Aggregates_exact_catalog_evaluation_and_verdict	C
+MeAndAI.Protocol.Conformance.Tests.ContractSliceCApplicabilityClosureTests.Closes_applicability_with_exact_terminal_shapes	C
+MeAndAI.Protocol.Conformance.Tests.ContractSliceCApplicabilityPlanTests.Plans_exact_static_applicability_instructions	C
+MeAndAI.Protocol.Conformance.Tests.ContractSliceCEvaluationAdvanceTests.Advances_owner_sharded_evaluation_to_closure	C
+MeAndAI.Protocol.Conformance.Tests.ContractSliceCEvaluationPlanTests.Plans_exact_projected_evaluation_round	C
+MeAndAI.Protocol.Conformance.Tests.ContractSliceCIntentTests.Mints_exact_intents_findings_and_failures	C
+MeAndAI.Protocol.Conformance.Tests.ContractSliceCOwnershipTests.Retains_exact_friend_project_and_policy_ownership_boundary	C
+MeAndAI.Protocol.Conformance.Tests.ContractSliceCProducerPipelineTests.Activates_and_orders_exact_six_family_producer_graph	C
+MeAndAI.Protocol.Conformance.Tests.ContractSliceCRegistrationTests.Rejects_registration_mismatch_without_kernel_activation	C
+MeAndAI.Protocol.Conformance.Tests.ContractSliceCStructuralTests.Matches_exact_cumulative_c_public_surface	C
+MeAndAI.Protocol.Conformance.Tests.ContractSliceDOwnershipTests.Enforces_exact_policy_friend_and_negative_surface	D
+MeAndAI.Protocol.Conformance.Tests.ContractSliceDPolicyEvaluatorTests.Evaluates_rule_0001_against_fresh_qualified_fixture	D
+MeAndAI.Protocol.Conformance.Tests.ContractSliceDPolicyEvaluatorTests.Evaluates_rule_0002_against_fresh_qualified_fixture	D
+MeAndAI.Protocol.Conformance.Tests.ContractSliceDPolicyEvaluatorTests.Evaluates_rule_0003_with_exact_target_specialization_and_co_report	D
+MeAndAI.Protocol.Conformance.Tests.ContractSliceDPolicyEvaluatorTests.Evaluates_rule_0004_with_exact_fragment_specialization_and_co_report	D
+MeAndAI.Protocol.Conformance.Tests.ContractSliceDPolicyEvaluatorTests.Evaluates_rule_0005_with_exact_commit_specialization_and_co_report	D
+MeAndAI.Protocol.Conformance.Tests.ContractSliceDPolicyExportTests.Exports_exact_real_registration_graph	D
+MeAndAI.Protocol.Conformance.Tests.ContractSliceDProducerInfrastructureTests.Activates_exact_real_codec_parser_index_projector_selector_evaluator_graph	D
+MeAndAI.Protocol.Conformance.Tests.ContractSliceDRepositoryProviderEquivalenceTests.Produces_equivalent_results_from_fresh_repository_and_provider_fixtures	D
+MeAndAI.Protocol.Conformance.Tests.ContractSliceDStructuralTests.Matches_exact_final_cumulative_public_surface	D
+```
+
+The parent warning-as-error Release build is `0 warnings / 0 errors`. A fresh
+ContractSlice-union run selected, discovered, executed, and passed exactly the
+`65` `E.Keys`, with failed/skipped `0/0`; its TRX is `102971` bytes with
+SHA-256 `65DF99326F325C43E1783BA11CD3A2E365EDE47DBE16D70F79D784C54CEFBE96`.
+No direct target-Scenario trait exists in the parent. This is parent
+custody, not activation evidence.
+
+The activation candidate has one unpublished atomic mutation boundary:
+
+1. In exactly the existing `49` tracked Conformance test source files that
+   directly declare the `65` rows of `E`, add one and only one direct
+   Scenario trait whose value is the canonical [TEST-0210](test-cases.md#test-0210)
+   identity to each `E` method. Keep every existing
+   Fact, method body, FQN, ContractSlice trait, class trait, and slice mapping
+   byte-semantically unchanged, except for the verifier oracle in item 2.
+2. In `ContractSliceActivationTopologyTests.cs`, retain the direct Fact, FQN,
+   `E`, and `ContractSlice=D`; replace only the planned-phase empty-scenario
+   assertions with exact activated-phase equality: each row has one direct
+   Scenario value equal to [TEST-0210](test-cases.md#test-0210), no class Scenario,
+   and the Scenario identity set
+   equals `E.Keys` exactly. The verifier itself is included in that equality.
+3. In `tests/scenario-ownership.psd1`, remove only
+   [TEST-0210](test-cases.md#test-0210) from the owning feature's
+   `PlannedDocumentation` list and add exactly one `DotNetTestProject`
+   authority owned by
+   `tests/dotnet/MeAndAI.Protocol.Conformance.Tests/MeAndAI.Protocol.Conformance.Tests.csproj`.
+   The other three owning-feature scenarios remain planned.
+4. In both `linux-validation` and `windows-validation`, retain the stable job,
+   shell, Full-route condition, Operations restore/test, package, and all later
+   steps. Retain the protocol restore command. Change only the protocol test
+   step from `run: >-` to `run: |`, target it at `MeAndAI.Protocol.slnx`, and
+   use the exact filter below. Each stable job still has exactly two restore
+   CLI invocations and two test CLI invocations in total, including exactly one
+   Protocol solution restore and exactly one Protocol solution test.
+5. Update the existing [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
+   executable assertion atomically: require the
+   protocol solution target once for restore and once for test, the protocol
+   test's literal run block and exact filter, no Domain-project test target,
+   exactly one deliberate Domain testhost and one Conformance testhost, and no
+   new job, shell, command, retry, `continue-on-error`, or alternate route.
+6. Synchronize only the existing twelve feature/architecture/test/memory
+   records used by this freeze. Update the owning freeze ledger in place; add no
+   thirteenth record or new stable scenario/test identifier.
+
+The exact protocol test command in each stable job is:
+
+```text
+dotnet test MeAndAI.Protocol.slnx --configuration Release --no-restore --nologo --verbosity minimal --filter "<frozen-filter>"
+```
+
+`<frozen-filter>` is the following terms joined in this exact order by one
+literal `|` and no whitespace: [Scenario=TEST-0220](test-cases.md#test-0220),
+[Scenario=TEST-0221](test-cases.md#test-0221),
+[Scenario=TEST-0210](test-cases.md#test-0210), `ContractSlice=A`,
+`ContractSlice=B`, `ContractSlice=C`, `ContractSlice=D`, and
+`FullyQualifiedName=MeAndAI.Protocol.Conformance.Tests.ContractSliceActivationTopologyTests.Matches_exact_contract_slice_scenario_inventory`.
+
+No production source, non-verifier test body, Fact/Theory/method/FQN, `E` row,
+ContractSlice trait, project/package/lock/restore graph, generated file,
+workflow job/shell, unrelated ownership entry, consumer, Scenario status/owner
+outside the target scenario, runtime-efficiency scope outside the exact route,
+or later subfeature
+may change. The NCrunch user file is excluded and must never be staged.
+
+Before mutation, the candidate re-proves exact parent HEAD/tree/status, source
+hash, `E` digests/counts, one direct non-skipped Fact per row, no Theory,
+one exact slice, no class traits, and zero target-Scenario traits. After the
+single atomic mutation it must prove:
+
+- ContractSlice union selected=discovered=executed=passed `65`,
+  failed=skipped `0`, and FQNs/digest exactly `E.Keys`;
+- [Scenario=TEST-0210](test-cases.md#test-0210) has the identical `65` FQNs/digest, with one direct
+  target Scenario trait per row and no foreign Scenario identity;
+- the topology verifier is focused green `1/1`;
+- the combined Protocol solution route is `163/163`, split as Conformance
+  `65` and Domain `98`, with failed/skipped `0/0`;
+- full Conformance `65/65`, Domain `98/98`, and API/ownership `15/15`;
+- warning-as-error Release build, format, diff, six frozen locks, ownership,
+  StructureOnly/graph, the linked runtime-efficiency contract, and publication evidence `7/7` with no
+  publication claim;
+- unchanged source except the exact allowlist, exact workflow topology and
+  command cardinalities, and two independent fresh-diff design/evidence/
+  traceability reviews at `0/0/0`.
+
+The design checkpoint must be committed and pushed as records-only, then pass
+Ubuntu and Windows at its exact head with publication skipped. Only after that
+hosted gate and explicit maintainer acceptance may implementation begin. A
+green implementation yields [TEST-0210](test-cases.md#test-0210) activation only after its own complete
+local gates, single focused commit/push, and exact-head hosted green. Until
+then [TEST-0210](test-cases.md#test-0210) is `Planned`; feature completion/DoD,
+[SUBF-0144](README.md#subf-0144)/[SUBF-0154](README.md#subf-0154),
+consumer work, merge, release, and publication remain held.
 
 ### Required [TEST-0210](test-cases.md#test-0210) groups
 
