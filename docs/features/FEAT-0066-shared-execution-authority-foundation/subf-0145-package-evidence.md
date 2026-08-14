@@ -47,3 +47,24 @@ cannot embed its own content-addressed SHA without changing that SHA.
 | Local commit | The focused commit containing this row; exact SHA is emitted after creation and reconciled at `EA-CONVERGE-01` |
 | Hosted / correction cost | Package push is prohibited; package hosted duration/errors are `N/A`. Design correction hosted errors `0`; its implementation-ownership identification and correction cost remain design-cohort evidence, not package hosted evidence |
 | Cohort efficiency | Hosted-push savings deferred to cohort measurement; no consistency or traceability loss observed locally |
+
+## `EA-PUBLICATION-ENVELOPE-01`
+
+| Field | Evidence |
+| --- | --- |
+| Status | `ReviewedLocalGreen`; fresh independent code/security review `0 Blocking / 0 Important / 0 Minor` |
+| Local elapsed | `00:11:30` from canonical R artifact creation through final code review and exact-current local gates; package record sync followed |
+| Canonical R | `MeAndAI.Operations.Architecture.Tests.PublicationEnvelopeContractTests.TEST_0212_envelope_binds_sealed_report_and_publication_grant`; one invocation, `1` failed / `0` passed, exact [`TEST-0212-PUBLICATION-RED-0003`](test-cases.md#test-0212) absence only; never rerun |
+| R source SHA-256 | `15A773A6B5680DC530C0FE0762C2B347CB23F01619742E3939A2688BC9A8405B` |
+| R TRX SHA-256 | `A09C6D073ECF7391646E7CF8CD6233A7BB8AABAC85BF30DC610DAEA1007EB4F2` |
+| Focused | Immutable original absence oracle stayed source-hash equal and passed exactly once post-product `1/1` in `2.486s`; transformed typed exact FQN passed `1/1` in `4.456s` |
+| Slice cumulative | [Subfeature=SUBF-0145](README.md#subf-0145) passed `19/19` in `4.184s`; no [Scenario=TEST-0212](test-cases.md#test-0212) trait or completion claim |
+| Operational cumulative | Architecture [TEST-0191](../FEAT-0059-csharp-operational-foundation/test-cases.md#test-0191), [TEST-0192](../FEAT-0059-csharp-operational-foundation/test-cases.md#test-0192), plus [Subfeature=SUBF-0145](README.md#subf-0145) passed `50/50` in `4.324s`; Packaging [TEST-0193](../FEAT-0059-csharp-operational-foundation/test-cases.md#test-0193) passed `17/17` in `3.288s` |
+| Release build | Solution passed with `0` warnings / `0` errors in `1.785s` |
+| Format / structural | Format/analyzers green; diff clean; exact two new files plus incremental public-API test and this ledger heading; marker residue `0`; exact FQN `1`; [Scenario=TEST-0212](test-cases.md#test-0212) traits `0`; [Subfeature=SUBF-0145](README.md#subf-0145) traits `19`; exact public API/nullability/member inventory green |
+| Budgets | Production `68/350`; tests `207/450`; combined `275/750`; largest file `204/500` |
+| Locks | All `17` tracked lock inputs byte-equal to accepted-design HEAD [8616aa1f4fe198b666b3abf5934b31e80d9498b8](https://github.com/hasanmanzak/meAndAI/commit/8616aa1f4fe198b666b3abf5934b31e80d9498b8) |
+| Review disposition | Code/security pass 1 `0/1/0`: field-by-field equality matrix added. Fresh code/security pass 2 `0/0/0`; fresh evidence/traceability review `0/0/0` |
+| Local commit | The focused commit containing this row; exact SHA is emitted after creation and reconciled at `EA-CONVERGE-01` |
+| Hosted / correction cost | Not run for a package by design; duration, hosted errors, owner-identification time, correction and revalidation cost are `N/A` |
+| Cohort efficiency | Hosted-push savings deferred to cohort measurement; no consistency or traceability loss observed locally |

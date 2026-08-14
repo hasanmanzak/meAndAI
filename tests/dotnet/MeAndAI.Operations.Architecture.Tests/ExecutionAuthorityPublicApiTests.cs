@@ -120,6 +120,7 @@ public sealed class ExecutionAuthorityPublicApiTests
         AssertProperties<GrantValidationRequest>(new("ExecutingActor", typeof(AuthorityActorId)), new("ExpectedBinding", typeof(ExecutionGrantBinding)), new("ExpectedGeneration", typeof(GrantGeneration)), new("ExpectedLeaseFence", typeof(LeaseFenceBinding)), new("ExpectedOperation", typeof(AuthorityOperationId)), new("ExpectedSubject", typeof(ExecutionSubject)), new("ExpectedTarget", typeof(ExecutionTarget)), new("Grant", typeof(ExecutionGrant)), new("ObservedAtUtc", typeof(DateTimeOffset)), new("RequiredCapability", typeof(ExecutionCapability)));
         AssertProperties<GrantConsumptionRequest>(new("ExpectedCurrentAuthoritySet", typeof(AuthoritySetBinding)), new("ExpectedStoreHead", typeof(AuthorityDigest)), new("Validation", typeof(GrantValidationRequest)));
         AssertProperties<ExecutionGrantDecision>(new("IsAuthorized", typeof(bool)), new("Rejection", typeof(ExecutionGrantRejection)));
+        AssertProperties<PublicationEnvelope>(new("AllowedEffectIdentity", typeof(string)), new("AuthoritySet", typeof(AuthoritySetBinding)), new("Digest", typeof(AuthorityDigest)), new("GateSnapshotIdentity", typeof(string)), new("IdempotencyKey", typeof(IdempotencyKey)), new("ProviderTarget", typeof(ExecutionTarget)), new("PublicationGrantDigest", typeof(AuthorityDigest)), new("ResultName", typeof(string)), new("SealedReportDigest", typeof(AuthorityDigest)));
         AssertProperties<ExecutionGrantAuthorizer>();
 
         AssertIdentityApi<AuthorityGrantId>(); AssertIdentityApi<AuthorityOperationId>(); AssertIdentityApi<IdempotencyKey>();
@@ -139,6 +140,7 @@ public sealed class ExecutionAuthorityPublicApiTests
         AssertFactory<GrantConsumptionRequest>("Create", typeof(GrantConsumptionRequest), [typeof(GrantValidationRequest), typeof(AuthoritySetBinding), typeof(AuthorityDigest)], ["validation", "expectedCurrentAuthoritySet", "expectedStoreHead"]);
         AssertFactory<ExecutionGrantDecision>("Authorized", typeof(ExecutionGrantDecision), [], []);
         AssertFactory<ExecutionGrantDecision>("Rejected", typeof(ExecutionGrantDecision), [typeof(ExecutionGrantRejection)], ["rejection"]);
+        AssertFactory<PublicationEnvelope>("Create", typeof(PublicationEnvelope), [typeof(ExecutionGrant), typeof(AuthorityDigest)], ["publicationGrant", "digest"]);
         AssertFactory<ExecutionGrantAuthorizer>("Create", typeof(ExecutionGrantAuthorizer), [typeof(IExecutionAuthorityReadPort), typeof(IExecutionAuthorityMutationPort)], ["readPort", "mutationPort"]);
         AssertFactory<ExecutionGrantAuthorizer>("AuthorizeAndConsumeAsync", typeof(ValueTask<ExecutionGrantDecision>), [typeof(GrantValidationRequest), typeof(CancellationToken)], ["request", "cancellationToken"], isStatic: false);
 
@@ -152,6 +154,7 @@ public sealed class ExecutionAuthorityPublicApiTests
         AssertGrantBindingSurface<PlanGrantBinding>(); AssertGrantBindingSurface<ReadGrantBinding>();
         AssertGrantBindingSurface<PublicationGrantBinding>(); AssertGrantBindingSurface<ExtensionActivationGrantBinding>();
         AssertGrantValueSurface<ExecutionGrant>(); AssertGrantValueSurface<GrantValidationRequest>(); AssertGrantValueSurface<GrantConsumptionRequest>();
+        AssertGrantValueSurface<PublicationEnvelope>();
         AssertGrantSurface<ExecutionGrantDecision>(typeof(object), [typeof(IEquatable<ExecutionGrantDecision>)], false, "Authorized", "Equals", "Equals", "GetHashCode", "Rejected");
         AssertGrantSurface<ExecutionGrantAuthorizer>(typeof(object), [], false, "AuthorizeAndConsumeAsync", "Create");
     }
