@@ -18,6 +18,7 @@ public sealed class ContractSliceCActivationTests
 
     [Fact]
     [Trait("ContractSlice", "C")]
+    [Trait("Scenario", "TEST-0210")]
     public void Activates_exact_synthetic_registration_graph()
     {
         var fixture = CreateFixture();

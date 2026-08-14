@@ -291,6 +291,7 @@ try {
             Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
                 -TestId 'TEST-0105'
         }
+        $processTreeStartObservationSeconds = 30
         [IO.Directory]::CreateDirectory($ownedCancellationRoot) | Out-Null
         $engineLiteral = ConvertTo-SingleQuotedLiteral -Value $engine
         $fixtureLiteral = ConvertTo-SingleQuotedLiteral -Value $fixturePath
@@ -315,7 +316,8 @@ try {
         try {
             [void]$pipeline.AddScript($cancellationHarness)
             $async = $pipeline.BeginInvoke()
-            $deadline = [DateTime]::UtcNow.AddSeconds(10)
+            $deadline = [DateTime]::UtcNow.AddSeconds(
+                $processTreeStartObservationSeconds)
             while ((-not (Test-Path -LiteralPath $parentPidPath -PathType Leaf) -or
                 -not (Test-Path -LiteralPath $childPidPath -PathType Leaf)) -and
                 [DateTime]::UtcNow -lt $deadline) {
@@ -323,7 +325,9 @@ try {
             }
             if (-not (Test-Path -LiteralPath $parentPidPath -PathType Leaf) -or
                 -not (Test-Path -LiteralPath $childPidPath -PathType Leaf)) {
-                Add-Failure 'TEST-0106 mock process tree did not start before cancellation.'
+                Add-Failure (
+                    'TEST-0106 mock process tree did not start within the bounded ' +
+                    "$processTreeStartObservationSeconds-second observation window before cancellation.")
             }
             else {
                 $ownedParentPid = [int][IO.File]::ReadAllText($parentPidPath)

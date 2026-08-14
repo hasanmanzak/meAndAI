@@ -183,6 +183,11 @@
             TestIds = @('TEST-0220', 'TEST-0221')
         }
         @{
+            Evidence = 'DotNetTestProject'
+            Owner = 'tests/dotnet/MeAndAI.Protocol.Conformance.Tests/MeAndAI.Protocol.Conformance.Tests.csproj'
+            TestIds = @('TEST-0210')
+        }
+        @{
             Evidence = 'PlannedDocumentation'
             Owner = 'docs/features/FEAT-0057-explicit-sdlc-backlog-governance/test-cases.md'
             TestIds = @('TEST-0224', 'TEST-0225', 'TEST-0226')
@@ -213,7 +218,7 @@
             Evidence = 'PlannedDocumentation'
             Owner = 'docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md'
             TestIds = @(
-                'TEST-0209', 'TEST-0210', 'TEST-0211', 'TEST-0222'
+                'TEST-0209', 'TEST-0211', 'TEST-0222'
             )
         }
         @{

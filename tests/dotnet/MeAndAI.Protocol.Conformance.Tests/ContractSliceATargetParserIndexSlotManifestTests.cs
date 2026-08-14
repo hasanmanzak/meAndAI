@@ -46,6 +46,7 @@ public sealed class ContractSliceATargetParserIndexSlotManifestTests
 
     [Fact]
     [Trait("ContractSlice", "A")]
+    [Trait("Scenario", "TEST-0210")]
     public void Enforces_exact_repository_target_schema_parser_index_and_slot_capability_closure()
     {
         var registry = CreateRegistry();

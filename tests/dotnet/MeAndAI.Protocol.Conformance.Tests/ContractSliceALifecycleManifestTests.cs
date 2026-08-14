@@ -15,6 +15,7 @@ public sealed class ContractSliceALifecycleManifestTests
 
     [Fact]
     [Trait("ContractSlice", "A")]
+    [Trait("Scenario", "TEST-0210")]
     public void Enforces_rule_lifecycle_against_transitions_and_active_profiles()
     {
         var manifest = ContractSliceATransitionManifestTests

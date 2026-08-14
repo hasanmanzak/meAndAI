@@ -48,6 +48,7 @@ public sealed class ContractSliceDPolicyExportTests
 
     [Fact]
     [Trait("ContractSlice", "D")]
+    [Trait("Scenario", "TEST-0210")]
     public void Exports_exact_real_registration_graph()
     {
         PolicyQualificationSliceExport export =
@@ -183,6 +184,7 @@ public sealed class ContractSliceDOwnershipTests
 
     [Fact]
     [Trait("ContractSlice", "D")]
+    [Trait("Scenario", "TEST-0210")]
     public void Enforces_exact_policy_friend_and_negative_surface()
     {
         var abstractions = typeof(PolicyQualificationSliceExport).Assembly;
@@ -224,6 +226,7 @@ public sealed class ContractSliceDStructuralTests
 {
     [Fact]
     [Trait("ContractSlice", "D")]
+    [Trait("Scenario", "TEST-0210")]
     public void Matches_exact_final_cumulative_public_surface()
     {
         var abstractions = typeof(PolicyQualificationSliceExport).Assembly;

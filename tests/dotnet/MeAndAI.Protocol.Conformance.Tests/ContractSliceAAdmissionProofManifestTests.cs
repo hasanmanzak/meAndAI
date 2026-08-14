@@ -58,6 +58,7 @@ public sealed class ContractSliceAAdmissionProofManifestTests
 
     [Fact]
     [Trait("ContractSlice", "A")]
+    [Trait("Scenario", "TEST-0210")]
     public void Enforces_admission_proof_declarations_with_exact_kind_component_and_artifact_closure()
     {
         var surfaceInput = new List<SurfaceKind> { SurfaceKind.Provider, SurfaceKind.Repository };

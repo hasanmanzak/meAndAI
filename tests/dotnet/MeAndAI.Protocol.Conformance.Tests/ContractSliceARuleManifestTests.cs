@@ -19,6 +19,7 @@ public sealed class ContractSliceARuleDeclarationTests
 
     [Fact]
     [Trait("ContractSlice", "A")]
+    [Trait("Scenario", "TEST-0210")]
     public void Enforces_canonical_multi_fragment_rule_provenance()
     {
         var source = CreateManifest(CreateRule(CreateNormativeFragments()));

@@ -316,7 +316,7 @@ The lifecycle records-only freeze head is exact-hosted-green: Ubuntu passed in
 `20m44s`, Windows in `46m51s`, and publication verification was correctly
 skipped. The exact lifecycle implementation identity recorded in the canonical
 handoff passed Ubuntu in `19m36s` and Windows in `36m02s`; publication verification was
-correctly skipped. ContractSlice A, B, and C are merged/exact-main green; C is `11/11`. D predecessor cohorts are `ExactHeadHostedGreen`; the final equivalence/closure cohort is local `3/3` with D-CONVERGE `ReviewedLocalGreen`; D is `11/11` and A+B+C+D/full Conformance is `65/65`. One final-cohort push and exact-head hosted CI remain pending; the parent scenario and final activation remain held.
+correctly skipped. ContractSlice A-D are merged and exact-main green at `A32/B11/C11/D11`, cumulative/full Conformance `65/65`, Domain `98/98`, and API/ownership `15/15`. The final [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) atomic activation is `ReviewedLocalGreen`: Scenario and ContractSlice each pass the same `65/65` FQNs and the combined route is `163/163`; its exact-head hosted implementation gate is pending. Feature completion/DoD, merge, release, and publication remain held. Follow the current [final activation freeze](log/2026-08-14-feat-0065-subf-0143-test-0210-final-activation-freeze.md).
 The exact record-delivery closure reached the full `4096/4096` instruction-graph
 budget. Ubuntu passed in `19m52s`; Windows reached its exact 45-minute job
 ceiling after every emitted suite result was successful. The bounded correction

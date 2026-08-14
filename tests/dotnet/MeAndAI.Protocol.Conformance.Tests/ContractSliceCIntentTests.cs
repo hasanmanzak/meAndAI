@@ -15,6 +15,7 @@ public sealed class ContractSliceCIntentTests
 
     [Fact]
     [Trait("ContractSlice", "C")]
+    [Trait("Scenario", "TEST-0210")]
     public void Mints_exact_intents_findings_and_failures()
     {
         CarrierInvariants();

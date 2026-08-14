@@ -10,6 +10,7 @@ public sealed class ContractSliceCRegistrationTests
 
     [Fact]
     [Trait("ContractSlice", "C")]
+    [Trait("Scenario", "TEST-0210")]
     public void Rejects_registration_mismatch_without_kernel_activation()
     {
         var fixture = CreateFixture();

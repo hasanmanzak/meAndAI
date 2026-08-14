@@ -22,6 +22,7 @@ public sealed class ContractSliceBAdmissionProofTests
 
     [Fact]
     [Trait("ContractSlice", "B")]
+    [Trait("Scenario", "TEST-0210")]
     public void Admits_exact_observed_failed_and_no_input_proofs()
     {
         var aggregate = ExecuteContract();

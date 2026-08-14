@@ -34,6 +34,7 @@ public sealed class ContractSliceAResourceManifestTests
 
     [Fact]
     [Trait("ContractSlice", "A")]
+    [Trait("Scenario", "TEST-0210")]
     public void Enforces_exact_manifest_byte_reachable_depth_and_token_ceilings()
     {
         var basis = CanonicalManifestWriter.Write(

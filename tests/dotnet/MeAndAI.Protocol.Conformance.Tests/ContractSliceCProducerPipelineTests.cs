@@ -23,6 +23,7 @@ public sealed class ContractSliceCProducerPipelineTests
 
     [Fact]
     [Trait("ContractSlice", "C")]
+    [Trait("Scenario", "TEST-0210")]
     public void Activates_and_orders_exact_six_family_producer_graph()
     {
         var fixture = ContractSliceCActivationTests.CreateFixture();

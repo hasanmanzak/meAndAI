@@ -77,6 +77,7 @@ public sealed class ContractSliceAPublicApiTests
 
     [Fact]
     [Trait("ContractSlice", "A")]
+    [Trait("Scenario", "TEST-0210")]
     public void ExportedTypesEqualTheContractSliceAInventories()
     {
         AssertOwnedExportInventory(
@@ -91,6 +92,7 @@ public sealed class ContractSliceAPublicApiTests
 
     [Fact]
     [Trait("ContractSlice", "A")]
+    [Trait("Scenario", "TEST-0210")]
     public void DeclaredPublicSurfaceEqualsTheContractSliceASnapshot()
     {
         var nullability = new NullabilityInfoContext();
@@ -116,6 +118,7 @@ public sealed class ContractSliceAPublicApiTests
 
     [Fact]
     [Trait("ContractSlice", "A")]
+    [Trait("Scenario", "TEST-0210")]
     public void PublicTypesHaveNoConstructionOrSerializationLeak()
     {
         foreach (var type in GetContractSliceATypes())
@@ -154,6 +157,7 @@ public sealed class ContractSliceAPublicApiTests
 
     [Fact]
     [Trait("ContractSlice", "A")]
+    [Trait("Scenario", "TEST-0210")]
     public void FriendAssembliesEqualTheCurrentContractSliceAAllowlist()
     {
         AssertFriendAssemblies("MeAndAI.Protocol.Domain", []);
@@ -172,6 +176,7 @@ public sealed class ContractSliceAPublicApiTests
 
     [Fact]
     [Trait("ContractSlice", "A")]
+    [Trait("Scenario", "TEST-0210")]
     public void StagedExportsExposeOnlyTheContractSliceASeam()
     {
         var abstractions = LoadAssembly(

@@ -93,6 +93,7 @@ public sealed class ContractSliceAArtifactComponentGraphTests
 
     [Fact]
     [Trait("ContractSlice", "A")]
+    [Trait("Scenario", "TEST-0210")]
     public void Enforces_exact_binding_runtime_anchor_and_reachability_graph()
     {
         var canonicalBytes = AsBytes(ClosedGraphManifest);

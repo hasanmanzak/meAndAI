@@ -58,6 +58,7 @@ public sealed class ContractSliceASelectorManifestTests
 
     [Fact]
     [Trait("ContractSlice", "A")]
+    [Trait("Scenario", "TEST-0210")]
     public void Enforces_expected_selectors_with_exact_slot_schema_resolver_and_finding_closure()
     {
         var allowedParentKinds = new[] { QualifiedEvidenceReferenceKind.ExpectedSelector };

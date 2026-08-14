@@ -18,6 +18,7 @@ public sealed class ContractSliceACompleteCatalogProfileTests
 
     [Fact]
     [Trait("ContractSlice", "A")]
+    [Trait("Scenario", "TEST-0210")]
     public void Enforces_exact_provider_profile_genesis_catalog_inventory_digest_and_added_transitions()
     {
         var predecessor = ContractSliceAFullManifestGraphTests.CreateManifest();

@@ -22,6 +22,7 @@ public sealed class ContractSliceBGovernedTextCodecTests
 
     [Fact]
     [Trait("ContractSlice", "B")]
+    [Trait("Scenario", "TEST-0210")]
     public void Round_trips_exact_governed_text_wire()
     {
         var codec = new GovernedTextCodecMirror();

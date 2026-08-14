@@ -8,6 +8,7 @@ public sealed class ContractSliceActivationTopologyTests
 
     [Fact]
     [Trait("ContractSlice", "D")]
+    [Trait("Scenario", "TEST-0210")]
     public void Matches_exact_contract_slice_scenario_inventory()
     {
         var frozen = FrozenInventory();
@@ -26,7 +27,7 @@ public sealed class ContractSliceActivationTopologyTests
             Assert.Equal(1, row.Facts);
             Assert.Equal(0, row.Theories);
             Assert.Single(row.Slices);
-            Assert.Empty(row.Scenarios);
+            Assert.Equal(["TEST-0210"], row.Scenarios);
             Assert.Empty(row.ClassSlices);
             Assert.Empty(row.ClassScenarios);
         });
@@ -43,9 +44,18 @@ public sealed class ContractSliceActivationTopologyTests
             actual.Add(row.Fqn, row.Slices[0]);
         }
 
+        var scenarioIdentities = rows
+            .Where(row => row.Scenarios.Length == 1 &&
+                string.Equals(row.Scenarios[0], "TEST-0210",
+                    StringComparison.Ordinal))
+            .Select(row => row.Fqn)
+            .OrderBy(fqn => fqn, StringComparer.Ordinal)
+            .ToArray();
+
         Assert.Equal(65, frozen.Count);
         Assert.Equal(frozen.ToArray(), expected.ToArray());
         Assert.Equal(expected.ToArray(), actual.ToArray());
+        Assert.Equal(expected.Keys.ToArray(), scenarioIdentities);
         Assert.Equal(32, actual.Count(pair => pair.Value == "A"));
         Assert.Equal(11, actual.Count(pair => pair.Value == "B"));
         Assert.Equal(11, actual.Count(pair => pair.Value == "C"));

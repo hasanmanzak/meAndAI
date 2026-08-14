@@ -15,6 +15,7 @@ public sealed class ContractSliceBRepositoryTreeCodecTests
         "cHJvdG9jb2wucmVwb3NpdG9yeS10cmVlLzEKAAAABHJlcG8AAAADZ2l0AAAACnJlcG9zaXRvcnkAAAAMZXhhY3QtY29tbWl0AAAAKDAxMjM0NTY3ODlhYmNkZWYwMTIzNDU2Nzg5YWJjZGVmMDEyMzQ1NjcAAAAMZXhhY3QtY29tbWl0AAAAKDAxMjM0NTY3ODlhYmNkZWYwMTIzNDU2Nzg5YWJjZGVmMDEyMzQ1NjcAAAAAAAAAAAAAAAAAAAABAwAAAAA=";
     [Fact]
     [Trait("ContractSlice", "B")]
+    [Trait("Scenario", "TEST-0210")]
     public void Round_trips_exact_repository_tree_wire()
     {
         var fixture = Fixture();

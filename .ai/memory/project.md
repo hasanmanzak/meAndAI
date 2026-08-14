@@ -155,7 +155,7 @@ Last verified: **2026-08-13**
   Ubuntu in `20m44s` and Windows in `46m51s`; publication verification was
   correctly skipped. The exact lifecycle implementation identity recorded in
   the canonical handoff passed Ubuntu in `19m36s` and Windows in `36m02s`; publication verification was
-  correctly skipped. ContractSlice A, B, and C are merged/exact-main green; C is `11/11`. D predecessor cohorts are `ExactHeadHostedGreen`; the final equivalence/closure cohort is local `3/3` with D-CONVERGE `ReviewedLocalGreen`; D is `11/11` and A+B+C+D/full Conformance is `65/65`. One final-cohort push and exact-head hosted CI remain pending; the parent scenario and final activation remain held. Follow the current [canonical log index](log/README.md). The
+  correctly skipped. ContractSlice A-D are merged and exact-main green at `A32/B11/C11/D11`, cumulative/full Conformance `65/65`, Domain `98/98`, and API/ownership `15/15`. The final [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) atomic activation is `ReviewedLocalGreen`: Scenario and ContractSlice each pass the same `65/65` FQNs and the combined route is `163/163`; its exact-head hosted implementation gate is pending. Feature completion/DoD, merge, release, and publication remain held. Follow the current [canonical log index](log/README.md). The
   predecessor-manifest exact-head hosted-green handoff indexed there is
   immutable history; the admission-proof reviewed-local-green handoff,
   the selector reviewed-local-green handoff in the canonical log index,

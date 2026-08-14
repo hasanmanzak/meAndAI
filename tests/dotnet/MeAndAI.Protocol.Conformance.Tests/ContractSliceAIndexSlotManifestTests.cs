@@ -25,6 +25,7 @@ public sealed class ContractSliceAIndexSlotManifestTests
     ];
     [Fact]
     [Trait("ContractSlice", "A")]
+    [Trait("Scenario", "TEST-0210")]
     public void Enforces_exact_repository_tree_index_and_slot_capability_closure()
     {
         var source = CreateManifest(includeIndex: true);

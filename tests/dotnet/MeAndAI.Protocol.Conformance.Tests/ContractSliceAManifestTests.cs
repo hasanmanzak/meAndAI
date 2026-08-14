@@ -14,6 +14,7 @@ public sealed class ContractSliceAManifestTests
 
     [Fact]
     [Trait("ContractSlice", "A")]
+    [Trait("Scenario", "TEST-0210")]
     public void Parses_minimal_canonical_qualification_manifest()
     {
         var canonicalBytes = new UTF8Encoding(

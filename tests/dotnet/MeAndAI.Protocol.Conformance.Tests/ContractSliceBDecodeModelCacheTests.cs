@@ -24,6 +24,7 @@ public sealed class ContractSliceBDecodeModelCacheTests
 
     [Fact]
     [Trait("ContractSlice", "B")]
+    [Trait("Scenario", "TEST-0210")]
     public async Task Enforces_exact_codec_cache_single_flight_collision_and_eviction()
     {
         var aggregate = await ExecuteContractAsync();
