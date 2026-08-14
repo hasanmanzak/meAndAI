@@ -3,14 +3,14 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted; ContractSlice A, B, and C are merged/exact-main green. D Policy activation, real producer infrastructure, and the first-rules cohort are `ExactHeadHostedGreen`; RULE-0003 through RULE-0005 are `ReviewedLocalGreen`. D is `9/11` and cumulative A+B+C+D/full Conformance is `63/63`; the specialized-rules cohort is local `3/3` with its single push pending and equivalence/closure inactive. [TEST-0210](test-cases.md#test-0210) remains `Planned`; final activation and DoD remain held. |
+| Status | Gate 2 accepted; ContractSlice A, B, and C are merged/exact-main green. D Policy activation, real producer infrastructure, first-rules, and specialized-rules cohorts are `ExactHeadHostedGreen`; repository/provider equivalence is `ReviewedLocalGreen`. D is `10/11` and cumulative A+B+C+D/full Conformance is `64/64`; activation topology is frozen and active locally, with D-CONVERGE inactive. [TEST-0210](test-cases.md#test-0210) remains `Planned`; final activation and DoD remain held. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Test | [TEST-0210](test-cases.md#test-0210) |
 | Gate 3 micro-delivery routing | Historical A, B, and C delivery remains owned by their micro plans. Current prospective routing is the [ContractSlice D micro-delivery plan](subf-0143-contractslice-d-micro-delivery-plan.md); packet labels refine delivery but activate no executable work. |
 | Exact-main design baseline | Accepted A merge commit [`51623f4d404a95e0f706d72805cf7ddbbbd293b8`](https://github.com/hasanmanzak/meAndAI/commit/51623f4d404a95e0f706d72805cf7ddbbbd293b8), validated by exact-main [run 31304787603](https://github.com/hasanmanzak/meAndAI/actions/runs/31304787603) |
-| Design and Gate 3 authority | Historical A/B/C directives, accepted reds, diagnostics, and hosted evidence remain immutable. D Policy activation, producer infrastructure, and first-rules cohort are `ExactHeadHostedGreen`; RULE-0003 through RULE-0005 are `ReviewedLocalGreen`, the specialized-rules single push is pending, and equivalence/closure, final activation, merge, release, and publication remain held. |
+| Design and Gate 3 authority | Historical A/B/C directives, accepted reds, diagnostics, and hosted evidence remain immutable. D Policy activation, producer infrastructure, first-rules, and specialized-rules cohorts are `ExactHeadHostedGreen`; repository/provider equivalence is `ReviewedLocalGreen`; activation topology is the sole active local packet, while D-CONVERGE, final activation, merge, release, and publication remain held. |
 | Completed predecessor | [SUBF-0153](README.md#subf-0153) / [TEST-0221](test-cases.md#test-0221), merged through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173) and exact-main validated by [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) |
 
 ## Directive and hard boundary
@@ -10964,6 +10964,21 @@ other rules, and held surfaces remain frozen. Canonical red is one fresh common
 Release `--no-build` invocation and never reruns after commitment; green is
 focused `1/1`, D `9/9`, and full Conformance `63/63`, followed by the complete
 specialized-cohort local gate and one push of all three focused commits.
+
+### `D-REPOSITORY-PROVIDER-EQUIVALENCE-01` executable freeze
+
+The D micro-plan is normative. Exact hosted predecessor `68755ff58da0c80d0bbe65bbb518b9b53077d8c5`
+activates one direct Fact and marker `TEST-0210-D-BEHAVIOR-RED-0008`. Only
+`ContractSliceDPolicyEvaluatorTests.cs` changes, within `220` normalized lines;
+production and every other executable surface remain frozen. Separate fresh
+repository/provider references, contexts, target evidence, capability handles,
+and profiles exercise real RULE-0003 non-clickable/wrong-target and RULE-0005
+wrong-repository/exact cases. Ordered findings and failures must match while all
+qualified handles remain distinct; neither side may consume the other's result.
+Only a null complete equivalence result reaches the marker. Canonical red is one
+fresh common Release `--no-build` invocation and is immutable after child start;
+green is focused `1/1`, D `10/10`, and full Conformance `64/64` before one
+focused local commit without push.
 
 ### `C-EVALUATION-PLAN-01` executable freeze
 

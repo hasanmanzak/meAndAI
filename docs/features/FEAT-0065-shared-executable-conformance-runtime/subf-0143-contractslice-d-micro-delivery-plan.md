@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Gate 2 micro-delivery plan and design freeze |
-| State | Design exact-head hosted green and maintainer accepted; Policy activation, producer infrastructure, and the first-rules cohort are `ExactHeadHostedGreen`; `D-RULE-0003-01` through `D-RULE-0005-01` are `ReviewedLocalGreen`; D is `9/11` and A+B+C+D/full Conformance is `63/63`; specialized-rules cohort is local `3/3` with its single push pending and equivalence/closure inactive |
+| State | Design exact-head hosted green and maintainer accepted; Policy activation, producer infrastructure, first-rules, and specialized-rules cohorts are `ExactHeadHostedGreen`; repository/provider equivalence is `ReviewedLocalGreen`; D is `10/11` and A+B+C+D/full Conformance is `64/64`; activation topology is frozen and active locally, with D-CONVERGE inactive |
 | Parent | [SUBF-0143](README.md#subf-0143) |
 | Scenario | [TEST-0210](test-cases.md#test-0210), retained `Planned` |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
@@ -538,6 +538,40 @@ common one-shot Release `--no-build` oracle and is immutable after invocation
 commitment. Green is focused `1/1`, D `9/9`, full `63/63`; then the full
 specialized-rules cohort gates run before its single push.
 
+### `D-REPOSITORY-PROVIDER-EQUIVALENCE-01` pre-red freeze
+
+The exact predecessor is specialized-rules head
+[`68755ff58da0c80d0bbe65bbb518b9b53077d8c5`](https://github.com/hasanmanzak/meAndAI/commit/68755ff58da0c80d0bbe65bbb518b9b53077d8c5),
+validated by [run 31754385239](https://github.com/hasanmanzak/meAndAI/actions/runs/31754385239): Ubuntu `18m01s`, Windows `19m33s`, publication skipped. The sole direct Fact is
+`ContractSliceDRepositoryProviderEquivalenceTests.Produces_equivalent_results_from_fresh_repository_and_provider_fixtures`,
+with marker `TEST-0210-D-BEHAVIOR-RED-0008`, only `ContractSlice=D`, and no
+Scenario/Theory/overload/class trait.
+
+The packet modifies only `ContractSliceDPolicyEvaluatorTests.cs`; production,
+projects, packages, locks, workflows, and every other test file are immutable.
+The test creates independent repository and provider references, context
+evidence, target evidence, capability handles, and profiles from common fixture
+definitions. It evaluates RULE-0003 non-clickable and wrong-target cases plus
+RULE-0005 wrong-repository and exact cases through the real export, compares the
+ordered finding/failure codes, and proves all qualified handles are distinct.
+No result or runtime handle crosses from one side to the other. Only a null
+complete equivalence result reaches the marker. Changed C# is capped at `220`
+normalized lines. Canonical red uses the common one-shot Release `--no-build`
+oracle and becomes immutable after child start. Green is focused `1/1`, D
+`10/10`, and full `64/64`; then records synchronize and one focused local commit
+closes the packet without push.
+
+Canonical R0008 is immutable at external root
+`D:\Temp\meandai-test-0210-d-r0008-9bcc0f45c0734e4ca3821702f34e5d1f`.
+Its sole TRX is `5,114` bytes with SHA-256
+`DE2B37F6B13246C363B920805AFC4CB6B5CAD6156AC51179AA23BD82943C74F0`;
+native exit was `1`, the sole result/definition/entry was the exact Failed FQN
+with marker-only message, counters were `total/executed/failed=1/1/1` and all
+other thirteen zero, one marker-free stack and one RunInfo were present, and no
+attachment/collector node existed. The red never reruns. Removing only the null
+seam produced focused `1/1`, D `10/10`, full `64/64`, Domain `98/98`, and a
+warning-free Release build; the packet is `ReviewedLocalGreen`.
+
 ## Cohort measurement ledger
 
 | Cohort | Local work/validation | Hosted CI | Hosted defects | Owner identification | Correction/revalidation | Estimated saving vs package-hosted | Consistency/traceability loss |
@@ -545,7 +579,7 @@ specialized-rules cohort gates run before its single push.
 | Policy activation | About `45m` local work; exact-tree StructureOnly `546.622s` and publication evidence `7/7` in `369.5s`, run concurrently | [Run 31719641316](https://github.com/hasanmanzak/meAndAI/actions/runs/31719641316): Ubuntu `18m53s`, Windows `18m40s`, publication skipped | `0` | Not applicable | `0` | Baseline: one avoided intermediate hosted wait | None observed |
 | Real producer infrastructure | About `2h` active implementation/validation; StructureOnly `527.148s`, publication evidence `7/7` in `337.4s` | Pending one cohort push | `0` locally | Not applicable locally | `0` locally | No avoided package push; singleton cohort preserves semantic isolation | None observed locally |
 | First common rules | RULE-0001 about `1h`; RULE-0002 about `1h` active implementation/validation; focused `1/1`, D `6/6`, full `60/60`, Domain `98/98`, API/ownership `15/15`, Release `0/0`, locks/format/diff clean; synchronized StructureOnly `528.328s`, publication evidence `7/7` in `334.7s`; evidence-line recurrence StructureOnly `501.510s`, publication `7/7` in `329.4s` | Run 31746252371: Ubuntu `22m36s`, Windows `20m05s`, publication skipped | `0` | RULE-0001 isolated one registration token-identity defect plus one staging expectation; RULE-0002 isolated one predecessor staging expectation immediately | About `20m` total including rebuild/revalidation | One intermediate hosted wait avoided | None observed |
-| Specialized common rules | RULE-0003 about `1h`, RULE-0004 about `30m`, and RULE-0005 about `25m` active implementation/validation; focused `1/1`, D `9/9`, full `63/63`, Domain `98/98`, Release `0/0`, format/diff clean; RULE-0005 `300/700` changed C# lines | Not pushed; cohort local `3/3`, single push pending | `0` locally | RULE-0003 infrastructure staging expectation and one RULE-0004 compile-time comparer defect identified immediately; RULE-0005 needed no correction | Under `15m` total including rebuild/revalidation | Two intermediate hosted waits avoided | None observed locally |
+| Specialized common rules | RULE-0003 about `1h`, RULE-0004 about `30m`, and RULE-0005 about `25m` active implementation/validation; focused `1/1`, D `9/9`, full `63/63`, Domain `98/98`, Release `0/0`, format/diff clean; RULE-0005 `300/700` changed C# lines | Run 31754385239: Ubuntu `18m01s`, Windows `19m33s`, publication skipped | `0` | RULE-0003 infrastructure staging expectation and one RULE-0004 compile-time comparer defect identified immediately; RULE-0005 needed no correction | Under `15m` total including rebuild/revalidation | Two intermediate hosted waits avoided | None observed |
 | Equivalence/closure | `NotMeasured` | `NotMeasured` | `NotMeasured` | `NotMeasured` | `NotMeasured` | Baseline: two avoided intermediate hosted waits | `NotMeasured` |
 
 At D closure, observed duration, hosted duration, hosted defects, owning-package

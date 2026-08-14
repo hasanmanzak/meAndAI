@@ -105,11 +105,39 @@ public sealed class ContractSliceDPolicyEvaluatorTests
     }
 }
 
+public sealed class ContractSliceDRepositoryProviderEquivalenceTests
+{
+    private const string Marker = "TEST-0210-D-BEHAVIOR-RED-0008";
+
+    [Fact]
+    [Trait("ContractSlice", "D")]
+    public void Produces_equivalent_results_from_fresh_repository_and_provider_fixtures()
+    {
+        ContractSliceDRepositoryProviderEquivalenceEvidence? evidence =
+            ContractSliceDPolicyEvaluatorFixture
+                .EvaluateRepositoryProviderEquivalence(
+                    InitialRuleQualificationPolicy.Export);
+        if (evidence is null)
+        {
+            Assert.Fail(Marker);
+        }
+
+        Assert.Equal(4, evidence.ExercisedCases);
+        Assert.True(evidence.EquivalentOutcomes);
+        Assert.True(evidence.DistinctQualifiedEvidence);
+    }
+}
+
 internal sealed record ContractSliceDPolicyEvaluatorEvidence(
     int ExercisedFindings,
     int ExercisedFixtures,
     bool ExactReferences,
     bool CancellationClosed);
+
+internal sealed record ContractSliceDRepositoryProviderEquivalenceEvidence(
+    int ExercisedCases,
+    bool EquivalentOutcomes,
+    bool DistinctQualifiedEvidence);
 
 internal static class ContractSliceDPolicyEvaluatorFixture
 {
@@ -637,6 +665,82 @@ internal static class ContractSliceDPolicyEvaluatorFixture
             cases.All(item => item.CancellationClosed));
     }
 
+    internal static ContractSliceDRepositoryProviderEquivalenceEvidence?
+        EvaluateRepositoryProviderEquivalence(
+            PolicyQualificationSliceExport export)
+    {
+        ArgumentNullException.ThrowIfNull(export);
+        var cases = new[]
+        {
+            EquivalenceCase(
+                GovernedReferenceKind.CrossRecord,
+                GovernedReferenceSyntax.NonClickable,
+                GovernedReferenceResolution.Unresolved,
+                null,
+                Rule3),
+            EquivalenceCase(
+                GovernedReferenceKind.CrossRecord,
+                GovernedReferenceSyntax.Clickable,
+                GovernedReferenceResolution.WrongTarget,
+                null,
+                Rule3),
+            EquivalenceCase(
+                GovernedReferenceKind.Commit,
+                GovernedReferenceSyntax.Clickable,
+                GovernedReferenceResolution.WrongRepository,
+                null,
+                Rule5),
+            EquivalenceCase(
+                GovernedReferenceKind.Commit,
+                GovernedReferenceSyntax.Clickable,
+                GovernedReferenceResolution.ExternalEvidenceRequired,
+                GovernedReferenceResolution.Exact,
+                Rule5),
+        };
+
+        foreach (var item in cases)
+        {
+            var repository = EvaluateReference(
+                export,
+                Reference(item.Kind, item.Syntax, item.Resolution),
+                item.Overlay,
+                provider: false,
+                rule: item.Rule);
+            var provider = EvaluateReference(
+                export,
+                Reference(item.Kind, item.Syntax, item.Resolution),
+                item.Overlay,
+                provider: true,
+                rule: item.Rule);
+
+            Assert.Equal(
+                repository.Intent.Findings.Select(finding => finding.Code.Value),
+                provider.Intent.Findings.Select(finding => finding.Code.Value));
+            Assert.Equal(
+                repository.Intent.Failures.Select(failure => failure.Code.Value),
+                provider.Intent.Failures.Select(failure => failure.Code.Value));
+            Assert.NotSame(repository.Reference.Reference,
+                provider.Reference.Reference);
+            Assert.NotSame(repository.Reference.Target, provider.Reference.Target);
+            Assert.NotSame(repository.Context, provider.Context);
+            if (repository.TargetEvidence is not null &&
+                provider.TargetEvidence is not null)
+            {
+                Assert.NotSame(repository.TargetEvidence, provider.TargetEvidence);
+            }
+        }
+
+        return new(cases.Length, true, true);
+    }
+
+    private static EquivalenceDefinition EquivalenceCase(
+        GovernedReferenceKind kind,
+        GovernedReferenceSyntax syntax,
+        GovernedReferenceResolution resolution,
+        GovernedReferenceResolution? overlay,
+        string rule) =>
+        new(kind, syntax, resolution, overlay, rule);
+
     private static ReferenceCase EvaluateReference(
         PolicyQualificationSliceExport export,
         GovernedReferenceView reference,
@@ -981,6 +1085,13 @@ internal static class ContractSliceDPolicyEvaluatorFixture
         QualifiedEvidenceHandle? TargetEvidence,
         bool ExactReferences,
         bool CancellationClosed);
+
+    private sealed record EquivalenceDefinition(
+        GovernedReferenceKind Kind,
+        GovernedReferenceSyntax Syntax,
+        GovernedReferenceResolution Resolution,
+        GovernedReferenceResolution? Overlay,
+        string Rule);
 
     private sealed record IndexedTree(
         IRepositoryTree Tree,
