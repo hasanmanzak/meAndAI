@@ -135,8 +135,11 @@ contain `ProtectedPolicyEvaluation`, are owned by Conformance's
   `ContractSliceBStructuralTests.cs`, `ContractSliceCOwnershipTests.cs`, and
   `ContractSliceDPolicyExportTests.cs` solely to replace their immutable empty-
   Policy-friend expectation with the exact one-row
-  `MeAndAI.Protocol.Conformance.Tests` expectation. All five FQNs, traits and
-  every other predecessor assertion remain unchanged; no additional friend is
+  `MeAndAI.Protocol.Conformance.Tests` expectation. All named predecessor FQNs,
+  traits and other assertions remain unchanged except that the D file's
+  final structural Fact converts its exact one-type Policy export equality to
+  exact predecessor-type presence while the authority surface oracle owns the
+  exact two-type stage inventory; no additional friend or Policy export is
   accepted;
   the predecessor presence guards from the surface packet already permit only
   additive successor exports and still prove the qualification-only predecessor.
