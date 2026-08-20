@@ -26,9 +26,12 @@ evidence at full Conformance `65/65`, Domain `98/98`, API/ownership `15/15`,
 Scenario/ContractSlice `65/65`, and combined `163/163`. The current handoff owns
 the extension/waiver/debt/self-consumption `FrozenDesignCorrection`. Four
 ordered implementation packets remain `ReviewedLocalGreen`; the canonical
-debt red is preserved without rerun. The internal same-closure capability/
-reference custody amendment is locally green; exact-head hosted validation is
-pending.
+debt red is preserved without rerun. The first input-custody correction is
+immutable exact-head-hosted-green intermediate evidence. Fresh source
+projection superseded its target-resolution assumption; the
+[SUBF-0144](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0144) handoff
+now owns the immutable issued-closure carrier and staged API-oracle follow-up,
+whose fresh local and exact-head hosted gates still hold debt green.
 [TEST-0211](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0211), feature
 completion/DoD, release, and publication remain held.
 

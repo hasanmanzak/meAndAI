@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Ordered implementation control plan |
-| Status | `FrozenDesignCorrection`; same-closure capability/reference custody is added without changing public API, packet order, FQNs, markers, or ownership; implementation remains held pending exact correction-head hosted green |
+| Status | `FrozenDesignCorrection`; immutable issued-closure carrier custody and staged public-signature-oracle allowlists are corrected without changing public API, packet order, FQNs, markers, or ownership; debt green remains held pending the latest correction head's exact Ubuntu/Windows hosted green |
 | Parent design | [Protected policy and self-consumption design](subf-0144-extension-waiver-self-consumption-design.md) |
 | Scenario | [TEST-0211](test-cases.md#test-0211) |
 | Exact baseline | [`14ad828bcdde5f843cdbf12677b25f19736e5691`](https://github.com/hasanmanzak/meAndAI/commit/14ad828bcdde5f843cdbf12677b25f19736e5691) |
@@ -197,24 +197,69 @@ is not promoted into nonempty registration evidence.
 ### `DEBT-ENFORCEMENT-01`
 
 - add `src/MeAndAI.Protocol.Conformance/ProtectedPolicy/DebtEnforcementCore.cs`;
+  it owns the single deterministic internal `ComputeEvidenceSetDigest`
+  production writer. The friend fixture supplies an exact typed expected
+  extension evaluation to mint the signed payload; the public wrapper invokes
+  the real evaluator once and recomputes with the same writer. Test-side frame
+  duplication or a second evaluator invocation is forbidden;
+- modify `ProtectedPolicy/WaiverDispositionCore.cs` only to split its existing
+  authority validation into exact common authority, waiver, then debt checks:
+  common payload/envelope mismatch stays `DispositionAuthorityInvalid`, waiver
+  snapshot/row integrity is `WaiverInvalid`, and debt snapshot/trusted-base or
+  future-closed-row integrity is `DebtInvalid`. Valid prior waiver behavior and
+  its public surface/FQN remain unchanged;
 - modify only `ConformanceKernel.WaiverDisposition.cs` for the frozen debt and
   enforcement call path and add the exact implemented `EvaluateProtected`
   public member; neither the earlier waiver packet nor this packet may carry a
   shell or throwing placeholder;
-- modify `Planning/EvaluationAdvanceCore.cs` and
-  `Planning/EvaluationAdvanceResult.cs` only to retain the exact capability
-  product of the existing single repository-target index invocation plus its
-  context-proof handle/reference in one internal, caller-unconstructible
-  `ProtectedEvaluationInput`; no second parser/index invocation, payload
-  reconstruction, public member, or [TEST-0210](test-cases.md#test-0210)
-  behavior change is allowed;
+- modify only `Planning/EvaluationAdvanceResult.cs` to add the internal
+  `ProtectedEvaluationInput` and the sole internal
+  `EvaluationClosure.WithProtectedInput(IRepositoryTree)` replacement seam.
+  This packet permits exactly one call site in the project-neutral friend
+  fixture and no production call site. The seam binds the exact completed
+  repository-tree outcome context proof and returns only the immutable
+  replacement issued by the exact planning session;
+- modify only the `KernelPlanningSession` state portion of
+  `Planning/ApplicabilityPlanningCore.cs` to add
+  `ReplaceIssuedEvaluationClosure(source, protectedInput)`. Under the existing
+  state lock it requires an issued, carrier-free, neither evaluating nor
+  evaluated source; creates a replacement with the same applicability/context
+  references, completed-round count, and ordinal acquisition/evaluation
+  element references in fresh defensive collections; and atomically swaps it
+  into the issued set. Source reuse, a second/concurrent replacement, or a
+  second evaluation is `PlanStateInvalid`. No other code in that file may
+  change. Ordinary advance results keep a null carrier.
+  `WithProtectedInput(null)` is `ArgumentNullException(repositoryTree)`;
+  missing/duplicate/non-Complete tree outcomes, null/wrong context proof,
+  wrong session and every other custody/state defect are
+  `CatalogIntegrityException(PlanStateInvalid)` before replacement;
+  `Planning/EvaluationAdvanceCore.cs` is immutable: its existing
+  repository-target-resolution index product is not a repository tree, and no
+  cast, second parser/index invocation, payload reconstruction, public member,
+  or [TEST-0210](test-cases.md#test-0210) behavior change is allowed;
 - modify `Evaluation/CompleteCatalogEvaluation.cs` and
   `Evaluation/EvaluationAggregationCore.cs` only to retain/pass the internal
-  exact consumed `EvaluationClosure` reference and its same-object protected
-  input carrier; no public member or [TEST-0210](test-cases.md#test-0210)
-  behavior changes, and `EvaluateProtected` rejects any non-identical closure
-  or carrier;
-- add only `tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ProtectedPolicyDebtEnforcementTests.cs`.
+  exact consumed immutable replacement `EvaluationClosure` reference at
+  baseline construction; no public member or
+  [TEST-0210](test-cases.md#test-0210) behavior changes, and
+  `EvaluateProtected` rejects any non-identical closure or
+  carrier substitution;
+- add only `tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ProtectedPolicyDebtEnforcementTests.cs`;
+  that test owns the friend-only repository-tree/carrier fixture, produces the
+  baseline from the exact replacement closure, and proves the ordinary null-
+  carrier Audit route is `Indeterminate/ReportOnly` without evaluator
+  invocation; a separate test-only Prospective or FullBlocking profile owns
+  `Indeterminate/Block`. It also
+  proves source/replacement distinction, exact projection identities/order,
+  source invalidation, second/concurrent replacement rejection, retry
+  stability, one-shot replacement evaluation and evaluated-closure rejection.
+  It also proves `enforcementPhase` exactly equals the baseline profile phase.
+  The fixture is not
+  production activation or acquisition evidence;
+- modify `ProtectedPolicySurfaceTests.cs` only to advance the already-frozen
+  complete ordinal public-signature digest by the exact implemented
+  `ConformanceKernel.EvaluateProtected` member. Every prior type/member row,
+  total, boundary oracle, FQN and trait remains unchanged.
 
 ### `SELF-CONSUMPTION-01`
 
@@ -222,7 +267,11 @@ is not promoted into nonempty registration evidence.
   and `ConformanceKernel.SelfConsumption.cs`;
 - add the exact implemented `QualifyCandidate` public member; a shell or
   throwing placeholder is forbidden;
-- add only `tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ProtectedPolicySelfConsumptionTests.cs`.
+- add only `tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ProtectedPolicySelfConsumptionTests.cs`;
+- modify `ProtectedPolicySurfaceTests.cs` only to advance that same complete
+  ordinal public-signature digest by the exact implemented
+  `ConformanceKernel.QualifyCandidate` member. Every earlier staged row remains
+  exact and the convergence reasserts the final frozen inventory.
 
 ### `PROTECTED-POLICY-CONVERGE-01`
 
@@ -307,6 +356,15 @@ throwing or untested production placeholder is forbidden. The accepted red
 source remains byte-identical through review; green removes only its marker/
 missing-seam assertion while implementing the owning behavior under the frozen
 allowlist.
+
+The immutable `DEBT-ENFORCEMENT-01` R=0004 source, FQN, marker, source hash and
+TRX remain canonical and are never rerun. Because the internal carrier defect
+was discovered only after that invocation, once this exact correction reaches
+hosted green its green transformation may additionally add only the frozen
+issued-replacement carrier positive, source/second/evaluated rejection,
+ordinary phase-specific null-carrier unresolved assertions and their friend fixture to the same
+test file. This does not rewrite the red observation or authorize a replacement
+red identity.
 
 Before the sole child invocation, the runner freezes exact HEAD/upstream/status,
 source/runner/DLL/PDB/lock hashes, exact command, fresh-path absence, and one
@@ -394,7 +452,11 @@ and digest before commit; no static relation-neutral claim substitutes for that
 executable validation.
 
 The original cohort reached `AcceptedFrozenDesign` and activated the ordered
-pipeline. For this correction, fresh design/evidence/traceability/security/
+pipeline. The first input-custody correction is immutable intermediate
+evidence, but fresh source projection found that its assumed target-resolution
+product is not a repository tree. This latest follow-up owns only the immutable
+issued-closure carrier topology and staged signature-oracle allowlists. Fresh
+design/evidence/traceability/security/
 graph reviews must again close `0/0/0`; StructureOnly and publication-evidence
 must be green; the exact correction cohort must be committed and pushed; and
 Ubuntu/Windows hosted validation must succeed for that exact head with
