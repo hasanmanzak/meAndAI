@@ -2,7 +2,7 @@
 
 | Field | Value |
 | --- | --- |
-| State | `AcceptedFrozenDesign`; exact design head is Ubuntu/Windows hosted green; `POLICY-SURFACE-FRAMING-01` and `EXTENSION-AUTHORITY-01` are `ReviewedLocalGreen`; `EXTENSION-EVALUATION-01` is next and inactive in this commit |
+| State | `AcceptedFrozenDesign`; exact design head is Ubuntu/Windows hosted green; `POLICY-SURFACE-FRAMING-01`, `EXTENSION-AUTHORITY-01`, and `EXTENSION-EVALUATION-01` are `ReviewedLocalGreen`; `WAIVER-DISPOSITION-01` is next and inactive in this commit |
 | Exact predecessor | [`14ad828bcdde5f843cdbf12677b25f19736e5691`](https://github.com/hasanmanzak/meAndAI/commit/14ad828bcdde5f843cdbf12677b25f19736e5691) |
 | Exact-main validation | [Run 31797357907](https://github.com/hasanmanzak/meAndAI/actions/runs/31797357907): Ubuntu `7m24s`, Windows `12m38s`, publication verification skipped |
 | Accepted design head | [`5d148233913dde08a7b24a4f696eace3c6f3407e`](https://github.com/hasanmanzak/meAndAI/commit/5d148233913dde08a7b24a4f696eace3c6f3407e) |
@@ -121,3 +121,29 @@ changed lines. Final Conformance.Tests DLL/PDB SHA-256 values are respectively
 `3CB2907618F2FA9F00C6CCA02F68D917A7691A135C57B542BC8D1E2E52A55F71` and
 `05C1EBF1D5D1B11AEBD9882B1BCEB803211FA01A7996E081EC01E1BB78DE33C1`.
 No push or hosted-green claim is made for this intermediate packet.
+
+## `EXTENSION-EVALUATION-01` local delivery
+
+Canonical R `0002` ran exactly once at the authority predecessor. Its exact
+`191`-line / `7583`-byte source SHA-256 was
+`BA76F20D4E91B78ADD7E1F267A8321792133D0C2EC98ABD1B90AFBBE24D9392A`;
+the one-result TRX failed solely on marker
+`PROTECTED-POLICY-EVALUATION-RED-0002` and has SHA-256
+`9D737EF05F2D238761736332C56E12E96CC99313BC6FC2BFFF9B4E60D35BF9F3`.
+The original source remained byte-identical for its sole post-product oracle
+pass; the red invocation is immutable and was not rerun.
+
+Bounded green adds the one Policy-owned
+`protocol.extension.repository-path-required` evaluator registration,
+capability-only static applicability/evaluation, deterministic finding and
+unresolved results, independent stable-state validation, strict normalized-
+path/schema enforcement, cancellation, and the exact `200000` equality /
+`200001` resource-limit boundary. The sole package Fact proves missing,
+present, kind-mismatch, static-inapplicable, unsealed, cancellation, malformed-
+declaration, registration, component, and bound behavior. Focused `1/1`,
+protected-policy cumulative `3/3`, full Conformance `68/68`, Domain `98/98`,
+warning-as-error Release build `0/0`, format, six locks, API/ownership, diff,
+scope, StructureOnly, publication evidence, graph/schema-2, links, and fresh
+review gates are green. No public type/member total changes. The exact
+code/test scope is five paths and remains below `2500` normalized changed
+lines. No push or hosted-green claim is made for this intermediate packet.

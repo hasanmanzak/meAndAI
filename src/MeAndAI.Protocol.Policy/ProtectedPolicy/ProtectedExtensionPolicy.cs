@@ -32,7 +32,12 @@ namespace MeAndAI.Protocol.Policy
             var predecessor = new ProtectedPolicy.PredecessorTrustEnvelopeVerifier(
                 IssuerKeyId,
                 publicKey);
-            var digest = ComputeEmptyExportDigest(publicKey);
+            var registrations = new[]
+            {
+                ProtectedPolicy.RepositoryPathRequiredExtensionEvaluator
+                    .CreateRegistration(),
+            };
+            var digest = ComputeExportDigest(publicKey, registrations);
             Export = ExtensionPolicyPackExport.Create(
                 ExportKey,
                 ExportVersion,
@@ -44,12 +49,14 @@ namespace MeAndAI.Protocol.Policy
                 pack,
                 disposition,
                 predecessor,
-                Array.Empty<ExtensionEvaluatorRegistration>());
+                registrations);
         }
 
         public static ExtensionPolicyPackExport Export { get; }
 
-        private static ExactSha256Digest ComputeEmptyExportDigest(byte[] publicKey)
+        private static ExactSha256Digest ComputeExportDigest(
+            byte[] publicKey,
+            IReadOnlyList<ExtensionEvaluatorRegistration> registrations)
         {
             var components = new[]
             {
@@ -79,7 +86,52 @@ namespace MeAndAI.Protocol.Policy
                     WriteComponent(stream, component);
                 }
 
-                ProtectedPolicyFrame.UInt32(stream, 0);
+                ProtectedPolicyFrame.UInt32(stream, checked((uint)registrations.Count));
+                foreach (var registration in registrations)
+                {
+                    var kind = registration.Declaration;
+                    ProtectedPolicyFrame.String(stream, kind.EvaluatorKind);
+                    ProtectedPolicyFrame.String(stream, kind.EvaluatorVersion);
+                    WriteComponent(stream, kind.Component);
+                    ProtectedPolicyFrame.UInt32(
+                        stream,
+                        checked((uint)kind.Parameters.Count));
+                    foreach (var parameter in kind.Parameters)
+                    {
+                        ProtectedPolicyFrame.String(stream, parameter.Key);
+                        ProtectedPolicyFrame.String(stream, parameter.ValueGrammar);
+                        ProtectedPolicyFrame.UInt32(
+                            stream,
+                            checked((uint)parameter.MaximumUtf8Bytes));
+                    }
+
+                    WriteStrings(stream, kind.ApplicabilitySlotKeys);
+                    WriteStrings(stream, kind.EvaluationSlotKeys);
+                    ProtectedPolicyFrame.UInt32(
+                        stream,
+                        checked((uint)kind.Findings.Count));
+                    foreach (var finding in kind.Findings)
+                    {
+                        ProtectedPolicyFrame.String(stream, finding.Code.Value);
+                        ProtectedPolicyFrame.String(stream, finding.Severity.Value);
+                        ProtectedPolicyFrame.String(stream, finding.Remediation.Value);
+                        WriteStrings(
+                            stream,
+                            finding.AllowedPrimaryReferenceKinds
+                                .Select(static row => row.Value)
+                                .ToArray());
+                        WriteStrings(
+                            stream,
+                            finding.AllowedRelatedReferenceKinds
+                                .Select(static row => row.Value)
+                                .ToArray());
+                    }
+
+                    WriteStrings(
+                        stream,
+                        kind.FailureCodes.Select(static row => row.Value).ToArray());
+                    ProtectedPolicyFrame.Bool(stream, kind.WaiverAllowed);
+                }
             });
         }
 
@@ -98,6 +150,17 @@ namespace MeAndAI.Protocol.Policy
             ProtectedPolicyFrame.String(stream, component.ComponentVersion);
             ProtectedPolicyFrame.String(stream, component.AssemblyName);
             ProtectedPolicyFrame.String(stream, component.TypeName);
+        }
+
+        private static void WriteStrings(
+            MemoryStream stream,
+            IReadOnlyList<string> values)
+        {
+            ProtectedPolicyFrame.UInt32(stream, checked((uint)values.Count));
+            foreach (var value in values)
+            {
+                ProtectedPolicyFrame.String(stream, value);
+            }
         }
     }
 

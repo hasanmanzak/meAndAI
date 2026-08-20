@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / dependency-closed [FEAT-0065](README.md) design slice |
-| Status | `AcceptedFrozenDesign`; exact design head is hosted green; `POLICY-SURFACE-FRAMING-01` and `EXTENSION-AUTHORITY-01` are packet-local `ReviewedLocalGreen`; `EXTENSION-EVALUATION-01` is next and inactive in this commit |
+| Status | `AcceptedFrozenDesign`; exact design head is hosted green; `POLICY-SURFACE-FRAMING-01`, `EXTENSION-AUTHORITY-01`, and `EXTENSION-EVALUATION-01` are packet-local `ReviewedLocalGreen`; `WAIVER-DISPOSITION-01` is next and inactive in this commit |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
