@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / dependency-closed [FEAT-0065](README.md) design slice |
-| Status | `FrozenDesign`; fresh reviews `0/0/0`; implementation inactive until every `AcceptedFrozenDesign` gate closes |
+| Status | `FrozenDesignCorrection`; public API, seven packets, FQNs, markers, and ownership are unchanged; internal same-closure capability/reference custody requires exact-head hosted green before implementation resumes |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
@@ -1172,15 +1172,60 @@ policy snapshot's manifest digest must equal the kernel manifest and its
 rules must be an exact one-to-one ordinal `(RuleId, RuleRevision)` projection
 of the protected baseline: no missing, extra, duplicate, retired, or revision-
 drifted row is accepted. Its digest is recomputed with the typed framing below.
+`EvaluationAdvanceCore` retains the exact capability product of its existing
+single repository-target index invocation instead of discarding it. In the
+same advance operation it binds that product and the exact repository-tree
+context-proof handle/reference into one internal `ProtectedEvaluationInput`;
+the carrier is retained by `EvaluationClosure` and is neither public nor
+caller-constructible. No parser/index invocation is replayed, no payload is
+reconstructed from a digest, and no independent capability is manufactured.
+`ProtectedEvaluationInput` is an internal sealed type in
+`EvaluationAdvanceResult.cs`. It owns exactly an `IRuleInputAccess Access` and
+an ordinal read-only map from `QualifiedEvidenceHandle` to
+`QualifiedEvidenceReference`. Its sole internal factory receives the exact
+produced `IRepositoryTree` instance and the completed repository-target
+outcome's non-null `ContextProof`, creates one fresh handle, maps that handle to
+that same reference, and creates an access object that serves only
+`protocol.slot.repository-tree` as `IRepositoryTree` plus that slot's one
+context-proof handle. Any other capability type/slot, context slot, or expected-
+reference request fails closed. `EvaluationClosure.ProtectedInput` is that
+same object when the repository-target outcome is Complete and the index
+succeeds; it is null otherwise. A required repository-tree extension with a
+null carrier is unresolved/Block without invoking the evaluator.
+
+```csharp
+internal sealed class ProtectedEvaluationInput
+{
+    internal IRuleInputAccess Access { get; }
+    internal IReadOnlyDictionary<QualifiedEvidenceHandle,
+        QualifiedEvidenceReference> References { get; }
+    internal static ProtectedEvaluationInput Create(
+        IRepositoryTree repositoryTree,
+        QualifiedEvidenceReference contextProof);
+}
+
+// On EvaluationClosure; public surface unchanged.
+internal ProtectedEvaluationInput? ProtectedInput { get; }
+
+// On CompleteCatalogEvaluation; public surface unchanged.
+internal EvaluationClosure Closure { get; }
+```
+
 `CompleteCatalogEvaluation` retains an internal, non-public reference to the
 exact `EvaluationClosure` consumed by `EvaluationAggregationCore`; the core
 passes it at construction without exposing a new public member.
-`EvaluateProtected` requires `ReferenceEquals(baseline.Closure, closure)`, the
+`EvaluateProtected` requires `ReferenceEquals(baseline.Closure, closure)`,
+`ReferenceEquals(baseline.Closure.ProtectedInput, closure.ProtectedInput)`, the
 same kernel planning session, catalog/profile identity, and exact ordinal
-acquisition/terminal-evaluation projections. Any mismatch is
+acquisition/terminal-evaluation projections. The declared repository-tree
+evaluation slot is resolved only from that retained access/reference pair;
+acquisition admission remains owned by the closure. Every finding handle must
+resolve exactly once in the retained map. Any missing, extra, substituted,
+replayed, or mismatched carrier/reference is
 `protocol.policy.evaluation-context-mismatch`. This requires bounded changes
-only to `CompleteCatalogEvaluation.cs` and `EvaluationAggregationCore.cs` in
-the packet that first implements `EvaluateProtected`;
+only to `EvaluationAdvanceCore.cs`, `EvaluationAdvanceResult.cs`,
+`CompleteCatalogEvaluation.cs`, and `EvaluationAggregationCore.cs` in the
+packet that first implements `EvaluateProtected`;
 [TEST-0210](test-cases.md#test-0210) public surface
 and evaluation behavior remain byte-for-byte compatible. No method performs
 I/O or changes activation state. `BaselineRuleWaiverPolicy` is a complete successor
@@ -1919,9 +1964,13 @@ general limit rise.
 The exact package order, expected-red identities, mutation allowlists, line
 budgets, local commands, review gates, record synchronization, commit/push and
 hosted requirements are normative in the
-[micro-delivery plan](subf-0144-micro-delivery-plan.md). This design becomes
-`AcceptedFrozenDesign` only after fresh design, evidence, traceability,
-security/authority, graph/capacity and implementation-topology reviews all
-close `0/0/0`; diff/format/link checks and StructureOnly are green; the exact
-design cohort is committed and pushed; and that exact head is Ubuntu/Windows
-hosted green with publication verification skipped.
+[micro-delivery plan](subf-0144-micro-delivery-plan.md). The original design
+reached `AcceptedFrozenDesign` through those gates and activated the ordered
+pipeline. This bounded correction temporarily returns the design to
+`FrozenDesignCorrection`; it restores `AcceptedFrozenDesign` only after fresh
+design, evidence, traceability, security/authority, graph/capacity and
+implementation-topology reviews close `0/0/0`, diff/format/link checks and
+StructureOnly are green, the exact twelve-record correction is committed and
+pushed, and that exact head is Ubuntu/Windows hosted green with publication
+verification skipped. Success resumes the preserved debt packet after its
+canonical red; it neither replays completed packets nor consumes another red.

@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Ordered implementation control plan |
-| Status | `FrozenDesign`; fresh reviews and local design gates green; implementation inactive pending exact design-head hosted green |
+| Status | `FrozenDesignCorrection`; same-closure capability/reference custody is added without changing public API, packet order, FQNs, markers, or ownership; implementation remains held pending exact correction-head hosted green |
 | Parent design | [Protected policy and self-consumption design](subf-0144-extension-waiver-self-consumption-design.md) |
 | Scenario | [TEST-0211](test-cases.md#test-0211) |
 | Exact baseline | [`14ad828bcdde5f843cdbf12677b25f19736e5691`](https://github.com/hasanmanzak/meAndAI/commit/14ad828bcdde5f843cdbf12677b25f19736e5691) |
@@ -201,11 +201,19 @@ is not promoted into nonempty registration evidence.
   enforcement call path and add the exact implemented `EvaluateProtected`
   public member; neither the earlier waiver packet nor this packet may carry a
   shell or throwing placeholder;
+- modify `Planning/EvaluationAdvanceCore.cs` and
+  `Planning/EvaluationAdvanceResult.cs` only to retain the exact capability
+  product of the existing single repository-target index invocation plus its
+  context-proof handle/reference in one internal, caller-unconstructible
+  `ProtectedEvaluationInput`; no second parser/index invocation, payload
+  reconstruction, public member, or [TEST-0210](test-cases.md#test-0210)
+  behavior change is allowed;
 - modify `Evaluation/CompleteCatalogEvaluation.cs` and
   `Evaluation/EvaluationAggregationCore.cs` only to retain/pass the internal
-  exact consumed `EvaluationClosure` reference; no public member or
-  [TEST-0210](test-cases.md#test-0210)
-  behavior changes, and `EvaluateProtected` rejects any non-identical closure;
+  exact consumed `EvaluationClosure` reference and its same-object protected
+  input carrier; no public member or [TEST-0210](test-cases.md#test-0210)
+  behavior changes, and `EvaluateProtected` rejects any non-identical closure
+  or carrier;
 - add only `tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ProtectedPolicyDebtEnforcementTests.cs`.
 
 ### `SELF-CONSUMPTION-01`
@@ -364,7 +372,7 @@ The design cohort is exactly these twelve Markdown paths:
 1. `.ai/memory/README.md`;
 2. `.ai/memory/project.md`;
 3. `.ai/memory/log/README.md`;
-4. one new [SUBF-0144](README.md#subf-0144) design-freeze memory ledger;
+4. the owning [SUBF-0144](README.md#subf-0144) design-freeze memory ledger;
 5. `docs/architecture/protocol-governance-and-execution/README.md`;
 6. `docs/architecture/protocol-governance-and-execution/successor-delivery-plan.md`;
 7. `docs/architecture/protocol-governance-and-execution/transition-register.md`;
@@ -374,9 +382,10 @@ The design cohort is exactly these twelve Markdown paths:
 11. this micro plan; and
 12. the [protected-policy design](subf-0144-extension-waiver-self-consumption-design.md).
 
-The cohort adds no code/test/project/workflow/package/lock node. Its three new
-Markdown nodes are exactly the design, micro plan, and owning ledger; no fourth
-handoff/appendix node is permitted. New protected-policy design/implementation
+The original cohort added no code/test/project/workflow/package/lock node and
+introduced exactly the design, micro plan, and owning ledger. This correction
+modifies those same twelve records, adds no node, and permits no fourth
+handoff/appendix. New protected-policy design/implementation
 delivery commit/run links remain only in the owning ledger; existing baseline/
 predecessor links keep their current owners, while other live summaries use
 existing links or generic wording. The
@@ -384,14 +393,15 @@ canonical schema-2 builder must record the exact node/relation/blob/byte tuple
 and digest before commit; no static relation-neutral claim substitutes for that
 executable validation.
 
-When fresh design/evidence/traceability/security/graph reviews close `0/0/0`,
-StructureOnly and publication-evidence are green, the exact cohort is committed
-and pushed, and Ubuntu/Windows hosted validation succeeds for that exact head
-with publication skipped, status becomes `AcceptedFrozenDesign`. The
-maintainer's directive then automatically authorizes `POLICY-SURFACE-FRAMING-01`
-expected red and the ordered implementation pipeline. No extra confirmation is
-required. Any design or hosted failure reopens only this design cohort and
-keeps implementation inactive.
+The original cohort reached `AcceptedFrozenDesign` and activated the ordered
+pipeline. For this correction, fresh design/evidence/traceability/security/
+graph reviews must again close `0/0/0`; StructureOnly and publication-evidence
+must be green; the exact correction cohort must be committed and pushed; and
+Ubuntu/Windows hosted validation must succeed for that exact head with
+publication skipped. Success restores `AcceptedFrozenDesign` and automatically
+resumes `DEBT-ENFORCEMENT-01` after its preserved canonical red. No extra
+confirmation, completed-packet replay, or red rerun is required. Any correction
+or hosted failure reopens only this design cohort and keeps debt green held.
 
 ## Held future work
 

@@ -6,7 +6,7 @@
 | Parent epic | [EPIC-0002 / issue #163](https://github.com/hasanmanzak/meAndAI/issues/163) |
 | Architecture task | [TASK-0003 / issue #164](https://github.com/hasanmanzak/meAndAI/issues/164) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
-| Current authority | ContractSlice A-D and final [TEST-0210](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) activation are merged/exact-main hosted green at full Conformance `65/65` and combined `163/163`. [SUBF-0144](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0144) is `FrozenDesign` with fresh reviews and local design gates green; implementation activates only after exact design-head hosted green. Feature completion/DoD, release, and publication remain held. |
+| Current authority | ContractSlice A-D and final [TEST-0210](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) activation are merged/exact-main hosted green at full Conformance `65/65` and combined `163/163`. [SUBF-0144](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0144) is in `FrozenDesignCorrection`; four packets remain `ReviewedLocalGreen`, canonical debt red is preserved, and debt green resumes automatically after the internal same-closure custody correction reaches exact-head hosted green. Feature completion/DoD, release, and publication remain held. |
 
 This plan allocates the accepted architecture to stable delivery records. It
 did not itself authorize implementation. The later

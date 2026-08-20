@@ -24,9 +24,11 @@ ContractSlice A-D and the final
 atomic activation are immutable merged/exact-main-hosted-green predecessor
 evidence at full Conformance `65/65`, Domain `98/98`, API/ownership `15/15`,
 Scenario/ContractSlice `65/65`, and combined `163/163`. The current handoff owns
-the frozen extension/waiver/debt/self-consumption design with fresh reviews
-`0/0/0` and keeps implementation inactive pending local StructureOnly/graph/
-publication gates plus exact design-head hosted green.
+the extension/waiver/debt/self-consumption `FrozenDesignCorrection`. Four
+ordered implementation packets remain `ReviewedLocalGreen`; the canonical
+debt red is preserved without rerun. The internal same-closure capability/
+reference custody amendment is locally green; exact-head hosted validation is
+pending.
 [TEST-0211](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0211), feature
 completion/DoD, release, and publication remain held.
 
