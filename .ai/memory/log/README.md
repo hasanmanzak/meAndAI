@@ -26,9 +26,9 @@ evidence at full Conformance `65/65`, Domain `98/98`, API/ownership `15/15`,
 Scenario/ContractSlice `65/65`, and combined `163/163`. The current handoff owns
 the `AcceptedFrozenDesign` extension/waiver/debt/self-consumption boundary and
 its exact design-head hosted-green evidence. `POLICY-SURFACE-FRAMING-01` and
-`EXTENSION-AUTHORITY-01` and `EXTENSION-EVALUATION-01` are packet-local
-`ReviewedLocalGreen`; `WAIVER-DISPOSITION-01` is next and inactive in the
-evaluation commit.
+`EXTENSION-AUTHORITY-01`, `EXTENSION-EVALUATION-01`, and
+`WAIVER-DISPOSITION-01` are packet-local `ReviewedLocalGreen`;
+`DEBT-ENFORCEMENT-01` is next and inactive in the waiver commit.
 [TEST-0211](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0211), feature
 completion/DoD, release, and publication remain held.
 

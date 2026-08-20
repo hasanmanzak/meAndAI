@@ -2,7 +2,7 @@
 
 | Field | Value |
 | --- | --- |
-| State | `AcceptedFrozenDesign`; exact design head is Ubuntu/Windows hosted green; `POLICY-SURFACE-FRAMING-01`, `EXTENSION-AUTHORITY-01`, and `EXTENSION-EVALUATION-01` are `ReviewedLocalGreen`; `WAIVER-DISPOSITION-01` is next and inactive in this commit |
+| State | `AcceptedFrozenDesign`; exact design head is Ubuntu/Windows hosted green; `POLICY-SURFACE-FRAMING-01`, `EXTENSION-AUTHORITY-01`, `EXTENSION-EVALUATION-01`, and `WAIVER-DISPOSITION-01` are `ReviewedLocalGreen`; `DEBT-ENFORCEMENT-01` is next and inactive in this commit |
 | Exact predecessor | [`14ad828bcdde5f843cdbf12677b25f19736e5691`](https://github.com/hasanmanzak/meAndAI/commit/14ad828bcdde5f843cdbf12677b25f19736e5691) |
 | Exact-main validation | [Run 31797357907](https://github.com/hasanmanzak/meAndAI/actions/runs/31797357907): Ubuntu `7m24s`, Windows `12m38s`, publication verification skipped |
 | Accepted design head | [`5d148233913dde08a7b24a4f696eace3c6f3407e`](https://github.com/hasanmanzak/meAndAI/commit/5d148233913dde08a7b24a4f696eace3c6f3407e) |
@@ -147,3 +147,27 @@ scope, StructureOnly, publication evidence, graph/schema-2, links, and fresh
 review gates are green. No public type/member total changes. The exact
 code/test scope is five paths and remains below `2500` normalized changed
 lines. No push or hosted-green claim is made for this intermediate packet.
+
+## `WAIVER-DISPOSITION-01` local delivery
+
+Canonical R `0003` ran exactly once at the evaluation predecessor. Its exact
+`188`-line / `7269`-byte source SHA-256 was
+`CFBF7F5E7DAB0B104284A27D703F234267C0A21DF3DED5F9192277CF808CBAB3`;
+the one-result TRX failed solely on marker
+`PROTECTED-POLICY-WAIVER-RED-0003` and has SHA-256
+`8CC5F21C6947FEAF51A1EE279E56A5B93FCE37DA554E1867282C41A99B3BF671`.
+The red source remained byte-identical after the invocation; R is immutable
+and was not rerun.
+
+Bounded green adds kernel-owned protected finding identity projection,
+authenticated waiver disposition, exact half-open expiry, baseline-overlay
+eligibility, extension non-waivability, and finding/path/repository scope
+matching without weakening conformance. The sole package Fact proves stable
+identity across time, proof, and unrelated target mutations; content/source
+mutation inequality; signed authority, snapshot, trusted-base, expiry,
+eligibility, scope, and non-waivable failures. Focused `1/1`, protected-policy
+cumulative `4/4`, full Conformance `69/69`, Domain `98/98`, warning-as-error
+Release build `0/0`, format, locks, diff/scope, StructureOnly, publication
+evidence, graph/schema-2, links, and fresh review gates are green. The exact
+three-path code/test scope is `1343/2500` normalized lines. No push or hosted-
+green claim is made for this intermediate packet.
