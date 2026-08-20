@@ -24,12 +24,16 @@ public sealed class ExecutionAuthorityPortTests
             ("ReadAuthoritySetAsync", typeof(ValueTask<ApprovalAuthoritySetSnapshot?>),
                 new[] { typeof(AuthoritySetId), typeof(CancellationToken) }),
             ("ReadGrantStoreHeadAsync", typeof(ValueTask<AuthorityDigest?>),
-                new[] { typeof(JournalStoreReference), typeof(CancellationToken) })
+                new[] { typeof(JournalStoreReference), typeof(CancellationToken) }),
+            ("ReadExtensionActivationAsync", typeof(ValueTask<ExtensionActivationRecord?>),
+                new[] { typeof(ExecutionTarget), typeof(CancellationToken) })
         ]);
         AssertMethods(typeof(IExecutionAuthorityMutationPort),
         [
             ("TryConsumeGrantAsync", typeof(ValueTask<ExecutionGrantDecision>),
-                new[] { typeof(GrantConsumptionRequest), typeof(CancellationToken) })
+                new[] { typeof(GrantConsumptionRequest), typeof(CancellationToken) }),
+            ("TryActivateExtensionAsync", typeof(ValueTask<ActivationCasDecision>),
+                new[] { typeof(ExtensionActivationMutationRequest), typeof(CancellationToken) })
         ]);
         Assert.DoesNotContain(typeof(IExecutionAuthorityReadPort).GetInterfaces(),
             static type => type == typeof(IProviderMutationPort));
@@ -63,8 +67,9 @@ public sealed class ExecutionAuthorityPortTests
             Assert.Equal(parameters,
                 method.GetParameters().Select(static value => value.ParameterType));
             Assert.Equal(parameters.Length == 2
-                    ? new[] { name == "TryConsumeGrantAsync" ? "request" :
-                        name == "ReadAuthoritySetAsync" ? "id" : "store",
+                    ? new[] { name == "ReadAuthoritySetAsync" ? "id" :
+                        name == "ReadGrantStoreHeadAsync" ? "store" :
+                        name == "ReadExtensionActivationAsync" ? "repository" : "request",
                         "cancellationToken" }
                     : [],
                 method.GetParameters().Select(static value => value.Name));
@@ -80,9 +85,17 @@ public sealed class ExecutionAuthorityPortTests
         public ValueTask<AuthorityDigest?> ReadGrantStoreHeadAsync(
             JournalStoreReference store, CancellationToken cancellationToken) =>
             ValueTask.FromResult<AuthorityDigest?>(null);
+        public ValueTask<ExtensionActivationRecord?> ReadExtensionActivationAsync(
+            ExecutionTarget repository, CancellationToken cancellationToken) =>
+            ValueTask.FromResult<ExtensionActivationRecord?>(null);
         public ValueTask<ExecutionGrantDecision> TryConsumeGrantAsync(
             GrantConsumptionRequest request, CancellationToken cancellationToken) =>
             ValueTask.FromResult(ExecutionGrantDecision.Rejected(
                 ExecutionGrantRejection.GrantStoreDrift));
+        public ValueTask<ActivationCasDecision> TryActivateExtensionAsync(
+            ExtensionActivationMutationRequest request,
+            CancellationToken cancellationToken) =>
+            ValueTask.FromResult(ActivationCasDecision.Rejected(
+                ExecutionGrantRejection.CasConflict));
     }
 }

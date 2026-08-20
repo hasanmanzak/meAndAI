@@ -9,10 +9,15 @@ public interface IExecutionAuthorityReadPort : IProviderReadPort
         AuthoritySetId id, CancellationToken cancellationToken);
     ValueTask<AuthorityDigest?> ReadGrantStoreHeadAsync(
         JournalStoreReference store, CancellationToken cancellationToken);
+    ValueTask<ExtensionActivationRecord?> ReadExtensionActivationAsync(
+        ExecutionTarget repository, CancellationToken cancellationToken);
 }
 
 public interface IExecutionAuthorityMutationPort : IProviderMutationPort
 {
     ValueTask<ExecutionGrantDecision> TryConsumeGrantAsync(
         GrantConsumptionRequest request, CancellationToken cancellationToken);
+    ValueTask<ActivationCasDecision> TryActivateExtensionAsync(
+        ExtensionActivationMutationRequest request,
+        CancellationToken cancellationToken);
 }

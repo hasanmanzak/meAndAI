@@ -483,6 +483,9 @@ public sealed class ExecutionGrantContractTests
             HeadReads++;
             return ValueTask.FromResult<AuthorityDigest?>(ReturnHead ? readHead : null);
         }
+        public ValueTask<ExtensionActivationRecord?> ReadExtensionActivationAsync(
+            ExecutionTarget repository, CancellationToken cancellationToken) =>
+            ValueTask.FromResult<ExtensionActivationRecord?>(null);
         public ValueTask<ExecutionGrantDecision> TryConsumeGrantAsync(
             GrantConsumptionRequest request, CancellationToken cancellationToken)
         {
@@ -499,5 +502,10 @@ public sealed class ExecutionGrantContractTests
             if (decision.IsAuthorized) { consumedIds.Add(grant.Id); consumedKeys.Add(grant.IdempotencyKey); }
             return ValueTask.FromResult(decision);
         }
+        public ValueTask<ActivationCasDecision> TryActivateExtensionAsync(
+            ExtensionActivationMutationRequest request,
+            CancellationToken cancellationToken) =>
+            ValueTask.FromResult(ActivationCasDecision.Rejected(
+                ExecutionGrantRejection.CasConflict));
     }
 }

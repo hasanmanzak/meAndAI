@@ -68,3 +68,25 @@ cannot embed its own content-addressed SHA without changing that SHA.
 | Local commit | The focused commit containing this row; exact SHA is emitted after creation and reconciled at `EA-CONVERGE-01` |
 | Hosted / correction cost | Not run for a package by design; duration, hosted errors, owner-identification time, correction and revalidation cost are `N/A` |
 | Cohort efficiency | Hosted-push savings deferred to cohort measurement; no consistency or traceability loss observed locally |
+
+## `EA-EXTENSION-ACTIVATION-01`
+
+| Field | Evidence |
+| --- | --- |
+| Status | `ReviewedLocalGreen`; fresh package-local code/security review `0 Blocking / 0 Important / 0 Minor` |
+| Local elapsed | `00:24:00` from hosted correction closure through reconciliation, bounded green, final review, and package record sync |
+| Canonical R | `MeAndAI.Operations.Architecture.Tests.ExtensionActivationContractTests.TEST_0212_only_fresh_winning_cas_activates_extension`; one invocation, `1` failed / `0` passed, exact [`TEST-0212-ACTIVATION-RED-0004`](test-cases.md#test-0212) member absence only; never rerun |
+| R source SHA-256 | `BB515C795941141CE5D5D8A3459848F353405D9B52C8F7F637E07F53BC99C566` |
+| R TRX SHA-256 | `D656490AC54434D740F859A4732518D5BF5B41C474467FF81B564006B1507FC1` |
+| Correction prerequisite | Narrow allowlist correction [b2bc2121af44fbbe28d7d6c5a416b59d6e9aac67](https://github.com/hasanmanzak/meAndAI/commit/b2bc2121af44fbbe28d7d6c5a416b59d6e9aac67) passed exact-head [run 32347855158](https://github.com/hasanmanzak/meAndAI/actions/runs/32347855158): Ubuntu `24:04`, Windows `39:18`, publication skipped, hosted errors `0`; source/original/TRX hashes were reverified after reconciliation without an R invocation |
+| Focused | Immutable source-identical original absence oracle passed exactly once after warning-free product build; transformed typed exact FQN passed `1/1` in `2.241s` |
+| Slice cumulative | [Subfeature=SUBF-0145](README.md#subf-0145) passed `20/20` in `2.237s`; no [Scenario=TEST-0212](test-cases.md#test-0212) trait or completion claim |
+| Operational cumulative | Architecture [TEST-0191](../FEAT-0059-csharp-operational-foundation/test-cases.md#test-0191), [TEST-0192](../FEAT-0059-csharp-operational-foundation/test-cases.md#test-0192), plus [Subfeature=SUBF-0145](README.md#subf-0145) passed `51/51` in `2.723s`; Packaging [TEST-0193](../FEAT-0059-csharp-operational-foundation/test-cases.md#test-0193) passed `17/17` in `2.532s` |
+| Release build | Solution passed with `0` warnings / `0` errors in `1.520s` |
+| Format / structural | Format/analyzers green; diff clean; exact seven implementation/test paths plus this ledger heading; R marker residue `0`; exact FQN `1`; [Scenario=TEST-0212](test-cases.md#test-0212) traits `0`; exact public API/nullability/member and port inventories green |
+| Budgets | Production `439/700`; tests `310/700`; combined `749/1300`; largest file `511/550` |
+| Locks | All `17` tracked lock inputs byte-equal to accepted-design HEAD [8616aa1f4fe198b666b3abf5934b31e80d9498b8](https://github.com/hasanmanzak/meAndAI/commit/8616aa1f4fe198b666b3abf5934b31e80d9498b8) |
+| Review disposition | Pass 1 `0/1/0`: atomic replay/head/authority drift and unapproved-store negative oracles added. Fresh pass 2 `0/0/0` |
+| Local commit | The focused commit containing this row; exact SHA is emitted after creation and reconciled at `EA-CONVERGE-01` |
+| Hosted / correction cost | Package push is prohibited. Allowlist correction hosted errors `0`; owner identification found the two exact predecessor test doubles before green, with correction/revalidation cost carried by the correction gate |
+| Cohort efficiency | One correction push covered the design boundary without pushing packages; no consistency or traceability loss observed locally |

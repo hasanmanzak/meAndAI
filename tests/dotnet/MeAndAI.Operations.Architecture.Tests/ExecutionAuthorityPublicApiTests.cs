@@ -121,7 +121,12 @@ public sealed class ExecutionAuthorityPublicApiTests
         AssertProperties<GrantConsumptionRequest>(new("ExpectedCurrentAuthoritySet", typeof(AuthoritySetBinding)), new("ExpectedStoreHead", typeof(AuthorityDigest)), new("Validation", typeof(GrantValidationRequest)));
         AssertProperties<ExecutionGrantDecision>(new("IsAuthorized", typeof(bool)), new("Rejection", typeof(ExecutionGrantRejection)));
         AssertProperties<PublicationEnvelope>(new("AllowedEffectIdentity", typeof(string)), new("AuthoritySet", typeof(AuthoritySetBinding)), new("Digest", typeof(AuthorityDigest)), new("GateSnapshotIdentity", typeof(string)), new("IdempotencyKey", typeof(IdempotencyKey)), new("ProviderTarget", typeof(ExecutionTarget)), new("PublicationGrantDigest", typeof(AuthorityDigest)), new("ResultName", typeof(string)), new("SealedReportDigest", typeof(AuthorityDigest)));
+        AssertProperties<ExtensionActivationRecord>(new("ActivationApprovals", typeof(IReadOnlyList<GrantApprovalEvidence>)), new("ActivationEpoch", typeof(AuthorityRevision)), new("ActivationGrantDigest", typeof(AuthorityDigest)), new("ActivatingTargetCommit", typeof(string)), new("ActivePolicyDigest", typeof(AuthorityDigest)), new("ActivePolicyIdentity", typeof(string)), new("ActiveSnapshotDigest", typeof(AuthorityDigest)), new("AuthoritySet", typeof(AuthoritySetBinding)), new("BootstrapEvidenceDigest", typeof(AuthorityDigest), IsNullable: true), new("CasVersion", typeof(AuthorityRevision)), new("ClosureEvidenceDigest", typeof(AuthorityDigest)), new("PreviousRecordDigest", typeof(AuthorityDigest), IsNullable: true), new("RecordDigest", typeof(AuthorityDigest)), new("Repository", typeof(ExecutionTarget)), new("TransitionEvidenceDigest", typeof(AuthorityDigest)));
+        AssertProperties<ExtensionActivationCommand>(new("ExpectedCurrent", typeof(ExtensionActivationRecord)), new("ExpectedLeaseFence", typeof(LeaseFenceBinding)), new("Grant", typeof(ExecutionGrant)), new("Proposed", typeof(ExtensionActivationRecord)), new("TransitionEvidenceDigest", typeof(AuthorityDigest)));
+        AssertProperties<ExtensionActivationMutationRequest>(new("Command", typeof(ExtensionActivationCommand)), new("ExecutingActor", typeof(AuthorityActorId)), new("ExpectedCurrentAuthoritySet", typeof(AuthoritySetBinding)), new("ExpectedGrantStoreHead", typeof(AuthorityDigest)), new("ObservedAtUtc", typeof(DateTimeOffset)));
+        AssertProperties<ActivationCasDecision>(new("IsActivated", typeof(bool)), new("Record", typeof(ExtensionActivationRecord), IsNullable: true), new("Rejection", typeof(ExecutionGrantRejection)));
         AssertProperties<ExecutionGrantAuthorizer>();
+        AssertProperties<ExtensionActivationService>();
 
         AssertIdentityApi<AuthorityGrantId>(); AssertIdentityApi<AuthorityOperationId>(); AssertIdentityApi<IdempotencyKey>();
         AssertFactory<GrantGeneration>("Create", typeof(GrantGeneration), [typeof(long)], ["value"]);
@@ -141,8 +146,16 @@ public sealed class ExecutionAuthorityPublicApiTests
         AssertFactory<ExecutionGrantDecision>("Authorized", typeof(ExecutionGrantDecision), [], []);
         AssertFactory<ExecutionGrantDecision>("Rejected", typeof(ExecutionGrantDecision), [typeof(ExecutionGrantRejection)], ["rejection"]);
         AssertFactory<PublicationEnvelope>("Create", typeof(PublicationEnvelope), [typeof(ExecutionGrant), typeof(AuthorityDigest)], ["publicationGrant", "digest"]);
+        AssertFactory<ExtensionActivationRecord>("CreateGenesis", typeof(ExtensionActivationRecord), [typeof(ExecutionTarget), typeof(string), typeof(AuthorityDigest), typeof(AuthorityDigest), typeof(string), typeof(AuthorityDigest), typeof(IEnumerable<GrantApprovalEvidence>), typeof(AuthorityDigest), typeof(AuthorityDigest), typeof(AuthorityDigest), typeof(AuthoritySetBinding)], ["repository", "activePolicyIdentity", "activePolicyDigest", "activeSnapshotDigest", "activatingTargetCommit", "bootstrapEvidenceDigest", "activationApprovals", "activationGrantDigest", "transitionEvidenceDigest", "closureEvidenceDigest", "authoritySet"]);
+        AssertFactory<ExtensionActivationRecord>("CreateSuccessor", typeof(ExtensionActivationRecord), [typeof(ExecutionTarget), typeof(AuthorityRevision), typeof(AuthorityRevision), typeof(string), typeof(AuthorityDigest), typeof(AuthorityDigest), typeof(string), typeof(AuthorityDigest), typeof(IEnumerable<GrantApprovalEvidence>), typeof(AuthorityDigest), typeof(AuthorityDigest), typeof(AuthorityDigest), typeof(AuthoritySetBinding)], ["repository", "activationEpoch", "casVersion", "activePolicyIdentity", "activePolicyDigest", "activeSnapshotDigest", "activatingTargetCommit", "previousRecordDigest", "activationApprovals", "activationGrantDigest", "transitionEvidenceDigest", "closureEvidenceDigest", "authoritySet"]);
+        AssertFactory<ExtensionActivationCommand>("Create", typeof(ExtensionActivationCommand), [typeof(ExtensionActivationRecord), typeof(AuthorityDigest), typeof(ExecutionGrant), typeof(LeaseFenceBinding), typeof(ExtensionActivationRecord)], ["expectedCurrent", "transitionEvidenceDigest", "grant", "expectedLeaseFence", "proposed"]);
+        AssertFactory<ExtensionActivationMutationRequest>("Create", typeof(ExtensionActivationMutationRequest), [typeof(ExtensionActivationCommand), typeof(AuthoritySetBinding), typeof(AuthorityDigest), typeof(AuthorityActorId), typeof(DateTimeOffset)], ["command", "expectedCurrentAuthoritySet", "expectedGrantStoreHead", "executingActor", "observedAtUtc"]);
+        AssertFactory<ActivationCasDecision>("Activated", typeof(ActivationCasDecision), [typeof(ExtensionActivationRecord)], ["record"]);
+        AssertFactory<ActivationCasDecision>("Rejected", typeof(ActivationCasDecision), [typeof(ExecutionGrantRejection)], ["rejection"]);
         AssertFactory<ExecutionGrantAuthorizer>("Create", typeof(ExecutionGrantAuthorizer), [typeof(IExecutionAuthorityReadPort), typeof(IExecutionAuthorityMutationPort)], ["readPort", "mutationPort"]);
         AssertFactory<ExecutionGrantAuthorizer>("AuthorizeAndConsumeAsync", typeof(ValueTask<ExecutionGrantDecision>), [typeof(GrantValidationRequest), typeof(CancellationToken)], ["request", "cancellationToken"], isStatic: false);
+        AssertFactory<ExtensionActivationService>("Create", typeof(ExtensionActivationService), [typeof(IExecutionAuthorityReadPort), typeof(IExecutionAuthorityMutationPort)], ["readPort", "mutationPort"]);
+        AssertFactory<ExtensionActivationService>("ActivateAsync", typeof(ValueTask<ActivationCasDecision>), [typeof(ExtensionActivationCommand), typeof(AuthorityActorId), typeof(DateTimeOffset), typeof(CancellationToken)], ["command", "executingActor", "observedAtUtc", "cancellationToken"], isStatic: false);
 
         AssertGrantIdentitySurface<AuthorityGrantId>(); AssertGrantIdentitySurface<AuthorityOperationId>(); AssertGrantIdentitySurface<IdempotencyKey>();
         AssertGrantSurface<GrantGeneration>(typeof(object), [typeof(IEquatable<GrantGeneration>)], true, "Create", "Equals", "Equals", "GetHashCode", "ToString");
@@ -155,8 +168,13 @@ public sealed class ExecutionAuthorityPublicApiTests
         AssertGrantBindingSurface<PublicationGrantBinding>(); AssertGrantBindingSurface<ExtensionActivationGrantBinding>();
         AssertGrantValueSurface<ExecutionGrant>(); AssertGrantValueSurface<GrantValidationRequest>(); AssertGrantValueSurface<GrantConsumptionRequest>();
         AssertGrantValueSurface<PublicationEnvelope>();
+        AssertGrantSurface<ExtensionActivationRecord>(typeof(object), [typeof(IEquatable<ExtensionActivationRecord>)], false, "CreateGenesis", "CreateSuccessor", "Equals", "Equals", "GetHashCode");
+        AssertGrantValueSurface<ExtensionActivationCommand>();
+        AssertGrantValueSurface<ExtensionActivationMutationRequest>();
+        AssertGrantSurface<ActivationCasDecision>(typeof(object), [typeof(IEquatable<ActivationCasDecision>)], false, "Activated", "Equals", "Equals", "GetHashCode", "Rejected");
         AssertGrantSurface<ExecutionGrantDecision>(typeof(object), [typeof(IEquatable<ExecutionGrantDecision>)], false, "Authorized", "Equals", "Equals", "GetHashCode", "Rejected");
         AssertGrantSurface<ExecutionGrantAuthorizer>(typeof(object), [], false, "AuthorizeAndConsumeAsync", "Create");
+        AssertGrantSurface<ExtensionActivationService>(typeof(object), [], false, "ActivateAsync", "Create");
     }
     private static void AssertProperties<T>(params PropertySpec[] properties) =>
         AssertPropertiesCore<T>(properties, isAbstract: false);
@@ -179,7 +197,7 @@ public sealed class ExecutionAuthorityPublicApiTests
             Assert.Equal(expected[index].IsStatic, actual[index].GetMethod!.IsStatic);
             Assert.Null(actual[index].GetSetMethod(nonPublic: true));
             if (!actual[index].PropertyType.IsValueType)
-                Assert.Equal(NullabilityState.NotNull,
+                Assert.Equal(expected[index].IsNullable ? NullabilityState.Nullable : NullabilityState.NotNull,
                     new NullabilityInfoContext().Create(actual[index]).ReadState);
         }
     }
@@ -213,7 +231,8 @@ public sealed class ExecutionAuthorityPublicApiTests
         Assert.Equal(type == typeof(ExecutionGrantBinding), type.IsAbstract);
         Assert.Equal(type != typeof(ExecutionGrantBinding), type.IsSealed);
         Assert.Equal(baseType, type.BaseType);
-        Assert.Equal(type == typeof(ExecutionGrantAuthorizer)
+        Assert.Equal(type == typeof(ExecutionGrantAuthorizer) ||
+            type == typeof(ExtensionActivationService)
             ? "MeAndAI.Operations.Application.ExecutionAuthority"
             : "MeAndAI.Operations.Domain.ExecutionAuthority", type.Namespace);
         Assert.Equal(interfaces.OrderBy(static value => value.FullName, StringComparer.Ordinal),
@@ -377,5 +396,6 @@ public sealed class ExecutionAuthorityPublicApiTests
         }
         return method;
     }
-    private sealed record PropertySpec(string Name, Type Type, bool IsStatic = false);
+    private sealed record PropertySpec(string Name, Type Type,
+        bool IsStatic = false, bool IsNullable = false);
 }
