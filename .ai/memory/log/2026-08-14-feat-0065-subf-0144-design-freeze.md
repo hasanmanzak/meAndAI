@@ -69,3 +69,19 @@ Final record-synchronized StructureOnly and publication evidence `7/7`, graph
 checkpoint. No push or hosted-green
 claim is made for this intermediate packet; `EXTENSION-AUTHORITY-01` is the
 next ordered packet.
+
+## Authority-red diagnostic correction
+
+The first authority attempt at the later packet-local surface predecessor used
+the frozen FQN and marker `PROTECTED-POLICY-AUTHORITY-RED-0001`, but an unquoted
+PowerShell logger semicolon split the command before the exact logger filename
+and FQN filter. The child ran a broad suite and the target Fact stopped before
+its marker on a case-only digest-text assertion. Source identity was `497`
+lines / SHA-256
+`DE43FA292099760EBBBBA3046D4F9B1F374F3BBE3E809C46A5A32EA34B9B9073`; the
+sole `127528`-byte diagnostic TRX has SHA-256
+`3C2235A61C4654673B3EE08EAA9937016063ACD229CBF26BFA7C56919C08015F`.
+The attempt is immutable diagnostic evidence, not canonical red and not product
+evidence. It is never retried. The delivery plan now freezes quoted logger and
+filter arguments plus replacement marker `PROTECTED-POLICY-AUTHORITY-RED-0007`
+for one fresh invocation after this exact correction head is hosted green.

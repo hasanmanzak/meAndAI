@@ -42,7 +42,7 @@
 | Packet | Owner and outcome | Canonical expected-red identity | Hard redraw threshold |
 | --- | --- | --- | --- |
 | `POLICY-SURFACE-FRAMING-01` | Exact public types/factories, versioned frames/golden vectors, API/ownership and negative surface | `MeAndAI.Protocol.Conformance.Tests.ProtectedPolicySurfaceTests.Exposes_exact_extension_waiver_debt_and_self_consumption_surface`; compile SurfaceRed solely on missing `ExtensionId` | `6,500` normalized code+test changed lines |
-| `EXTENSION-AUTHORITY-01` | Trusted pack/proof binding, immutable Policy export, active/proposed separation | `MeAndAI.Protocol.Conformance.Tests.ProtectedPolicyExtensionAuthorityTests.Keeps_active_extension_authority_separate_from_candidate_proposal`; marker `PROTECTED-POLICY-AUTHORITY-RED-0001` | `2,500` lines |
+| `EXTENSION-AUTHORITY-01` | Trusted pack/proof binding, immutable Policy export, active/proposed separation | `MeAndAI.Protocol.Conformance.Tests.ProtectedPolicyExtensionAuthorityTests.Keeps_active_extension_authority_separate_from_candidate_proposal`; replacement marker `PROTECTED-POLICY-AUTHORITY-RED-0007` | `2,500` lines |
 | `EXTENSION-EVALUATION-01` | Protocol-owned required-path kind, capability-only applicability/evaluation and findings | `MeAndAI.Protocol.Conformance.Tests.ProtectedPolicyExtensionEvaluationTests.Evaluates_only_protocol_owned_additive_extension_kinds`; marker `PROTECTED-POLICY-EVALUATION-RED-0002` | `2,500` lines |
 | `WAIVER-DISPOSITION-01` | Stable finding identity, authenticated waiver policy/snapshot, expiry and non-waivable behavior | `MeAndAI.Protocol.Conformance.Tests.ProtectedPolicyWaiverDispositionTests.Applies_exact_waiver_identity_expiry_and_nonwaivable_rules`; marker `PROTECTED-POLICY-WAIVER-RED-0003` | `2,500` lines |
 | `DEBT-ENFORCEMENT-01` | Authenticated debt snapshot and exact Audit/Prospective/FullBlocking truth table | `MeAndAI.Protocol.Conformance.Tests.ProtectedPolicyDebtEnforcementTests.Applies_exact_debt_and_enforcement_precedence`; marker `PROTECTED-POLICY-DEBT-RED-0004` | `2,500` lines |
@@ -127,6 +127,10 @@ contain `ProtectedPolicyEvaluation`, are owned by Conformance's
 - add `src/MeAndAI.Protocol.Policy/Properties/AssemblyInfo.cs` containing only
   the exact `InternalsVisibleTo("MeAndAI.Protocol.Conformance.Tests")` friend;
 - add only `tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ProtectedPolicyExtensionAuthorityTests.cs`;
+  modify `ProtectedPolicySurfaceTests.cs` only to advance the already-frozen
+  complete stage inventory from Policy `1` / non-Domain `148` to Policy `2` /
+  non-Domain `149` and to include the exact implemented
+  `ConformanceKernel.ActivateExtensions` member in its signature oracle;
   modify `ContractSliceAOwnershipTests.cs`, `ContractSliceAPublicApiTests.cs`,
   `ContractSliceBStructuralTests.cs`, `ContractSliceCOwnershipTests.cs`, and
   `ContractSliceDPolicyExportTests.cs` solely to replace their immutable empty-
@@ -279,8 +283,8 @@ it makes no test-discovery claim. Every behavior red uses:
 dotnet test tests/dotnet/MeAndAI.Protocol.Conformance.Tests/MeAndAI.Protocol.Conformance.Tests.csproj
   --configuration Release --no-restore --no-build --nologo --verbosity minimal
   --results-directory <fresh-external-directory>
-  --logger trx;LogFileName=<packet-marker>.trx
-  --filter FullyQualifiedName=<exact-fqn>
+  --logger "trx;LogFileName=<packet-marker>.trx"
+  --filter "FullyQualifiedName=<exact-fqn>"
 ```
 
 The exact behavior-red seam is packet-owned and cannot be substituted:
@@ -293,6 +297,22 @@ The exact behavior-red seam is packet-owned and cannot be substituted:
 | `DEBT-ENFORCEMENT-01` | The exact unchanged, unclosed, unexpired Prospective debt still returns `ActiveViolation` / `Block`; the marker owns the missing `HistoricalDebt` disposition and implemented public wrapper. |
 | `SELF-CONSUMPTION-01` | Fully authenticated matching overlap and independent-fixture evaluations pass binding gates but remain `IsQualified=false`; the marker owns only the missing qualified result. |
 | `PROTECTED-POLICY-CONVERGE-01` | The full semantic matrix is green first; the marker owns only the absent atomic seven Scenario traits, one owner move, and two filter additions. |
+
+The first authority attempt used marker `PROTECTED-POLICY-AUTHORITY-RED-0001`
+at the later packet-local surface predecessor.
+Its source was `497` lines / SHA-256
+`DE43FA292099760EBBBBA3046D4F9B1F374F3BBE3E809C46A5A32EA34B9B9073`, but
+PowerShell split the unquoted logger value at its semicolon. The child therefore
+received neither the exact logger filename nor the exact FQN filter, ran the
+broad `67`-test suite, and stopped before the marker on a case-only digest-text
+assertion. The sole generated `127528`-byte diagnostic TRX has SHA-256
+`3C2235A61C4654673B3EE08EAA9937016063ACD229CBF26BFA7C56919C08015F`.
+That attempt consumed `0001` as immutable diagnostic evidence and is never
+retried or promoted to canonical red. The exact quoted command above and
+replacement marker `PROTECTED-POLICY-AUTHORITY-RED-0007` are the only renewed
+authority; the FQN and semantic missing-mint seam remain unchanged. Before the
+replacement invocation, its corrected source and fresh result-root identities
+must be frozen independently.
 
 The pre-red compile scaffold is intentional, fail-closed, and uncommitted. A
 throwing or untested production placeholder is forbidden. The accepted red
