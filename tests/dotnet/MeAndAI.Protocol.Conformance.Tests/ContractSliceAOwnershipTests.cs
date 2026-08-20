@@ -364,7 +364,9 @@ public sealed class ContractSliceAOwnershipTests
             new FriendExpectation(
                 "MeAndAI.Protocol.Conformance",
                 ["MeAndAI.Protocol.Conformance.Tests"]),
-            new FriendExpectation("MeAndAI.Protocol.Policy", []),
+            new FriendExpectation(
+                "MeAndAI.Protocol.Policy",
+                ["MeAndAI.Protocol.Conformance.Tests"]),
         };
 
         foreach (var expectation in expected)

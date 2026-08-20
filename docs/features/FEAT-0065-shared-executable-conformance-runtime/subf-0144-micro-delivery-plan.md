@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Ordered implementation control plan |
-| Status | `AcceptedFrozenDesign`; `POLICY-SURFACE-FRAMING-01` is packet-local `ReviewedLocalGreen`; `EXTENSION-AUTHORITY-01` is the next ordered packet and has not started |
+| Status | `AcceptedFrozenDesign`; `POLICY-SURFACE-FRAMING-01` and `EXTENSION-AUTHORITY-01` are packet-local `ReviewedLocalGreen`; `EXTENSION-EVALUATION-01` is the next ordered packet and is inactive in this commit |
 | Parent design | [Protected policy and self-consumption design](subf-0144-extension-waiver-self-consumption-design.md) |
 | Scenario | [TEST-0211](test-cases.md#test-0211) |
 | Exact baseline | [`14ad828bcdde5f843cdbf12677b25f19736e5691`](https://github.com/hasanmanzak/meAndAI/commit/14ad828bcdde5f843cdbf12677b25f19736e5691) |

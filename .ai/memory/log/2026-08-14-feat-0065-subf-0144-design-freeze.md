@@ -2,7 +2,7 @@
 
 | Field | Value |
 | --- | --- |
-| State | `AcceptedFrozenDesign`; exact design head is Ubuntu/Windows hosted green; `POLICY-SURFACE-FRAMING-01` is `ReviewedLocalGreen` at this focused delivery; later packets remain ordered and inactive |
+| State | `AcceptedFrozenDesign`; exact design head is Ubuntu/Windows hosted green; `POLICY-SURFACE-FRAMING-01` and `EXTENSION-AUTHORITY-01` are `ReviewedLocalGreen`; `EXTENSION-EVALUATION-01` is next and inactive in this commit |
 | Exact predecessor | [`14ad828bcdde5f843cdbf12677b25f19736e5691`](https://github.com/hasanmanzak/meAndAI/commit/14ad828bcdde5f843cdbf12677b25f19736e5691) |
 | Exact-main validation | [Run 31797357907](https://github.com/hasanmanzak/meAndAI/actions/runs/31797357907): Ubuntu `7m24s`, Windows `12m38s`, publication verification skipped |
 | Accepted design head | [`5d148233913dde08a7b24a4f696eace3c6f3407e`](https://github.com/hasanmanzak/meAndAI/commit/5d148233913dde08a7b24a4f696eace3c6f3407e) |
@@ -85,3 +85,39 @@ The attempt is immutable diagnostic evidence, not canonical red and not product
 evidence. It is never retried. The delivery plan now freezes quoted logger and
 filter arguments plus replacement marker `PROTECTED-POLICY-AUTHORITY-RED-0007`
 for one fresh invocation after this exact correction head is hosted green.
+
+## `EXTENSION-AUTHORITY-01` local delivery
+
+Replacement canonical R `0007` ran exactly once after the correction head was
+Ubuntu/Windows hosted green. Its `499`-line / `21579`-byte source SHA-256 was
+`A4D2792D089D8204B53D770E59338C7EC9A47E23E772E0ACC941F1309A4D2166`;
+the exact one-result TRX failed solely on the frozen missing public activation
+member and has SHA-256
+`031871D75E080F5B58999D64E910219C4873FC979B5A311699263CF2FB7C7F49`.
+The source, DLL, and PDB identities remained unchanged after the invocation;
+R is immutable and was not rerun.
+
+Bounded green adds the retained Policy-owned Ed25519 verifiers, immutable
+unprovisioned production export, exact manifest/pack/artifact binding, and the
+public canonical-empty activation seam. The sole package Fact owns all four
+typed test-only proof routes, exact known-answer bytes and field/byte mutation
+rejection, cross-record/epoch and artifact/component negatives, and public
+nonempty fail-closed behavior. The successor preflight then exposed a packet-
+local dependency-closure defect: later registered-evaluator tests could not
+construct their typed Policy export without changing this immutable fixture.
+The correction leaves the canonical R source and production surface untouched,
+adds only typed-registration test-export and validated canonical-nonempty
+fixture seams plus their exact canonical framing, and keeps raw digests, keys,
+signers, verifier callbacks, and arbitrary bytes outside the helper. Corrected
+final source is `974` lines / `41940` bytes
+at SHA-256
+`388A3342A3EDD0E0193BBEDDDDCF89ECACC409E4E7056887995EA754D6A128B8`.
+Focused `1/1`, protected-policy cumulative `2/2`, full Conformance `67/67`,
+Domain `98/98`, warning-as-error Release build `0/0`, format, six locks,
+API/ownership, diff, scope, final record-synchronized StructureOnly,
+publication evidence `7/7`, graph/schema-2, link, and fresh review gates are
+green. The exact code/test scope is twelve paths at `1681/2500` normalized
+changed lines. Final Conformance.Tests DLL/PDB SHA-256 values are respectively
+`3CB2907618F2FA9F00C6CCA02F68D917A7691A135C57B542BC8D1E2E52A55F71` and
+`05C1EBF1D5D1B11AEBD9882B1BCEB803211FA01A7996E081EC01E1BB78DE33C1`.
+No push or hosted-green claim is made for this intermediate packet.

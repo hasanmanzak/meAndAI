@@ -200,7 +200,7 @@ public sealed class ContractSliceDOwnershipTests
             ],
             Friends(abstractions));
         Assert.Equal(["MeAndAI.Protocol.Conformance.Tests"], Friends(conformance));
-        Assert.Empty(Friends(policy));
+        Assert.Equal(["MeAndAI.Protocol.Conformance.Tests"], Friends(policy));
         Assert.DoesNotContain(abstractions.GetReferencedAssemblies(),
             assembly => assembly.Name == "MeAndAI.Protocol.Policy");
         Assert.DoesNotContain(conformance.GetReferencedAssemblies(),
@@ -243,9 +243,9 @@ public sealed class ContractSliceDStructuralTests
         ProtectedPolicySurfaceTests.AssertPredecessorInventory(
             domain,
             ProtectedPolicySurfaceTests.PredecessorDomainTypes);
-        Assert.Equal(
-            ["MeAndAI.Protocol.Policy.InitialRuleQualificationPolicy"],
-            policy.GetExportedTypes().Select(type => type.FullName));
+        ProtectedPolicySurfaceTests.AssertPredecessorInventory(
+            policy,
+            ProtectedPolicySurfaceTests.PredecessorPolicyTypes);
 
         var type = typeof(InitialRuleQualificationPolicy);
         Assert.True(type.IsPublic && type.IsAbstract && type.IsSealed);

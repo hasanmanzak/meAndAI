@@ -759,7 +759,9 @@ public sealed class ContractSliceBOwnershipTests
         AssertFriendAssemblies(
             "MeAndAI.Protocol.Conformance",
             ["MeAndAI.Protocol.Conformance.Tests"]);
-        AssertFriendAssemblies("MeAndAI.Protocol.Policy", []);
+        AssertFriendAssemblies(
+            "MeAndAI.Protocol.Policy",
+            ["MeAndAI.Protocol.Conformance.Tests"]);
 
         var abstractions = LoadAssembly(
             "MeAndAI.Protocol.Conformance.Abstractions");
