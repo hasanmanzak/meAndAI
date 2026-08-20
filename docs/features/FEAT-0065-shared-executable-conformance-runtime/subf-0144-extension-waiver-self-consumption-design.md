@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / dependency-closed [FEAT-0065](README.md) design slice |
-| Status | `FrozenDesign`; fresh reviews `0/0/0`; implementation inactive until every `AcceptedFrozenDesign` gate closes |
+| Status | `AcceptedFrozenDesign`; exact design head is hosted green; `POLICY-SURFACE-FRAMING-01` is packet-local `ReviewedLocalGreen`; later packets remain ordered |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |

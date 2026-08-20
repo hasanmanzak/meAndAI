@@ -24,9 +24,10 @@ ContractSlice A-D and the final
 atomic activation are immutable merged/exact-main-hosted-green predecessor
 evidence at full Conformance `65/65`, Domain `98/98`, API/ownership `15/15`,
 Scenario/ContractSlice `65/65`, and combined `163/163`. The current handoff owns
-the frozen extension/waiver/debt/self-consumption design with fresh reviews
-`0/0/0` and keeps implementation inactive pending local StructureOnly/graph/
-publication gates plus exact design-head hosted green.
+the `AcceptedFrozenDesign` extension/waiver/debt/self-consumption boundary and
+its exact design-head hosted-green evidence. `POLICY-SURFACE-FRAMING-01` is
+packet-local `ReviewedLocalGreen`; the next ordered authority packet has not
+started.
 [TEST-0211](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0211), feature
 completion/DoD, release, and publication remain held.
 

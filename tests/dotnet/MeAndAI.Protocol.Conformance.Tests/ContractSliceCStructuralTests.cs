@@ -51,10 +51,12 @@ public sealed class ContractSliceCStructuralTests
         Assert.Equal(
             ConformanceC.Order(StringComparer.Ordinal),
             ExportedNames(conformance, ConformanceC));
-        Assert.Equal(
-            95,
-            abstractions.GetExportedTypes().Length +
-            conformance.GetExportedTypes().Length);
+        ProtectedPolicySurfaceTests.AssertPredecessorInventory(
+            abstractions,
+            ProtectedPolicySurfaceTests.PredecessorAbstractionsTypes);
+        ProtectedPolicySurfaceTests.AssertPredecessorInventory(
+            conformance,
+            ProtectedPolicySurfaceTests.PredecessorConformanceTypes);
         foreach (var type in AbstractionsC
             .Select(name => RequireType(abstractions, name))
             .Concat(ConformanceC.Select(name => RequireType(conformance, name))))

@@ -1,7 +1,7 @@
 # Project-local AI Memory
 
 Scope: **this `meAndAI` repository only**<br>
-Last reviewed: **2026-08-13**<br>
+Last reviewed: **2026-08-20**<br>
 Protocol version: **0.16.0**<br>
 Latest immutable release before this unmerged development: **0.16.0**
 
@@ -316,7 +316,7 @@ The lifecycle records-only freeze head is exact-hosted-green: Ubuntu passed in
 `20m44s`, Windows in `46m51s`, and publication verification was correctly
 skipped. The exact lifecycle implementation identity recorded in the canonical
 handoff passed Ubuntu in `19m36s` and Windows in `36m02s`; publication verification was
-correctly skipped. ContractSlice A-D and the final [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) atomic activation are merged and exact-main hosted green at `A32/B11/C11/D11`, cumulative/full Conformance `65/65`, Domain `98/98`, API/ownership `15/15`, Scenario/ContractSlice `65/65`, and combined `163/163`. [SUBF-0144](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0144) is `FrozenDesign` with fresh reviews and local StructureOnly/graph/publication gates green; implementation remains inactive pending exact design-head hosted green. [TEST-0211](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0211), feature completion/DoD, release, and publication remain held. Follow the current [design handoff](log/2026-08-14-feat-0065-subf-0144-design-freeze.md).
+correctly skipped. ContractSlice A-D and the final [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) atomic activation are merged and exact-main hosted green at `A32/B11/C11/D11`, cumulative/full Conformance `65/65`, Domain `98/98`, API/ownership `15/15`, Scenario/ContractSlice `65/65`, and combined `163/163`. [SUBF-0144](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0144) is `AcceptedFrozenDesign`; `POLICY-SURFACE-FRAMING-01` is packet-local `ReviewedLocalGreen` with focused `1/1`, full Conformance `66/66`, Domain `98/98`, warning-free Release builds, and review `0/0/0`. The next ordered authority packet has not started. [TEST-0211](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0211), feature completion/DoD, release, and publication remain held. Follow the current [design handoff](log/2026-08-14-feat-0065-subf-0144-design-freeze.md).
 The exact record-delivery closure reached the full `4096/4096` instruction-graph
 budget. Ubuntu passed in `19m52s`; Windows reached its exact 45-minute job
 ceiling after every emitted suite result was successful. The bounded correction

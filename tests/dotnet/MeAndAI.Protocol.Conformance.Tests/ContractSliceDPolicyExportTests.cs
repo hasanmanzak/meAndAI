@@ -234,17 +234,18 @@ public sealed class ContractSliceDStructuralTests
         var domain = typeof(RuleId).Assembly;
         var policy = typeof(InitialRuleQualificationPolicy).Assembly;
 
-        Assert.Equal(72, abstractions.GetExportedTypes().Length);
-        Assert.Equal(23, conformance.GetExportedTypes().Length);
-        Assert.Equal(37, domain.GetExportedTypes().Length);
+        ProtectedPolicySurfaceTests.AssertPredecessorInventory(
+            abstractions,
+            ProtectedPolicySurfaceTests.PredecessorAbstractionsTypes);
+        ProtectedPolicySurfaceTests.AssertPredecessorInventory(
+            conformance,
+            ProtectedPolicySurfaceTests.PredecessorConformanceTypes);
+        ProtectedPolicySurfaceTests.AssertPredecessorInventory(
+            domain,
+            ProtectedPolicySurfaceTests.PredecessorDomainTypes);
         Assert.Equal(
             ["MeAndAI.Protocol.Policy.InitialRuleQualificationPolicy"],
             policy.GetExportedTypes().Select(type => type.FullName));
-        Assert.Equal(
-            96,
-            abstractions.GetExportedTypes().Length +
-            conformance.GetExportedTypes().Length +
-            policy.GetExportedTypes().Length);
 
         var type = typeof(InitialRuleQualificationPolicy);
         Assert.True(type.IsPublic && type.IsAbstract && type.IsSealed);

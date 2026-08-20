@@ -143,13 +143,8 @@ public sealed class ContractSliceAOwnershipTests
             .ToArray();
         var assembly = Assembly.Load(
             new AssemblyName("MeAndAI.Protocol.Domain"));
-        var actual = assembly
-            .GetExportedTypes()
-            .Select(type => type.FullName)
-            .Order(StringComparer.Ordinal)
-            .ToArray();
 
-        Assert.Equal(expected, actual);
+        ProtectedPolicySurfaceTests.AssertPredecessorInventory(assembly, expected);
     }
 
     [Fact]
