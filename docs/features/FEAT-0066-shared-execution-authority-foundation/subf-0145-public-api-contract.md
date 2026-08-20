@@ -3,8 +3,8 @@
 | Field | Value |
 | --- | --- |
 | Classification | Normative API appendix to the [selected design](subf-0145-authority-grant-activation-design.md) |
-| Status | `DesignCorrectionCandidate`; grant production paused after canonical red |
-| Correction | Independent expected lease/fence coordinates plus exact unapproved/missing grant-store mapping; no inventory, rejection, FQN, order, package identity/order/budget, or ownership change |
+| Status | `AcceptedFrozenDesign`; four implementation packages are `ReviewedLocalGreen`, and `EA-CONVERGE-01` exact-head hosted validation is pending |
+| Correction | Closed: independent expected lease/fence coordinates plus exact unapproved/missing grant-store mapping; no inventory, rejection, FQN, order, package identity/order/budget, or ownership change |
 | Parent | [FEAT-0066](README.md) |
 | Test | [TEST-0212](test-cases.md#test-0212) |
 | Values/errors | [Exact value and error contract](subf-0145-value-error-contract.md) |

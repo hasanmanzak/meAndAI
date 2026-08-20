@@ -1,9 +1,10 @@
 # FEAT-0066 Test Scenarios
 
-Test implementation is paused at a design-correction boundary. [SUBF-0145](README.md#subf-0145)
-has a `ReviewedLocalGreen` snapshot package and one accepted grant red; grant
-production resumes only after the corrected [AcceptedFrozenDesign gate](subf-0145-micro-delivery-plan.md#acceptedfrozendesign-gate)
-is exact-head hosted green. [SUBF-0146](README.md#subf-0146) remains inactive.
+[SUBF-0145](README.md#subf-0145) remains scenario-inactive, but its authority
+snapshot, execution grant, publication envelope, and extension activation
+packages are each `ReviewedLocalGreen` in separate local commits. The
+records-only `EA-CONVERGE-01` cohort commit, single push, and exact-head hosted
+gate are pending. [SUBF-0146](README.md#subf-0146) remains inactive.
 
 | ID | Related slice | Scenario | Expected result | Level | Intent review | Status | Automation |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -20,14 +21,11 @@ is exact-head hosted green. [SUBF-0146](README.md#subf-0146) remains inactive.
 
 ## Evidence
 
-The snapshot package is `ReviewedLocalGreen`. The grant package's one canonical
-[`TEST-0212-GRANT-RED-0002`](#test-0212) invocation failed only on the frozen
-authorizer absence; source SHA-256 is
-`BBECC0F165FFAD9DC59B62A742B9B26F53C3DC6624A90DD9004D52A9155C52B7` and TRX
-SHA-256 is `87D21A285E5BDDEC8D1B555583963A073DCF0C9E954EF901568C61806238C7A3`.
-The correction creates no replacement R and that invocation is never rerun.
-During green transformation, intermediate facts replace the governance-invalid
-[Scenario=TEST-0212](#test-0212) trait with exact [Subfeature=SUBF-0145](README.md#subf-0145); their FQNs and
-this canonical documentation trace remain unchanged. The scenario trait,
-executable owner, and `Passing` status activate only in a separate final atom.
-A historical engine-state enum or workflow lease remains non-evidence.
+All four package-local canonical reds are immutable and were consumed exactly
+once. Their source/TRX identities, one-time original-oracle routes, bounded
+greens, cumulative counts, reviews, and focused commits are retained by the
+[package ledger](subf-0145-package-evidence.md). The four exact package FQNs and
+[Subfeature=SUBF-0145](README.md#subf-0145) are locally green; no fact carries
+[Scenario=TEST-0212](#test-0212). The scenario trait, executable owner, and
+`Passing` status activate only in a separate final atom. A historical
+engine-state enum or workflow lease remains non-evidence.

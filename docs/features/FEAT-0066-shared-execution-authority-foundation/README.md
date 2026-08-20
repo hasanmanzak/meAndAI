@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Feature |
-| Status | [SUBF-0145](#subf-0145) `DesignCorrectionCandidate`; implementation paused after the grant expected-red while the narrow lease/fence and grant-store correction repeats `AcceptedFrozenDesign` exact-head hosted validation |
+| Status | [SUBF-0145](#subf-0145) `AcceptedFrozenDesign`; all four implementation packages are `ReviewedLocalGreen`, and `EA-CONVERGE-01` final-sync exact-head hosted validation is pending |
 | Target version | 0.17.0 |
 | Issue | [#166](https://github.com/hasanmanzak/meAndAI/issues/166) |
 | Pull request | Design checkpoint not yet created |
@@ -14,16 +14,16 @@
 
 This record owns boundary 2 in the accepted
 [successor plan](../../architecture/protocol-governance-and-execution/successor-delivery-plan.md#1-capability-ownership).
-The current maintainer directive authorizes the
-[SUBF-0145](#subf-0145) [design freeze](subf-0145-authority-grant-activation-design.md) and
-conditionally authorizes only its four implementation packages after the exact
-[AcceptedFrozenDesign gate](subf-0145-micro-delivery-plan.md#acceptedfrozendesign-gate)
-is green. The initial gate activated implementation; the authority-snapshot
-package reached `ReviewedLocalGreen` and the grant canonical red was accepted.
-That red exposed a missing independent expected lease/fence coordinate and an
-unmapped protected grant-store absence, so grant production is paused until
-the synchronized correction repeats the same gate. The accepted red is not rerun.
-After correction green, the package sequence resumes without another confirmation.
+The current maintainer directive authorized the
+[SUBF-0145](#subf-0145) [design freeze](subf-0145-authority-grant-activation-design.md) and,
+after the exact
+[AcceptedFrozenDesign gate](subf-0145-micro-delivery-plan.md#acceptedfrozendesign-gate),
+only its four implementation packages. The initial gate and both narrow
+design corrections passed exact-head hosted validation; the accepted reds were
+never rerun. Authority snapshot, execution grant, publication envelope, and
+extension activation now each have a separate focused `ReviewedLocalGreen`
+commit. `EA-CONVERGE-01` owns the records-only local commit, one cohort push,
+and exact-head Ubuntu/Windows gate.
 Every intermediate implementation fact remains subfeature-scoped with the exact
 [Subfeature=SUBF-0145](#subf-0145) trait. [Scenario=TEST-0212](test-cases.md#test-0212), its executable owner, and
 its `Passing` status remain held for a separate atomic final-activation gate;
@@ -99,14 +99,14 @@ reconstruction, and explicit recovery grants for every mutating application.
 | Test readiness | Gate 1 state | Evidence |
 | --- | --- | --- |
 | Scenarios | Defined | [Test scenarios](test-cases.md) |
-| Test code | In progress, production paused | Snapshot package is `ReviewedLocalGreen`; grant canonical red is accepted and immutable during design correction |
-| Baseline run | Canonical reds captured through grant | No prior same-contract implementation exists; the correction adds no product evidence |
+| Test code | Four packages `ReviewedLocalGreen`; converge pending | All four exact FQNs and [Subfeature=SUBF-0145](#subf-0145) are locally green; [Scenario=TEST-0212](test-cases.md#test-0212) remains held |
+| Baseline run | Four canonical reds immutable; four bounded greens complete | Exact R identities and local package evidence are retained in the [package ledger](subf-0145-package-evidence.md) |
 
 ## Decomposition and subfeature gates
 
 | ID | Slice | Tracking | Tests/run | Self-review/findings | Status |
 | --- | --- | --- | --- | --- | --- |
-| `SUBF-0145` <a name="subf-0145"></a> | Authority snapshots, role separation, grants, activation CAS, and publication envelopes | [#166](https://github.com/hasanmanzak/meAndAI/issues/166) | [TEST-0212](test-cases.md#test-0212) / snapshot local green; grant red accepted | Narrow correction reviews active | `DesignCorrectionCandidate`; [design](subf-0145-authority-grant-activation-design.md) / [API](subf-0145-public-api-contract.md) / [values/errors](subf-0145-value-error-contract.md) / [micro plan](subf-0145-micro-delivery-plan.md) |
+| `SUBF-0145` <a name="subf-0145"></a> | Authority snapshots, role separation, grants, activation CAS, and publication envelopes | [#166](https://github.com/hasanmanzak/meAndAI/issues/166) | [TEST-0212](test-cases.md#test-0212) / four package FQNs and cumulative local green | Package reviews `0/0/0`; cohort review pending | Four packages `ReviewedLocalGreen`; final-sync exact-head hosted pending; [design](subf-0145-authority-grant-activation-design.md) / [API](subf-0145-public-api-contract.md) / [values/errors](subf-0145-value-error-contract.md) / [micro plan](subf-0145-micro-delivery-plan.md) |
 | `SUBF-0146` <a name="subf-0146"></a> | Leases, fences, journal, receipts, retention, reconstruction, and recovery grants | [#166](https://github.com/hasanmanzak/meAndAI/issues/166) | [TEST-0213](test-cases.md#test-0213) / not started | Pending | Proposed |
 
 ## Decisions and relationships
@@ -121,7 +121,7 @@ reconstruction, and explicit recovery grants for every mutating application.
 - [x] Numbered planning scenarios and explicit WIP absence finding.
 - [x] Exact authority/grant/activation schemas and store-port contracts for selected [SUBF-0145](#subf-0145).
 - [x] Exact [TEST-0212](test-cases.md#test-0212) expected-red FQNs, replay, role, publication, and concurrent-CAS fixture plan.
-- [ ] Narrow expected lease/fence and protected grant-store correction repeats the exact `AcceptedFrozenDesign` local and hosted gates.
+- [x] Narrow expected lease/fence and protected grant-store correction passed the exact `AcceptedFrozenDesign` local and hosted gates.
 - [ ] [SUBF-0146](#subf-0146) journal, crash, corruption, retention, reconstruction, and recovery schema/fixture freeze.
 - [x] Gate 2 design review for the selected dependency-closed slice; accepted at
   [`8616aa1f4fe198b666b3abf5934b31e80d9498b8`](https://github.com/hasanmanzak/meAndAI/commit/8616aa1f4fe198b666b3abf5934b31e80d9498b8)
@@ -139,5 +139,8 @@ reconstruction, and explicit recovery grants for every mutating application.
 
 ## Definition of Done
 
-All implementation, expected-red, review, exact-head test, adapter,
-documentation, release, and external evidence gates remain pending.
+All four selected implementation packages and their package-local reviews are
+green. The `EA-CONVERGE-01` final record sync, cohort review, single push, and
+exact-head hosted gate remain pending. [TEST-0212](test-cases.md#test-0212)
+activation, [SUBF-0146](#subf-0146), adapters, feature merge, release,
+publication, consumer mutation, and external authority effects remain held.

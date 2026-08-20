@@ -3,8 +3,8 @@
 | Field | Value |
 | --- | --- |
 | Classification | Selected Gate 2 design for the first [FEAT-0066](README.md) slice |
-| Status | `DesignCorrectionCandidate`; grant production paused after canonical red |
-| Correction | Add independent expected lease/fence coordinates and close protected grant-store failure mapping without changing type inventory, rejection set/order, FQNs, package identities/order/budgets, or ownership |
+| Status | `AcceptedFrozenDesign`; four implementation packages are `ReviewedLocalGreen`, and `EA-CONVERGE-01` exact-head hosted validation is pending |
+| Correction | Closed: independent expected lease/fence coordinates and protected grant-store failure mapping were added without changing type inventory, rejection set/order, FQNs, package identities/order/budgets, or ownership |
 | Public API | [Exact public API contract](subf-0145-public-api-contract.md) |
 | Values/errors | [Exact value and error contract](subf-0145-value-error-contract.md) |
 | Delivery | [Micro-delivery plan](subf-0145-micro-delivery-plan.md) |
@@ -13,17 +13,16 @@
 
 ## Authority and activation condition
 
-This packet is design-only. Its conditional implementation authority activates
-only after the complete packet is committed, pushed, independently reviewed
-with `0 Blocking / 0 Important / 0 Minor`, and exact-head Ubuntu plus Windows
-stable CI is green. Until then no production or executable-test implementation
-is authorized.
-
-After that gate, only the four dependency-ordered packages in the
-[micro plan](subf-0145-micro-delivery-plan.md#package-matrix) are authorized
-without another user confirmation. Merge, release, publication, consumer
-mutation, credentials, real authority effects, authority transfer,
-[SUBF-0146](README.md#subf-0146), and any later successor remain held.
+This packet was design-only. Its initial checkpoint and narrow corrections were
+committed, pushed, independently reviewed with
+`0 Blocking / 0 Important / 0 Minor`, and validated by exact-head Ubuntu plus
+Windows stable CI before implementation resumed. Only the four
+dependency-ordered packages in the
+[micro plan](subf-0145-micro-delivery-plan.md#package-matrix) were authorized;
+all four are now `ReviewedLocalGreen`. `EA-CONVERGE-01` final-sync validation is
+pending. Merge, release, publication, consumer mutation, credentials, real
+authority effects, authority transfer, [SUBF-0146](README.md#subf-0146), and
+any later successor remain held.
 
 ## Gate 2 outcome
 

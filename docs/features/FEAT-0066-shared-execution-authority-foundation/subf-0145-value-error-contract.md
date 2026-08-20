@@ -3,8 +3,8 @@
 | Field | Value |
 | --- | --- |
 | Classification | Normative value/error appendix to the [selected design](subf-0145-authority-grant-activation-design.md) |
-| Status | `DesignCorrectionCandidate`; grant production paused after canonical red |
-| Correction | Preserve independent lease/fence negative states and map unapproved/missing protected grant-store state exactly |
+| Status | `AcceptedFrozenDesign`; four implementation packages are `ReviewedLocalGreen`, and `EA-CONVERGE-01` exact-head hosted validation is pending |
+| Correction | Closed: independent lease/fence negative states are preserved and unapproved/missing protected grant-store state is mapped exactly |
 | Public signatures | [Exact public API contract](subf-0145-public-api-contract.md) |
 | Test | [TEST-0212](test-cases.md#test-0212) |
 

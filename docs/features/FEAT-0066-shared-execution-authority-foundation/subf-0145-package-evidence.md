@@ -90,3 +90,16 @@ cannot embed its own content-addressed SHA without changing that SHA.
 | Local commit | The focused commit containing this row; exact SHA is emitted after creation and reconciled at `EA-CONVERGE-01` |
 | Hosted / correction cost | Package push is prohibited. Allowlist correction hosted errors `0`; owner identification found the two exact predecessor test doubles before green, with correction/revalidation cost carried by the correction gate |
 | Cohort efficiency | One correction push covered the design boundary without pushing packages; no consistency or traceability loss observed locally |
+
+## `EA-CONVERGE-01`
+
+| Field | Evidence |
+| --- | --- |
+| Status | Local cohort candidate; four implementation packages are `ReviewedLocalGreen`; records-only commit, committed-tree structural/publication gates, one cohort push, and exact-head hosted validation are pending |
+| Package commits | Snapshot [db487e19237eb44bfe16b4b4ee0d2601525644f7](https://github.com/hasanmanzak/meAndAI/commit/db487e19237eb44bfe16b4b4ee0d2601525644f7); grant [dbc74e2f86679a382355eb08ed01fc05e1f5ada3](https://github.com/hasanmanzak/meAndAI/commit/dbc74e2f86679a382355eb08ed01fc05e1f5ada3); publication [2ca31a58988f046e3ed11604949004aa2a7bc9a5](https://github.com/hasanmanzak/meAndAI/commit/2ca31a58988f046e3ed11604949004aa2a7bc9a5); activation [ee6707dc893e103d0a8ec236cfff9a0a49f98436](https://github.com/hasanmanzak/meAndAI/commit/ee6707dc893e103d0a8ec236cfff9a0a49f98436); narrow correction reconciliations remain distinct ancestors |
+| Canonical R | `R=NotApplicable`; converge adds no behavior, marker, executable test, scenario activation, or production surface |
+| Local behavior | Four exact FQNs `1/1` each; [Subfeature=SUBF-0145](README.md#subf-0145) `20/20`; complete Operations Architecture `51/51`; Packaging `17/17`; full Conformance `65/65`; full Domain `98/98` |
+| Build / format / locks | Operations Release build `0` warnings / `0` errors; format and diff clean; all `17` tracked lock inputs byte-equal to accepted-design HEAD [8616aa1f4fe198b666b3abf5934b31e80d9498b8](https://github.com/hasanmanzak/meAndAI/commit/8616aa1f4fe198b666b3abf5934b31e80d9498b8) |
+| Final local gates | Committed-tree StructureOnly/graph, publication evidence, exact record allowlist/budget, and fresh cohort-diff review remain required before the single push; this row makes no forward green claim |
+| Scenario / held scope | [TEST-0212](test-cases.md#test-0212) remains `Planned`; scenario owner/workflow activation, [SUBF-0146](README.md#subf-0146), merge, release, publication, consumer mutation, and real authority effects remain held |
+| Hosted / efficiency | Pending. The final exact-head run will record Ubuntu/Windows duration, hosted error count, owning-package identification and correction cost if any, estimated saving versus four package-level hosted pushes, and consistency/traceability outcome outside the content-addressed repository head |

@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Dependency-ordered delivery control for [TEST-0212](test-cases.md#test-0212) |
-| Status | `DesignCorrectionCandidate`; snapshot is `ReviewedLocalGreen`, grant red is accepted, and production is paused pending repeated exact-head design gates |
+| Status | `AcceptedFrozenDesign`; all four implementation packages are `ReviewedLocalGreen`, and `EA-CONVERGE-01` exact-head hosted validation is pending |
 | Design | [Authority, grant, publication, and activation design](subf-0145-authority-grant-activation-design.md) |
 | Public API | [Exact public API contract](subf-0145-public-api-contract.md) |
 | Values/errors | [Exact value and error contract](subf-0145-value-error-contract.md) |
@@ -76,8 +76,8 @@ changes no type inventory, rejection set/order, expected-red identity/FQN,
 package sequence/budget, or scenario owner/status. The one exact package-2
 allowlist carveout below permits only this trait correction in the committed
 snapshot test. The
-accepted grant red remains immutable and is not invoked again; implementation
-resumes only after the correction exact head passes Ubuntu and Windows.
+accepted grant red remains immutable and was not invoked again; implementation
+resumed only after the correction exact head passed Ubuntu and Windows.
 
 The activation canonical red later exposed one package-local allowlist defect:
 the two existing exact port-test doubles must implement the activation members
