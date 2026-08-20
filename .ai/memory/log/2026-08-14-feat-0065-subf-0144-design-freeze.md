@@ -2,12 +2,15 @@
 
 | Field | Value |
 | --- | --- |
-| State | `FrozenDesignCorrection`; `POLICY-SURFACE-FRAMING-01`, `EXTENSION-AUTHORITY-01`, `EXTENSION-EVALUATION-01`, and `WAIVER-DISPOSITION-01` remain `ReviewedLocalGreen` with cumulative `4/4`, full Conformance `69/69`, Domain `98/98`, warning-free Release builds, and review `0/0/0`; the canonical debt red is preserved, local correction gates are green, and exact correction-head hosted validation is pending |
+| State | `AcceptedFrozenDesign`; `POLICY-SURFACE-FRAMING-01`, `EXTENSION-AUTHORITY-01`, `EXTENSION-EVALUATION-01`, and `WAIVER-DISPOSITION-01` remain `ReviewedLocalGreen` with cumulative `4/4`, full Conformance `69/69`, Domain `98/98`, warning-free Release builds, and review `0/0/0`; canonical `PROTECTED-POLICY-DEBT-RED-0004` is preserved; the first and superseding issued-closure/API-oracle corrections are immutable exact-head-hosted-green design evidence; `DEBT-ENFORCEMENT-01` green work has resumed but is not complete |
 | Exact predecessor | [`14ad828bcdde5f843cdbf12677b25f19736e5691`](https://github.com/hasanmanzak/meAndAI/commit/14ad828bcdde5f843cdbf12677b25f19736e5691) |
 | Exact-main validation | [Run 31797357907](https://github.com/hasanmanzak/meAndAI/actions/runs/31797357907): Ubuntu `7m24s`, Windows `12m38s`, publication verification skipped |
 | Accepted design head / correction base | [`5d148233913dde08a7b24a4f696eace3c6f3407e`](https://github.com/hasanmanzak/meAndAI/commit/5d148233913dde08a7b24a4f696eace3c6f3407e) |
 | Accepted design validation | [Run 31829876408](https://github.com/hasanmanzak/meAndAI/actions/runs/31829876408): Ubuntu `23m39s`, Windows `51m55s`, publication verification skipped |
-
+| Input-custody correction head | [`f4e93d32f987a125a863d237af88f033152552b2`](https://github.com/hasanmanzak/meAndAI/commit/f4e93d32f987a125a863d237af88f033152552b2) |
+| Input-custody correction validation | [Run 32409128978](https://github.com/hasanmanzak/meAndAI/actions/runs/32409128978): Ubuntu `23m41s`, Windows `51m58s`, publication verification skipped |
+| Issued-closure correction head | [`613274543942d027161542756995535f28dd5881`](https://github.com/hasanmanzak/meAndAI/commit/613274543942d027161542756995535f28dd5881) |
+| Issued-closure correction validation | [Run 32422501257](https://github.com/hasanmanzak/meAndAI/actions/runs/32422501257): Ubuntu `22m40s`, Windows `52m24s`, publication verification skipped |
 | Design | [Protected policy and self-consumption design](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0144-extension-waiver-self-consumption-design.md) |
 | Delivery control | [Micro-delivery plan](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0144-micro-delivery-plan.md) |
 
@@ -179,17 +182,26 @@ green claim is made for this intermediate packet.
 Implementation review after the canonical debt red found one dependency-
 closure defect before green: the accepted evaluation closure retained only
 reference/digest metadata while the extension evaluator requires the exact
-repository-tree capability and its context proof. The bounded correction keeps
-the public API, seven packet identities and order, canonical FQNs and markers,
-ownership, line budgets, and every downstream hold unchanged. It freezes one
-internal caller-unconstructible carrier containing the exact capability product
-from the existing single target-index invocation and its exact context-proof
-handle/reference. The same carrier is retained through `EvaluationClosure` and
-`CompleteCatalogEvaluation`; no index replay, digest-based reconstruction,
-new I/O, or alternate capability path is allowed. The preserved debt red is
-not rerun. Implementation resumes automatically only after this exact twelve-
-record correction reaches fresh local green and exact-head Ubuntu/Windows
-hosted green with publication skipped.
+repository-tree capability and its context proof. The first bounded correction
+reached exact-head hosted green at the immutable commit/run above, but fresh
+source projection then proved its assumed existing index product is an
+`IRepositoryTargetResolutionIndex`, not an `IRepositoryTree`. That head remains
+historical input-custody evidence and is not the current accepted
+implementation gate.
+
+The latest bounded follow-up keeps the public API, seven packet identities and
+order, canonical FQNs and markers, ownership, line budgets, and every downstream
+hold unchanged. The ordinary evaluation-advance route remains immutable and no
+index is replayed. The project-neutral friend fixture supplies a test-owned
+tree to an internal seam that atomically replaces the exact issued closure in
+its planning session with an immutable carrier-bearing closure; the source is
+invalidated and only the replacement can be evaluated once. The same follow-up
+also permits the existing surface oracle to advance only its pre-frozen
+`EvaluateProtected` and later `QualifyCandidate` signature rows in their owning
+packets. The preserved canonical R0004 is not rerun. The exact issued-closure
+correction head completed fresh local review, StructureOnly, publication,
+graph, commit/push, and Ubuntu/Windows hosted green with publication skipped;
+`DEBT-ENFORCEMENT-01` green work is therefore resumed but not complete.
 
 The original design's immutable static review closed `0/0/0` and its local
 gates recorded design `1,927/2,400`, plan `408/500`, focused governance
@@ -200,18 +212,23 @@ as correction evidence. The exact correction cohort must record fresh review,
 line, link, StructureOnly, publication and graph evidence before its focused
 commit/push and exact-head hosted gate.
 
-The pre-reconciliation correction candidate's fresh design/evidence/
-traceability/security and implementation-topology review is `0/0/0`. Its
-scope is exactly the same twelve Markdown paths, with no code, test, project,
-workflow, package, lock or new graph node. That candidate recorded design
-`1,976/2,400` normalized lines and plan `418/500`;
-canonical vectors and signed envelopes are outside the correction hunks and
-remain unchanged. Full protocol governance is `37/37`, including the clickable-
-reference barrier. Final StructureOnly is green at `526241ms` on PowerShell 7
-and `901935ms` on Windows PowerShell 5.1; publication evidence is `7/7` without
-a published-state claim; and `git diff --check` is green. The exact schema-2
-graph at that candidate is bounded at `379/4524/341/5085629`. Preservation of
-the four 079 packet-history checkpoints leaves the reconciled design at
-`1,976/2,400` normalized lines and the plan at `441/500`; its final graph and
-same-length byte-count substitution must be reprojected before the reconciled
-commit. Commit, push and exact correction-head hosted green remain pending.
+The first correction's local evidence remains immutable historical evidence:
+review `0/0/0`, exact twelve-path scope, design `1,976/2,400`, plan `418/500`,
+protocol governance `37/37`, StructureOnly `526241ms` on PowerShell 7 and
+`901935ms` on Windows PowerShell 5.1, publication evidence `7/7`, and graph
+`379/4524/341/5085629`. None is reused for the latest follow-up. The latest
+follow-up's exact twelve-path pre-evidence tree recorded fresh review `0/0/0`,
+design `2,067/2,400`, plan `480/500`, canonical-link validation with no missing
+target, protocol governance `37/37`, StructureOnly `474121ms` on PowerShell 7
+and `867949ms` on Windows PowerShell 5.1, publication evidence `7/7` with no
+published-state claim, and a clean diff-check. Its schema-2 pre-evidence graph
+snapshot was `386/4536/341/5098354`, digest
+`0b68522e043cbb75716cbff4ce176f5c45bd9bb4b7892e391dcc6d6825ad0924`,
+under dirty-tree snapshot
+`45224b03051b0c1f1b69ca7833c2b490c1d6eb9585a42877ead104a780c8d030`.
+Recording that evidence changed the document bytes, so fresh canonical graph,
+identity, and committed-tree StructureOnly validation followed the record. The
+exact issued-closure correction head and Ubuntu/Windows hosted-green run are
+immutable in the metadata above. That gate restored `AcceptedFrozenDesign` and
+resumed `DEBT-ENFORCEMENT-01` green work after preserved canonical R0004; the
+packet is active but is not complete.

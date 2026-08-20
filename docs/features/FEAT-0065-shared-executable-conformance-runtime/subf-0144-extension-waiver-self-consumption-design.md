@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / dependency-closed [FEAT-0065](README.md) design slice |
-| Status | `FrozenDesignCorrection`; `POLICY-SURFACE-FRAMING-01`, `EXTENSION-AUTHORITY-01`, `EXTENSION-EVALUATION-01`, and `WAIVER-DISPOSITION-01` remain packet-local `ReviewedLocalGreen`; the canonical debt red is preserved; public API, seven packets, FQNs, markers, and ownership are unchanged; internal same-closure capability/reference custody requires exact-head hosted green before debt green resumes |
+| Status | `AcceptedFrozenDesign`; `POLICY-SURFACE-FRAMING-01`, `EXTENSION-AUTHORITY-01`, `EXTENSION-EVALUATION-01`, and `WAIVER-DISPOSITION-01` remain packet-local `ReviewedLocalGreen`; canonical `PROTECTED-POLICY-DEBT-RED-0004` is preserved; the superseding immutable issued-closure carrier and staged public-signature-oracle correction is exact-head hosted green without changing public API, seven packets, FQNs, markers, or ownership; `DEBT-ENFORCEMENT-01` green work has resumed but is not complete |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
@@ -1172,26 +1172,59 @@ policy snapshot's manifest digest must equal the kernel manifest and its
 rules must be an exact one-to-one ordinal `(RuleId, RuleRevision)` projection
 of the protected baseline: no missing, extra, duplicate, retired, or revision-
 drifted row is accepted. Its digest is recomputed with the typed framing below.
-`EvaluationAdvanceCore` retains the exact capability product of its existing
-single repository-target index invocation instead of discarding it. In the
-same advance operation it binds that product and the exact repository-tree
-context-proof handle/reference into one internal `ProtectedEvaluationInput`;
-the carrier is retained by `EvaluationClosure` and is neither public nor
-caller-constructible. No parser/index invocation is replayed, no payload is
-reconstructed from a digest, and no independent capability is manufactured.
+The ordinary evaluation-advance route invokes only the existing repository-
+target-resolution index, whose product is an
+`IRepositoryTargetResolutionIndex`; it does not produce an `IRepositoryTree`.
+That route and its exact invocation/retry behavior remain byte-for-byte
+unchanged. A cast, a second repository-tree index invocation, or reconstruction
+from an outcome digest is forbidden.
+
+The already authorized internal project-neutral [TEST-0211](test-cases.md#test-0211)
+friend fixture proves the nonempty extension semantics without promoting that
+fixture into production evidence. Starting from the exact issued
+`EvaluationClosure`, it supplies one immutable test-owned `IRepositoryTree` and
+calls the sole internal `EvaluationClosure.WithProtectedInput` seam before
+baseline evaluation. That seam requires no existing carrier, finds exactly one
+Complete `protocol.slot.repository-tree` acquisition with a non-null
+`ContextProof`, creates the carrier from that exact reference, verifies the
+exact `KernelPlanningSession`, and asks the session to replace the issued
+closure atomically. Under the session state lock, the source must be issued,
+neither evaluating nor evaluated, and carrier-free. The replacement preserves
+the same applicability and context object references, completed-round count,
+and ordinal acquisition and terminal-evaluation element references in fresh
+defensive collections; it adds only the carrier and replaces the source in the
+issued set. The source is thereafter invalid, the replacement accepts no
+second carrier, and only the replacement may be evaluated once. The baseline
+is produced from that immutable replacement, and `CompleteCatalogEvaluation`
+retains it. `EvaluateProtected` must receive the same replacement closure.
+`WithProtectedInput(null)` throws `ArgumentNullException` with parameter
+`repositoryTree`; missing, duplicate, non-Complete or null/wrong-context-proof
+tree outcomes, wrong sessions, source/state reuse and all other custody defects
+throw `CatalogIntegrityException(CatalogIntegrityCode.PlanStateInvalid)` rather
+than leaking collection exceptions.
+Ordinary production closures retain a null carrier. A required repository-tree
+extension with a null carrier is unresolved without invoking the evaluator:
+the canonical Audit baseline is `Indeterminate/ReportOnly`, while Prospective
+or FullBlocking is `Indeterminate/Block`; the public nonempty activation
+boundary remains fail-closed until the separately accepted
+[FEAT-0066](../FEAT-0066-shared-execution-authority-foundation/README.md)/
+[FEAT-0067](../FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md)
+ingress exists.
+
+No parser/index invocation is replayed, no target-resolution capability is
+misrepresented as a tree, and no payload is reconstructed from a digest.
 `ProtectedEvaluationInput` is an internal sealed type in
 `EvaluationAdvanceResult.cs`. It owns exactly an `IRuleInputAccess Access` and
-an ordinal read-only map from `QualifiedEvidenceHandle` to
+a reference-identity-keyed read-only map from `QualifiedEvidenceHandle` to
 `QualifiedEvidenceReference`. Its sole internal factory receives the exact
-produced `IRepositoryTree` instance and the completed repository-target
-outcome's non-null `ContextProof`, creates one fresh handle, maps that handle to
+fixture `IRepositoryTree` instance and the completed repository-tree outcome's
+non-null `ContextProof`, creates one fresh handle, maps that handle to
 that same reference, and creates an access object that serves only
 `protocol.slot.repository-tree` as `IRepositoryTree` plus that slot's one
 context-proof handle. Any other capability type/slot, context slot, or expected-
-reference request fails closed. `EvaluationClosure.ProtectedInput` is that
-same object when the repository-target outcome is Complete and the index
-succeeds; it is null otherwise. A required repository-tree extension with a
-null carrier is unresolved/Block without invoking the evaluator.
+reference request fails closed. `EvaluationClosure.ProtectedInput` is the
+carrier only on the immutable friend-fixture replacement and is null on the
+ordinary advance result.
 
 ```csharp
 internal sealed class ProtectedEvaluationInput
@@ -1204,8 +1237,15 @@ internal sealed class ProtectedEvaluationInput
         QualifiedEvidenceReference contextProof);
 }
 
-// On EvaluationClosure; public surface unchanged.
+// On EvaluationClosure; public surface unchanged. Returns a replacement.
 internal ProtectedEvaluationInput? ProtectedInput { get; }
+internal EvaluationClosure WithProtectedInput(
+    IRepositoryTree repositoryTree);
+
+// On KernelPlanningSession; public surface unchanged.
+internal EvaluationClosure ReplaceIssuedEvaluationClosure(
+    EvaluationClosure source,
+    ProtectedEvaluationInput protectedInput);
 
 // On CompleteCatalogEvaluation; public surface unchanged.
 internal EvaluationClosure Closure { get; }
@@ -1213,19 +1253,29 @@ internal EvaluationClosure Closure { get; }
 
 `CompleteCatalogEvaluation` retains an internal, non-public reference to the
 exact `EvaluationClosure` consumed by `EvaluationAggregationCore`; the core
-passes it at construction without exposing a new public member.
-`EvaluateProtected` requires `ReferenceEquals(baseline.Closure, closure)`,
-`ReferenceEquals(baseline.Closure.ProtectedInput, closure.ProtectedInput)`, the
-same kernel planning session, catalog/profile identity, and exact ordinal
+passes that immutable reference into complete-evaluation construction without
+exposing a new public member. Cancellation or host failure retries only the
+same replacement. `EvaluateProtected` requires
+`ReferenceEquals(baseline.Closure, closure)`, the same kernel planning session,
+catalog/profile identity, and exact ordinal
 acquisition/terminal-evaluation projections. The declared repository-tree
 evaluation slot is resolved only from that retained access/reference pair;
 acquisition admission remains owned by the closure. Every finding handle must
 resolve exactly once in the retained map. Any missing, extra, substituted,
 replayed, or mismatched carrier/reference is
 `protocol.policy.evaluation-context-mismatch`. This requires bounded changes
-only to `EvaluationAdvanceCore.cs`, `EvaluationAdvanceResult.cs`,
-`CompleteCatalogEvaluation.cs`, and `EvaluationAggregationCore.cs` in the
-packet that first implements `EvaluateProtected`;
+only to `EvaluationAdvanceResult.cs`, the `KernelPlanningSession` state portion
+of `ApplicabilityPlanningCore.cs`, `CompleteCatalogEvaluation.cs`, and
+`EvaluationAggregationCore.cs` in the packet that first implements
+`EvaluateProtected`; `EvaluationAdvanceCore.cs` remains immutable. The debt
+behavior test owns the friend-only tree/carrier fixture and proves both the
+source/replacement distinction, identical projection elements, source
+invalidation, second/concurrent replacement rejection, retry stability,
+one-shot replacement evaluation, evaluated-closure rejection, and the ordinary
+null-carrier unresolved route. It asserts the exact null-argument and
+`PlanStateInvalid` precedence above. No production call site to the internal
+replacement seam is allowed in this packet; the test fixture is its sole
+allowlisted call site;
 [TEST-0210](test-cases.md#test-0210) public surface
 and evaluation behavior remain byte-for-byte compatible. No method performs
 I/O or changes activation state. `BaselineRuleWaiverPolicy` is a complete successor
@@ -1257,6 +1307,9 @@ and `CatalogDigest = baseline.Catalog.CompleteInventoryDigest`; the active
 snapshot is bound by the current-anchor frame, while the remaining activation-
 payload fields are bound separately by the active policy and qualification
 equality gates below. Any mismatch fails before the runtime binding is minted.
+The separate `enforcementPhase` argument must equal
+`baseline.Profile.Axes.EnforcementPhase`; a mismatch is
+`protocol.policy.evaluation-context-mismatch` before disposition evaluation.
 
 `EvidenceSetDigest` is never caller-selected. Conformance recomputes
 `protocol.protected-evidence-set/1\n` followed by raw baseline manifest digest,
@@ -1278,6 +1331,21 @@ exact outcomes, the context manifest/catalog must match the baseline, and any
 other duplicate semantic row or mismatch fails before hashing. The four sets are bounded at
 `4,096` slots, `65,536` scopes, `200,000` outcomes and `1,000,000` references;
 equality passes, first-one-over and checked overflow fail before retention.
+Each scope-row digest is SHA-256 over
+`protocol.protected-evidence-scope/1\n` followed by the exact qualified-
+reference scope subframe: length-prefixed subject identity, source identity,
+surface token, snapshot-kind token, target identity, boundary snapshot-kind
+token and boundary identity, then signed big-endian started/completed UTC ticks.
+It is deliberately distinct from the stable-scope projection, which excludes
+target/boundary/times. Membership is exactly `closure.Context.Scopes` and must
+equal the structural-unique projection of every non-null acquisition
+`ContextProof.Scope`; missing, extra, duplicate semantic/frame rows, or one
+digest for byte-distinct frames fail before retention. The scope vector
+`subject`/`source`/`repository`/
+`exact-commit`, forty-zero target and boundary identities, and ticks `0..1` is
+exactly `207` bytes, SHA-256
+`FB1C8D577BD29102273DD0DF24C3065271DC540739FBB9F7FC05B9DC1C633167`,
+Base64 `cHJvdG9jb2wucHJvdGVjdGVkLWV2aWRlbmNlLXNjb3BlLzEKAAAAB3N1YmplY3QAAAAGc291cmNlAAAACnJlcG9zaXRvcnkAAAAMZXhhY3QtY29tbWl0AAAAKDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAAAAAMZXhhY3QtY29tbWl0AAAAKDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAAAAAAAAAAAAAAAAAAAAAB`.
 The empty-set fixture uses digest bytes `11`/`22`/`33`, round `0`, authority
 `complete-protocol-snapshot`, catalog `1` and four empty sets: `184` bytes,
 SHA-256 `00884E9BEE5DC73A3399711573094D431CF1124234C169DB83A48E7880913586`,
@@ -1285,6 +1353,25 @@ Base64 `cHJvdG9jb2wucHJvdGVjdGVkLWV2aWRlbmNlLXNldC8xChERERERERERERERERERERERERER
 Each identity/count/row has one-byte mutation, duplicate, order and N/N+1
 oracles. Disposition, overlap and independent-fixture contracts consume only
 this raw recomputed digest.
+
+The signed disposition fixture does not invoke the evaluator twice or copy the
+canonical writer. `DebtEnforcementCore` owns one deterministic internal seam:
+
+```csharp
+internal static ExactSha256Digest ComputeEvidenceSetDigest(
+    CompleteCatalogEvaluation baseline,
+    EvaluationClosure closure,
+    ActivatedExtensionPolicy activeExtensions,
+    IReadOnlyList<ExtensionEvaluation> extensionEvaluations);
+```
+
+The friend-only debt fixture constructs the exact expected typed extension
+evaluation through existing internal constructors and calls this production
+writer to mint its signed payload. The public `EvaluateProtected` path invokes
+the real evaluator exactly once, calls the same writer over its actual result,
+and requires raw digest equality before disposition. Expected/actual evaluation
+identity, order, references and carrier context must match; the helper performs
+no evaluation and creates no authority.
 
 Precedence is exact: invalid/missing activation, pack, signature, authority or
 other integrity input throws the exact `ProtectedPolicyIntegrityException`
@@ -1966,11 +2053,14 @@ budgets, local commands, review gates, record synchronization, commit/push and
 hosted requirements are normative in the
 [micro-delivery plan](subf-0144-micro-delivery-plan.md). The original design
 reached `AcceptedFrozenDesign` through those gates and activated the ordered
-pipeline. This bounded correction temporarily returns the design to
-`FrozenDesignCorrection`; it restores `AcceptedFrozenDesign` only after fresh
-design, evidence, traceability, security/authority, graph/capacity and
-implementation-topology reviews close `0/0/0`, diff/format/link checks and
-StructureOnly are green, the exact twelve-record correction is committed and
-pushed, and that exact head is Ubuntu/Windows hosted green with publication
-verification skipped. Success resumes the preserved debt packet after its
-canonical red; it neither replays completed packets nor consumes another red.
+pipeline. The first input-custody correction remains immutable intermediate
+evidence, but fresh source projection proved its target-resolution product is
+not a repository tree. The superseding correction owns only the immutable
+issued-closure carrier topology and staged public-signature-oracle allowlists.
+Its fresh design, evidence, traceability, security/authority, graph/capacity
+and implementation-topology reviews closed `0/0/0`; diff/format/link checks
+and StructureOnly were green; and its exact twelve-record head became Ubuntu/
+Windows hosted green with publication verification skipped. The design is
+therefore `AcceptedFrozenDesign`, and `DEBT-ENFORCEMENT-01` green work has
+resumed after preserved canonical R0004 without replaying completed packets or
+consuming another red; the debt packet is not yet complete.
