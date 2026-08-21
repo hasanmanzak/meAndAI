@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Dependency-ordered delivery control for [TEST-0212](test-cases.md#test-0212) |
-| Status | `AcceptedFrozenDesign`; all four implementation packages are `ReviewedLocalGreen`, and `EA-CONVERGE-01` exact-head hosted validation is pending |
+| Status | `AcceptedFrozenDesign`; all four implementation packages are `ReviewedLocalGreen`, and the immutable [EA-CONVERGE-01 implementation checkpoint](subf-0145-package-evidence.md#ea-converge-01) is exact-head hosted green; the final review-link cohort is reconciled with latest main, while exact-head closure remains external |
 | Design | [Authority, grant, publication, and activation design](subf-0145-authority-grant-activation-design.md) |
 | Public API | [Exact public API contract](subf-0145-public-api-contract.md) |
 | Values/errors | [Exact value and error contract](subf-0145-value-error-contract.md) |
@@ -95,7 +95,7 @@ behavior, rejection, expected-red identity, package order, or budget.
 | `EA-EXECUTION-GRANT-01` | [`TEST-0212-GRANT-RED-0002`](test-cases.md#test-0212) / `MeAndAI.Operations.Architecture.Tests.ExecutionGrantContractTests.TEST_0212_grant_is_fresh_exact_non_transitive_and_single_use` | Exact subject/target/binding/grant validation plus one-time fake-store consumption and least-authority ports | exact FQN; [Subfeature=SUBF-0145](README.md#subf-0145); operational cumulative filter | `ReviewedLocalGreen` commit 2 |
 | `EA-PUBLICATION-ENVELOPE-01` | [`TEST-0212-PUBLICATION-RED-0003`](test-cases.md#test-0212) / `MeAndAI.Operations.Architecture.Tests.PublicationEnvelopeContractTests.TEST_0212_envelope_binds_sealed_report_and_publication_grant` | Cycle-free sealed-report/publication-grant envelope with mismatch negatives | exact FQN; [Subfeature=SUBF-0145](README.md#subf-0145); operational cumulative filter | `ReviewedLocalGreen` commit 3 |
 | `EA-EXTENSION-ACTIVATION-01` | [`TEST-0212-ACTIVATION-RED-0004`](test-cases.md#test-0212) / `MeAndAI.Operations.Architecture.Tests.ExtensionActivationContractTests.TEST_0212_only_fresh_winning_cas_activates_extension` | Protected record/transition/command plus two-contender single-winning CAS | exact FQN; [Subfeature=SUBF-0145](README.md#subf-0145); operational cumulative filter | `ReviewedLocalGreen` commit 4 |
-| `EA-CONVERGE-01` | `R=NotApplicable`; no new behavior or marker | Records, exact API inventory, full local cohort gates, independent cohort diff review | all gates below | records-only local commit 5, one cohort push, exact-head hosted gate |
+| `EA-CONVERGE-01` | `R=NotApplicable`; no new behavior or marker | Records, exact API inventory, full local cohort gates, independent cohort diff review | all gates below | immutable records-only checkpoint exact-head hosted green; final review-link cohort reconciled with latest main, external exact-head closure required |
 
 Each corrected-freeze red source has one `[Fact]`, only the cohort trait
 [Subfeature=SUBF-0145](README.md#subf-0145), and no sleep/retry/network/real-store dependency. The accepted TRX and
@@ -432,9 +432,12 @@ For each package and the final cohort record:
 - estimated savings versus four package-level hosted pushes, plus any observed
   consistency or traceability loss.
 
-The final [SUBF-0145](README.md#subf-0145) cohort completion claim requires the
-`EA-CONVERGE-01` audit, final record synchronization, remote-equal exact-head
-Ubuntu/Windows green, and no unresolved B/I/M. It does not claim
+The immutable [SUBF-0145](README.md#subf-0145) implementation checkpoint met the
+`EA-CONVERGE-01` audit, record synchronization, remote-equal exact-head
+Ubuntu/Windows gate, and no-unresolved-B/I/M requirement. The final review-link
+cohort is reconciled with latest main and changes the evidence tree; its exact-
+tree and hosted closure is external PR/issue evidence rather than a fact
+projected backward into this record commit. Neither checkpoint claims
 [TEST-0212](test-cases.md#test-0212) completion while that scenario remains
-`Planned`; nor does it imply feature merge, release, publication, consumer
+`Planned`; nor does either imply feature merge, release, publication, consumer
 activation, or [SUBF-0146](README.md#subf-0146) implementation.

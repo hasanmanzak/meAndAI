@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Selected Gate 2 design for the first [FEAT-0066](README.md) slice |
-| Status | `AcceptedFrozenDesign`; four implementation packages are `ReviewedLocalGreen`, and `EA-CONVERGE-01` exact-head hosted validation is pending |
+| Status | `AcceptedFrozenDesign`; four implementation packages are `ReviewedLocalGreen`, and the immutable [EA-CONVERGE-01 implementation checkpoint](subf-0145-package-evidence.md#ea-converge-01) is exact-head hosted green; the final review-link cohort is reconciled with latest main, while exact-head closure remains external |
 | Correction | Closed: independent expected lease/fence coordinates and protected grant-store failure mapping were added without changing type inventory, rejection set/order, FQNs, package identities/order/budgets, or ownership |
 | Public API | [Exact public API contract](subf-0145-public-api-contract.md) |
 | Values/errors | [Exact value and error contract](subf-0145-value-error-contract.md) |
@@ -19,10 +19,13 @@ committed, pushed, independently reviewed with
 Windows stable CI before implementation resumed. Only the four
 dependency-ordered packages in the
 [micro plan](subf-0145-micro-delivery-plan.md#package-matrix) were authorized;
-all four are now `ReviewedLocalGreen`. `EA-CONVERGE-01` final-sync validation is
-pending. Merge, release, publication, consumer mutation, credentials, real
-authority effects, authority transfer, [SUBF-0146](README.md#subf-0146), and
-any later successor remain held.
+all four are now `ReviewedLocalGreen`. The immutable
+[EA-CONVERGE-01 checkpoint](subf-0145-package-evidence.md#ea-converge-01) is
+exact-head hosted green. The final review-link cohort is reconciled with latest
+main; its exact-tree and hosted closure belongs to external PR/issue evidence,
+and the prior checkpoint is not evidence for these changed bytes. Merge, release,
+publication, consumer mutation, credentials, real authority effects, authority
+transfer, [SUBF-0146](README.md#subf-0146), and any later successor remain held.
 
 ## Gate 2 outcome
 
@@ -344,7 +347,7 @@ to older ContractSlice artifacts or to raise limits during implementation.
 
 ## Frozen design statement
 
-This packet freezes a dependency-closed Gate 2 candidate, not an implementation
-or completion claim. The implementation gate remains conditional until the
-fresh-diff reviews, committed-tree structural evidence, and exact-head hosted
-checks above are all closed.
+This packet froze a dependency-closed Gate 2 candidate; it did not itself
+implement or complete the slice. Its conditional implementation-entry gate
+closed before the four bounded packages began. Current delivery state and its
+fresh-head boundary are recorded in the [package ledger](subf-0145-package-evidence.md#ea-converge-01).

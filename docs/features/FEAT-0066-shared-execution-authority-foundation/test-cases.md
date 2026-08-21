@@ -2,9 +2,12 @@
 
 [SUBF-0145](README.md#subf-0145) remains scenario-inactive, but its authority
 snapshot, execution grant, publication envelope, and extension activation
-packages are each `ReviewedLocalGreen` in separate local commits. The
-records-only `EA-CONVERGE-01` cohort commit, single push, and exact-head hosted
-gate are pending. [SUBF-0146](README.md#subf-0146) remains inactive.
+packages are each `ReviewedLocalGreen` in separate local commits. Their
+immutable [EA-CONVERGE-01 checkpoint](subf-0145-package-evidence.md#ea-converge-01)
+is exact-head hosted green. The final review-link cohort is reconciled with
+latest main and shares one later commit/push; its exact-tree and hosted closure
+belongs to external PR/issue evidence, and the prior checkpoint is not evidence
+for these changed bytes. [SUBF-0146](README.md#subf-0146) remains inactive.
 
 | ID | Related slice | Scenario | Expected result | Level | Intent review | Status | Automation |
 | --- | --- | --- | --- | --- | --- | --- | --- |

@@ -1,8 +1,9 @@
 # [SUBF-0145](README.md#subf-0145) Package Evidence
 
-This bounded ledger records local package evidence. Hosted cohort evidence and
-the containing local commit SHA are reconciled at `EA-CONVERGE-01`; a commit
-cannot embed its own content-addressed SHA without changing that SHA.
+This bounded ledger records local package evidence and the later immutable
+hosted cohort checkpoint. A commit cannot embed its own content-addressed SHA
+without changing that SHA; final review-link/exact-head evidence therefore
+remains external and is not projected backward into this record commit.
 
 ## `EA-AUTHORITY-SNAPSHOT-01`
 
@@ -95,11 +96,12 @@ cannot embed its own content-addressed SHA without changing that SHA.
 
 | Field | Evidence |
 | --- | --- |
-| Status | Local cohort candidate; four implementation packages are `ReviewedLocalGreen`; records-only commit, committed-tree structural/publication gates, one cohort push, and exact-head hosted validation are pending |
+| Status | Immutable implementation checkpoint `ExactHeadHostedGreen`; all four implementation packages remain `ReviewedLocalGreen`; the final review-link cohort is reconciled with exact latest-main predecessor [`a291556b2fa3c6fbaac7fa564ed35baadb5e9626`](https://github.com/hasanmanzak/meAndAI/commit/a291556b2fa3c6fbaac7fa564ed35baadb5e9626), while its exact-head closure remains external |
 | Package commits | Snapshot [db487e19237eb44bfe16b4b4ee0d2601525644f7](https://github.com/hasanmanzak/meAndAI/commit/db487e19237eb44bfe16b4b4ee0d2601525644f7); grant [dbc74e2f86679a382355eb08ed01fc05e1f5ada3](https://github.com/hasanmanzak/meAndAI/commit/dbc74e2f86679a382355eb08ed01fc05e1f5ada3); publication [2ca31a58988f046e3ed11604949004aa2a7bc9a5](https://github.com/hasanmanzak/meAndAI/commit/2ca31a58988f046e3ed11604949004aa2a7bc9a5); activation [ee6707dc893e103d0a8ec236cfff9a0a49f98436](https://github.com/hasanmanzak/meAndAI/commit/ee6707dc893e103d0a8ec236cfff9a0a49f98436); narrow correction reconciliations remain distinct ancestors |
+| Immutable implementation checkpoint | Exact commit [`34dd4682cbf4f2082d801fb015240bfbf5c08e86`](https://github.com/hasanmanzak/meAndAI/commit/34dd4682cbf4f2082d801fb015240bfbf5c08e86); git tree identity: `b825ece6f54b45a9d59e3d00b0e42df5d57cc9dc`; exact-head Ubuntu/Windows [run 32355484720](https://github.com/hasanmanzak/meAndAI/actions/runs/32355484720) succeeded with publication verification skipped and hosted errors `0` |
 | Canonical R | `R=NotApplicable`; converge adds no behavior, marker, executable test, scenario activation, or production surface |
 | Local behavior | Four exact FQNs `1/1` each; [Subfeature=SUBF-0145](README.md#subf-0145) `20/20`; complete Operations Architecture `51/51`; Packaging `17/17`; full Conformance `65/65`; full Domain `98/98` |
 | Build / format / locks | Operations Release build `0` warnings / `0` errors; format and diff clean; all `17` tracked lock inputs byte-equal to accepted-design HEAD [8616aa1f4fe198b666b3abf5934b31e80d9498b8](https://github.com/hasanmanzak/meAndAI/commit/8616aa1f4fe198b666b3abf5934b31e80d9498b8) |
-| Final local gates | Committed-tree StructureOnly/graph, publication evidence, exact record allowlist/budget, and fresh cohort-diff review remain required before the single push; this row makes no forward green claim |
+| Final local gates | The immutable implementation checkpoint passed committed-tree StructureOnly/graph, publication evidence, exact record allowlist/budget, and fresh cohort-diff review before its single push. The final review-link cohort must close the same exact-tree gates before commit/push; their results remain external rather than self-recorded here |
 | Scenario / held scope | [TEST-0212](test-cases.md#test-0212) remains `Planned`; scenario owner/workflow activation, [SUBF-0146](README.md#subf-0146), merge, release, publication, consumer mutation, and real authority effects remain held |
-| Hosted / efficiency | Pending. The final exact-head run will record Ubuntu/Windows duration, hosted error count, owning-package identification and correction cost if any, estimated saving versus four package-level hosted pushes, and consistency/traceability outcome outside the content-addressed repository head |
+| Hosted / efficiency | The immutable checkpoint used one cohort push rather than four package pushes, avoiding three package-level hosted invocations; its hosted error count was `0`, no owning-package correction was required, and no consistency or traceability loss was observed. The final review-link cohort is not covered by that run; its exact-head result belongs to PR/issue closure |

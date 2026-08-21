@@ -3,10 +3,10 @@
 | Field | Value |
 | --- | --- |
 | Classification | Feature |
-| Status | [SUBF-0145](#subf-0145) `AcceptedFrozenDesign`; all four implementation packages are `ReviewedLocalGreen`, and `EA-CONVERGE-01` final-sync exact-head hosted validation is pending |
+| Status | [SUBF-0145](#subf-0145) `AcceptedFrozenDesign`; all four implementation packages are `ReviewedLocalGreen`, and the immutable [EA-CONVERGE-01 implementation checkpoint](subf-0145-package-evidence.md#ea-converge-01) is exact-head hosted green; the final review-link cohort is reconciled with latest main, while its exact-head hosted result belongs to external PR/issue closure and is not projected into this record commit |
 | Target version | 0.17.0 |
 | Issue | [#166](https://github.com/hasanmanzak/meAndAI/issues/166) |
-| Pull request | Design checkpoint not yet created |
+| Pull request | [Draft PR #187](https://github.com/hasanmanzak/meAndAI/pull/187) |
 | Decisions | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md), [DEC-0011](../../decisions/DEC-0011-qualified-evidence-and-closure.md), [DEC-0013](../../decisions/DEC-0013-trusted-adoption-and-recoverable-evidence.md), and [DEC-0017](../../decisions/DEC-0017-idempotent-consumer-lifecycle.md) |
 | Tests | [TEST-0212](test-cases.md#test-0212) and [TEST-0213](test-cases.md#test-0213) |
 
@@ -22,8 +22,12 @@ only its four implementation packages. The initial gate and both narrow
 design corrections passed exact-head hosted validation; the accepted reds were
 never rerun. Authority snapshot, execution grant, publication envelope, and
 extension activation now each have a separate focused `ReviewedLocalGreen`
-commit. `EA-CONVERGE-01` owns the records-only local commit, one cohort push,
-and exact-head Ubuntu/Windows gate.
+commit. The immutable [EA-CONVERGE-01 checkpoint](subf-0145-package-evidence.md#ea-converge-01)
+passed its records-only commit, one cohort push, and exact-head Ubuntu/Windows
+gate. The final review-link cohort is reconciled with latest main and shares one
+later commit/push. Its exact-head hosted result belongs to external PR/issue
+closure and is not projected into this content-addressed record; the prior
+checkpoint is not evidence for these changed bytes.
 Every intermediate implementation fact remains subfeature-scoped with the exact
 [Subfeature=SUBF-0145](#subf-0145) trait. [Scenario=TEST-0212](test-cases.md#test-0212), its executable owner, and
 its `Passing` status remain held for a separate atomic final-activation gate;
@@ -99,14 +103,14 @@ reconstruction, and explicit recovery grants for every mutating application.
 | Test readiness | Gate 1 state | Evidence |
 | --- | --- | --- |
 | Scenarios | Defined | [Test scenarios](test-cases.md) |
-| Test code | Four packages `ReviewedLocalGreen`; converge pending | All four exact FQNs and [Subfeature=SUBF-0145](#subf-0145) are locally green; [Scenario=TEST-0212](test-cases.md#test-0212) remains held |
+| Test code | Four packages `ReviewedLocalGreen`; immutable converge checkpoint hosted green; final review-link cohort reconciled with latest main | All four exact FQNs and [Subfeature=SUBF-0145](#subf-0145) are locally green; [Scenario=TEST-0212](test-cases.md#test-0212) remains held |
 | Baseline run | Four canonical reds immutable; four bounded greens complete | Exact R identities and local package evidence are retained in the [package ledger](subf-0145-package-evidence.md) |
 
 ## Decomposition and subfeature gates
 
 | ID | Slice | Tracking | Tests/run | Self-review/findings | Status |
 | --- | --- | --- | --- | --- | --- |
-| `SUBF-0145` <a name="subf-0145"></a> | Authority snapshots, role separation, grants, activation CAS, and publication envelopes | [#166](https://github.com/hasanmanzak/meAndAI/issues/166) | [TEST-0212](test-cases.md#test-0212) / four package FQNs and cumulative local green | Package reviews `0/0/0`; cohort review pending | Four packages `ReviewedLocalGreen`; final-sync exact-head hosted pending; [design](subf-0145-authority-grant-activation-design.md) / [API](subf-0145-public-api-contract.md) / [values/errors](subf-0145-value-error-contract.md) / [micro plan](subf-0145-micro-delivery-plan.md) |
+| `SUBF-0145` <a name="subf-0145"></a> | Authority snapshots, role separation, grants, activation CAS, and publication envelopes | [#166](https://github.com/hasanmanzak/meAndAI/issues/166) | [TEST-0212](test-cases.md#test-0212) / four package FQNs and cumulative local green | Package reviews `0/0/0`; immutable cohort review `0/0/0`; final reconciliation review closes on the exact PR head | Four packages `ReviewedLocalGreen`; immutable converge checkpoint exact-head hosted green; final review-link cohort reconciled with latest main; hosted/merge evidence remains external; [design](subf-0145-authority-grant-activation-design.md) / [API](subf-0145-public-api-contract.md) / [values/errors](subf-0145-value-error-contract.md) / [micro plan](subf-0145-micro-delivery-plan.md) |
 | `SUBF-0146` <a name="subf-0146"></a> | Leases, fences, journal, receipts, retention, reconstruction, and recovery grants | [#166](https://github.com/hasanmanzak/meAndAI/issues/166) | [TEST-0213](test-cases.md#test-0213) / not started | Pending | Proposed |
 
 ## Decisions and relationships
@@ -140,7 +144,10 @@ reconstruction, and explicit recovery grants for every mutating application.
 ## Definition of Done
 
 All four selected implementation packages and their package-local reviews are
-green. The `EA-CONVERGE-01` final record sync, cohort review, single push, and
-exact-head hosted gate remain pending. [TEST-0212](test-cases.md#test-0212)
-activation, [SUBF-0146](#subf-0146), adapters, feature merge, release,
-publication, consumer mutation, and external authority effects remain held.
+green, and the immutable [EA-CONVERGE-01 checkpoint](subf-0145-package-evidence.md#ea-converge-01)
+is exact-head hosted green. The final review-link cohort is reconciled with
+latest main; its exact-tree, single-push, and exact-head hosted closure belongs
+to external PR/issue evidence and is not projected into this record commit.
+[TEST-0212](test-cases.md#test-0212) activation,
+[SUBF-0146](#subf-0146), adapters, feature merge, release, publication,
+consumer mutation, and external authority effects remain held.

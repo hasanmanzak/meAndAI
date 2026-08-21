@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Normative API appendix to the [selected design](subf-0145-authority-grant-activation-design.md) |
-| Status | `AcceptedFrozenDesign`; four implementation packages are `ReviewedLocalGreen`, and `EA-CONVERGE-01` exact-head hosted validation is pending |
+| Status | `AcceptedFrozenDesign`; four implementation packages are `ReviewedLocalGreen`, and the immutable [EA-CONVERGE-01 implementation checkpoint](subf-0145-package-evidence.md#ea-converge-01) is exact-head hosted green; the final review-link cohort is reconciled with latest main, while exact-head closure remains external |
 | Correction | Closed: independent expected lease/fence coordinates plus exact unapproved/missing grant-store mapping; no inventory, rejection, FQN, order, package identity/order/budget, or ownership change |
 | Parent | [FEAT-0066](README.md) |
 | Test | [TEST-0212](test-cases.md#test-0212) |
