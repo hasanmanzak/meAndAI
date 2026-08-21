@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Ordered implementation control plan |
-| Status | `FrozenDesignCorrection`; immutable issued-closure carrier custody and staged public-signature-oracle allowlists are corrected without changing public API, packet order, FQNs, markers, or ownership; debt green remains held pending the latest correction head's exact Ubuntu/Windows hosted green |
+| Status | `FrozenDesignCorrection`; the first five packets through debt enforcement remain `ReviewedLocalGreen`, canonical R0004 is immutable, and the prior input-custody/API-oracle correction is exact-head hosted green; SELF R0005 is not invoked and remains held until the canonical outcome-entry projection allowlist correction is exact-head Ubuntu/Windows hosted green |
 | Parent design | [Protected policy and self-consumption design](subf-0144-extension-waiver-self-consumption-design.md) |
 | Scenario | [TEST-0211](test-cases.md#test-0211) |
 | Exact baseline | [`14ad828bcdde5f843cdbf12677b25f19736e5691`](https://github.com/hasanmanzak/meAndAI/commit/14ad828bcdde5f843cdbf12677b25f19736e5691) |
@@ -265,6 +265,10 @@ is not promoted into nonempty registration evidence.
 
 - add `src/MeAndAI.Protocol.Conformance/ProtectedPolicy/SelfConsumptionCore.cs`
   and `ConformanceKernel.SelfConsumption.cs`;
+- modify `DebtEnforcementCore.cs` only to extract its existing private outcome
+  writers into one internal immutable canonical entry projection shared by
+  existing `OutcomeSetDigest` and SELF; no public API, frame bytes, digest,
+  error, limit, evaluator behavior, or second writer is permitted;
 - add the exact implemented `QualifyCandidate` public member; a shell or
   throwing placeholder is forbidden;
 - add only `tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ProtectedPolicySelfConsumptionTests.cs`;
@@ -451,19 +455,17 @@ canonical schema-2 builder must record the exact node/relation/blob/byte tuple
 and digest before commit; no static relation-neutral claim substitutes for that
 executable validation.
 
-The original cohort reached `AcceptedFrozenDesign` and activated the ordered
-pipeline. The first input-custody correction is immutable intermediate
-evidence, but fresh source projection found that its assumed target-resolution
-product is not a repository tree. This latest follow-up owns only the immutable
-issued-closure carrier topology and staged signature-oracle allowlists. Fresh
-design/evidence/traceability/security/
-graph reviews must again close `0/0/0`; StructureOnly and publication-evidence
-must be green; the exact correction cohort must be committed and pushed; and
-Ubuntu/Windows hosted validation must succeed for that exact head with
-publication skipped. Success restores `AcceptedFrozenDesign` and automatically
-resumes `DEBT-ENFORCEMENT-01` after its preserved canonical red. No extra
-confirmation, completed-packet replay, or red rerun is required. Any correction
-or hosted failure reopens only this design cohort and keeps debt green held.
+The original cohort reached `AcceptedFrozenDesign`; the superseding issued-
+closure/API-oracle correction is exact-head hosted green and the first five
+packets remain local-green. SELF pre-red dependency review then proved that
+its frozen four-path allowlist could not obtain canonical per-entry outcome
+digests without copying DEBT's private writer. This bounded twelve-record
+correction adds only the shared `DebtEnforcementCore` projection allowance.
+Fresh reviews must close `0/0/0`; StructureOnly, publication evidence, graph,
+commit/push and exact-head Ubuntu/Windows validation must be green. Success
+restores `AcceptedFrozenDesign` and activates SELF R0005 without replaying any
+completed packet or red. Failure reopens only this correction and keeps R0005
+uninvoked.
 
 ## Held future work
 

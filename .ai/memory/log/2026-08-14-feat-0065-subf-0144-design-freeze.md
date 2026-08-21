@@ -2,13 +2,15 @@
 
 | Field | Value |
 | --- | --- |
-| State | `FrozenDesignCorrection`; four ordered implementation packets remain `ReviewedLocalGreen`, the canonical debt red is preserved, the first input-custody correction is immutable exact-head-hosted-green intermediate evidence, and debt green remains held while the immutable issued-closure carrier plus staged API-oracle follow-up completes fresh local and exact-head hosted gates |
+| State | `FrozenDesignCorrection`; five ordered packets through debt enforcement remain `ReviewedLocalGreen`, canonical R0004 is immutable, and the input-custody and issued-closure/API-oracle corrections are exact-head-hosted-green evidence; SELF R0005 is not invoked and remains held while the canonical outcome-entry projection allowlist correction completes fresh local and exact-head hosted gates |
 | Exact predecessor | [`14ad828bcdde5f843cdbf12677b25f19736e5691`](https://github.com/hasanmanzak/meAndAI/commit/14ad828bcdde5f843cdbf12677b25f19736e5691) |
 | Exact-main validation | [Run 31797357907](https://github.com/hasanmanzak/meAndAI/actions/runs/31797357907): Ubuntu `7m24s`, Windows `12m38s`, publication verification skipped |
 | Accepted design head / correction base | [`5d148233913dde08a7b24a4f696eace3c6f3407e`](https://github.com/hasanmanzak/meAndAI/commit/5d148233913dde08a7b24a4f696eace3c6f3407e) |
 | Accepted design validation | [Run 31829876408](https://github.com/hasanmanzak/meAndAI/actions/runs/31829876408): Ubuntu `23m39s`, Windows `51m55s`, publication verification skipped |
 | Input-custody correction head | [`f4e93d32f987a125a863d237af88f033152552b2`](https://github.com/hasanmanzak/meAndAI/commit/f4e93d32f987a125a863d237af88f033152552b2) |
 | Input-custody correction validation | [Run 32409128978](https://github.com/hasanmanzak/meAndAI/actions/runs/32409128978): Ubuntu `23m41s`, Windows `51m58s`, publication verification skipped |
+| Issued-closure correction head | [`613274543942d027161542756995535f28dd5881`](https://github.com/hasanmanzak/meAndAI/commit/613274543942d027161542756995535f28dd5881) |
+| Issued-closure correction validation | [Run 32422501257](https://github.com/hasanmanzak/meAndAI/actions/runs/32422501257): Ubuntu `22m40s`, Windows `52m24s`, publication verification skipped |
 | Design | [Protected policy and self-consumption design](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0144-extension-waiver-self-consumption-design.md) |
 | Delivery control | [Micro-delivery plan](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0144-micro-delivery-plan.md) |
 
@@ -88,5 +90,46 @@ under dirty-tree snapshot
 `45224b03051b0c1f1b69ca7833c2b490c1d6eb9585a42877ead104a780c8d030`.
 Recording this evidence changes the document bytes, so fresh canonical graph
 and identity validation plus committed-tree StructureOnly follow this record.
-The exact head containing this record must then be pushed once and become
-Ubuntu/Windows hosted green before debt green resumes.
+The exact issued-closure correction head above was pushed once and became
+Ubuntu/Windows hosted green with publication skipped. Its semantic content was
+then reconciled into the implementation line without replaying a completed
+packet or canonical red; debt enforcement subsequently reached packet-local
+`ReviewedLocalGreen` on that separate implementation branch.
+
+## SELF canonical outcome-entry projection correction
+
+SELF pre-red dependency review found one exact allowlist defect before R0005:
+`ProtectedPolicyEvaluation` retains only aggregate `OutcomeSetDigest`, while
+the canonical per-entry rule/disposition/verdict/enforcement projection and
+writers are private to `DebtEnforcementCore`. The prior four-path SELF
+allowlist would therefore require either a second writer or aggregate/status-
+only comparison, both forbidden by the frozen differential contract.
+
+This bounded correction changes no public API, packet identity/order, FQN,
+marker, frame bytes, digest, error, resource limit, evaluator behavior or
+completed-packet evidence. It permits `SELF-CONSUMPTION-01` to modify only the
+existing `DebtEnforcementCore.cs` in addition to its frozen paths, extracting
+one internal immutable `ProjectOutcomeSet(ProtectedPolicyEvaluation)` seam.
+The existing DEBT digest path and SELF use the same private row writers,
+ordering and set frame; SELF compares recomputed aggregates and exact row maps
+under its role-specific error precedence. No second writer or caller-supplied
+entry becomes authority.
+
+The correction cohort remains exactly the same twelve records, adds no new
+handoff, and introduces no production/test/workflow/lock mutation. Fresh design,
+implementation-topology, security/authority, evidence and traceability reviews,
+line/link/diff checks, canonical schema-2 graph, StructureOnly, publication
+evidence, one focused commit/push and exact-head Ubuntu/Windows hosted green are
+required before `AcceptedFrozenDesign` is restored and R0005 may be invoked.
+
+The exact twelve-path pre-evidence tree closed design/runtime/security and
+evidence/traceability reviews at `0/0/0`, design `2,079/2,400`, micro plan
+`482/500`, and `git diff --check` green. Protocol governance passed `37/37`;
+PowerShell 7 StructureOnly passed in `490772ms`; Windows PowerShell 5.1
+StructureOnly passed in `936799ms`; and publication evidence passed `7/7`
+without a published-state claim. Canonical schema-2 validation recorded
+`379/4528/341/5101837` with digest
+`6f9e5e7a5b03c5ff7f9ea093fa3237d9517e088aeac29817e9000d7cd94f847b`.
+Recording these observations changes the ledger bytes, so fresh post-record
+graph/identity/link, StructureOnly and publication-evidence validation must
+follow before the focused correction commit. R0005 remains uninvoked.

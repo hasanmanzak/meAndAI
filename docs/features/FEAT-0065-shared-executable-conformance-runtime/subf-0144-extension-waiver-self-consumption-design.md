@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / dependency-closed [FEAT-0065](README.md) design slice |
-| Status | `FrozenDesignCorrection`; public API, seven packets, FQNs, markers, and ownership are unchanged; immutable issued-closure carrier custody and staged public-signature-oracle allowlists require the latest correction head's exact Ubuntu/Windows hosted green before debt green resumes |
+| Status | `FrozenDesignCorrection`; the first five packets remain `ReviewedLocalGreen`, canonical R0004 is immutable, and the issued-closure/API-oracle correction is exact-head hosted green; SELF R0005 remains uninvoked until the canonical outcome-entry projection allowlist correction is exact-head Ubuntu/Windows hosted green |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
@@ -1649,7 +1649,20 @@ an unchanged status. Reviewed identities must equal the exact set of actually
 differing outcome identities; each row's predecessor/candidate digests equal
 the corresponding actual entry digests and must differ. Missing, extra, equal,
 or stale rows throw `DifferentialUnexplained` before qualification. No such
-integrity defect is converted into a false result. After all authenticated
+integrity defect is converted into a false result.
+
+`DebtEnforcementCore` is the single canonical owner of that projection. Its
+existing private rule, disposition, verdict, enforcement and set-frame writers
+feed one internal immutable `ProjectOutcomeSet(ProtectedPolicyEvaluation)`
+seam. The seam defensively returns the exact ordered row-key/raw-entry-digest
+list plus its recomputed aggregate digest; the existing DEBT path also obtains
+`OutcomeSetDigest` from the same private projection/frame implementation. SELF
+must compare each predecessor/candidate/independent recomputed digest with the
+retained aggregate under its role-specific error map, then compare exact row
+maps. It may not copy a row writer, accept caller rows, expose the projection
+publicly, change canonical bytes/order/limits, or create a second digest owner.
+
+After all authenticated
 identity, binding, evidence, fixture, and differential-closure gates pass, the
 sole semantic false route is an independent evaluation whose actual
 `OutcomeSetDigest` differs from the signed `IndependentExpectedOutcomeSetDigest`;
@@ -2052,16 +2065,15 @@ The exact package order, expected-red identities, mutation allowlists, line
 budgets, local commands, review gates, record synchronization, commit/push and
 hosted requirements are normative in the
 [micro-delivery plan](subf-0144-micro-delivery-plan.md). The original design
-reached `AcceptedFrozenDesign` through those gates and activated the ordered
-pipeline. The first input-custody correction remains immutable intermediate
-evidence, but fresh source projection proved its target-resolution product is
-not a repository tree. This bounded latest follow-up owns only the immutable
-issued-closure carrier topology and staged public-signature-oracle allowlists,
-and temporarily keeps the design in
-`FrozenDesignCorrection`; it restores `AcceptedFrozenDesign` only after fresh
+and superseding issued-closure/API-oracle correction are exact-head hosted
+green; the first five packets remain local-green. SELF pre-red dependency
+review found that its prior allowlist could not obtain exact per-entry outcome
+digests without duplicating DEBT's private writer. This bounded twelve-record
+correction therefore changes only the internal canonical projection ownership
+and SELF allowlist, keeping the design in `FrozenDesignCorrection` until fresh
 design, evidence, traceability, security/authority, graph/capacity and
 implementation-topology reviews close `0/0/0`, diff/format/link checks and
-StructureOnly are green, the exact twelve-record correction is committed and
-pushed, and that exact head is Ubuntu/Windows hosted green with publication
-verification skipped. Success resumes the preserved debt packet after its
-canonical red; it neither replays completed packets nor consumes another red.
+StructureOnly are green, the exact correction is committed and pushed, and
+that exact head is Ubuntu/Windows hosted green with publication skipped.
+Success restores `AcceptedFrozenDesign` and permits the still-uninvoked R0005;
+it replays neither a completed packet nor a canonical red.
