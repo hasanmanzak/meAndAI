@@ -12,8 +12,11 @@ explicit SDLC/backlog scope, workflow/role/context architecture, planned tests,
 open Definition of Ready items, and the ContractSlice-C-first merge order. It
 does not change the active continuation or authorize implementation.
 
-Follow the current
-[design handoff](2026-08-14-feat-0065-subf-0144-design-freeze.md).
+Follow the current consolidated
+[report-sealing design handoff](2026-08-21-feat-0065-subf-0154-design-freeze.md).
+The predecessor
+[protected-policy design handoff](2026-08-14-feat-0065-subf-0144-design-freeze.md)
+remains the immutable source of its packet evidence.
 The immutable
 [ContractSlice D design freeze](2026-08-13-feat-0065-subf-0143-contractslice-d-design-freeze.md)
 and
@@ -35,13 +38,19 @@ R0006 are preserved without rerun. The first input-
 custody correction and the superseding immutable issued-closure/API-oracle
 correction plus the canonical outcome-entry projection correction are immutable
 exact-head-hosted-green design evidence. [TEST-0211](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0211)
-is locally Passing/active with its owner/workflow activated. The pre-correction
-candidate is on [PR #186](https://github.com/hasanmanzak/meAndAI/pull/186), where
-Ubuntu reached the 25-minute ceiling. Its bounded 30-minute [FIND-0462](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0462)
-correction and canonical selected-profile expected-reader [FIND-0463](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md#find-0463)
-correction are local `ReviewedLocalGreen`;
-replacement exact-head hosted-green, merge, completion/DoD, release, and
-publication remain unclaimed, and the report-sealing successor stays held.
+is locally Passing/active with its owner/workflow activated. Its bounded
+[FIND-0462](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0462)
+and canonical [FIND-0463](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md#find-0463)
+corrections are contained in [PR #186](https://github.com/hasanmanzak/meAndAI/pull/186),
+merged at exact main [`a291556b2fa3c6fbaac7fa564ed35baadb5e9626`](https://github.com/hasanmanzak/meAndAI/commit/a291556b2fa3c6fbaac7fa564ed35baadb5e9626);
+exact-main hosted-green, completion/DoD, release, and publication remain
+unclaimed. The report-sealing successor now has one consolidated
+corrected `AcceptedFrozenDesign` checkpoint: predecessor-bound subject/snapshot
+custody, exhaustive frame/golden, and Cohort-1-only R are frozen. Its
+implementation and sole R remain held pending exact-main hosted-green evidence,
+fresh review, and explicit implementation authority;
+[TEST-0209](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0209)
+and convergence P/R are `NotApplicable`.
 
 In parallel, the optional repository-navigation direction is captured as a
 records-only

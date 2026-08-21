@@ -155,8 +155,27 @@ Last verified: **2026-08-21**
   Ubuntu in `20m44s` and Windows in `46m51s`; publication verification was
   correctly skipped. The exact lifecycle implementation identity recorded in
   the canonical handoff passed Ubuntu in `19m36s` and Windows in `36m02s`; publication verification was
-  correctly skipped. ContractSlice A-D and the final [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) atomic activation are merged and exact-main hosted green at `A32/B11/C11/D11`, cumulative/full Conformance `65/65`, Domain `98/98`, API/ownership `15/15`, Scenario/ContractSlice `65/65`, and combined `163/163`. [SUBF-0144](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0144) remains `AcceptedFrozenDesign`: all seven packets through convergence are packet-local `ReviewedLocalGreen`, with protected-policy/Scenario `7/7`, full Conformance `72/72`, Domain `98/98`, warning-free Release builds, and canonical R0004/R0005/R0006 immutable without rerun. [TEST-0211](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0211) is locally Passing/active with its owner/workflow activated. The pre-correction candidate is on [PR #186](https://github.com/hasanmanzak/meAndAI/pull/186); bounded [FIND-0462](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0462) and canonical [FIND-0463](../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md#find-0463) infrastructure corrections are local `ReviewedLocalGreen`. Replacement exact-head hosted-green, merge, feature DoD, release, and publication remain unclaimed; the report-sealing successor stays held. Follow the current [canonical log index](log/README.md). The
-  predecessor-manifest exact-head hosted-green handoff indexed there is
+  correctly skipped. ContractSlice A-D and the final [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) atomic activation are merged and exact-main hosted green at `A32/B11/C11/D11`, cumulative/full Conformance `65/65`, Domain `98/98`, API/ownership `15/15`, Scenario/ContractSlice `65/65`, and combined `163/163`. [SUBF-0144](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0144) remains `AcceptedFrozenDesign`: all seven packets through convergence are packet-local `ReviewedLocalGreen`, with protected-policy/Scenario `7/7`, full Conformance `72/72`, Domain `98/98`, warning-free Release builds, and canonical R0004/R0005/R0006 immutable without rerun. [TEST-0211](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0211) is locally Passing/active with its owner/workflow activated. The bounded [FIND-0462](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0462) and canonical [FIND-0463](../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md#find-0463) corrections are contained in [PR #186](https://github.com/hasanmanzak/meAndAI/pull/186), merged at exact main [`a291556b2fa3c6fbaac7fa564ed35baadb5e9626`](https://github.com/hasanmanzak/meAndAI/commit/a291556b2fa3c6fbaac7fa564ed35baadb5e9626); exact-main hosted-green, feature DoD, release, and publication remain unclaimed. Follow the current [canonical log index](log/README.md). The
+  [SUBF-0154](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0154)
+  now has one consolidated corrected `AcceptedFrozenDesign`
+  [report-sealing contract](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0154-canonical-report-sealing-design.md)
+  and [micro-delivery plan](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0154-micro-delivery-plan.md).
+  This is a design-only checkpoint reconciled onto exact-main input
+  [`a291556b2fa3c6fbaac7fa564ed35baadb5e9626`](https://github.com/hasanmanzak/meAndAI/commit/a291556b2fa3c6fbaac7fa564ed35baadb5e9626);
+  predecessor-bound subject/snapshot custody, exhaustive frame/golden and
+  Cohort-1-only R are frozen. Implementation and that sole R remain held
+  pending exact-main hosted-green evidence for
+  [SUBF-0144](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0144),
+  fresh changed-diff review and
+  explicit implementation authority. [TEST-0209](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0209)
+  and convergence P/R are `NotApplicable`. Applicable Active recurrences are
+  canonical cross-record links, planned Scenario deferral, locked xUnit
+  StackTrace, VSTest zero-discovery abort, multi-cohort ledger advancement,
+  full commit permalinks, untracked packets absent from the HEAD graph, and the
+  selected-profile graph-reader route with exact `1,048,576`/`8,388,608`
+  limits, caller-owned `240000`, preserved generic `120000`, and no unchanged
+  retry; no additional report-specific recurrence was found.
+  The predecessor-manifest exact-head hosted-green handoff indexed there is
   immutable history; the admission-proof reviewed-local-green handoff,
   the selector reviewed-local-green handoff in the canonical log index,
   finding declaration reviewed-local-green handoff,
