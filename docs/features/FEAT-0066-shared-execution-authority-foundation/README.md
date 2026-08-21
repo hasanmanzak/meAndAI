@@ -3,10 +3,10 @@
 | Field | Value |
 | --- | --- |
 | Classification | Feature |
-| Status | [SUBF-0145](#subf-0145) `AcceptedFrozenDesign`; all four implementation packages are `ReviewedLocalGreen`, and the immutable [EA-CONVERGE-01 implementation checkpoint](subf-0145-package-evidence.md#ea-converge-01) is exact-head hosted green; the final review-link cohort is reconciled with latest main, while its exact-head hosted result belongs to external PR/issue closure and is not projected into this record commit |
+| Status | [SUBF-0145](#subf-0145) is merged and exact-main hosted green through [PR #187](https://github.com/hasanmanzak/meAndAI/pull/187) and [run 32521885155](https://github.com/hasanmanzak/meAndAI/actions/runs/32521885155); the records-only [TEST-0212 final activation freeze](subf-0145-test-0212-final-activation-freeze.md) is local `AcceptedFrozenDesign`, while activation implementation, its single push/hosted cycle, feature DoD, release, and publication remain held |
 | Target version | 0.17.0 |
 | Issue | [#166](https://github.com/hasanmanzak/meAndAI/issues/166) |
-| Pull request | [Draft PR #187](https://github.com/hasanmanzak/meAndAI/pull/187) |
+| Pull request | Merged [PR #187](https://github.com/hasanmanzak/meAndAI/pull/187) |
 | Decisions | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md), [DEC-0011](../../decisions/DEC-0011-qualified-evidence-and-closure.md), [DEC-0013](../../decisions/DEC-0013-trusted-adoption-and-recoverable-evidence.md), and [DEC-0017](../../decisions/DEC-0017-idempotent-consumer-lifecycle.md) |
 | Tests | [TEST-0212](test-cases.md#test-0212) and [TEST-0213](test-cases.md#test-0213) |
 
@@ -24,15 +24,20 @@ never rerun. Authority snapshot, execution grant, publication envelope, and
 extension activation now each have a separate focused `ReviewedLocalGreen`
 commit. The immutable [EA-CONVERGE-01 checkpoint](subf-0145-package-evidence.md#ea-converge-01)
 passed its records-only commit, one cohort push, and exact-head Ubuntu/Windows
-gate. The final review-link cohort is reconciled with latest main and shares one
-later commit/push. Its exact-head hosted result belongs to external PR/issue
-closure and is not projected into this content-addressed record; the prior
-checkpoint is not evidence for these changed bytes.
+gate. The final review-link cohort is merged at exact main
+[`ff7d1f62641947e32c7b818a0d457fb1bc8f3296`](https://github.com/hasanmanzak/meAndAI/commit/ff7d1f62641947e32c7b818a0d457fb1bc8f3296)
+through [PR #187](https://github.com/hasanmanzak/meAndAI/pull/187) and
+[run 32521885155](https://github.com/hasanmanzak/meAndAI/actions/runs/32521885155).
+That closure does not retroactively replace the immutable package checkpoint.
 Every intermediate implementation fact remains subfeature-scoped with the exact
 [Subfeature=SUBF-0145](#subf-0145) trait. [Scenario=TEST-0212](test-cases.md#test-0212), its executable owner, and
 its `Passing` status remain held for a separate atomic final-activation gate;
 the canonical [TEST-0212](test-cases.md#test-0212) record therefore stays
 `PlannedDocumentation`/`Planned` throughout these packages.
+The records-only [final activation freeze](subf-0145-test-0212-final-activation-freeze.md)
+now fixes that future atom's exact inventory, natural-red topology oracle,
+fourteen-path allowlist, owner/workflow transform, caps, and gates. It grants no
+partial or current implementation claim.
 Merge, release, publication, consumer mutation, credentials, authority
 transfer, and [SUBF-0146](#subf-0146) implementation remain separately held.
 The preserved [draft PR #160](https://github.com/hasanmanzak/meAndAI/pull/160)
@@ -103,14 +108,14 @@ reconstruction, and explicit recovery grants for every mutating application.
 | Test readiness | Gate 1 state | Evidence |
 | --- | --- | --- |
 | Scenarios | Defined | [Test scenarios](test-cases.md) |
-| Test code | Four packages `ReviewedLocalGreen`; immutable converge checkpoint hosted green; final review-link cohort reconciled with latest main | All four exact FQNs and [Subfeature=SUBF-0145](#subf-0145) are locally green; [Scenario=TEST-0212](test-cases.md#test-0212) remains held |
+| Test code | Four packages `ReviewedLocalGreen`; immutable converge checkpoint hosted green; final activation design frozen locally | All `20` exact Facts and six source files are frozen by the [activation design](subf-0145-test-0212-final-activation-freeze.md); no Scenario trait, owner, workflow, or topology-test implementation has started |
 | Baseline run | Four canonical reds immutable; four bounded greens complete | Exact R identities and local package evidence are retained in the [package ledger](subf-0145-package-evidence.md) |
 
 ## Decomposition and subfeature gates
 
 | ID | Slice | Tracking | Tests/run | Self-review/findings | Status |
 | --- | --- | --- | --- | --- | --- |
-| `SUBF-0145` <a name="subf-0145"></a> | Authority snapshots, role separation, grants, activation CAS, and publication envelopes | [#166](https://github.com/hasanmanzak/meAndAI/issues/166) | [TEST-0212](test-cases.md#test-0212) / four package FQNs and cumulative local green | Package reviews `0/0/0`; immutable cohort review `0/0/0`; final reconciliation review closes on the exact PR head | Four packages `ReviewedLocalGreen`; immutable converge checkpoint exact-head hosted green; final review-link cohort reconciled with latest main; hosted/merge evidence remains external; [design](subf-0145-authority-grant-activation-design.md) / [API](subf-0145-public-api-contract.md) / [values/errors](subf-0145-value-error-contract.md) / [micro plan](subf-0145-micro-delivery-plan.md) |
+| `SUBF-0145` <a name="subf-0145"></a> | Authority snapshots, role separation, grants, activation CAS, and publication envelopes | [#166](https://github.com/hasanmanzak/meAndAI/issues/166) | [TEST-0212](test-cases.md#test-0212) / four package FQNs and cumulative local green | Package reviews `0/0/0`; immutable cohort review `0/0/0`; final reconciliation review closed on merged [PR #187](https://github.com/hasanmanzak/meAndAI/pull/187) | Four packages `ReviewedLocalGreen`; immutable converge checkpoint and exact-main [`ff7d1f62641947e32c7b818a0d457fb1bc8f3296`](https://github.com/hasanmanzak/meAndAI/commit/ff7d1f62641947e32c7b818a0d457fb1bc8f3296) are hosted green; [design](subf-0145-authority-grant-activation-design.md) / [API](subf-0145-public-api-contract.md) / [values/errors](subf-0145-value-error-contract.md) / [micro plan](subf-0145-micro-delivery-plan.md) |
 | `SUBF-0146` <a name="subf-0146"></a> | Leases, fences, journal, receipts, retention, reconstruction, and recovery grants | [#166](https://github.com/hasanmanzak/meAndAI/issues/166) | [TEST-0213](test-cases.md#test-0213) / not started | Pending | Proposed |
 
 ## Decisions and relationships
@@ -125,6 +130,7 @@ reconstruction, and explicit recovery grants for every mutating application.
 - [x] Numbered planning scenarios and explicit WIP absence finding.
 - [x] Exact authority/grant/activation schemas and store-port contracts for selected [SUBF-0145](#subf-0145).
 - [x] Exact [TEST-0212](test-cases.md#test-0212) expected-red FQNs, replay, role, publication, and concurrent-CAS fixture plan.
+- [x] Exact [TEST-0212 final activation](subf-0145-test-0212-final-activation-freeze.md) inventory, neutral topology oracle, owner/workflow transform, allowlist, caps, and held boundary.
 - [x] Narrow expected lease/fence and protected grant-store correction passed the exact `AcceptedFrozenDesign` local and hosted gates.
 - [ ] [SUBF-0146](#subf-0146) journal, crash, corruption, retention, reconstruction, and recovery schema/fixture freeze.
 - [x] Gate 2 design review for the selected dependency-closed slice; accepted at
@@ -145,9 +151,12 @@ reconstruction, and explicit recovery grants for every mutating application.
 
 All four selected implementation packages and their package-local reviews are
 green, and the immutable [EA-CONVERGE-01 checkpoint](subf-0145-package-evidence.md#ea-converge-01)
-is exact-head hosted green. The final review-link cohort is reconciled with
-latest main; its exact-tree, single-push, and exact-head hosted closure belongs
-to external PR/issue evidence and is not projected into this record commit.
+is exact-head hosted green. The final review-link cohort is merged through
+[PR #187](https://github.com/hasanmanzak/meAndAI/pull/187); exact-main
+[`ff7d1f62641947e32c7b818a0d457fb1bc8f3296`](https://github.com/hasanmanzak/meAndAI/commit/ff7d1f62641947e32c7b818a0d457fb1bc8f3296)
+passed [run 32521885155](https://github.com/hasanmanzak/meAndAI/actions/runs/32521885155).
 [TEST-0212](test-cases.md#test-0212) activation,
 [SUBF-0146](#subf-0146), adapters, feature merge, release, publication,
 consumer mutation, and external authority effects remain held.
+The [final activation design](subf-0145-test-0212-final-activation-freeze.md)
+satisfies Gate 2 only; the activation atom and its single push/hosted gate remain held.
