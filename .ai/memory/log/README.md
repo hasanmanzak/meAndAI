@@ -32,8 +32,9 @@ ordered implementation packets—`POLICY-SURFACE-FRAMING-01`,
 warning-free Release builds, and review `0/0/0`; canonical
 `PROTECTED-POLICY-DEBT-RED-0004` is preserved without rerun. The first input-
 custody correction and the superseding immutable issued-closure/API-oracle
-correction are immutable exact-head-hosted-green design evidence.
-`SELF-CONSUMPTION-01` is the next ordered packet and remains inactive.
+correction plus the canonical outcome-entry projection correction are immutable
+exact-head-hosted-green design evidence. `SELF-CONSUMPTION-01` is the next
+ordered packet, is permitted, and remains uninvoked.
 [TEST-0211](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0211), feature
 completion/DoD, release, and publication remain held.
 

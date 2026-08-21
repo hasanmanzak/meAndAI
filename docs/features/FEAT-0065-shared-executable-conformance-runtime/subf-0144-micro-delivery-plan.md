@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Ordered implementation control plan |
-| Status | `AcceptedFrozenDesign`; the first five ordered packets through `DEBT-ENFORCEMENT-01` are packet-local `ReviewedLocalGreen` at protected-policy cumulative `5/5` and full Conformance `70/70`; canonical `PROTECTED-POLICY-DEBT-RED-0004` remains immutable without rerun; the superseding immutable issued-closure carrier and staged public-signature-oracle correction remains exact-head hosted green without changing public API, packet order, FQNs, markers, or ownership; `SELF-CONSUMPTION-01` is next and inactive |
+| Status | `AcceptedFrozenDesign`; the first five ordered packets through `DEBT-ENFORCEMENT-01` are packet-local `ReviewedLocalGreen` at protected-policy cumulative `5/5` and full Conformance `70/70`; canonical `PROTECTED-POLICY-DEBT-RED-0004` remains immutable without rerun; the immutable issued-closure/API-oracle and canonical outcome-entry projection corrections are exact-head hosted green without changing public API, packet order, FQNs, markers, or ownership; `SELF-CONSUMPTION-01` is next, permitted, and uninvoked |
 | Parent design | [Protected policy and self-consumption design](subf-0144-extension-waiver-self-consumption-design.md) |
 | Scenario | [TEST-0211](test-cases.md#test-0211) |
 | Exact baseline | [`14ad828bcdde5f843cdbf12677b25f19736e5691`](https://github.com/hasanmanzak/meAndAI/commit/14ad828bcdde5f843cdbf12677b25f19736e5691) |
@@ -261,6 +261,10 @@ is not promoted into nonempty registration evidence.
 
 - add `src/MeAndAI.Protocol.Conformance/ProtectedPolicy/SelfConsumptionCore.cs`
   and `ConformanceKernel.SelfConsumption.cs`;
+- modify `DebtEnforcementCore.cs` only to extract its existing private outcome
+  writers into one internal immutable canonical entry projection shared by
+  existing `OutcomeSetDigest` and SELF; no public API, frame bytes, digest,
+  error, limit, evaluator behavior, or second writer is permitted;
 - add the exact implemented `QualifyCandidate` public member; a shell or
   throwing placeholder is forbidden;
 - add only `tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ProtectedPolicySelfConsumptionTests.cs`;
@@ -465,15 +469,16 @@ executable validation.
 
 The original cohort reached `AcceptedFrozenDesign` and activated the ordered
 pipeline. The first input-custody correction is immutable intermediate
-evidence, but fresh source projection found that its assumed target-resolution
-product is not a repository tree. The superseding follow-up owns only the
-immutable issued-closure carrier topology and staged signature-oracle
-allowlists. Its fresh design/evidence/traceability/security/graph reviews
-closed `0/0/0`; StructureOnly and publication evidence were green; and its
-exact correction head became Ubuntu/Windows hosted green with publication
-skipped. This preserves `AcceptedFrozenDesign`; `DEBT-ENFORCEMENT-01` is
-`ReviewedLocalGreen` after preserved canonical R0004 without completed-packet
-replay or red rerun; `SELF-CONSUMPTION-01` is next and inactive.
+evidence, and the superseding issued-closure/API-oracle correction is exact-
+head hosted green. The first five packets remain local-green after preserved
+canonical R0004 without completed-packet replay or red rerun. SELF pre-red
+dependency review then proved that its frozen four-path allowlist could not
+obtain canonical per-entry outcome digests without copying DEBT's private
+writer. The bounded twelve-record correction adds only the shared
+`DebtEnforcementCore` projection allowance; fresh reviews closed `0/0/0`, and
+StructureOnly, publication evidence, graph, commit/push and exact-head Ubuntu/
+Windows validation are green. `AcceptedFrozenDesign` is preserved and SELF
+R0005 is permitted but remains uninvoked.
 
 ## Held future work
 

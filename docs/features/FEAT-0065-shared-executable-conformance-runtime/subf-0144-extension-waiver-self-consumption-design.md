@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / dependency-closed [FEAT-0065](README.md) design slice |
-| Status | `AcceptedFrozenDesign`; the first five ordered packets through `DEBT-ENFORCEMENT-01` are packet-local `ReviewedLocalGreen` at protected-policy cumulative `5/5` and full Conformance `70/70`; canonical `PROTECTED-POLICY-DEBT-RED-0004` remains immutable without rerun; the superseding immutable issued-closure carrier and staged public-signature-oracle correction remains exact-head hosted green without changing public API, seven packets, FQNs, markers, or ownership; `SELF-CONSUMPTION-01` is next and inactive |
+| Status | `AcceptedFrozenDesign`; the first five ordered packets through `DEBT-ENFORCEMENT-01` are packet-local `ReviewedLocalGreen` at protected-policy cumulative `5/5` and full Conformance `70/70`; canonical `PROTECTED-POLICY-DEBT-RED-0004` remains immutable without rerun; the immutable issued-closure/API-oracle and canonical outcome-entry projection corrections are exact-head hosted green without changing public API, seven packets, FQNs, markers, or ownership; `SELF-CONSUMPTION-01` is next, permitted, and uninvoked |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
@@ -1649,7 +1649,20 @@ an unchanged status. Reviewed identities must equal the exact set of actually
 differing outcome identities; each row's predecessor/candidate digests equal
 the corresponding actual entry digests and must differ. Missing, extra, equal,
 or stale rows throw `DifferentialUnexplained` before qualification. No such
-integrity defect is converted into a false result. After all authenticated
+integrity defect is converted into a false result.
+
+`DebtEnforcementCore` is the single canonical owner of that projection. Its
+existing private rule, disposition, verdict, enforcement and set-frame writers
+feed one internal immutable `ProjectOutcomeSet(ProtectedPolicyEvaluation)`
+seam. The seam defensively returns the exact ordered row-key/raw-entry-digest
+list plus its recomputed aggregate digest; the existing DEBT path also obtains
+`OutcomeSetDigest` from the same private projection/frame implementation. SELF
+must compare each predecessor/candidate/independent recomputed digest with the
+retained aggregate under its role-specific error map, then compare exact row
+maps. It may not copy a row writer, accept caller rows, expose the projection
+publicly, change canonical bytes/order/limits, or create a second digest owner.
+
+After all authenticated
 identity, binding, evidence, fixture, and differential-closure gates pass, the
 sole semantic false route is an independent evaluation whose actual
 `OutcomeSetDigest` differs from the signed `IndependentExpectedOutcomeSetDigest`;
@@ -2054,13 +2067,20 @@ hosted requirements are normative in the
 [micro-delivery plan](subf-0144-micro-delivery-plan.md). The original design
 reached `AcceptedFrozenDesign` through those gates and activated the ordered
 pipeline. The first input-custody correction remains immutable intermediate
-evidence, but fresh source projection proved its target-resolution product is
-not a repository tree. The superseding correction owns only the immutable
-issued-closure carrier topology and staged public-signature-oracle allowlists.
-Its fresh design, evidence, traceability, security/authority, graph/capacity
-and implementation-topology reviews closed `0/0/0`; diff/format/link checks
-and StructureOnly were green; and its exact twelve-record head became Ubuntu/
-Windows hosted green with publication verification skipped. The design remains
-`AcceptedFrozenDesign`; `DEBT-ENFORCEMENT-01` is `ReviewedLocalGreen` after
+evidence, and the superseding issued-closure/API-oracle correction reached
+exact-head Ubuntu/Windows hosted green with publication verification skipped.
+The first five packets through `DEBT-ENFORCEMENT-01` remain local-green after
 preserved canonical R0004 without replaying completed packets or consuming
-another red. `SELF-CONSUMPTION-01` is next and inactive; [TEST-0211](test-cases.md#test-0211) and completion/DoD remain held.
+another red.
+
+SELF pre-red dependency review then found that its prior allowlist could not
+obtain exact per-entry outcome digests without duplicating DEBT's private
+writer. The bounded twelve-record correction changes only the internal
+canonical projection ownership and SELF allowlist. Its fresh design, evidence,
+traceability, security/authority, graph/capacity and implementation-topology
+reviews closed `0/0/0`; diff/format/link checks and StructureOnly were green;
+and its exact correction head became Ubuntu/Windows hosted green with
+publication skipped. The design therefore remains `AcceptedFrozenDesign` and
+permits the still-uninvoked R0005. `SELF-CONSUMPTION-01` is next and uninvoked;
+[TEST-0211](test-cases.md#test-0211) and completion/DoD remain held. No
+completed packet or canonical red was replayed.
