@@ -171,7 +171,9 @@ public sealed class ContractSliceAPublicApiTests
         AssertFriendAssemblies(
             "MeAndAI.Protocol.Conformance",
             ["MeAndAI.Protocol.Conformance.Tests"]);
-        AssertFriendAssemblies("MeAndAI.Protocol.Policy", []);
+        AssertFriendAssemblies(
+            "MeAndAI.Protocol.Policy",
+            ["MeAndAI.Protocol.Conformance.Tests"]);
     }
 
     [Fact]

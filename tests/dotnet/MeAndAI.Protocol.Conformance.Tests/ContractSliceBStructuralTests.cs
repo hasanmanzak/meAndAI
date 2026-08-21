@@ -759,14 +759,18 @@ public sealed class ContractSliceBOwnershipTests
         AssertFriendAssemblies(
             "MeAndAI.Protocol.Conformance",
             ["MeAndAI.Protocol.Conformance.Tests"]);
-        AssertFriendAssemblies("MeAndAI.Protocol.Policy", []);
+        AssertFriendAssemblies(
+            "MeAndAI.Protocol.Policy",
+            ["MeAndAI.Protocol.Conformance.Tests"]);
 
         var abstractions = LoadAssembly(
             "MeAndAI.Protocol.Conformance.Abstractions");
         var conformance = LoadAssembly("MeAndAI.Protocol.Conformance");
         var domain = LoadAssembly("MeAndAI.Protocol.Domain");
 
-        Assert.Equal(37, domain.GetExportedTypes().Length);
+        ProtectedPolicySurfaceTests.AssertPredecessorInventory(
+            domain,
+            ProtectedPolicySurfaceTests.PredecessorDomainTypes);
         AssertFactory(abstractions, "QualifiedEvidenceHandle", []);
         AssertFactory(
             abstractions,

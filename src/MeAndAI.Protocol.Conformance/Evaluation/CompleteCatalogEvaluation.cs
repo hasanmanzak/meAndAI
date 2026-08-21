@@ -7,6 +7,7 @@ public sealed class CompleteCatalogEvaluation
     internal CompleteCatalogEvaluation(
         CompleteCatalogSnapshot catalog,
         NamedExecutionProfile profile,
+        EvaluationClosure closure,
         IEnumerable<SealedAcquisitionOutcome> acquisitions,
         IEnumerable<RuleEvaluation> evaluations,
         bool hasKnownViolation,
@@ -15,6 +16,7 @@ public sealed class CompleteCatalogEvaluation
     {
         Catalog = catalog;
         Profile = profile;
+        Closure = closure;
         Acquisitions = Array.AsReadOnly(acquisitions.ToArray());
         Evaluations = Array.AsReadOnly(evaluations.ToArray());
         HasKnownViolation = hasKnownViolation;
@@ -25,6 +27,8 @@ public sealed class CompleteCatalogEvaluation
     public CompleteCatalogSnapshot Catalog { get; }
 
     public NamedExecutionProfile Profile { get; }
+
+    internal EvaluationClosure Closure { get; }
 
     public IReadOnlyList<SealedAcquisitionOutcome> Acquisitions { get; }
 

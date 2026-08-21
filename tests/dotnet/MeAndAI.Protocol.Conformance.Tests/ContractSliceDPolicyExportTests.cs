@@ -200,7 +200,7 @@ public sealed class ContractSliceDOwnershipTests
             ],
             Friends(abstractions));
         Assert.Equal(["MeAndAI.Protocol.Conformance.Tests"], Friends(conformance));
-        Assert.Empty(Friends(policy));
+        Assert.Equal(["MeAndAI.Protocol.Conformance.Tests"], Friends(policy));
         Assert.DoesNotContain(abstractions.GetReferencedAssemblies(),
             assembly => assembly.Name == "MeAndAI.Protocol.Policy");
         Assert.DoesNotContain(conformance.GetReferencedAssemblies(),
@@ -234,17 +234,18 @@ public sealed class ContractSliceDStructuralTests
         var domain = typeof(RuleId).Assembly;
         var policy = typeof(InitialRuleQualificationPolicy).Assembly;
 
-        Assert.Equal(72, abstractions.GetExportedTypes().Length);
-        Assert.Equal(23, conformance.GetExportedTypes().Length);
-        Assert.Equal(37, domain.GetExportedTypes().Length);
-        Assert.Equal(
-            ["MeAndAI.Protocol.Policy.InitialRuleQualificationPolicy"],
-            policy.GetExportedTypes().Select(type => type.FullName));
-        Assert.Equal(
-            96,
-            abstractions.GetExportedTypes().Length +
-            conformance.GetExportedTypes().Length +
-            policy.GetExportedTypes().Length);
+        ProtectedPolicySurfaceTests.AssertPredecessorInventory(
+            abstractions,
+            ProtectedPolicySurfaceTests.PredecessorAbstractionsTypes);
+        ProtectedPolicySurfaceTests.AssertPredecessorInventory(
+            conformance,
+            ProtectedPolicySurfaceTests.PredecessorConformanceTypes);
+        ProtectedPolicySurfaceTests.AssertPredecessorInventory(
+            domain,
+            ProtectedPolicySurfaceTests.PredecessorDomainTypes);
+        ProtectedPolicySurfaceTests.AssertPredecessorInventory(
+            policy,
+            ProtectedPolicySurfaceTests.PredecessorPolicyTypes);
 
         var type = typeof(InitialRuleQualificationPolicy);
         Assert.True(type.IsPublic && type.IsAbstract && type.IsSealed);

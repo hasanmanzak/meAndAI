@@ -199,6 +199,36 @@ internal sealed class KernelPlanningSession : IPlanBoundEvidenceSession
         }
     }
 
+    internal EvaluationClosure ReplaceIssuedEvaluationClosure(
+        EvaluationClosure source,
+        ProtectedEvaluationInput protectedInput)
+    {
+        lock (_stateGate)
+        {
+            if (source is null ||
+                protectedInput is null ||
+                source.ProtectedInput is not null ||
+                !_issuedEvaluationClosures.Contains(source) ||
+                _evaluating.Contains(source) ||
+                _evaluated.Contains(source))
+            {
+                throw new CatalogIntegrityException(
+                    CatalogIntegrityCode.PlanStateInvalid);
+            }
+
+            var replacement = new EvaluationClosure(
+                source.CompletedRoundCount,
+                source.Applicability,
+                source.Context,
+                source.Acquisitions,
+                source.TerminalEvaluations,
+                protectedInput);
+            _issuedEvaluationClosures.Remove(source);
+            _issuedEvaluationClosures.Add(replacement);
+            return replacement;
+        }
+    }
+
     internal void BeginEvaluate(EvaluationClosure closure)
     {
         lock (_stateGate)

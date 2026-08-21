@@ -26,12 +26,9 @@ public sealed class ContractSliceCOwnershipTests
         Assert.Equal(
             ["MeAndAI.Protocol.Conformance.Tests"],
             Friends(conformance));
-        Assert.DoesNotContain(
-            policy.GetCustomAttributes<InternalsVisibleToAttribute>(),
-            attribute => string.Equals(
-                attribute.AssemblyName,
-                "MeAndAI.Protocol.Conformance.Tests",
-                StringComparison.Ordinal));
+        Assert.Equal(
+            ["MeAndAI.Protocol.Conformance.Tests"],
+            Friends(policy));
         Assert.DoesNotContain(
             abstractions.GetReferencedAssemblies(),
             assembly => string.Equals(

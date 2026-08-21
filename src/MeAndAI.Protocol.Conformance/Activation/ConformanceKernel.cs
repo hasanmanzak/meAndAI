@@ -3,7 +3,7 @@ using MeAndAI.Protocol.Domain;
 
 namespace MeAndAI.Protocol.Conformance;
 
-public sealed class ConformanceKernel
+public sealed partial class ConformanceKernel
 {
     private readonly CatalogSliceProducerGraph _producerGraph;
     private readonly KernelPlanningSession _planningSession;
