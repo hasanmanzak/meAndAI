@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / dependency-closed [FEAT-0065](README.md) design slice |
-| Status | `AcceptedFrozenDesign`; the first six ordered packets through `SELF-CONSUMPTION-01` are packet-local `ReviewedLocalGreen` at protected-policy cumulative `6/6` and full Conformance `71/71`; canonical R0004/R0005 remain immutable without rerun; the immutable issued-closure/API-oracle and canonical outcome-entry projection corrections are exact-head hosted green without changing public API, seven packets, FQNs, markers, or ownership; `PROTECTED-POLICY-CONVERGE-01` is next, permitted, and inactive |
+| Status | `AcceptedFrozenDesign`; all seven packets through `PROTECTED-POLICY-CONVERGE-01` are packet-local `ReviewedLocalGreen`, subject to final exact-tree gates, at protected-policy/Scenario `7/7`, full Conformance `72/72`, and Domain `98/98`; canonical R0004/R0005/R0006 remain immutable without rerun; [TEST-0211](test-cases.md#test-0211) is locally Passing/active with owner/workflow activated; [SUBF-0144](README.md#subf-0144) is locally implementation-complete without push, hosted-green, merge, DoD, release, or publication claim; [SUBF-0154](README.md#subf-0154) remains held until exact-head hosted green |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
@@ -2080,10 +2080,12 @@ canonical projection ownership and SELF allowlist. Its fresh design, evidence,
 traceability, security/authority, graph/capacity and implementation-topology
 reviews closed `0/0/0`; diff/format/link checks and StructureOnly were green;
 and its exact correction head became Ubuntu/Windows hosted green with
-publication skipped. Canonical R0005 was then consumed once and retained
-immutably without rerun. The bounded five-path green transform makes the first
-six packets through `SELF-CONSUMPTION-01` packet-local `ReviewedLocalGreen` at
-cumulative `6/6`, full Conformance `71/71`, Domain `98/98`, warning-free
-Release builds, and review `0/0/0`. `PROTECTED-POLICY-CONVERGE-01` is next,
-permitted, and inactive; [TEST-0211](test-cases.md#test-0211) and completion/DoD
-remain held, with no SELF push or hosted-green claim.
+publication skipped. Canonical R0005 remains immutable without rerun. Canonical
+R0006 was then consumed once and retained without rerun; its exact ten-path
+green transform makes all seven packets through `PROTECTED-POLICY-CONVERGE-01`
+packet-local `ReviewedLocalGreen`, subject to final exact-tree gates, at
+protected-policy/Scenario `7/7`, full Conformance `72/72`, Domain `98/98`, and
+warning/error-free Release validation. [TEST-0211](test-cases.md#test-0211)
+is locally Passing/active with owner/workflow activated. No push, hosted-green,
+merge, completion/DoD, release, or publication claim is made; [SUBF-0154](README.md#subf-0154) remains
+held until exact-head hosted green.

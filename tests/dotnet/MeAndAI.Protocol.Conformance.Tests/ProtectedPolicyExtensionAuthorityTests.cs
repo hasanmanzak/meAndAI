@@ -11,6 +11,7 @@ namespace MeAndAI.Protocol.Conformance.Tests;
 public sealed class ProtectedPolicyExtensionAuthorityTests
 {
     [Fact]
+    [Trait("Scenario", "TEST-0211")]
     public void Keeps_active_extension_authority_separate_from_candidate_proposal()
     {
         var fixture = ProjectNeutralProtectedAuthorityFixture.CreateCanonicalEmpty();

@@ -2,7 +2,7 @@
 
 | Field | Value |
 | --- | --- |
-| State | `AcceptedFrozenDesign`; the first six ordered packets through `SELF-CONSUMPTION-01` are `ReviewedLocalGreen` with cumulative `6/6`, full Conformance `71/71`, Domain `98/98`, warning-free Release builds, and review `0/0/0`; canonical R0004/R0005 remain immutable without rerun; the input-custody, issued-closure/API-oracle, and canonical outcome-entry projection corrections are immutable exact-head-hosted-green design evidence; `PROTECTED-POLICY-CONVERGE-01` is next, permitted, and inactive; [TEST-0211](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0211) remains Planned and completion/DoD remains held |
+| State | `AcceptedFrozenDesign`; all seven packets through `PROTECTED-POLICY-CONVERGE-01` are `ReviewedLocalGreen`, subject to final exact-tree gates, at protected-policy/Scenario `7/7`, full Conformance `72/72`, Domain `98/98`, and warning-free Release builds; canonical R0004/R0005/R0006 remain immutable without rerun; [TEST-0211](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0211) is locally Passing/active with its owner/workflow activated; [SUBF-0144](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0144) implementation is locally complete without push, hosted-green, merge, completion/DoD, release, or publication claim; the held report-sealing successor remains blocked until exact-head hosted green |
 | Exact predecessor | [`14ad828bcdde5f843cdbf12677b25f19736e5691`](https://github.com/hasanmanzak/meAndAI/commit/14ad828bcdde5f843cdbf12677b25f19736e5691) |
 | Exact-main validation | [Run 31797357907](https://github.com/hasanmanzak/meAndAI/actions/runs/31797357907): Ubuntu `7m24s`, Windows `12m38s`, publication verification skipped |
 | Accepted design head / correction base | [`5d148233913dde08a7b24a4f696eace3c6f3407e`](https://github.com/hasanmanzak/meAndAI/commit/5d148233913dde08a7b24a4f696eace3c6f3407e) |
@@ -36,9 +36,9 @@ stay in the managed integration feature.
 The design cohort remained records-only and owned no production/test/workflow
 change. Its fresh reviews, local gates, focused commit/push, and exact-head
 hosted validation are complete, so the conditional ordered implementation
-authority is active. [TEST-0211](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0211) remains Planned and feature
-completion, release, publication, consumer mutation, authority transfer, and
-PowerShell retirement remain held.
+authority became active. At that design-only checkpoint,
+[TEST-0211](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0211) was Planned and feature completion, release, publication, consumer
+mutation, authority transfer, and PowerShell retirement were held.
 
 ## Accepted design and implementation packet history
 
@@ -278,7 +278,7 @@ link, and StructureOnly validation follows before the separate local commit.
 No push or hosted-green claim is made for
 this intermediate packet. At that checkpoint `SELF-CONSUMPTION-01` was next
 and inactive;
-[TEST-0211](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0211), Scenario activation, completion/DoD, release, and publication remain held.
+[TEST-0211](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0211), Scenario activation, completion/DoD, release, and publication were held.
 
 ## SELF canonical outcome-entry projection correction
 
@@ -364,12 +364,57 @@ The exact public-signature digest is
 the six-FQN LF-terminal digest is
 `21A528A91BF052C6283CC2A1E13A83A957BB0AD1BD7D7F5924ADE9281AC98C05`.
 Format, diff, and all six lock checks are green; design/runtime/traceability and
-security review each closed `0/0/0`. The first six packets through SELF are
-packet-local `ReviewedLocalGreen`. `PROTECTED-POLICY-CONVERGE-01` is next,
-permitted, and inactive; [TEST-0211](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0211), Scenario activation, completion/DoD, release, and publication remain held.
+security review each closed `0/0/0`. At that SELF checkpoint, the first six
+packets were packet-local `ReviewedLocalGreen`; `PROTECTED-POLICY-CONVERGE-01`
+was next, permitted, and inactive; [TEST-0211](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0211), Scenario activation, completion/DoD, release, and publication were held.
 
 This SELF packet has not been pushed and makes no hosted-green claim. At record
 synchronization the final graph/identity/link, StructureOnly, and publication-
 evidence gates were pending; they must validate this exact record tree before
 the separate local commit, and their results are intentionally not duplicated
 here.
+
+Canonical R0006 was consumed exactly once before its green transformation and
+must never be rerun. The frozen red source is `13,540` bytes / `321` LF lines
+with SHA-256
+`190D70B889240B4C2DB8AF7D854F08BAA81B104705AD65F6192104FD1B50BB46`.
+The exact runner is `14,902` bytes with SHA-256
+`B3FA6C67D0861F9A40F660C6A97F2F1474159C84648E49B61A5B6F8502321A3D`.
+Its sole `5,056`-byte TRX has SHA-256
+`50A3E2842F0AF881C417CAFF1537B0AA3A4BAE98CCDE644C00980F5F0E1EDD9A`;
+the exact filtered result selected/executed `1/1`, failed only at the marker-
+only oracle, and completed in `2m04s`. This immutable red is accepted evidence,
+not an authorization to rerun it.
+
+The green transformation is exactly ten code/test/workflow paths:
+`.github/workflows/protocol-tests.yml`,
+`tests/capabilities/workflow-efficiency/main-validation-route.tests.ps1`,
+`tests/scenario-ownership.psd1`, the new
+`tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ProtectedPolicyConvergenceTests.cs`,
+and the six existing
+`tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ProtectedPolicyDebtEnforcementTests.cs`,
+`tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ProtectedPolicyExtensionAuthorityTests.cs`,
+`tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ProtectedPolicyExtensionEvaluationTests.cs`,
+`tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ProtectedPolicySelfConsumptionTests.cs`,
+`tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ProtectedPolicySurfaceTests.cs`,
+and `tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ProtectedPolicyWaiverDispositionTests.cs`.
+Normalized churn is `331` additions plus `6` deletions, gross `337/2,000`.
+
+After the split-string repair, focused convergence passed `1/1` in `2m19s`;
+protected-policy/Scenario cumulative passed `7/7` in `2m21s`; full Conformance
+passed `72/72` in `2m23s`; and Domain passed `98/98` in `85ms`. Format is green
+and the Release build closed with `0` warnings / `0` errors. The frozen main-
+validation route checks are green. Their source oracle
+uses split-string test IDs only to remain compatible with governance reference
+parsing while asserting the same exact runtime filter bytes; scenario semantics
+and workflow coverage are unchanged.
+
+All seven packets through `PROTECTED-POLICY-CONVERGE-01` are packet-local
+`ReviewedLocalGreen`, subject to final exact-tree gates. [TEST-0211](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0211)
+is locally Passing/active and its Scenario owner/workflow is activated. This
+subfeature implementation is locally complete, but no push, hosted-green, merge,
+completion/DoD, release, or publication claim is made; the report-sealing successor remains held
+until exact-head hosted green. At this record synchronization the fresh final
+graph/identity/link, PowerShell 7 and Windows PowerShell 5.1 StructureOnly,
+publication-evidence, and review gates are pending on the exact synchronized
+tree; their later results must not be projected backward into this paragraph.

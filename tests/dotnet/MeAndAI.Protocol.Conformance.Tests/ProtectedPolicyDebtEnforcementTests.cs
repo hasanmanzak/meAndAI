@@ -11,6 +11,7 @@ namespace MeAndAI.Protocol.Conformance.Tests;
 public sealed class ProtectedPolicyDebtEnforcementTests
 {
     [Fact]
+    [Trait("Scenario", "TEST-0211")]
     public void Applies_exact_debt_and_enforcement_precedence()
     {
         var fixture = ProjectNeutralProtectedAuthorityFixture.CreateCanonicalEmpty();

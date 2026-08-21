@@ -228,6 +228,7 @@ public sealed class ProtectedPolicySurfaceTests
     ];
 
     [Fact]
+    [Trait("Scenario", "TEST-0211")]
     public void Exposes_exact_extension_waiver_debt_and_self_consumption_surface()
     {
         AssertExactStageInventories();

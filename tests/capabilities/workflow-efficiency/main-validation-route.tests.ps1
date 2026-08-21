@@ -436,11 +436,13 @@ try {
         $protocolVocabularyScenarioId = 'TEST-' + '0220'
         $protocolEvidenceScenarioId = 'TEST-' + '0221'
         $protocolKernelScenarioId = 'TEST-' + '0210'
+        $protocolProtectedPolicyScenarioId = 'TEST-' + '0211'
         $protocolScenarioFilter =
-            'Scenario={0}|Scenario={1}|Scenario={2}|ContractSlice=A|ContractSlice=B|ContractSlice=C|ContractSlice=D|FullyQualifiedName=MeAndAI.Protocol.Conformance.Tests.ContractSliceActivationTopologyTests.Matches_exact_contract_slice_scenario_inventory' -f
+            'Scenario={0}|Scenario={1}|Scenario={2}|Scenario={3}|ContractSlice=A|ContractSlice=B|ContractSlice=C|ContractSlice=D|FullyQualifiedName=MeAndAI.Protocol.Conformance.Tests.ContractSliceActivationTopologyTests.Matches_exact_contract_slice_scenario_inventory' -f
                 $protocolVocabularyScenarioId,
                 $protocolEvidenceScenarioId,
-                $protocolKernelScenarioId
+                $protocolKernelScenarioId,
+                $protocolProtectedPolicyScenarioId
         $protocolTestCommand =
             'dotnet test MeAndAI.Protocol.slnx --configuration Release --no-restore --nologo --verbosity minimal --filter "{0}"' -f $protocolScenarioFilter
         $expectedProtocolSteps = @(

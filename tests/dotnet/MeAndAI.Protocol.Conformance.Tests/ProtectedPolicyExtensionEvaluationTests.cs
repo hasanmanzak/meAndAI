@@ -11,6 +11,7 @@ public sealed class ProtectedPolicyExtensionEvaluationTests
     private const string RepositoryTreeSlot = "protocol.slot.repository-tree";
 
     [Fact]
+    [Trait("Scenario", "TEST-0211")]
     public void Evaluates_only_protocol_owned_additive_extension_kinds()
     {
         var registration =

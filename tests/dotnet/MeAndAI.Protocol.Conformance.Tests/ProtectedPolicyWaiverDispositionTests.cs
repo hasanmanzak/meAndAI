@@ -9,6 +9,7 @@ namespace MeAndAI.Protocol.Conformance.Tests;
 public sealed class ProtectedPolicyWaiverDispositionTests
 {
     [Fact]
+    [Trait("Scenario", "TEST-0211")]
     public void Applies_exact_waiver_identity_expiry_and_nonwaivable_rules()
     {
         var fixture = ProjectNeutralProtectedAuthorityFixture.CreateCanonicalEmpty();

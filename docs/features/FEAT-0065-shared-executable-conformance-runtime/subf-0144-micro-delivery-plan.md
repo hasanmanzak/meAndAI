@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Ordered implementation control plan |
-| Status | `AcceptedFrozenDesign`; the first six ordered packets through `SELF-CONSUMPTION-01` are packet-local `ReviewedLocalGreen` at protected-policy cumulative `6/6` and full Conformance `71/71`; canonical R0004/R0005 remain immutable without rerun; the immutable issued-closure/API-oracle and canonical outcome-entry projection corrections are exact-head hosted green without changing public API, packet order, FQNs, markers, or ownership; `PROTECTED-POLICY-CONVERGE-01` is next, permitted, and inactive |
+| Status | `AcceptedFrozenDesign`; all seven packets through `PROTECTED-POLICY-CONVERGE-01` are packet-local `ReviewedLocalGreen`, subject to final exact-tree gates, at protected-policy/Scenario `7/7` and full Conformance `72/72`; canonical R0004/R0005/R0006 remain immutable without rerun; [TEST-0211](test-cases.md#test-0211) is locally Passing/active with owner/workflow activated; [SUBF-0144](README.md#subf-0144) is locally implementation-complete without push, hosted-green, merge, DoD, release, or publication claim; [SUBF-0154](README.md#subf-0154) remains held until exact-head hosted green |
 | Parent design | [Protected policy and self-consumption design](subf-0144-extension-waiver-self-consumption-design.md) |
 | Scenario | [TEST-0211](test-cases.md#test-0211) |
 | Exact baseline | [`14ad828bcdde5f843cdbf12677b25f19736e5691`](https://github.com/hasanmanzak/meAndAI/commit/14ad828bcdde5f843cdbf12677b25f19736e5691) |
@@ -468,17 +468,17 @@ and digest before commit; no static relation-neutral claim substitutes for that
 executable validation.
 
 The original cohort reached `AcceptedFrozenDesign` and activated the ordered
-pipeline. The first input-custody correction is immutable intermediate
-evidence, and the superseding issued-closure/API-oracle correction is exact-
-head hosted green. SELF pre-red review proved that its four-path allowlist
-could not obtain canonical per-entry outcome digests without copying DEBT's private writer; the bounded correction added only the shared
-`DebtEnforcementCore` projection allowance and reached exact-head hosted green.
-Canonical R0005 was then consumed once and retained immutably without rerun;
-the five-path SELF green transform closed focused `1/1`, protected-policy
-cumulative `6/6`, full Conformance `71/71`, Domain `98/98`, warning-free
-Release builds, locks/format/diff/API oracles, and reviews `0/0/0` locally.
-The first six packets are `ReviewedLocalGreen`; `PROTECTED-POLICY-CONVERGE-01`
-is next, permitted, and inactive without a SELF push or hosted-green claim.
+pipeline. Its three bounded corrections remain immutable exact-head hosted
+evidence without changing the seven-packet design or ownership boundary.
+Canonical R0004/R0005/R0006 remain immutable without rerun. The ten-path
+convergence transform closed focused `1/1`, protected-policy/Scenario `7/7`,
+full Conformance `72/72`, Domain `98/98`, warning/error-free Release validation,
+and the frozen main-validation route checks locally. All seven packets
+through `PROTECTED-POLICY-CONVERGE-01` are `ReviewedLocalGreen`, subject to
+final exact-tree graph, StructureOnly, publication-evidence, and review gates.
+[TEST-0211](test-cases.md#test-0211) is locally Passing/active with its Scenario
+owner/workflow activated. No push, hosted-green, merge, completion/DoD, release,
+or publication claim is made.
 
 ## Held future work
 

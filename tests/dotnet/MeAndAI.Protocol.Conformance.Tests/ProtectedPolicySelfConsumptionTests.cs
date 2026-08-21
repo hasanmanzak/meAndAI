@@ -9,6 +9,7 @@ namespace MeAndAI.Protocol.Conformance.Tests;
 public sealed class ProtectedPolicySelfConsumptionTests
 {
     [Fact]
+    [Trait("Scenario", "TEST-0211")]
     public void Rejects_candidate_only_and_unreviewed_differential_authority()
     {
         var fixture = CreateFixture();
