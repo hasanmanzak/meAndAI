@@ -37,9 +37,9 @@ correction plus the canonical outcome-entry projection correction are immutable
 exact-head-hosted-green design evidence. [TEST-0211](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0211)
 is locally Passing/active with its owner/workflow activated. The pre-correction
 candidate is on [PR #186](https://github.com/hasanmanzak/meAndAI/pull/186), where
-Ubuntu reached the 25-minute ceiling. Its bounded 30-minute correction is local
-`ReviewedLocalGreen`
-under [FIND-0462](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0462);
+Ubuntu reached the 25-minute ceiling. Its bounded 30-minute [FIND-0462](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0462)
+correction and canonical selected-profile expected-reader [FIND-0463](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md#find-0463)
+correction are local `ReviewedLocalGreen`;
 replacement exact-head hosted-green, merge, completion/DoD, release, and
 publication remain unclaimed, and the report-sealing successor stays held.
 

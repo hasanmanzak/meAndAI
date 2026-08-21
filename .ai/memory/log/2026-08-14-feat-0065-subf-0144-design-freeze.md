@@ -2,7 +2,7 @@
 
 | Field | Value |
 | --- | --- |
-| State | `AcceptedFrozenDesign`; all seven packets through `PROTECTED-POLICY-CONVERGE-01` are `ReviewedLocalGreen` at protected-policy/Scenario `7/7`, full Conformance `72/72`, Domain `98/98`, and warning-free Release builds; canonical R0004/R0005/R0006 remain immutable without rerun; [TEST-0211](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0211) is locally Passing/active with its owner/workflow activated. The [PR #186](https://github.com/hasanmanzak/meAndAI/pull/186) pre-correction candidate exposed the finite Ubuntu timeout defect in [FIND-0462](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0462); the bounded correction is local `ReviewedLocalGreen`, while replacement exact-head hosted validation, merge, completion/DoD, release, and publication are unclaimed; the held report-sealing successor remains blocked. |
+| State | `AcceptedFrozenDesign`; all seven packets through `PROTECTED-POLICY-CONVERGE-01` are `ReviewedLocalGreen` at protected-policy/Scenario `7/7`, full Conformance `72/72`, Domain `98/98`, and warning-free Release builds; canonical R0004/R0005/R0006 remain immutable without rerun; [TEST-0211](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0211) is locally Passing/active with its owner/workflow activated. The [PR #186](https://github.com/hasanmanzak/meAndAI/pull/186) pre-correction candidate exposed [FIND-0462](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0462), and committed-head graph reconstruction exposed canonical [FIND-0463](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md#find-0463); both bounded infrastructure corrections are local `ReviewedLocalGreen`, while replacement exact-head hosted validation, merge, completion/DoD, release, and publication are unclaimed; the held report-sealing successor remains blocked. |
 | Exact predecessor | [`14ad828bcdde5f843cdbf12677b25f19736e5691`](https://github.com/hasanmanzak/meAndAI/commit/14ad828bcdde5f843cdbf12677b25f19736e5691) |
 | Exact-main validation | [Run 31797357907](https://github.com/hasanmanzak/meAndAI/actions/runs/31797357907): Ubuntu `7m24s`, Windows `12m38s`, publication verification skipped |
 | Accepted design head / correction base | [`5d148233913dde08a7b24a4f696eace3c6f3407e`](https://github.com/hasanmanzak/meAndAI/commit/5d148233913dde08a7b24a4f696eace3c6f3407e) |
@@ -432,3 +432,17 @@ red took `507.7s` and reported one timeout problem; this is not R0006. The first
 post-transform run found only this handoff's bare [TEST-0124](../../../docs/features/FEAT-0027-v0104-runner-minute-efficiency/test-cases.md#test-0124)
 link; after correction the owner passed in `483.7s`. Final record wording requires
 one post-record same-owner confirmation; hosted facts remain external evidence.
+
+Canonical [FIND-0463](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md#find-0463)
+owns a distinct twelve-path test-infrastructure correction under [DEC-0036](../../../docs/decisions/DEC-0036-prospective-instruction-graph-capacity.md).
+Its [TEST-0162](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/test-cases.md#test-0162)
+red/green sequence caught both absent selected-limit bindings, the exact
+[TEST-0159](../../../docs/features/FEAT-0039-v0130-test-runtime-efficiency/test-cases.md#test-0159)
+operation-inventory recurrence, and both absent caller-local deadlines. The
+corrected readers pass loaded `1,048,576`/`8,388,608` plus `240000`; the generic
+helper retains `120000`. Committed-head [TEST-0153](../../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0153)
+passed PS7/PS5.1 at digest `8b992f95273aa597e12aa8d3ede053dee378ed89f1416575183b5a11de6c42ce`
+and `386`/`4554`/`341`/`5135238`; quick closure passed both runtimes on the same
+source bytes. A sandbox-only `CreateFileMapping` access denial was diagnostic
+and not blindly retried there. Product graph policy, protected-policy semantics, and
+R0004/R0005/R0006 custody are unchanged.

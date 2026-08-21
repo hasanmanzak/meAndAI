@@ -93,12 +93,17 @@ $builder = $module.ExportedCommands['New-MeAndAIInstructionGraph']
 $validator = $module.ExportedCommands['Test-MeAndAIExactInstructionGraph']
 $identityGetter =
     $module.ExportedCommands['Get-MeAndAIInstructionGraphIdentity']
+$limitsGetter = $module.ExportedCommands['Get-MeAndAIInstructionGraphLimits']
 if ($null -eq $builder -or $null -eq $validator -or
-    $null -eq $identityGetter) {
+    $null -eq $identityGetter -or $null -eq $limitsGetter) {
     throw 'The TEST-0153 capabilities contract lacks graph exports.'
 }
+$limits = & $limitsGetter
 $session = New-MeAndAITestGitBlobBatchSession `
-    -Repository $Repository
+    -Repository $Repository `
+    -MaximumBlobBytes ([long]$limits.MaximumBlobBytes) `
+    -MaximumAggregateBlobBytes ([long]$limits.MaximumAggregateBlobBytes) `
+    -SessionTimeoutMilliseconds 240000
 $graph = $null
 $primaryError = $null
 $cleanupError = $null

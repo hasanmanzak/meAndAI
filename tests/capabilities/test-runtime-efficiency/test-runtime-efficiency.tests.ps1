@@ -965,6 +965,18 @@ if ($quickGraphReaders.Count -eq 1) {
     Assert-True ($quickGraphReaderSource -cnotmatch
         '(?i)cat-file\s+(?:--batch|blob)(?:\s|["''])') `
         'TEST-0162 quick expected graph reader bypasses the shared transport.'
+    Assert-True (
+        @([regex]::Matches($quickGraphReaderSource,
+            '(?i)Get-MeAndAIInstructionGraphLimits')).Count -eq 1 -and
+        @([regex]::Matches($quickGraphReaderSource,
+            '(?i)&\s+\$limitsGetter')).Count -eq 1 -and
+        $quickGraphReaderSource -cmatch
+            '(?i)-MaximumBlobBytes\s+\(\[long\]\$limits\.MaximumBlobBytes\)' -and
+        $quickGraphReaderSource -cmatch
+            '(?i)-MaximumAggregateBlobBytes\s+\(\[long\]\$limits\.MaximumAggregateBlobBytes\)' -and
+        @([regex]::Matches($quickGraphReaderSource,
+            '(?i)-SessionTimeoutMilliseconds\s+240000')).Count -eq 1
+    ) 'TEST-0162 quick expected graph reader lacks exact selected-profile limit threading.'
 }
 $bootstrapGraphIdentitySource =
     [IO.File]::ReadAllText($bootstrapGraphIdentityPath)
@@ -974,6 +986,18 @@ Assert-Equal @([regex]::Matches($bootstrapGraphIdentitySource,
 Assert-True ($bootstrapGraphIdentitySource -cnotmatch
     '(?i)cat-file\s+(?:--batch|blob)(?:\s|["''])') `
     'TEST-0162 bootstrap expected graph reader bypasses the shared transport.'
+Assert-True (
+    @([regex]::Matches($bootstrapGraphIdentitySource,
+        '(?i)Get-MeAndAIInstructionGraphLimits')).Count -eq 1 -and
+    @([regex]::Matches($bootstrapGraphIdentitySource,
+        '(?i)&\s+\$limitsGetter')).Count -eq 1 -and
+    $bootstrapGraphIdentitySource -cmatch
+        '(?i)-MaximumBlobBytes\s+\(\[long\]\$limits\.MaximumBlobBytes\)' -and
+    $bootstrapGraphIdentitySource -cmatch
+        '(?i)-MaximumAggregateBlobBytes\s+\(\[long\]\$limits\.MaximumAggregateBlobBytes\)' -and
+    @([regex]::Matches($bootstrapGraphIdentitySource,
+        '(?i)-SessionTimeoutMilliseconds\s+240000')).Count -eq 1
+) 'TEST-0162 bootstrap expected graph reader lacks exact selected-profile limit threading.'
 $testGitBatchAst = Get-ParsedTestAst -Path $testGitBatchPath
 $testGitBatchFactories = @($testGitBatchAst.FindAll({
     param($node)
@@ -985,6 +1009,9 @@ Assert-Equal $testGitBatchFactories.Count 1 `
     'TEST-0162 shared test Git batch factory is missing or ambiguous.'
 if ($testGitBatchFactories.Count -eq 1) {
     $testGitBatchSource = [string]$testGitBatchFactories[0].Extent.Text
+    Assert-True ($testGitBatchSource -cmatch
+        '(?m)\[int\]\$SessionTimeoutMilliseconds = 120000,') `
+        'TEST-0162 shared test Git reader default session deadline changed.'
     Assert-Equal @([regex]::Matches(
         $testGitBatchSource,
         '(?i)cat-file\s+--batch(?:\s|["''])'
@@ -1073,6 +1100,7 @@ $expectedQuickDynamicInvocations = [ordered]@{
     '$graphRecordConverter|<script>' = 1
     '$graphRecordConverter|global:gh' = 1
     '$identityValidator|global:gh' = 1
+    '$limitsGetter|Get-TestCommittedInstructionGraph' = 1
     # TEST-0069/TEST-0176 retain bounded real-launcher ownership slices plus
     # pure historical classification, inventory, and snapshot adapters.
     '$launcherPath|<script>' = 93
