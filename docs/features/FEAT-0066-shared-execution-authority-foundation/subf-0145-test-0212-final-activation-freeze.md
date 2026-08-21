@@ -1,28 +1,26 @@
-# TEST-0212 final atomic activation freeze
+# [TEST-0212](test-cases.md#test-0212) final atomic activation freeze
 
 | Field | Frozen value |
 | --- | --- |
-| State | `AcceptedFrozenDesign`; activation implementation remains held until this reviewed design cohort is committed locally |
-| Exact-main parent | [`ff7d1f62641947e32c7b818a0d457fb1bc8f3296`](https://github.com/hasanmanzak/meAndAI/commit/ff7d1f62641947e32c7b818a0d457fb1bc8f3296), tree `fc00f9da75e10662f67307793c62909df36009f6` |
-| Scenario | [TEST-0212](test-cases.md#test-0212), retained `Planned` and `PlannedDocumentation` until the transformed local atom is green; the candidate status then becomes standard `Passing` with exact-head hosted evidence still stated as pending |
+| State | Local semantic gates are `Passing`; final exact-tree structural/review gates, commit/push, and exact-head hosted validation remain pending |
+| Exact-main parent | [`ff7d1f62641947e32c7b818a0d457fb1bc8f3296`](https://github.com/hasanmanzak/meAndAI/commit/ff7d1f62641947e32c7b818a0d457fb1bc8f3296), git tree identity: `fc00f9da75e10662f67307793c62909df36009f6` |
+| Scenario | [TEST-0212](test-cases.md#test-0212) is locally `Passing`; exact `20` Scenario traits, executable owner, both workflow filters, and the neutral topology oracle are active, with hosted evidence pending |
 | Owning slice | [SUBF-0145](README.md#subf-0145); all four product packages and immutable [EA-CONVERGE-01](subf-0145-package-evidence.md#ea-converge-01) remain predecessor evidence |
 | Tracking | [Issue #166](https://github.com/hasanmanzak/meAndAI/issues/166), merged [PR #187](https://github.com/hasanmanzak/meAndAI/pull/187), and exact-main [run 32521885155](https://github.com/hasanmanzak/meAndAI/actions/runs/32521885155) |
 
 ## Authority and holds
 
-This records-only cohort freezes the separate final activation atom authorized
-after the four accepted [SUBF-0145](README.md#subf-0145) packages. It does not
-activate a scenario, change product behavior, or consume a fifth product
-expected-red. The six existing test sources retain only
-`Subfeature=SUBF-0145`; the scenario owner remains planned documentation; and
-the two stable workflow filters remain unchanged in this cohort.
+The historical records-only design cohort froze this separate final activation
+atom after the four accepted [SUBF-0145](README.md#subf-0145) packages. At that
+checkpoint it changed no Scenario, product behavior, or product expected-red:
+the six test sources retained only [Subfeature=SUBF-0145](README.md#subf-0145), the owner remained
+planned documentation, and both stable workflow filters were unchanged.
 
-Implementation may start only after this three-record design diff passes fresh
-design, evidence, and traceability review and is committed as one local design
-checkpoint. The accepted design and its implementation share one branch and
-one final push/hosted cycle; no design-only hosted cycle is required. The
-implementation is one indivisible local atom: no partial trait, owner,
-workflow, runtime-oracle, status, or evidence state may be committed or pushed.
+Implementation began only after that three-record design diff passed fresh
+review and was committed locally. The accepted design and implementation share
+this branch and one final push/hosted cycle; no design-only hosted cycle was
+used. The candidate remains one indivisible atom with no partial trait, owner,
+workflow, runtime-oracle, status, or evidence state committed or pushed.
 
 [TEST-0213](test-cases.md#test-0213), [SUBF-0146](README.md#subf-0146), product
 source, public API, packages, locks, adapters, consumers, merge, feature DoD,
@@ -41,10 +39,10 @@ The ordinal path list, LF plus terminal LF, has SHA-256
 5. [`ExtensionActivationContractTests.cs`](../../../tests/dotnet/MeAndAI.Operations.Architecture.Tests/ExtensionActivationContractTests.cs)
 6. [`PublicationEnvelopeContractTests.cs`](../../../tests/dotnet/MeAndAI.Operations.Architecture.Tests/PublicationEnvelopeContractTests.cs)
 
-Each Fact carries exactly one `Subfeature=SUBF-0145` trait and no `Scenario`
+Each Fact carries exactly one [Subfeature=SUBF-0145](README.md#subf-0145) trait and no `Scenario`
 trait. No existing Fact identity, method, FQN, body, class, file allocation,
 or subfeature trait may change; the only permitted edit in these files is one
-direct `Scenario=TEST-0212` trait on each frozen Fact. The ordinal FQN list, LF
+direct [Scenario=TEST-0212](test-cases.md#test-0212) trait on each frozen Fact. The ordinal FQN list, LF
 plus terminal LF, has SHA-256
 `989E196327C5FB5C25730840B707B53F0C5DFFDC6D3753AC390369F1FD081469`:
 
@@ -78,7 +76,7 @@ through either trait. Its final reflection oracle must prove all of the
 following ordinally:
 
 - public declared Fact methods beginning `TEST_0212_` equal the frozen `20`;
-- `Scenario=TEST-0212` and `Subfeature=SUBF-0145` each select exactly the same
+- [Scenario=TEST-0212](test-cases.md#test-0212) and [Subfeature=SUBF-0145](README.md#subf-0145) each select exactly the same
   frozen `20` FQNs;
 - each target has exactly one Fact, one exact scenario trait, and one exact
   subfeature trait, with no additional value for either key; and
@@ -86,8 +84,8 @@ following ordinally:
 
 Before any target trait, owner, workflow, status, or evidence mutation, the
 new scaffold proves the exact predecessor inventory, proves zero
-`Scenario=TEST-0212` targets, and fails only through marker
-`TEST-0212-FINAL-ACTIVATION-NATURAL-RED-0001`. The exact topology FQN is invoked
+[Scenario=TEST-0212](test-cases.md#test-0212) targets, and fails only through marker
+[TEST-0212-FINAL-ACTIVATION-NATURAL-RED-0001](test-cases.md#test-0212). The exact topology FQN is invoked
 once in one fresh result directory. Its source SHA-256, TRX SHA-256, duration,
 `1` failed / `0` passed counts, exact marker echo, and zero other failure are
 captured before transformation. There is no retry. This is activation-topology
@@ -107,11 +105,11 @@ retry, reused result directories, or evidence reuse are forbidden.
 
 The sole invocation identity is the Architecture test project, Release,
 `--no-restore`, the exact FQN filter above, TRX name
-`TEST-0212-FINAL-ACTIVATION-NATURAL-RED-0001.trx`, and one newly created empty
+[TEST-0212-FINAL-ACTIVATION-NATURAL-RED-0001](test-cases.md#test-0212) `.trx`, and one newly created empty
 result directory:
 
 ```text
-dotnet test tests/dotnet/MeAndAI.Operations.Architecture.Tests/MeAndAI.Operations.Architecture.Tests.csproj --configuration Release --no-restore --no-build --nologo --verbosity minimal --filter "FullyQualifiedName=MeAndAI.Operations.Architecture.Tests.ExecutionAuthorityActivationTopologyTests.Matches_exact_execution_authority_scenario_inventory" --logger "trx;LogFileName=TEST-0212-FINAL-ACTIVATION-NATURAL-RED-0001.trx" --results-directory <fresh-empty-result-root>
+dotnet test tests/dotnet/MeAndAI.Operations.Architecture.Tests/MeAndAI.Operations.Architecture.Tests.csproj --configuration Release --no-restore --no-build --nologo --verbosity minimal --filter "FullyQualifiedName=MeAndAI.Operations.Architecture.Tests.ExecutionAuthorityActivationTopologyTests.Matches_exact_execution_authority_scenario_inventory" --logger "trx;LogFileName=<frozen-marker>.trx" --results-directory <fresh-empty-result-root>
 ```
 
 The invocation must execute the frozen DLL/PDB, not build inside `dotnet test`.
@@ -137,11 +135,11 @@ changes atomically:
 
 - existing `DotNetTestProject` owner
   `tests/dotnet/MeAndAI.Operations.Architecture.Tests/MeAndAI.Operations.Architecture.Tests.csproj`
-  expands from `TEST-0191`, `TEST-0192` to `TEST-0191`, `TEST-0192`,
-  `TEST-0212`; and
-- the FEAT-0066 `PlannedDocumentation` owner retains only `TEST-0213`.
+  expands from [TEST-0191](../FEAT-0059-csharp-operational-foundation/test-cases.md#test-0191), [TEST-0192](../FEAT-0059-csharp-operational-foundation/test-cases.md#test-0192) to those same records plus
+  [TEST-0212](test-cases.md#test-0212); and
+- the [FEAT-0066](README.md) `PlannedDocumentation` owner retains only [TEST-0213](test-cases.md#test-0213).
 
-In the same local atom, the TEST-0212 status changes from `Planned` to standard
+In the same local atom, the [TEST-0212](test-cases.md#test-0212) status changes from `Planned` to standard
 `Passing`, while its automation/evidence text says exact-head hosted validation
 is pending. It must not claim hosted green, completion, merge, release, or
 publication before those events.
@@ -150,17 +148,15 @@ Both stable `Run C# operational foundation tests` steps in
 [`protocol-tests.yml`](../../../.github/workflows/protocol-tests.yml) use this
 exact filter, byte-for-byte apart from YAML newline conventions:
 
-```text
-Scenario=TEST-0191|Scenario=TEST-0192|Scenario=TEST-0193|Scenario=TEST-0212|FullyQualifiedName=MeAndAI.Operations.Architecture.Tests.ExecutionAuthorityActivationTopologyTests.Matches_exact_execution_authority_scenario_inventory
-```
+The filter concatenates `Scenario=` with [TEST-0191](../FEAT-0059-csharp-operational-foundation/test-cases.md#test-0191), [TEST-0192](../FEAT-0059-csharp-operational-foundation/test-cases.md#test-0192), [TEST-0193](../FEAT-0059-csharp-operational-foundation/test-cases.md#test-0193), and [TEST-0212](test-cases.md#test-0212), in that order, then appends `FullyQualifiedName=MeAndAI.Operations.Architecture.Tests.ExecutionAuthorityActivationTopologyTests.Matches_exact_execution_authority_scenario_inventory`.
 
 The Ubuntu/bash and Windows/PowerShell steps keep their job, name, shell,
 route, solution, configuration, restore, logger, timeout, and failure
 semantics. No matrix, fan-out, fan-in, alternate route, or additional hosted
 job is introduced.
 
-The exact [TEST-0146 main-validation owner](../../../tests/capabilities/workflow-efficiency/main-validation-route.tests.ps1)
-constructs `TEST-0212` from split stable components, constructs the exact
+The exact [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) [main-validation owner](../../../tests/capabilities/workflow-efficiency/main-validation-route.tests.ps1)
+constructs [TEST-0212](test-cases.md#test-0212) from split stable components, constructs the exact
 filter and neutral FQN above, and requires one matching operational restore
 and test step in each stable job. It preserves the existing exact job and
 protocol-step oracles and rejects missing, duplicate, alternate-run-form,
@@ -181,10 +177,10 @@ activation atom:
 8. `tests/scenario-ownership.psd1`
 9. `.github/workflows/protocol-tests.yml`
 10. `tests/capabilities/workflow-efficiency/main-validation-route.tests.ps1`
-11. `docs/features/FEAT-0066-shared-execution-authority-foundation/subf-0145-test-0212-final-activation-freeze.md`
-12. `docs/features/FEAT-0066-shared-execution-authority-foundation/README.md`
-13. `docs/features/FEAT-0066-shared-execution-authority-foundation/test-cases.md`
-14. `docs/features/FEAT-0066-shared-execution-authority-foundation/subf-0145-package-evidence.md`
+11. [the activation freeze](subf-0145-test-0212-final-activation-freeze.md)
+12. [the feature record](README.md)
+13. [the scenario registry](test-cases.md)
+14. [the package evidence ledger](subf-0145-package-evidence.md)
 
 Path 14 is the dependency-closed owning evidence ledger; it records the
 activation atom and does not rewrite package or converge evidence. No separate
@@ -202,12 +198,12 @@ formatting:
 - scenario ownership changes at most `12` gross lines;
 - the workflow changes exactly two filter lines (`4` gross lines) and adds no
   physical line;
-- the TEST-0146 owner changes at most `80` gross lines and remains at most
+- the [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) owner changes at most `80` gross lines and remains at most
   `780` physical lines;
-- the four record paths change at most `120` gross lines during implementation;
+- the four record paths change at most `160` gross lines after the bounded canonical-link correction;
   and
 - executable/test gross change is at most `356`, record gross change at most
-  `120`, total gross change at most `476`, and no fifteenth path is permitted.
+  `160`, total gross change at most `516`, and no fifteenth path is permitted.
 
 This design cohort itself is exactly the new freeze plus `README.md` and
 `test-cases.md`: at most `320` additions, `340` gross changed lines, and no
@@ -217,12 +213,12 @@ executable or evidence claim.
 
 After the one natural-red invocation, the transformed exact tree must pass:
 
-1. the neutral topology FQN `1/1`, `Scenario=TEST-0212` `20/20`, and
-   `Subfeature=SUBF-0145` `20/20`, with all three target sets exact;
+1. the neutral topology FQN `1/1`, [Scenario=TEST-0212](test-cases.md#test-0212) `20/20`, and
+   [Subfeature=SUBF-0145](README.md#subf-0145) `20/20`, with all three target sets exact;
 2. full Operations Architecture `52/52`, Packaging `17/17`, and the combined
    workflow filter `69/69`, with exact project/result partition assertions;
 3. warning-as-error Release build, standard format, locks, API/ownership,
-   diff/allowlist/caps, marker absence, and the exact TEST-0146 owner;
+   diff/allowlist/caps, marker absence, and the exact [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) owner;
 4. StructureOnly/instruction graph and publication-evidence checks without a
    release or publication claim;
 5. fresh code/security and evidence/traceability reviews at `0/0/0`; and
@@ -230,10 +226,13 @@ After the one natural-red invocation, the transformed exact tree must pass:
    hosted-pending record sync, one push, exact-head Ubuntu/Windows hosted green,
    then external PR/issue closure without rewriting the candidate bytes.
 
-Only after local gates 1 through 5 may the TEST-0212 record become `Passing`
-with hosted evidence explicitly pending and the atom be committed. SUBF-0145
+Local gates 1 through 3 are green; gates 4 and 5 must close on the exact final
+record bytes before the atom is committed. The immutable natural-red custody
+and current local evidence are retained in the
+[package ledger](subf-0145-package-evidence.md#test-0212-final-activation).
+[SUBF-0145](README.md#subf-0145)
 scenario activation closes only after gate 6 exact-head hosted green and
-external PR/issue closure. TEST-0213/SUBF-0146 stay held until a separately
+external PR/issue closure. [TEST-0213](test-cases.md#test-0213)/[SUBF-0146](README.md#subf-0146) stay held until a separately
 accepted Gate-2 design and exact-main predecessor exist. Merge, feature DoD,
 release, publication, consumer activation, and external authority remain
 separate.

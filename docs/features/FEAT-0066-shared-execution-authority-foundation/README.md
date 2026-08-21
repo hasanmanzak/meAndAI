@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Feature |
-| Status | [SUBF-0145](#subf-0145) is merged and exact-main hosted green through [PR #187](https://github.com/hasanmanzak/meAndAI/pull/187) and [run 32521885155](https://github.com/hasanmanzak/meAndAI/actions/runs/32521885155); the records-only [TEST-0212 final activation freeze](subf-0145-test-0212-final-activation-freeze.md) is local `AcceptedFrozenDesign`, while activation implementation, its single push/hosted cycle, feature DoD, release, and publication remain held |
+| Status | [SUBF-0145](#subf-0145) is merged and exact-main hosted green through [PR #187](https://github.com/hasanmanzak/meAndAI/pull/187) and [run 32521885155](https://github.com/hasanmanzak/meAndAI/actions/runs/32521885155); [TEST-0212](test-cases.md#test-0212) [final activation](subf-0145-test-0212-final-activation-freeze.md) semantic gates are locally `Passing`, while final exact-tree structural/review gates, commit/push, exact-head hosted validation, feature DoD, release, and publication remain pending or held |
 | Target version | 0.17.0 |
 | Issue | [#166](https://github.com/hasanmanzak/meAndAI/issues/166) |
 | Pull request | Merged [PR #187](https://github.com/hasanmanzak/meAndAI/pull/187) |
@@ -29,15 +29,11 @@ gate. The final review-link cohort is merged at exact main
 through [PR #187](https://github.com/hasanmanzak/meAndAI/pull/187) and
 [run 32521885155](https://github.com/hasanmanzak/meAndAI/actions/runs/32521885155).
 That closure does not retroactively replace the immutable package checkpoint.
-Every intermediate implementation fact remains subfeature-scoped with the exact
-[Subfeature=SUBF-0145](#subf-0145) trait. [Scenario=TEST-0212](test-cases.md#test-0212), its executable owner, and
-its `Passing` status remain held for a separate atomic final-activation gate;
-the canonical [TEST-0212](test-cases.md#test-0212) record therefore stays
-`PlannedDocumentation`/`Planned` throughout these packages.
-The records-only [final activation freeze](subf-0145-test-0212-final-activation-freeze.md)
-now fixes that future atom's exact inventory, natural-red topology oracle,
-fourteen-path allowlist, owner/workflow transform, caps, and gates. It grants no
-partial or current implementation claim.
+Every implementation Fact remains subfeature-scoped with exact
+[Subfeature=SUBF-0145](#subf-0145), and the atomic final-activation candidate
+adds [Scenario=TEST-0212](test-cases.md#test-0212) to the same exact `20` Facts.
+The neutral topology, executable owner, both stable filters, [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) oracle,
+and `Passing` status are locally green; exact-head hosted validation is pending.
 Merge, release, publication, consumer mutation, credentials, authority
 transfer, and [SUBF-0146](#subf-0146) implementation remain separately held.
 The preserved [draft PR #160](https://github.com/hasanmanzak/meAndAI/pull/160)
@@ -108,14 +104,14 @@ reconstruction, and explicit recovery grants for every mutating application.
 | Test readiness | Gate 1 state | Evidence |
 | --- | --- | --- |
 | Scenarios | Defined | [Test scenarios](test-cases.md) |
-| Test code | Four packages `ReviewedLocalGreen`; immutable converge checkpoint hosted green; final activation design frozen locally | All `20` exact Facts and six source files are frozen by the [activation design](subf-0145-test-0212-final-activation-freeze.md); no Scenario trait, owner, workflow, or topology-test implementation has started |
+| Test code | Four packages `ReviewedLocalGreen`; immutable converge checkpoint hosted green; final activation locally green | The [activation design](subf-0145-test-0212-final-activation-freeze.md) owns exact Scenario `20/20`, neutral topology `1/1`, owner/workflow and [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) evidence; hosted validation pending |
 | Baseline run | Four canonical reds immutable; four bounded greens complete | Exact R identities and local package evidence are retained in the [package ledger](subf-0145-package-evidence.md) |
 
 ## Decomposition and subfeature gates
 
 | ID | Slice | Tracking | Tests/run | Self-review/findings | Status |
 | --- | --- | --- | --- | --- | --- |
-| `SUBF-0145` <a name="subf-0145"></a> | Authority snapshots, role separation, grants, activation CAS, and publication envelopes | [#166](https://github.com/hasanmanzak/meAndAI/issues/166) | [TEST-0212](test-cases.md#test-0212) / four package FQNs and cumulative local green | Package reviews `0/0/0`; immutable cohort review `0/0/0`; final reconciliation review closed on merged [PR #187](https://github.com/hasanmanzak/meAndAI/pull/187) | Four packages `ReviewedLocalGreen`; immutable converge checkpoint and exact-main [`ff7d1f62641947e32c7b818a0d457fb1bc8f3296`](https://github.com/hasanmanzak/meAndAI/commit/ff7d1f62641947e32c7b818a0d457fb1bc8f3296) are hosted green; [design](subf-0145-authority-grant-activation-design.md) / [API](subf-0145-public-api-contract.md) / [values/errors](subf-0145-value-error-contract.md) / [micro plan](subf-0145-micro-delivery-plan.md) |
+| `SUBF-0145` <a name="subf-0145"></a> | Authority snapshots, role separation, grants, activation CAS, and publication envelopes | [#166](https://github.com/hasanmanzak/meAndAI/issues/166) | [TEST-0212](test-cases.md#test-0212) / four package FQNs plus final activation local green | Package/cohort reviews `0/0/0`; merged [PR #187](https://github.com/hasanmanzak/meAndAI/pull/187) exact-main green; activation fresh reviews pending | Four packages `ReviewedLocalGreen`; immutable converge and exact-main [`ff7d1f62641947e32c7b818a0d457fb1bc8f3296`](https://github.com/hasanmanzak/meAndAI/commit/ff7d1f62641947e32c7b818a0d457fb1bc8f3296) hosted green; [TEST-0212](test-cases.md#test-0212) locally `Passing`, exact-head hosted pending |
 | `SUBF-0146` <a name="subf-0146"></a> | Leases, fences, journal, receipts, retention, reconstruction, and recovery grants | [#166](https://github.com/hasanmanzak/meAndAI/issues/166) | [TEST-0213](test-cases.md#test-0213) / not started | Pending | Proposed |
 
 ## Decisions and relationships
@@ -130,7 +126,7 @@ reconstruction, and explicit recovery grants for every mutating application.
 - [x] Numbered planning scenarios and explicit WIP absence finding.
 - [x] Exact authority/grant/activation schemas and store-port contracts for selected [SUBF-0145](#subf-0145).
 - [x] Exact [TEST-0212](test-cases.md#test-0212) expected-red FQNs, replay, role, publication, and concurrent-CAS fixture plan.
-- [x] Exact [TEST-0212 final activation](subf-0145-test-0212-final-activation-freeze.md) inventory, neutral topology oracle, owner/workflow transform, allowlist, caps, and held boundary.
+- [x] Exact [TEST-0212](test-cases.md#test-0212) [final activation](subf-0145-test-0212-final-activation-freeze.md) inventory, neutral topology oracle, owner/workflow transform, allowlist, caps, and held boundary.
 - [x] Narrow expected lease/fence and protected grant-store correction passed the exact `AcceptedFrozenDesign` local and hosted gates.
 - [ ] [SUBF-0146](#subf-0146) journal, crash, corruption, retention, reconstruction, and recovery schema/fixture freeze.
 - [x] Gate 2 design review for the selected dependency-closed slice; accepted at
@@ -155,8 +151,9 @@ is exact-head hosted green. The final review-link cohort is merged through
 [PR #187](https://github.com/hasanmanzak/meAndAI/pull/187); exact-main
 [`ff7d1f62641947e32c7b818a0d457fb1bc8f3296`](https://github.com/hasanmanzak/meAndAI/commit/ff7d1f62641947e32c7b818a0d457fb1bc8f3296)
 passed [run 32521885155](https://github.com/hasanmanzak/meAndAI/actions/runs/32521885155).
-[TEST-0212](test-cases.md#test-0212) activation,
-[SUBF-0146](#subf-0146), adapters, feature merge, release, publication,
+[TEST-0212](test-cases.md#test-0212) exact-head hosted closure,
+[SUBF-0146](#subf-0146), adapters, feature DoD, release, publication,
 consumer mutation, and external authority effects remain held.
-The [final activation design](subf-0145-test-0212-final-activation-freeze.md)
-satisfies Gate 2 only; the activation atom and its single push/hosted gate remain held.
+The [final activation atom](subf-0145-test-0212-final-activation-freeze.md) is
+locally green; only its final exact-tree gates, one commit/push, and exact-head
+Ubuntu/Windows closure remain before external activation completion.

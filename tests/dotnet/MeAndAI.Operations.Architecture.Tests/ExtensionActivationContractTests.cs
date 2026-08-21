@@ -7,6 +7,7 @@ public sealed class ExtensionActivationContractTests
 {
     [Fact]
     [Trait("Subfeature", "SUBF-0145")]
+    [Trait("Scenario", "TEST-0212")]
     public async Task TEST_0212_only_fresh_winning_cas_activates_extension()
     {
         Fixture fixture = new();

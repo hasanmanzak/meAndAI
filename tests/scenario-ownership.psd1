@@ -170,7 +170,7 @@
         @{
             Evidence = 'DotNetTestProject'
             Owner = 'tests/dotnet/MeAndAI.Operations.Architecture.Tests/MeAndAI.Operations.Architecture.Tests.csproj'
-            TestIds = @('TEST-0191', 'TEST-0192')
+            TestIds = @('TEST-0191', 'TEST-0192', 'TEST-0212')
         }
         @{
             Evidence = 'DotNetTestProject'
@@ -224,7 +224,7 @@
         @{
             Evidence = 'PlannedDocumentation'
             Owner = 'docs/features/FEAT-0066-shared-execution-authority-foundation/test-cases.md'
-            TestIds = @('TEST-0212', 'TEST-0213')
+            TestIds = @('TEST-0213')
         }
         @{
             Evidence = 'PlannedDocumentation'
