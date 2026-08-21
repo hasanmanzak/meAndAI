@@ -2,7 +2,7 @@
 
 | Field | Value |
 | --- | --- |
-| State | `AcceptedFrozenDesign`; `POLICY-SURFACE-FRAMING-01`, `EXTENSION-AUTHORITY-01`, `EXTENSION-EVALUATION-01`, and `WAIVER-DISPOSITION-01` remain `ReviewedLocalGreen` with cumulative `4/4`, full Conformance `69/69`, Domain `98/98`, warning-free Release builds, and review `0/0/0`; canonical `PROTECTED-POLICY-DEBT-RED-0004` is preserved; the first and superseding issued-closure/API-oracle corrections are immutable exact-head-hosted-green design evidence; `DEBT-ENFORCEMENT-01` green work has resumed but is not complete |
+| State | `AcceptedFrozenDesign`; the first five ordered packets through `DEBT-ENFORCEMENT-01` are `ReviewedLocalGreen` with cumulative `5/5`, full Conformance `70/70`, Domain `98/98`, warning-free Release builds, and review `0/0/0`; canonical `PROTECTED-POLICY-DEBT-RED-0004` remains immutable without rerun; the first and superseding issued-closure/API-oracle corrections remain immutable exact-head-hosted-green design evidence; `SELF-CONSUMPTION-01` is next and inactive; [TEST-0211](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0211) remains Planned and completion/DoD remains held |
 | Exact predecessor | [`14ad828bcdde5f843cdbf12677b25f19736e5691`](https://github.com/hasanmanzak/meAndAI/commit/14ad828bcdde5f843cdbf12677b25f19736e5691) |
 | Exact-main validation | [Run 31797357907](https://github.com/hasanmanzak/meAndAI/actions/runs/31797357907): Ubuntu `7m24s`, Windows `12m38s`, publication verification skipped |
 | Accepted design head / correction base | [`5d148233913dde08a7b24a4f696eace3c6f3407e`](https://github.com/hasanmanzak/meAndAI/commit/5d148233913dde08a7b24a4f696eace3c6f3407e) |
@@ -201,7 +201,7 @@ also permits the existing surface oracle to advance only its pre-frozen
 packets. The preserved canonical R0004 is not rerun. The exact issued-closure
 correction head completed fresh local review, StructureOnly, publication,
 graph, commit/push, and Ubuntu/Windows hosted green with publication skipped;
-`DEBT-ENFORCEMENT-01` green work is therefore resumed but not complete.
+that immutable predecessor permitted debt delivery without replaying R0004.
 
 The original design's immutable static review closed `0/0/0` and its local
 gates recorded design `1,927/2,400`, plan `408/500`, focused governance
@@ -230,5 +230,49 @@ Recording that evidence changed the document bytes, so fresh canonical graph,
 identity, and committed-tree StructureOnly validation followed the record. The
 exact issued-closure correction head and Ubuntu/Windows hosted-green run are
 immutable in the metadata above. That gate restored `AcceptedFrozenDesign` and
-resumed `DEBT-ENFORCEMENT-01` green work after preserved canonical R0004; the
-packet is active but is not complete.
+permitted `DEBT-ENFORCEMENT-01` after preserved canonical R0004 without
+replaying any completed packet.
+
+## `DEBT-ENFORCEMENT-01` local delivery
+
+Canonical R `0004` ran exactly once at the waiver predecessor. Its exact
+`147`-line / `5519`-byte LF source SHA-256 was
+`11CFA4F78078721F1E28B681575EE6E443EE3EA1A42A9A13A1DE6FE65EFFBF71`;
+the `4910`-byte one-result TRX failed solely on marker
+`PROTECTED-POLICY-DEBT-RED-0004` and has SHA-256
+`C1B46F82DC3B8BEFFCD2C1DB964E5AB64787FAC1B7C9B6D5CEBBC5C65AD54728`.
+The frozen FQN is
+`MeAndAI.Protocol.Conformance.Tests.ProtectedPolicyDebtEnforcementTests.Applies_exact_debt_and_enforcement_precedence`;
+R remains immutable and was not rerun.
+
+Bounded green adds authenticated exact-debt matching, closed/expired/version/
+trusted-base rejection, deterministic Audit/Prospective/FullBlocking
+enforcement precedence, protected baseline-plus-extension evaluation,
+canonical evidence/outcome/runtime binding, strict context and resource
+bounds, and one-shot protected-input closure custody. The exact code/test scope
+is `src/MeAndAI.Protocol.Conformance/Evaluation/CompleteCatalogEvaluation.cs`,
+`src/MeAndAI.Protocol.Conformance/Evaluation/EvaluationAggregationCore.cs`,
+`src/MeAndAI.Protocol.Conformance/Planning/ApplicabilityPlanningCore.cs`,
+`src/MeAndAI.Protocol.Conformance/Planning/EvaluationAdvanceResult.cs`,
+`src/MeAndAI.Protocol.Conformance/ProtectedPolicy/ConformanceKernel.WaiverDisposition.cs`,
+`src/MeAndAI.Protocol.Conformance/ProtectedPolicy/DebtEnforcementCore.cs`,
+`src/MeAndAI.Protocol.Conformance/ProtectedPolicy/WaiverDispositionCore.cs`,
+`tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ProtectedPolicyDebtEnforcementTests.cs`,
+and `tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ProtectedPolicySurfaceTests.cs`.
+It is `2484` additions / `4` deletions, gross `2488/2500`.
+
+Focused is `1/1` in `15s`; protected-policy cumulative is `5/5` in `1m9s`;
+full Conformance is `70/70` in `1m12s`; Domain is `98/98` in `86ms`;
+warning-as-error Release is `0` warnings / `0` errors; and format is green.
+Pre-evidence PowerShell 7 and Windows PowerShell 5.1 StructureOnly passed in
+`487935ms` and `914985ms`; publication evidence is `7/7` without a
+published-state claim;
+fresh review is `0/0/0`; and the exact public-signature digest is
+`a8765858717682abf7451ddd04fd3f2d7b9816411ae826c99eacb9197ea9c513`.
+The schema-2 pre-evidence graph is `379/4528/341/5114063`, digest
+`ad99298dd62b023771ce5278b605fd0d336bb27553dd3d529532ef092e1cae2b`.
+Recording that evidence changes the document bytes, so fresh graph, identity,
+link, and StructureOnly validation follows before the separate local commit.
+No push or hosted-green claim is made for
+this intermediate packet. `SELF-CONSUMPTION-01` is next and remains inactive;
+[TEST-0211](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0211), Scenario activation, completion/DoD, release, and publication remain held.

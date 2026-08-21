@@ -5,6 +5,31 @@ namespace MeAndAI.Protocol.Conformance;
 
 public sealed partial class ConformanceKernel
 {
+    public ProtectedPolicyEvaluation EvaluateProtected(
+        CompleteCatalogEvaluation baseline,
+        EvaluationClosure closure,
+        ActivatedExtensionPolicy activeExtensions,
+        ProposedExtensionTransition? proposedTransition,
+        WaiverSnapshot waivers,
+        HistoricalDebtSnapshot historicalDebt,
+        ProtectedDispositionAuthorityPayload dispositionPayload,
+        ProtectedAuthorityEnvelope dispositionProof,
+        EnforcementPhase enforcementPhase,
+        CancellationToken cancellationToken = default) =>
+        DebtEnforcementCore.Evaluate(
+            Catalog,
+            _planningSession,
+            baseline,
+            closure,
+            activeExtensions,
+            proposedTransition,
+            waivers,
+            historicalDebt,
+            dispositionPayload,
+            dispositionProof,
+            enforcementPhase,
+            cancellationToken);
+
     internal ProtectedFinding ProtectFinding(
         RuleFinding finding,
         RuleDeclaration declaration) =>
@@ -32,4 +57,19 @@ public sealed partial class ConformanceKernel
             proof,
             evidenceSetDigest,
             findings);
+
+    internal DebtEnforcementOutcome ApplyDebtAndEnforcement(
+        WaiverDispositionOutcome waiverOutcome,
+        HistoricalDebtSnapshot historicalDebt,
+        string protocolVersion,
+        DateTimeOffset evaluationUtc,
+        ConformanceVerdict verdict,
+        EnforcementPhase enforcementPhase) =>
+        DebtEnforcementCore.Apply(
+            waiverOutcome,
+            historicalDebt,
+            protocolVersion,
+            evaluationUtc,
+            verdict,
+            enforcementPhase);
 }

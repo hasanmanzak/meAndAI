@@ -195,7 +195,6 @@ internal static class WaiverDispositionCore
             !payload.ExpectedAuthorityRecordDigest.Equals(
                 activePolicy.ActivationRecordDigest) ||
             payload.AuthorityEpoch != activePolicy.ActivationEpoch ||
-            !historicalDebt.SnapshotDigest.Equals(payload.DebtSnapshotDigest) ||
             !activePolicy.Policy.DispositionVerifier.Verify(payload, proof))
         {
             throw AuthorityInvalid();
@@ -208,6 +207,16 @@ internal static class WaiverDispositionCore
         {
             throw new ProtectedPolicyIntegrityException(
                 ProtectedPolicyIntegrityCode.WaiverInvalid);
+        }
+
+        if (!historicalDebt.SnapshotDigest.Equals(payload.DebtSnapshotDigest) ||
+            historicalDebt.Entries.Any(row =>
+                !row.TrustedBaseAuthorityDigest.Equals(
+                    payload.TrustedBaseAuthorityDigest) ||
+                row.ClosedUtc > payload.EvaluationUtc))
+        {
+            throw new ProtectedPolicyIntegrityException(
+                ProtectedPolicyIntegrityCode.DebtInvalid);
         }
     }
 
@@ -388,6 +397,77 @@ internal static class WaiverDispositionCore
             "protocol.stable-evidence-scope/1\n",
             stream => WriteStableScope(stream, scope));
 
+    internal static ExactSha256Digest ScopeDigest(EvidenceScope scope)
+    {
+        ArgumentNullException.ThrowIfNull(scope);
+        return ProtectedPolicyFrame.Hash(
+            "protocol.protected-evidence-scope/1\n",
+            stream => WriteFullScope(stream, scope));
+    }
+
+    internal static byte[] ScopeFrame(EvidenceScope scope)
+    {
+        ArgumentNullException.ThrowIfNull(scope);
+        using var stream = new MemoryStream();
+        stream.Write("protocol.protected-evidence-scope/1\n"u8);
+        WriteFullScope(stream, scope);
+        return stream.ToArray();
+    }
+
+    internal static ExactSha256Digest ReferenceDigest(
+        QualifiedEvidenceReference reference)
+    {
+        ArgumentNullException.ThrowIfNull(reference);
+        return ProtectedPolicyFrame.Hash(
+            "protocol.qualified-evidence-reference/1\n",
+            stream => WriteReference(stream, reference));
+    }
+
+    internal static byte[] ReferenceFrame(QualifiedEvidenceReference reference)
+    {
+        ArgumentNullException.ThrowIfNull(reference);
+        using var stream = new MemoryStream();
+        stream.Write("protocol.qualified-evidence-reference/1\n"u8);
+        WriteReference(stream, reference);
+        return stream.ToArray();
+    }
+
+    private static void WriteReference(
+        MemoryStream stream,
+        QualifiedEvidenceReference reference)
+    {
+        ProtectedPolicyFrame.String(stream, reference.Kind.Value);
+        ProtectedPolicyFrame.Digest(stream, reference.ManifestDigest);
+        ProtectedPolicyFrame.UInt32(
+            stream,
+            checked((uint)reference.CatalogVersion.Value));
+        ProtectedPolicyFrame.String(stream, reference.SlotKey);
+        ProtectedPolicyFrame.String(stream, reference.RequirementKey);
+        WriteFullScope(stream, reference.Scope);
+        ProtectedPolicyFrame.Digest(
+            stream,
+            reference.QualificationProofDigest);
+        WriteRoot(stream, reference.Root);
+        WriteLocation(stream, reference.Location);
+        ProtectedPolicyFrame.UInt32(
+            stream,
+            checked((uint)reference.Derivations.Count));
+        foreach (var derivation in reference.Derivations)
+        {
+            WriteComponent(stream, derivation.Component);
+            ProtectedPolicyFrame.String(stream, derivation.ArtifactFileName);
+            ProtectedPolicyFrame.Digest(stream, derivation.ArtifactDigest);
+            OptionalModel(stream, derivation.OutputModel);
+            OptionalCapability(stream, derivation.OutputCapability);
+            ProtectedPolicyFrame.String(stream, derivation.TypedNodeKind);
+            ProtectedPolicyFrame.String(stream, derivation.TypedNodeIdentity);
+            WriteFullLocation(stream, derivation.Location);
+        }
+
+        OptionalString(stream, reference.ExpectedSelectorParentKind?.Value);
+        OptionalSelector(stream, reference.Selector);
+    }
+
     private static ExactSha256Digest StableLocation(
         QualifiedEvidenceReference reference,
         string? requiredPath) => ProtectedPolicyFrame.Hash(
@@ -421,8 +501,8 @@ internal static class WaiverDispositionCore
             ProtectedPolicyFrame.String(stream, reference.SlotKey);
             ProtectedPolicyFrame.String(stream, reference.RequirementKey);
             WriteStableScope(stream, reference.Scope);
-            WriteRoot(stream, reference.Root);
-            WriteLocation(stream, reference.Location);
+            WriteStableRoot(stream, reference.Root);
+            WriteStableEvidenceLocation(stream, reference.Location);
             ProtectedPolicyFrame.UInt32(
                 stream,
                 checked((uint)reference.Derivations.Count));
@@ -493,6 +573,18 @@ internal static class WaiverDispositionCore
         ProtectedPolicyFrame.String(stream, scope.Target.SnapshotKind.Value);
     }
 
+    private static void WriteFullScope(MemoryStream stream, EvidenceScope scope)
+    {
+        WriteStableScope(stream, scope);
+        ProtectedPolicyFrame.String(stream, scope.Target.TargetIdentity);
+        ProtectedPolicyFrame.String(
+            stream,
+            scope.Boundary.SnapshotKind.Value);
+        ProtectedPolicyFrame.String(stream, scope.Boundary.BoundaryIdentity);
+        ProtectedPolicyFrame.Int64(stream, scope.Boundary.StartedAtUtc.Ticks);
+        ProtectedPolicyFrame.Int64(stream, scope.Boundary.CompletedAtUtc.Ticks);
+    }
+
     private static void WriteStableLocation(
         MemoryStream stream,
         EvidenceLocation location)
@@ -544,6 +636,25 @@ internal static class WaiverDispositionCore
             return;
         }
 
+        WriteFullScope(stream, root.Scope);
+        ProtectedPolicyFrame.String(stream, root.SchemaKey);
+        ProtectedPolicyFrame.String(stream, root.SchemaVersion);
+        ProtectedPolicyFrame.Digest(stream, root.ContentDigest);
+        WriteFullLocation(stream, root.Location);
+        WriteStrings(stream, root.RequirementKeys);
+        ProtectedPolicyFrame.Int64(stream, root.CapturedAtUtc.Ticks);
+    }
+
+    private static void WriteStableRoot(
+        MemoryStream stream,
+        RootEvidenceReference? root)
+    {
+        stream.WriteByte(root is null ? (byte)0 : (byte)1);
+        if (root is null)
+        {
+            return;
+        }
+
         ProtectedPolicyFrame.String(stream, root.SchemaKey);
         ProtectedPolicyFrame.String(stream, root.SchemaVersion);
         ProtectedPolicyFrame.Digest(stream, root.ContentDigest);
@@ -561,9 +672,24 @@ internal static class WaiverDispositionCore
             return;
         }
 
+        WriteFullLocation(stream, location);
+    }
+
+    private static void WriteStableEvidenceLocation(
+        MemoryStream stream,
+        EvidenceLocation? location)
+    {
+        stream.WriteByte(location is null ? (byte)0 : (byte)1);
+        if (location is null)
+        {
+            return;
+        }
+
         WriteStableLocation(stream, location);
         switch (location)
         {
+            case SnapshotEvidenceLocation:
+                break;
             case RepositoryEvidenceLocation repository:
                 OptionalString(stream, repository.BlobIdentity);
                 break;
@@ -574,6 +700,57 @@ internal static class WaiverDispositionCore
                 ProtectedPolicyFrame.String(stream, release.ReleaseObjectIdentity);
                 ProtectedPolicyFrame.Digest(stream, release.AssetDigest);
                 break;
+            default:
+                throw AuthorityInvalid();
+        }
+    }
+
+    private static void WriteFullLocation(
+        MemoryStream stream,
+        EvidenceLocation location)
+    {
+        switch (location)
+        {
+            case SnapshotEvidenceLocation:
+                stream.WriteByte(0);
+                WriteFullScope(stream, location.Scope);
+                break;
+            case RepositoryEvidenceLocation repository:
+                stream.WriteByte(1);
+                WriteFullScope(stream, repository.Scope);
+                ProtectedPolicyFrame.String(
+                    stream,
+                    repository.RepositoryRelativePath);
+                OptionalString(stream, repository.BlobIdentity);
+                OptionalInt32(stream, repository.Line);
+                OptionalString(stream, repository.Anchor);
+                OptionalString(stream, repository.Property);
+                break;
+            case ProviderEvidenceLocation provider:
+                stream.WriteByte(2);
+                WriteFullScope(stream, provider.Scope);
+                ProtectedPolicyFrame.String(
+                    stream,
+                    provider.ProviderServiceIdentity);
+                ProtectedPolicyFrame.String(stream, provider.ObjectType);
+                ProtectedPolicyFrame.String(
+                    stream,
+                    provider.StableObjectIdentity);
+                ProtectedPolicyFrame.String(stream, provider.VersionIdentity);
+                OptionalString(stream, provider.Field);
+                OptionalInt32(stream, provider.Line);
+                OptionalString(stream, provider.Fragment);
+                break;
+            case ReleaseAssetEvidenceLocation release:
+                stream.WriteByte(3);
+                WriteFullScope(stream, release.Scope);
+                ProtectedPolicyFrame.String(stream, release.ReleaseObjectIdentity);
+                ProtectedPolicyFrame.String(stream, release.Tag);
+                ProtectedPolicyFrame.String(stream, release.AssetName);
+                ProtectedPolicyFrame.Digest(stream, release.AssetDigest);
+                break;
+            default:
+                throw AuthorityInvalid();
         }
     }
 

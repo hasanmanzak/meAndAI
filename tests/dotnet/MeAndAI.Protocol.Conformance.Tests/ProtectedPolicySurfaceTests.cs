@@ -264,7 +264,7 @@ public sealed class ProtectedPolicySurfaceTests
         AssertCanonicalArtifactInputOrderRejection();
         AssertNoUnexpectedPublicConstruction();
         Assert.Equal(
-            "295a004f68ce48a5f8cfada6d447d54b2d4de910d2f9827f3efb7cf747802575",
+            "a8765858717682abf7451ddd04fd3f2d7b9816411ae826c99eacb9197ea9c513",
             PublicSignatureDigest());
     }
 

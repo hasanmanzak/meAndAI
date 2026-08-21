@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / dependency-closed [FEAT-0065](README.md) design slice |
-| Status | `AcceptedFrozenDesign`; `POLICY-SURFACE-FRAMING-01`, `EXTENSION-AUTHORITY-01`, `EXTENSION-EVALUATION-01`, and `WAIVER-DISPOSITION-01` remain packet-local `ReviewedLocalGreen`; canonical `PROTECTED-POLICY-DEBT-RED-0004` is preserved; the superseding immutable issued-closure carrier and staged public-signature-oracle correction is exact-head hosted green without changing public API, seven packets, FQNs, markers, or ownership; `DEBT-ENFORCEMENT-01` green work has resumed but is not complete |
+| Status | `AcceptedFrozenDesign`; the first five ordered packets through `DEBT-ENFORCEMENT-01` are packet-local `ReviewedLocalGreen` at protected-policy cumulative `5/5` and full Conformance `70/70`; canonical `PROTECTED-POLICY-DEBT-RED-0004` remains immutable without rerun; the superseding immutable issued-closure carrier and staged public-signature-oracle correction remains exact-head hosted green without changing public API, seven packets, FQNs, markers, or ownership; `SELF-CONSUMPTION-01` is next and inactive |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
@@ -2060,7 +2060,7 @@ issued-closure carrier topology and staged public-signature-oracle allowlists.
 Its fresh design, evidence, traceability, security/authority, graph/capacity
 and implementation-topology reviews closed `0/0/0`; diff/format/link checks
 and StructureOnly were green; and its exact twelve-record head became Ubuntu/
-Windows hosted green with publication verification skipped. The design is
-therefore `AcceptedFrozenDesign`, and `DEBT-ENFORCEMENT-01` green work has
-resumed after preserved canonical R0004 without replaying completed packets or
-consuming another red; the debt packet is not yet complete.
+Windows hosted green with publication verification skipped. The design remains
+`AcceptedFrozenDesign`; `DEBT-ENFORCEMENT-01` is `ReviewedLocalGreen` after
+preserved canonical R0004 without replaying completed packets or consuming
+another red. `SELF-CONSUMPTION-01` is next and inactive; [TEST-0211](test-cases.md#test-0211) and completion/DoD remain held.

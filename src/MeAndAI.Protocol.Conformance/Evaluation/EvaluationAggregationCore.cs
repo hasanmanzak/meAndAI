@@ -41,6 +41,7 @@ internal static class EvaluationAggregationCore
         return new CompleteCatalogEvaluation(
             catalog,
             profile,
+            closure,
             aggregation.Acquisitions,
             aggregation.Evaluations,
             aggregation.HasKnownViolation,
