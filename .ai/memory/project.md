@@ -1,6 +1,6 @@
 # Project Snapshot
 
-Last verified: **2026-08-13**
+Last verified: **2026-08-21**
 
 ## Verified facts
 
@@ -155,7 +155,7 @@ Last verified: **2026-08-13**
   Ubuntu in `20m44s` and Windows in `46m51s`; publication verification was
   correctly skipped. The exact lifecycle implementation identity recorded in
   the canonical handoff passed Ubuntu in `19m36s` and Windows in `36m02s`; publication verification was
-  correctly skipped. ContractSlice A-D are merged and exact-main green at `A32/B11/C11/D11`, cumulative/full Conformance `65/65`, Domain `98/98`, and API/ownership `15/15`. The final [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) atomic activation is `ReviewedLocalGreen`: Scenario and ContractSlice each pass the same `65/65` FQNs and the combined route is `163/163`; its exact-head hosted implementation gate is pending. Feature completion/DoD, merge, release, and publication remain held. Follow the current [canonical log index](log/README.md). The
+  correctly skipped. ContractSlice A-D and the final [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) atomic activation are merged and exact-main hosted green at `A32/B11/C11/D11`, cumulative/full Conformance `65/65`, Domain `98/98`, API/ownership `15/15`, Scenario/ContractSlice `65/65`, and combined `163/163`. [SUBF-0144](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0144) remains `AcceptedFrozenDesign`: all seven packets through convergence are packet-local `ReviewedLocalGreen`, with protected-policy/Scenario `7/7`, full Conformance `72/72`, Domain `98/98`, warning-free Release builds, and canonical R0004/R0005/R0006 immutable without rerun. [TEST-0211](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0211) is locally Passing/active with its owner/workflow activated. The pre-correction candidate is on [PR #186](https://github.com/hasanmanzak/meAndAI/pull/186); bounded [FIND-0462](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0462) and canonical [FIND-0463](../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md#find-0463) infrastructure corrections are local `ReviewedLocalGreen`. Replacement exact-head hosted-green, merge, feature DoD, release, and publication remain unclaimed; the report-sealing successor stays held. Follow the current [canonical log index](log/README.md). The
   predecessor-manifest exact-head hosted-green handoff indexed there is
   immutable history; the admission-proof reviewed-local-green handoff,
   the selector reviewed-local-green handoff in the canonical log index,
@@ -1551,6 +1551,35 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 - Freshness and review condition: last confirmed 2026-07-27; review whenever
   workflow graph inputs, exact target profiles, policy exports, ancillary
   helpers, marker schemas, or dispatch identity changes.
+- Superseded by: `None`
+
+### Independent expected reader falls back to generic graph transport limits
+
+- Status: `Active`
+- Observable signature: a valid committed graph fits its selected canonical
+  profile but the independent expected reader rejects it at a smaller generic
+  blob/aggregate limit, commonly followed by a batch-I/O abort diagnostic.
+- Applicability: every independent current/exact-target graph reader that uses
+  the shared test Git batch transport.
+- Affected contract and cause: selected [DEC-0036](../../docs/decisions/DEC-0036-prospective-instruction-graph-capacity.md)
+  limits were not threaded into the reader; transport defaults are safe
+  fallbacks, not graph-profile authority.
+- Canonical owner and evidence: [FIND-0463](../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md#find-0463)
+  / [TEST-0162](../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/test-cases.md#test-0162)
+  / [TEST-0153](../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0153).
+- Fixed release or evidence: local corrected readers use loaded
+  `1,048,576`/`8,388,608` limits plus reader-owned `240000`; PS7/PS5.1 return
+  `386/4554/341/5135238` and digest
+  `8b992f95273aa597e12aa8d3ede053dee378ed89f1416575183b5a11de6c42ce`;
+  exact-head hosted evidence remains pending.
+- Required safe response: invoke the exact loaded policy getter once, pass both
+  selected size limits and the reader-owned deadline, retain generic defaults,
+  and update the exact [TEST-0159](../../docs/features/FEAT-0039-v0130-test-runtime-efficiency/test-cases.md#test-0159)
+  operation inventory.
+- Unsafe retry boundary: do not raise generic defaults, hardcode only one limit,
+  bypass per-blob validation, or retry unchanged failed acquisition.
+- Freshness and review condition: last confirmed 2026-08-21; review whenever a
+  graph reader, selected profile, batch-helper call, or reader deadline changes.
 - Superseded by: `None`
 
 ## Open context

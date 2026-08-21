@@ -1067,7 +1067,7 @@ else {
     }
     if (-not [regex]::IsMatch(
         $linuxJobSource,
-        '(?m)^ {4}timeout-minutes: 25\r?$'
+        '(?m)^ {4}timeout-minutes: 30\r?$'
     ) -or -not [regex]::IsMatch(
         $postPublicationJobSource,
         '(?m)^ {4}timeout-minutes: 5\r?$'

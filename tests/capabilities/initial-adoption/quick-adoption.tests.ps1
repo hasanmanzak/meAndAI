@@ -387,8 +387,15 @@ function Get-TestCommittedInstructionGraph {
         })
     }
 
-    $session = New-MeAndAITestGitBlobBatchSession `
-        -Repository $Repository
+    $limitsGetter = $Builder.Module.ExportedCommands['Get-MeAndAIInstructionGraphLimits']
+    if ($null -eq $limitsGetter) {
+        throw 'The TEST-0154 graph fixture lacks exact graph limits.'
+    }
+    $limits = & $limitsGetter
+    $session = New-MeAndAITestGitBlobBatchSession -Repository $Repository `
+        -MaximumBlobBytes ([long]$limits.MaximumBlobBytes) `
+        -MaximumAggregateBlobBytes ([long]$limits.MaximumAggregateBlobBytes) `
+        -SessionTimeoutMilliseconds 240000
     $graph = $null
     $primaryFailure = $null
     $cleanupFailure = $null

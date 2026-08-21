@@ -185,7 +185,7 @@
         @{
             Evidence = 'DotNetTestProject'
             Owner = 'tests/dotnet/MeAndAI.Protocol.Conformance.Tests/MeAndAI.Protocol.Conformance.Tests.csproj'
-            TestIds = @('TEST-0210')
+            TestIds = @('TEST-0210', 'TEST-0211')
         }
         @{
             Evidence = 'PlannedDocumentation'
@@ -218,7 +218,7 @@
             Evidence = 'PlannedDocumentation'
             Owner = 'docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md'
             TestIds = @(
-                'TEST-0209', 'TEST-0211', 'TEST-0222'
+                'TEST-0209', 'TEST-0222'
             )
         }
         @{
