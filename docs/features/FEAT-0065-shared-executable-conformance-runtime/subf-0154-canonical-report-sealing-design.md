@@ -510,7 +510,7 @@ frame succeeds.
 The production writer is not the golden's author. A reviewer-owned literal
 grammar vector fixes the zero-acquisition/no-transition frame shape using
 schema `1`, runtime
-`1.0.0`, source/target commit `0000000000000000000000000000000000000001`,
+`1.0.0`, source/target synthetic commit: `0000000000000000000000000000000000000001`,
 subject/source `repo:fixture`, exact-commit repository target, catalog version
 `1`, profile `fixture/consumer/adoption-assessment/exact-commit/audit` with one
 repository surface, activation epoch `1`, evaluation ticks `0`, digest bytes
