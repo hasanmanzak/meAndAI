@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Ordered implementation control plan |
-| Status | `AcceptedFrozenDesign`; all seven packets through `PROTECTED-POLICY-CONVERGE-01` are packet-local `ReviewedLocalGreen`, subject to final exact-tree gates, at protected-policy/Scenario `7/7` and full Conformance `72/72`; canonical R0004/R0005/R0006 remain immutable without rerun; [TEST-0211](test-cases.md#test-0211) is locally Passing/active with owner/workflow activated; [SUBF-0144](README.md#subf-0144) is locally implementation-complete without push, hosted-green, merge, DoD, release, or publication claim; [SUBF-0154](README.md#subf-0154) remains held until exact-head hosted green |
+| Status | `AcceptedFrozenDesign`; all seven packets through `PROTECTED-POLICY-CONVERGE-01` are packet-local `ReviewedLocalGreen` at protected-policy/Scenario `7/7` and full Conformance `72/72`; canonical R0004/R0005/R0006 remain immutable without rerun; [TEST-0211](test-cases.md#test-0211) is locally Passing/active with owner/workflow activated. The [PR #186](https://github.com/hasanmanzak/meAndAI/pull/186) pre-correction candidate exposed the bounded Ubuntu timeout defect in [FIND-0462](README.md#find-0462); its correction is local `ReviewedLocalGreen`, while replacement exact-head hosted validation, merge, DoD, release, and publication are unclaimed. [SUBF-0154](README.md#subf-0154) remains held. |
 | Parent design | [Protected policy and self-consumption design](subf-0144-extension-waiver-self-consumption-design.md) |
 | Scenario | [TEST-0211](test-cases.md#test-0211) |
 | Exact baseline | [`14ad828bcdde5f843cdbf12677b25f19736e5691`](https://github.com/hasanmanzak/meAndAI/commit/14ad828bcdde5f843cdbf12677b25f19736e5691) |
@@ -467,6 +467,8 @@ canonical schema-2 builder must record the exact node/relation/blob/byte tuple
 and digest before commit; no static relation-neutral claim substitutes for that
 executable validation.
 
+The later hosted timeout occurrence is a separate bounded infrastructure correction under [FIND-0462](README.md#find-0462), not an eighth semantic packet. The final branch scope expands from the frozen `22` paths to exactly `24`: the existing workflow plus six existing record paths may change, and only `tests/capabilities/protocol-governance/protocol-governance.tests.ps1` and `docs/features/FEAT-0027-v0104-runner-minute-efficiency/test-cases.md` join the distinct scope. The correction touches exactly those nine paths: executable delta is `+2/-2`, record/total normalized gross caps are `80`/`84`, no file is added, and the graph adds at most the [FIND-0462](README.md#find-0462) node plus twelve unique relations. Ubuntu becomes `30`; Windows `55`, post-publication `5`, topology, routes, invocations, filters, owner, C#, API, locks, packages, `337/2,000` semantic churn, and canonical R0004/R0005/R0006 remain unchanged.
+
 The original cohort reached `AcceptedFrozenDesign` and activated the ordered
 pipeline. Its three bounded corrections remain immutable exact-head hosted
 evidence without changing the seven-packet design or ownership boundary.
@@ -476,9 +478,10 @@ full Conformance `72/72`, Domain `98/98`, warning/error-free Release validation,
 and the frozen main-validation route checks locally. All seven packets
 through `PROTECTED-POLICY-CONVERGE-01` are `ReviewedLocalGreen`, subject to
 final exact-tree graph, StructureOnly, publication-evidence, and review gates.
-[TEST-0211](test-cases.md#test-0211) is locally Passing/active with its Scenario
-owner/workflow activated. No push, hosted-green, merge, completion/DoD, release,
-or publication claim is made.
+[TEST-0211](test-cases.md#test-0211) is locally Passing/active with its Scenario owner/workflow activated.
+The pre-correction candidate was pushed through [PR #186](https://github.com/hasanmanzak/meAndAI/pull/186); its Ubuntu job reached the exact 25-minute ceiling.
+The same immutable old-head run's Windows job passed in about `50m06s`, with publication skipped; it supports retaining the 55-minute Windows bound but is not replacement-head evidence.
+The bounded correction is local; replacement exact-head hosted green, merge, completion/DoD, release, and publication are unclaimed.
 
 ## Held future work
 

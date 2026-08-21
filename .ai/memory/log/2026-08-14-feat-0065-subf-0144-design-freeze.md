@@ -2,7 +2,7 @@
 
 | Field | Value |
 | --- | --- |
-| State | `AcceptedFrozenDesign`; all seven packets through `PROTECTED-POLICY-CONVERGE-01` are `ReviewedLocalGreen`, subject to final exact-tree gates, at protected-policy/Scenario `7/7`, full Conformance `72/72`, Domain `98/98`, and warning-free Release builds; canonical R0004/R0005/R0006 remain immutable without rerun; [TEST-0211](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0211) is locally Passing/active with its owner/workflow activated; [SUBF-0144](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0144) implementation is locally complete without push, hosted-green, merge, completion/DoD, release, or publication claim; the held report-sealing successor remains blocked until exact-head hosted green |
+| State | `AcceptedFrozenDesign`; all seven packets through `PROTECTED-POLICY-CONVERGE-01` are `ReviewedLocalGreen` at protected-policy/Scenario `7/7`, full Conformance `72/72`, Domain `98/98`, and warning-free Release builds; canonical R0004/R0005/R0006 remain immutable without rerun; [TEST-0211](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0211) is locally Passing/active with its owner/workflow activated. The [PR #186](https://github.com/hasanmanzak/meAndAI/pull/186) pre-correction candidate exposed the finite Ubuntu timeout defect in [FIND-0462](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0462); the bounded correction is local `ReviewedLocalGreen`, while replacement exact-head hosted validation, merge, completion/DoD, release, and publication are unclaimed; the held report-sealing successor remains blocked. |
 | Exact predecessor | [`14ad828bcdde5f843cdbf12677b25f19736e5691`](https://github.com/hasanmanzak/meAndAI/commit/14ad828bcdde5f843cdbf12677b25f19736e5691) |
 | Exact-main validation | [Run 31797357907](https://github.com/hasanmanzak/meAndAI/actions/runs/31797357907): Ubuntu `7m24s`, Windows `12m38s`, publication verification skipped |
 | Accepted design head / correction base | [`5d148233913dde08a7b24a4f696eace3c6f3407e`](https://github.com/hasanmanzak/meAndAI/commit/5d148233913dde08a7b24a4f696eace3c6f3407e) |
@@ -411,10 +411,24 @@ and workflow coverage are unchanged.
 
 All seven packets through `PROTECTED-POLICY-CONVERGE-01` are packet-local
 `ReviewedLocalGreen`, subject to final exact-tree gates. [TEST-0211](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0211)
-is locally Passing/active and its Scenario owner/workflow is activated. This
-subfeature implementation is locally complete, but no push, hosted-green, merge,
-completion/DoD, release, or publication claim is made; the report-sealing successor remains held
-until exact-head hosted green. At this record synchronization the fresh final
+is locally Passing/active and its Scenario owner/workflow is activated. The
+pre-correction candidate was later pushed through [PR #186](https://github.com/hasanmanzak/meAndAI/pull/186);
+the bounded timeout correction is local `ReviewedLocalGreen`, while replacement
+exact-head hosted-green, merge, completion/DoD, release, and publication remain
+unclaimed and the report-sealing successor remains held. At this synchronization the fresh final
 graph/identity/link, PowerShell 7 and Windows PowerShell 5.1 StructureOnly,
 publication-evidence, and review gates are pending on the exact synchronized
 tree; their later results must not be projected backward into this paragraph.
+
+The [PR #186](https://github.com/hasanmanzak/meAndAI/pull/186) pre-correction
+candidate's Ubuntu [job 96784311587](https://github.com/hasanmanzak/meAndAI/actions/runs/32486565501/job/96784311587)
+in [run 32486565501](https://github.com/hasanmanzak/meAndAI/actions/runs/32486565501)
+reached the 25-minute ceiling after a prior manual exact-head `24m41s`; the same
+old-head Windows job passed in about `50m06s`, with publication skipped. It is
+diagnostic only. [FIND-0462](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0462)
+owns the nine-path `30`/`55`/`5` correction without changing frozen semantics
+or R0004/R0005/R0006 custody. Isolated [TEST-0124](../../../docs/features/FEAT-0027-v0104-runner-minute-efficiency/test-cases.md#test-0124)
+red took `507.7s` and reported one timeout problem; this is not R0006. The first
+post-transform run found only this handoff's bare [TEST-0124](../../../docs/features/FEAT-0027-v0104-runner-minute-efficiency/test-cases.md#test-0124)
+link; after correction the owner passed in `483.7s`. Final record wording requires
+one post-record same-owner confirmation; hosted facts remain external evidence.

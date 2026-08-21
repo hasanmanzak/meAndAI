@@ -35,9 +35,13 @@ R0006 are preserved without rerun. The first input-
 custody correction and the superseding immutable issued-closure/API-oracle
 correction plus the canonical outcome-entry projection correction are immutable
 exact-head-hosted-green design evidence. [TEST-0211](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0211)
-is locally Passing/active with its owner/workflow activated. The current subfeature is locally
-implementation-complete without push, hosted-green, merge, completion/DoD,
-release, or publication claim; the report-sealing successor remains held until exact-head hosted green.
+is locally Passing/active with its owner/workflow activated. The pre-correction
+candidate is on [PR #186](https://github.com/hasanmanzak/meAndAI/pull/186), where
+Ubuntu reached the 25-minute ceiling. Its bounded 30-minute correction is local
+`ReviewedLocalGreen`
+under [FIND-0462](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0462);
+replacement exact-head hosted-green, merge, completion/DoD, release, and
+publication remain unclaimed, and the report-sealing successor stays held.
 
 In parallel, the optional repository-navigation direction is captured as a
 records-only
