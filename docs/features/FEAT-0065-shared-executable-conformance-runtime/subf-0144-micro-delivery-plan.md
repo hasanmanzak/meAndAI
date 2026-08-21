@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Ordered implementation control plan |
-| Status | `AcceptedFrozenDesign`; the first five ordered packets through `DEBT-ENFORCEMENT-01` are packet-local `ReviewedLocalGreen` at protected-policy cumulative `5/5` and full Conformance `70/70`; canonical `PROTECTED-POLICY-DEBT-RED-0004` remains immutable without rerun; the immutable issued-closure/API-oracle and canonical outcome-entry projection corrections are exact-head hosted green without changing public API, packet order, FQNs, markers, or ownership; `SELF-CONSUMPTION-01` is next, permitted, and uninvoked |
+| Status | `AcceptedFrozenDesign`; the first six ordered packets through `SELF-CONSUMPTION-01` are packet-local `ReviewedLocalGreen` at protected-policy cumulative `6/6` and full Conformance `71/71`; canonical R0004/R0005 remain immutable without rerun; the immutable issued-closure/API-oracle and canonical outcome-entry projection corrections are exact-head hosted green without changing public API, packet order, FQNs, markers, or ownership; `PROTECTED-POLICY-CONVERGE-01` is next, permitted, and inactive |
 | Parent design | [Protected policy and self-consumption design](subf-0144-extension-waiver-self-consumption-design.md) |
 | Scenario | [TEST-0211](test-cases.md#test-0211) |
 | Exact baseline | [`14ad828bcdde5f843cdbf12677b25f19736e5691`](https://github.com/hasanmanzak/meAndAI/commit/14ad828bcdde5f843cdbf12677b25f19736e5691) |
@@ -470,15 +470,15 @@ executable validation.
 The original cohort reached `AcceptedFrozenDesign` and activated the ordered
 pipeline. The first input-custody correction is immutable intermediate
 evidence, and the superseding issued-closure/API-oracle correction is exact-
-head hosted green. The first five packets remain local-green after preserved
-canonical R0004 without completed-packet replay or red rerun. SELF pre-red
-dependency review then proved that its frozen four-path allowlist could not
-obtain canonical per-entry outcome digests without copying DEBT's private
-writer. The bounded twelve-record correction adds only the shared
-`DebtEnforcementCore` projection allowance; fresh reviews closed `0/0/0`, and
-StructureOnly, publication evidence, graph, commit/push and exact-head Ubuntu/
-Windows validation are green. `AcceptedFrozenDesign` is preserved and SELF
-R0005 is permitted but remains uninvoked.
+head hosted green. SELF pre-red review proved that its four-path allowlist
+could not obtain canonical per-entry outcome digests without copying DEBT's private writer; the bounded correction added only the shared
+`DebtEnforcementCore` projection allowance and reached exact-head hosted green.
+Canonical R0005 was then consumed once and retained immutably without rerun;
+the five-path SELF green transform closed focused `1/1`, protected-policy
+cumulative `6/6`, full Conformance `71/71`, Domain `98/98`, warning-free
+Release builds, locks/format/diff/API oracles, and reviews `0/0/0` locally.
+The first six packets are `ReviewedLocalGreen`; `PROTECTED-POLICY-CONVERGE-01`
+is next, permitted, and inactive without a SELF push or hosted-green claim.
 
 ## Held future work
 

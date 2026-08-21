@@ -81,12 +81,12 @@ internal sealed class DebtEnforcementCore
             verdict,
             enforcementPhase);
         var runtimeBinding = RuntimeBinding(catalog, session, activeExtensions);
-        var outcomeSetDigest = OutcomeSetDigest(
+        var outcomeSetDigest = ProjectOutcomeSet(
             baseline.Evaluations,
             extensionEvaluations,
             debtOutcome.Dispositions,
             verdict,
-            debtOutcome.Enforcement);
+            debtOutcome.Enforcement).Digest;
         return new ProtectedPolicyEvaluation(
             runtimeBinding,
             baseline,
@@ -445,7 +445,19 @@ internal sealed class DebtEnforcementCore
             anchor);
     }
 
-    private static ExactSha256Digest OutcomeSetDigest(
+    internal static ProtectedOutcomeSetProjection ProjectOutcomeSet(
+        ProtectedPolicyEvaluation evaluation)
+    {
+        ArgumentNullException.ThrowIfNull(evaluation);
+        return ProjectOutcomeSet(
+            evaluation.Baseline.Evaluations,
+            evaluation.ExtensionEvaluations,
+            evaluation.Dispositions,
+            evaluation.Verdict,
+            evaluation.Enforcement);
+    }
+
+    private static ProtectedOutcomeSetProjection ProjectOutcomeSet(
         IReadOnlyList<RuleEvaluation> baseline,
         IReadOnlyList<ExtensionEvaluation> extensions,
         IReadOnlyList<FindingDispositionResult> dispositions,
@@ -517,8 +529,9 @@ internal sealed class DebtEnforcementCore
             ScalarOutcome(
                 ProtectedOutcomeKind.Enforcement.Value,
                 enforcement.Value)));
-        return OutcomeSetFrame(entries.Select(static entry =>
-            KeyValuePair.Create(entry.Key, entry.Digest)).ToArray());
+        var rows = entries.Select(static entry =>
+            KeyValuePair.Create(entry.Key, entry.Digest)).ToArray();
+        return new ProtectedOutcomeSetProjection(rows, OutcomeSetFrame(rows));
     }
 
     private static ExactSha256Digest OutcomeSetFrame(
@@ -991,3 +1004,17 @@ internal sealed record DebtEnforcementOutcome(
     IReadOnlyList<FindingDispositionResult> Dispositions,
     ConformanceVerdict Verdict,
     EnforcementDecision Enforcement);
+
+internal sealed class ProtectedOutcomeSetProjection
+{
+    internal ProtectedOutcomeSetProjection(
+        IEnumerable<KeyValuePair<string, ExactSha256Digest>> entries,
+        ExactSha256Digest digest)
+    {
+        Entries = Array.AsReadOnly(entries.ToArray());
+        Digest = digest;
+    }
+
+    internal IReadOnlyList<KeyValuePair<string, ExactSha256Digest>> Entries { get; }
+    internal ExactSha256Digest Digest { get; }
+}

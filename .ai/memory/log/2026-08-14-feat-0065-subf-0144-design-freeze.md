@@ -2,7 +2,7 @@
 
 | Field | Value |
 | --- | --- |
-| State | `AcceptedFrozenDesign`; the first five ordered packets through `DEBT-ENFORCEMENT-01` are `ReviewedLocalGreen` with cumulative `5/5`, full Conformance `70/70`, Domain `98/98`, warning-free Release builds, and review `0/0/0`; canonical `PROTECTED-POLICY-DEBT-RED-0004` remains immutable without rerun; the input-custody, issued-closure/API-oracle, and canonical outcome-entry projection corrections are immutable exact-head-hosted-green design evidence; `SELF-CONSUMPTION-01` is next, permitted, and uninvoked; [TEST-0211](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0211) remains Planned and completion/DoD remains held |
+| State | `AcceptedFrozenDesign`; the first six ordered packets through `SELF-CONSUMPTION-01` are `ReviewedLocalGreen` with cumulative `6/6`, full Conformance `71/71`, Domain `98/98`, warning-free Release builds, and review `0/0/0`; canonical R0004/R0005 remain immutable without rerun; the input-custody, issued-closure/API-oracle, and canonical outcome-entry projection corrections are immutable exact-head-hosted-green design evidence; `PROTECTED-POLICY-CONVERGE-01` is next, permitted, and inactive; [TEST-0211](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0211) remains Planned and completion/DoD remains held |
 | Exact predecessor | [`14ad828bcdde5f843cdbf12677b25f19736e5691`](https://github.com/hasanmanzak/meAndAI/commit/14ad828bcdde5f843cdbf12677b25f19736e5691) |
 | Exact-main validation | [Run 31797357907](https://github.com/hasanmanzak/meAndAI/actions/runs/31797357907): Ubuntu `7m24s`, Windows `12m38s`, publication verification skipped |
 | Accepted design head / correction base | [`5d148233913dde08a7b24a4f696eace3c6f3407e`](https://github.com/hasanmanzak/meAndAI/commit/5d148233913dde08a7b24a4f696eace3c6f3407e) |
@@ -319,6 +319,57 @@ Recording these observations changes the ledger bytes, so fresh post-record
 graph/identity/link, StructureOnly and publication-evidence validation followed
 before the focused correction commit. The exact outcome-projection correction
 head and terminal Ubuntu/Windows hosted-green run are immutable in the metadata
-above, with publication verification skipped. That gate restored
-`AcceptedFrozenDesign` and permits the still-uninvoked R0005 without replaying
-a completed packet or canonical red. [TEST-0211](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0211), Scenario activation, completion/DoD, release, and publication remain held.
+above, with publication verification skipped. At that correction checkpoint,
+the gate restored `AcceptedFrozenDesign` and permitted the then-uninvoked R0005
+without replaying a completed packet or canonical red.
+
+Canonical R0005 was consumed exactly once before the green source transform.
+Its retained source has SHA-256
+`D46755304350CE3842E7CECE17B0083F3599B3DE2340DEE7CAEC728DF16070CB`;
+the immutable TRX has SHA-256
+`2E5C6AE0703D39D459720FF1EA559913F902B55BF60B05158764B09CAE082E6B`,
+is `5,026` bytes, and records exactly one marker-only failure.
+Local Git object input: `4fc59cf68dc3aa962e48238cef29c955993d2d42` retains stash-source custody. R0005 must
+never be rerun; absence of `PROTECTED-POLICY-SELF-CONSUMPTION-RED-0005` and
+`Assert.Fail` from the current test source is the required green state.
+
+The green transform is exactly five source/test paths. Their SHA-256 identities
+are `DebtEnforcementCore.cs`
+`919366AA774F027BF48BEB998BFD135079E65D958E153CA446519C784FCCC4D4`,
+`ConformanceKernel.SelfConsumption.cs`
+`D8040DEA5182404C822943D6BCA2807F777B965F629086E23899B2221ACD52CB`,
+`SelfConsumptionCore.cs`
+`375AFB515F5D1F77BF322FCE9569E1F4EE7AC36B638E6CC1661C9535E53125CE`,
+`ProtectedPolicySelfConsumptionTests.cs`
+`867C53DF3315CEC5EAD3996C0D40CF1B00AD9D3409CAB088163170370B167D5D`,
+and `ProtectedPolicySurfaceTests.cs`
+`1F621DF23AD429A9510C379218785EA5D8A3368FE909566CD56DB4E595335BAA`.
+Normalized churn is `1,894` additions plus `6` deletions, gross `1,900/2,500`.
+
+Focused SELF passed `1/1` in `26s`; protected-policy cumulative passed `6/6`
+in `1m13s`; full Conformance passed `71/71` in `1m16s`; and Domain passed
+`98/98` in `68ms`. Two warning/error-free Release builds completed in `1.95s`
+and `1.98s` with byte-stable outputs. Conformance DLL/PDB are respectively
+`A1C96B32B68D24C7C865AC904553C9B59C01A312D180C88A31B113D4DBF71B06`
+(`212,480` bytes) and
+`4FA0B07172F04239F4BE4AE194EB1332BA1C1F68C36D059271A3646D035729F0`
+(`61,704` bytes); test DLL/PDB are
+`547DFE2A4B767EC27AE32A1CD610EEDE2F8237623A380380E9689CBFBF500891`
+(`1,185,280` bytes) and
+`435E9072D2A72A9251C9AA3CFB8C7FD9FAFCE2A83C065B13091C0A100FD09F14`
+(`223,740` bytes).
+
+The exact public-signature digest is
+`2be3248728e679ff9567eb52faba505dc0f23654e26d0b9d961431616ef6184f`;
+the six-FQN LF-terminal digest is
+`21A528A91BF052C6283CC2A1E13A83A957BB0AD1BD7D7F5924ADE9281AC98C05`.
+Format, diff, and all six lock checks are green; design/runtime/traceability and
+security review each closed `0/0/0`. The first six packets through SELF are
+packet-local `ReviewedLocalGreen`. `PROTECTED-POLICY-CONVERGE-01` is next,
+permitted, and inactive; [TEST-0211](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0211), Scenario activation, completion/DoD, release, and publication remain held.
+
+This SELF packet has not been pushed and makes no hosted-green claim. At record
+synchronization the final graph/identity/link, StructureOnly, and publication-
+evidence gates were pending; they must validate this exact record tree before
+the separate local commit, and their results are intentionally not duplicated
+here.

@@ -24,17 +24,18 @@ ContractSlice A-D and the final
 atomic activation are immutable merged/exact-main-hosted-green predecessor
 evidence at full Conformance `65/65`, Domain `98/98`, API/ownership `15/15`,
 Scenario/ContractSlice `65/65`, and combined `163/163`. The current handoff owns
-the extension/waiver/debt/self-consumption `AcceptedFrozenDesign`. Five
+the extension/waiver/debt/self-consumption `AcceptedFrozenDesign`. Six
 ordered implementation packets—`POLICY-SURFACE-FRAMING-01`,
 `EXTENSION-AUTHORITY-01`, `EXTENSION-EVALUATION-01`, and
-`WAIVER-DISPOSITION-01`, plus `DEBT-ENFORCEMENT-01`—are packet-local
-`ReviewedLocalGreen`, with protected-policy cumulative `5/5`, full Conformance `70/70`, Domain `98/98`,
-warning-free Release builds, and review `0/0/0`; canonical
-`PROTECTED-POLICY-DEBT-RED-0004` is preserved without rerun. The first input-
+`WAIVER-DISPOSITION-01`, `DEBT-ENFORCEMENT-01`, and
+`SELF-CONSUMPTION-01`—are packet-local `ReviewedLocalGreen`, with protected-policy
+cumulative `6/6`, full Conformance `71/71`, Domain `98/98`, warning-free Release builds,
+and review `0/0/0`; canonical `PROTECTED-POLICY-DEBT-RED-0004` and
+`PROTECTED-POLICY-SELF-CONSUMPTION-RED-0005` are preserved without rerun. The first input-
 custody correction and the superseding immutable issued-closure/API-oracle
 correction plus the canonical outcome-entry projection correction are immutable
-exact-head-hosted-green design evidence. `SELF-CONSUMPTION-01` is the next
-ordered packet, is permitted, and remains uninvoked.
+exact-head-hosted-green design evidence. `PROTECTED-POLICY-CONVERGE-01` is the next
+ordered packet, is permitted, and remains inactive.
 [TEST-0211](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0211), feature
 completion/DoD, release, and publication remain held.
 
