@@ -3,14 +3,14 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Original Gate 2 accepted; ContractSlice A-D and [TEST-0210](test-cases.md#test-0210) are immutable merged/exact-main hosted-green predecessor evidence at `A32/B11/C11/D11` and `65/65`. [FIND-0466](README.md#find-0466) `C-QUALIFIED-REFERENCE-CUSTODY-01` and [FIND-0467](README.md#find-0467) `D-SELECTOR-SEMANTICS-CORRECTION-01` are `AcceptedFrozenDesign`; the common checkpoint awaits delivery gates. R0019/R0020 and implementation remain held before the design checkpoint merges and passes exact-main hosted green. Feature DoD, release and publication remain held. |
+| Status | Original Gate 2 accepted; ContractSlice A-D and [TEST-0210](test-cases.md#test-0210) are immutable merged/exact-main hosted-green predecessor evidence at `A32/B11/C11/D11` and `65/65`. The common [FIND-0466](README.md#find-0466)/[FIND-0467](README.md#find-0467) design checkpoint merged through [PR #191](https://github.com/hasanmanzak/meAndAI/pull/191) at exact main [`5bd13520444643d022ef1b421f9cbee48e29b014`](https://github.com/hasanmanzak/meAndAI/commit/5bd13520444643d022ef1b421f9cbee48e29b014); [run 32566870206](https://github.com/hasanmanzak/meAndAI/actions/runs/32566870206) passed both stable jobs. R0020 is accepted/immutable and the D selector correction is `ReviewedLocalGreen`; final record-synchronized graph, PS7/PS5.1 StructureOnly and publication-evidence gates are green, while commit, hosted, merge and exact-main gates remain pending. The C correction retains `AcceptedFrozenDesign`; R0019 waits for D exact-main green. Feature DoD, release and publication remain held. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Test | [TEST-0210](test-cases.md#test-0210) |
-| Gate 3 micro-delivery routing | Historical A-D delivery and final activation remain immutable. The new correction is owned only by the [C plan](subf-0143-contractslice-c-micro-delivery-plan.md#c-qualified-reference-custody-01-correction-control); no source/test/R mutation starts before its focused design commit merges and passes exact-main hosted green. |
+| Gate 3 micro-delivery routing | Historical A-D delivery and final activation remain immutable. The common correction design is exact-main green through [PR #191](https://github.com/hasanmanzak/meAndAI/pull/191). Exact [D implementation authority](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5379758091) is active at `ReviewedLocalGreen`; C remains owned by the [C plan](subf-0143-contractslice-c-micro-delivery-plan.md#c-qualified-reference-custody-01-correction-control) and cannot consume R0019 before D merges/exact-main green. |
 | Exact-main design baseline | Accepted A merge commit [`51623f4d404a95e0f706d72805cf7ddbbbd293b8`](https://github.com/hasanmanzak/meAndAI/commit/51623f4d404a95e0f706d72805cf7ddbbbd293b8), validated by exact-main [run 31304787603](https://github.com/hasanmanzak/meAndAI/actions/runs/31304787603) |
-| Design and Gate 3 authority | Historical A-D directives, accepted reds, diagnostics, cohort evidence, and exact-main closure remain immutable. [FIND-0466](README.md#find-0466) and [FIND-0467](README.md#find-0467) retain `AcceptedFrozenDesign` authority, but neither implementation starts before the common checkpoint is committed, merged and exact-main hosted green. Feature DoD, release, publication and [TEST-0209](test-cases.md#test-0209) remain held. |
+| Design and Gate 3 authority | Historical A-D directives, accepted reds, diagnostics, cohort evidence, and exact-main closure remain immutable. [PR #191](https://github.com/hasanmanzak/meAndAI/pull/191) closed the common design gate. [FIND-0467](README.md#find-0467) now owns accepted R0020 and marker-free reviewed-local-green implementation; [FIND-0466](README.md#find-0466) retains `AcceptedFrozenDesign` and R0019 remains held until D exact-main green. Feature DoD, release, publication and [TEST-0209](test-cases.md#test-0209) remain held. |
 | Completed predecessor | [SUBF-0153](README.md#subf-0153) / [TEST-0221](test-cases.md#test-0221), merged through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173) and exact-main validated by [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) |
 
 ## Directive and hard boundary
@@ -11807,20 +11807,20 @@ gate. The first line over either a package or aggregate cap, or any required
 extra path, forces redraw before the owning mutation/R. Design/record change
 hard-stops at `1,200`.
 
-This renewed Gate-2 design is `AcceptedFrozenDesign`. Implementation remains
-inactive while the accepted tree receives one focused commit that
-passes committed-HEAD schema-2 graph, StructureOnly and publication-evidence
-gates before one push and exact-head Ubuntu/Windows hosted validation. That
-exact-head gate makes the design PR merge-ready; the design PR must merge and
-its exact-main head pass Ubuntu/Windows before either implementation lane.
-That design gate authorizes only the D-first R0020 sequence below. After D
+This renewed Gate-2 design merged through [PR #191](https://github.com/hasanmanzak/meAndAI/pull/191)
+at exact main [`5bd13520444643d022ef1b421f9cbee48e29b014`](https://github.com/hasanmanzak/meAndAI/commit/5bd13520444643d022ef1b421f9cbee48e29b014),
+and [run 32566870206](https://github.com/hasanmanzak/meAndAI/actions/runs/32566870206)
+passed Ubuntu and Windows with publication verification skipped. That closed
+design gate authorized only the D-first R0020 sequence below. R0020 is now
+accepted and D is reviewed-local-green; its record-synchronized local closure
+gates are green and commit/hosted/merge/exact-main remain. After D
 merges/exact-main green, C reconciles; Package 1 and Package 2 close their
 natural-red/green gates in order. R0019 then consumes Package 1's production
 closed states and Package 2's graph0 against the exact still-one-round pre-
 Package-3 evaluator, retaining one immutable red. Package 3 green removes only
 that predecessor branch and marker and activates two-round behavior. R0019 uses the locked xUnit/VSTest message, optional marker-free
 stack/echo/RunInfo grammar, a `420000` ms outer bound, one child and no
-discovery/fallback/retry. The accepted tree claims no committed graph identity.
+discovery/fallback/retry. The C implementation tree claims no committed graph identity.
 [TEST-0209](test-cases.md#test-0209)
 and `COMPOSED-QUALIFICATION-01` remain inactive until both this correction and
 the Policy selector correction below are merged/exact-main hosted green, and
@@ -11828,8 +11828,8 @@ report sealing is reconciled and revalidated against those predecessors.
 
 ### `D-SELECTOR-SEMANTICS-CORRECTION-01` correction freeze <a name="d-selector-semantics-correction-01"></a>
 
-[FIND-0467](README.md#find-0467) owns a separate real-Policy defect. The three
-registered selector resolvers currently copy the parent canonical value.
+[FIND-0467](README.md#find-0467) owns a separate real-Policy defect. At the
+accepted red predecessor, the three registered selector resolvers copied the parent canonical value.
 `protocol.selector.relative-child.v1` instead requires the feature-directory
 Derived canonical path plus exactly one `/README.md` or `/test-cases.md` child;
 `protocol.selector.decision-record-by-id.v1` copies the exact `DEC-NNNN`
@@ -11854,20 +11854,37 @@ the red seam. The fixture resolves three exact Derived parents:
 Only the exact predecessor tuple where both feature values equal the unchanged
 directory parent while the decision value is correct may emit the marker.
 Other values, exceptions, setup failures and host failures are marker-free.
-The future pre-red transform must replace the historical `...RED-0002` null-
-evidence branch with a marker-free non-null assertion; thereafter the source
-must contain exactly one marker literal, `...RED-0010`. The current design
-checkpoint has no D source or R mutation. Results are collected by the exact selector
+The accepted R0020 pre-red transform replaced the historical `...RED-0002` null-
+evidence branch with a marker-free non-null assertion and contained exactly one
+marker literal, `...RED-0010`. Results were collected by the exact selector
 key rather than registration order; the exact three-key set, parent values and
 parent-handle identity are asserted before the marker tuple. Green removes only
 the `...RED-0010` marker branch and asserts all three exact values.
 Resolver cancellation is not applicable because the interface has no token;
 null input remains the existing `ArgumentNullException` contract.
 
+R0020 is accepted and immutable: runner `43,086` bytes / SHA-256
+`90BDA5172C04D72DC5AB07DDABABB30398ED10757577B04C51E82D0BC6B19CD0`,
+red source `26,001` bytes / SHA-256
+`B44F6370E391340322F2C0610B877884CCA9B450DA967C9105A0E91385A0593E`,
+report `12,933` bytes / SHA-256
+`CC452127DB21C7D51B62CD63EB6D8AC716CD279F52386A95D948C65F479E5394`,
+and sole TRX `5,298` bytes / SHA-256
+`AD5F3BA680897B7DD8A9BEE0FE6BB3C5FD04703698138C867D35271B6E806E61`.
+Native/runner exits were `1/0`; exact result/definition/entry and raw/transcript
+marker counts were `1/1/1` and `2/1`; all counters were exact and attachments/
+collectors were zero. The marker-free D correction is `ReviewedLocalGreen` at
+focused `1/1`, D `11/11`, Scenario and A-D union `65/65`, full Conformance
+`73/73`, Domain `98/98`, API/ownership `15/15`, Release `0/0`, format, six
+locks and diff green; fresh code and evidence reviews are `0/0/0`.
+Final schema-2 graph passed `4/4` with exact `2/2` process-start and `4/4`
+blob-request counters; PS7/PS5.1 StructureOnly and publication evidence `7/7`
+are green without a published-state claim.
+
 The D packet hard-stops at production `120`, test `180`, and combined `300`
-normalized changed lines. After this common design checkpoint is exact-main
-green, D is the first final implementation lane: it consumes R0020, closes its
-green/record/hosted/merge gates and passes exact-main before C consumes R0019.
+normalized changed lines; observed scope is `16/120`, `60/180`, `76/300`.
+D must close commit, hosted, merge and exact-main gates before C consumes
+R0019.
 C scaffold and static preflight may proceed in an isolated worktree during D,
 but C must reconcile onto D exact main before R0019. The exact sixteen design
 records are the maximum shared record-sync allowlist; only one record/merge

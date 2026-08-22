@@ -166,10 +166,15 @@ Last verified: **2026-08-22**
   [TEST-0209](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0209)
   composition review exposed [FIND-0466](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0466)
   and [FIND-0467](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0467):
-  C session/graph correction and the D selector packet are
-  `AcceptedFrozenDesign`; the common checkpoint awaits its delivery gates,
-  while R0019/R0020, implementation delivery push/hosted/merge and composed
-  qualification remain inactive. Feature DoD, release and publication remain
+  common design checkpoint merged through [PR #191](https://github.com/hasanmanzak/meAndAI/pull/191)
+  at exact main [`5bd13520444643d022ef1b421f9cbee48e29b014`](https://github.com/hasanmanzak/meAndAI/commit/5bd13520444643d022ef1b421f9cbee48e29b014)
+  and passed both stable jobs in [run 32566870206](https://github.com/hasanmanzak/meAndAI/actions/runs/32566870206).
+  The C session/graph correction remains `AcceptedFrozenDesign`; R0019/C
+  implementation waits for D exact-main green. R0020 is accepted/immutable and
+  the D selector packet is `ReviewedLocalGreen`; its final record-synchronized
+  graph, PS7/PS5.1 StructureOnly and publication-evidence gates are green, while
+  commit/push/hosted/merge/exact-main lifecycle and
+  composed qualification remain inactive. Feature DoD, release and publication remain
   unclaimed. Applicable Active recurrences are
   canonical cross-record links, planned Scenario deferral, locked xUnit
   StackTrace, VSTest zero-discovery abort, multi-cohort ledger advancement,
@@ -1694,10 +1699,12 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   the [typed correction design](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-typed-evaluation-kernel-design.md#c-qualified-reference-custody-01),
   [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210),
   and [issue #165](https://github.com/hasanmanzak/meAndAI/issues/165).
-- Fixed release or evidence: no fixed release or implementation evidence yet;
-  the accepted design adds the missing production plan-bound qualification
+- Fixed release or evidence: no fixed release or C implementation evidence yet.
+  The accepted design adds the missing production plan-bound qualification
   session and admission-stable closed codec state to the sealed graph/two-round
-  lifecycle; design delivery, R0019 and implementation remain pending.
+  lifecycle. Design delivery merged/exact-main hosted green through
+  [PR #191](https://github.com/hasanmanzak/meAndAI/pull/191); R0019 and C
+  implementation remain pending until D exact-main green.
 - Required safe response: correct the producer/reference owner first, preserve
   exact proof/model/reference/location/selector authority through the public
   evaluation route, prove it with a fresh project-neutral fixture, merge and
@@ -1725,11 +1732,21 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 - Canonical owner and evidence: [FIND-0467](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0467),
   the [D selector freeze](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-typed-evaluation-kernel-design.md#d-selector-semantics-correction-01),
   [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210), and [issue #165](https://github.com/hasanmanzak/meAndAI/issues/165).
-- Fixed release or evidence: no implementation evidence yet; exact parents and
-  three outputs, two-path allowlist, marker `TEST-0210-D-BEHAVIOR-RED-0010`,
-  and R0020 are frozen design-only.
-- Required safe response: correct the real Policy resolver owner and prove all
-  three values in the existing D infrastructure Fact before composed use.
+- Fixed release or evidence: no release. R0020 is accepted and immutable. Its
+  runner/red-source/report/TRX identities are `43,086`/
+  `90BDA5172C04D72DC5AB07DDABABB30398ED10757577B04C51E82D0BC6B19CD0`,
+  `26,001`/`B44F6370E391340322F2C0610B877884CCA9B450DA967C9105A0E91385A0593E`,
+  `12,933`/`CC452127DB21C7D51B62CD63EB6D8AC716CD279F52386A95D948C65F479E5394`,
+  and `5,298`/`AD5F3BA680897B7DD8A9BEE0FE6BB3C5FD04703698138C867D35271B6E806E61`
+  bytes/SHA-256. The marker-free two-path packet is `ReviewedLocalGreen` at
+  focused `1/1`, D `11/11`, Scenario/A-D `65/65`, Conformance `73/73`, Domain
+  `98/98`, API/ownership `15/15`, Release `0/0`, format/locks/diff and fresh
+  reviews `0/0/0`; caps are `16/120`, `60/180`, `76/300`. Final schema-2 graph
+  `4/4`, PS7/PS5.1 StructureOnly and publication evidence `7/7` are green.
+  Hosted/merge/exact-main implementation evidence remains pending.
+- Required safe response: preserve the exact two-path green packet and frozen
+  R0020; commit/push/host-validate/merge/exact-main validate, then permit C
+  reconciliation.
 - Unsafe retry boundary: do not patch a test-owned mirror, normalize paths
   implicitly, broaden the declaration, invent a location, or rerun R0020.
 - Freshness and review condition: confirmed 2026-08-22; review when selector

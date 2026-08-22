@@ -34,9 +34,15 @@ remains Planned.
 
 [FIND-0466](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0466)
 C session/graph correction and [FIND-0467](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0467)
-D selector correction are `AcceptedFrozenDesign`; the common
-[SUBF-0143](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)
-checkpoint is committed and its committed-HEAD graph, PS7/PS5.1 StructureOnly and publication-evidence gates are green; push, exact-head hosted validation, merge and exact-main green remain pending. No R0019/R0020 or C#/Policy mutation exists yet. [TEST-0209](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0209)
+D selector correction shared design checkpoint merged through
+[PR #191](https://github.com/hasanmanzak/meAndAI/pull/191) at exact main
+[`5bd13520444643d022ef1b421f9cbee48e29b014`](https://github.com/hasanmanzak/meAndAI/commit/5bd13520444643d022ef1b421f9cbee48e29b014);
+[run 32566870206](https://github.com/hasanmanzak/meAndAI/actions/runs/32566870206)
+passed both stable jobs. C remains `AcceptedFrozenDesign`; no R0019/C mutation
+exists. R0020 is accepted/immutable and D Policy/test is `ReviewedLocalGreen`;
+its final record-synchronized graph, PS7/PS5.1 StructureOnly and publication-
+evidence gates are green; commit/push/hosted/merge/exact-main remain pending.
+[TEST-0209](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0209)
 remains Planned and `COMPOSED-QUALIFICATION-01` remains inactive until the
 corrections are implemented, merged, exact-main hosted green, and report sealing
 is reconciled. Feature DoD, release and publication remain unclaimed.
