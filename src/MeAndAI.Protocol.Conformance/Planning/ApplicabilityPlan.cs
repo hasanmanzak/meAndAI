@@ -14,7 +14,8 @@ public sealed class ApplicabilityPlan
         IEnumerable<RuleId> ruleIds,
         IEnumerable<EvidenceSlotDeclaration> slots,
         IEnumerable<AcquisitionInstruction> instructions,
-        IPlanBoundEvidenceSession evidenceSession)
+        IPlanBoundEvidenceSession evidenceSession,
+        AcquisitionTarget? subjectRepository = null)
     {
         AuthorityKind = authorityKind;
         Profile = profile;
@@ -23,6 +24,7 @@ public sealed class ApplicabilityPlan
         Slots = Array.AsReadOnly(slots.ToArray());
         Instructions = Array.AsReadOnly(instructions.ToArray());
         EvidenceSession = evidenceSession;
+        SubjectRepository = subjectRepository;
     }
 
     public CatalogAuthorityKind AuthorityKind { get; }
@@ -38,4 +40,6 @@ public sealed class ApplicabilityPlan
     public IReadOnlyList<AcquisitionInstruction> Instructions { get; }
 
     internal IPlanBoundEvidenceSession EvidenceSession { get; }
+
+    internal AcquisitionTarget? SubjectRepository { get; }
 }

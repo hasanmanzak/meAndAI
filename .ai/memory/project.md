@@ -157,18 +157,19 @@ Last verified: **2026-08-21**
   the canonical handoff passed Ubuntu in `19m36s` and Windows in `36m02s`; publication verification was
   correctly skipped. ContractSlice A-D and the final [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) atomic activation are merged and exact-main hosted green at `A32/B11/C11/D11`, cumulative/full Conformance `65/65`, Domain `98/98`, API/ownership `15/15`, Scenario/ContractSlice `65/65`, and combined `163/163`. [SUBF-0144](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0144) remains `AcceptedFrozenDesign`: all seven packets through convergence are packet-local `ReviewedLocalGreen`, with protected-policy/Scenario `7/7`, full Conformance `72/72`, Domain `98/98`, warning-free Release builds, and canonical R0004/R0005/R0006 immutable without rerun. [TEST-0211](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0211) is locally Passing/active with its owner/workflow activated. The bounded [FIND-0462](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0462) and canonical [FIND-0463](../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md#find-0463) corrections are contained in [PR #186](https://github.com/hasanmanzak/meAndAI/pull/186), merged at exact main [`a291556b2fa3c6fbaac7fa564ed35baadb5e9626`](https://github.com/hasanmanzak/meAndAI/commit/a291556b2fa3c6fbaac7fa564ed35baadb5e9626); exact-main hosted-green, feature DoD, release, and publication remain unclaimed. Follow the current [canonical log index](log/README.md). The
   [SUBF-0154](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0154)
-  now has one consolidated corrected `AcceptedFrozenDesign`
+  retains one consolidated corrected `AcceptedFrozenDesign`
   [report-sealing contract](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0154-canonical-report-sealing-design.md)
   and [micro-delivery plan](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0154-micro-delivery-plan.md).
-  This is a design-only checkpoint reconciled onto exact-main input
+  The design was reconciled onto exact-main input
   [`a291556b2fa3c6fbaac7fa564ed35baadb5e9626`](https://github.com/hasanmanzak/meAndAI/commit/a291556b2fa3c6fbaac7fa564ed35baadb5e9626);
   predecessor-bound subject/snapshot custody, exhaustive frame/golden and
-  Cohort-1-only R are frozen. Implementation and that sole R remain held
-  pending exact-main hosted-green evidence for
-  [SUBF-0144](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0144),
-  fresh changed-diff review and
-  explicit implementation authority. [TEST-0209](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0209)
-  and convergence P/R are `NotApplicable`. Applicable Active recurrences are
+  Cohort-1-only R remain frozen. `REPORT-SEALING-01` is
+  `ReviewedLocalGreen`, [TEST-0222](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0222)
+  remains Planned while its local route is green, and R was not rerun. [TEST-0209](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0209)
+  remains Planned; `COMPOSED-QUALIFICATION-01` is inactive and its P/R is
+  `NotApplicable` until report sealing is exact-head hosted green. Push,
+  hosted validation, subfeature completion, release, and publication remain
+  unclaimed. Applicable Active recurrences are
   canonical cross-record links, planned Scenario deferral, locked xUnit
   StackTrace, VSTest zero-discovery abort, multi-cohort ledger advancement,
   full commit permalinks, untracked packets absent from the HEAD graph, and the
@@ -561,6 +562,61 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   new marker ordinal.
 - Freshness and review condition: confirmed 2026-08-01; review when the locked
   adapter, logger, or BehaviorRed evidence contract changes.
+- Superseded by: `None`
+
+### External expected-red verifier rejects a locked same-result transcript
+
+- Status: `Active`
+- Observable signature: an immutable accepted canonical-R TRX has the
+  authoritative marker `ErrorInfo/Message`, exact Failed counters, and the
+  locked xUnit/VSTest adapter's same-result `StdOut` transcript, but the
+  external runner exits nonzero after the child completed because it requires
+  that transcript to be byte-identical to the marker-only Message.
+- Applicability: external one-shot expected-red validators for direct
+  `Assert.Fail` Facts using the immutable xUnit/VSTest adapter and standard TRX
+  logger.
+- Affected contract and cause: the high-level evidence contract permits one
+  same-result transcript with exact assembly/FQN, one marker occurrence and
+  standard stack presentation; a lower-level post-invocation oracle narrowed
+  that allowance to a marker-only echo and misclassified valid adapter output.
+- Canonical owner and evidence:
+  [FIND-0464](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0464)
+  / [TEST-0222](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0222)
+  own the correction. Accepted source is `1,886` bytes / SHA-256
+  `F7BC82040457A1CB585B152BBDAD8E69FBA88FC5A7210E6ED167FC079D47581E`;
+  accepted TRX is `5,108` bytes / SHA-256
+  `4FFB591EAB6247DFC661D108501156BEEB33FBE746D191CE7E1B3B2F489D6C83`.
+- Fixed release or evidence: the original runner remains immutable diagnostic
+  evidence at `17,741` bytes / SHA-256
+  `61627FE78AF9E97BD5F5848F7BEBFF011D5E648DDFBDD710FEA74E723E92E89F`;
+  its exit `1` occurred only after the accepted TRX was written. The first
+  `14,541`-byte no-child verifier revision, SHA-256
+  `1FDC006F97AF61167021FFBD684A6ADEC08444681CDCC8EC20ED17945D7CC85B`,
+  stopped on a verifier-local scalar `Value` diagnostic without a child, R
+  rerun, or disposition. The corrected `14,541`-byte verifier
+  `D:\Temp\meandai-test0222-report-sealing-red-offline-verifier-4ffb591e-2c7d0a64.ps1`,
+  SHA-256
+  `79AF177BDAFFA2A03BDAEBE18B84BCCEA059FC9639DA3FAD9040A1404C741F66`,
+  ran with no child, exited `0`, and returned `accepted=true`: frozen
+  source/runner/TRX byte-and-hash identities matched; raw/transcript marker
+  counts were `2/1`; results/definitions/entries were `1/1/1`; counters were
+  `total=1`, `executed=1`, `failed=1`, other `13` zero; RunInfos were `1` and
+  attachments `0`. The marker-free Cohort-1 transform is locally green;
+  exact-head hosted, release, and publication claims remain absent.
+- Required safe response: preserve source, runner, TRX, DLL, PDB and lock
+  identities; validate the frozen TRX offline with DTD prohibited and no child
+  process; require the exact Message, assembly/FQN, standard stack, transcript
+  marker count `1`, raw marker count `2`, exact 16 counters/RunInfo shape, no
+  `StdErr`, foreign result, independent diagnostic, attachment or collector;
+  preserve that immutable R while later cohorts consume only the marker-free
+  reviewed-local-green predecessor.
+- Unsafe retry boundary: do not rerun R, edit or replace any frozen artifact,
+  suppress the locked transcript, reinterpret runner exit as a test failure,
+  clean the result root, allocate another marker, or rerun R during later
+  cohort or hosted recovery.
+- Freshness and review condition: confirmed 2026-08-22; review when the locked
+  xUnit/VSTest adapter, TRX logger, transcript grammar, external verifier, or
+  BehaviorRed evidence contract changes.
 - Superseded by: `None`
 
 ### VSTest testhost connection aborts before discovery
@@ -1607,7 +1663,7 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 - Observable signature: the stable Windows job is cancelled at its exact finite timeout after named PowerShell 5.1 Full child suites pass, while discovered suites or later package steps remain and no semantic failure is emitted.
 - Applicability: ordinary, manual, main, and merge-queue Full validation on the single stable Windows job; compatibility-only WindowsNative routing remains separate.
 - Affected contract and cause: serial-suite growth exceeded the reviewed Windows job headroom while the workflow retained an older finite bound. Job identity, route, command, scenario ownership, and product semantics are not the owning layer.
-- Canonical owner and evidence: [FIND-0464](../../docs/features/FEAT-0066-shared-execution-authority-foundation/README.md#find-0464)
+- Canonical owner and evidence: [FIND-0465](../../docs/features/FEAT-0066-shared-execution-authority-foundation/README.md#find-0465)
   / [TEST-0124](../../docs/features/FEAT-0027-v0104-runner-minute-efficiency/test-cases.md#test-0124) / [PR #189](https://github.com/hasanmanzak/meAndAI/pull/189) / [issue #166](https://github.com/hasanmanzak/meAndAI/issues/166).
 - Fixed release or evidence: no release. Exact head [`4679d15`](https://github.com/hasanmanzak/meAndAI/commit/4679d15ce597ae74c945259aa2da38551d263b87) passed Ubuntu in `20m37s`; Windows [run 32532961685](https://github.com/hasanmanzak/meAndAI/actions/runs/32532961685) reached exact `55m0s` after four named Full child groups passed, with nine suites and package steps remaining. The test-first owner then failed only the `55 -> 65` bound in `456.5s`; corrected local evidence is green and exact-head hosted evidence remains pending.
 - Required safe response: classify emitted suite evidence before changing any test or semantic surface, select the smallest finite step that contains the known remainder plus headroom, update the existing exact owner, and require fresh exact-head hosted proof. For this occurrence, `60` cannot contain the more-than-five-minute remainder and headroom; the reviewed bound is `65`.

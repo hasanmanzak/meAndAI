@@ -72,6 +72,16 @@ public sealed partial class ConformanceKernel
             profile,
             targets);
 
+    public ApplicabilityPlan PlanApplicability(
+        NamedExecutionProfile profile,
+        AcquisitionTarget subjectRepository,
+        IEnumerable<AcquisitionTarget> targets) =>
+        ApplicabilityPlanningCore.PlanComplete(
+            _planningSession,
+            profile,
+            subjectRepository,
+            targets);
+
     public ApplicabilityClosure CloseApplicability(
         ApplicabilityPlan plan,
         AcquisitionProofSet proofs,

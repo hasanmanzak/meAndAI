@@ -3,18 +3,19 @@
 | Field | Value |
 | --- | --- |
 | Classification | Ordered implementation control plan |
-| Status | `AcceptedFrozenDesign`; implementation remains held |
+| Status | `AcceptedFrozenDesign`; `REPORT-SEALING-01` is `ReviewedLocalGreen`; its local route is green while [TEST-0222](test-cases.md#test-0222) remains Planned; canonical R remains immutable; Cohort 2 and exact-head hosted validation remain pending |
 | Parent design | [Canonical report sealing design](subf-0154-canonical-report-sealing-design.md) |
 | Exact design input | Reconciled exact main [`a291556b2fa3c6fbaac7fa564ed35baadb5e9626`](https://github.com/hasanmanzak/meAndAI/commit/a291556b2fa3c6fbaac7fa564ed35baadb5e9626) |
 | Scenarios | [TEST-0222](test-cases.md#test-0222) and [TEST-0209](test-cases.md#test-0209) |
 
 ## Activation hold
 
-This plan grants no current implementation or expected-red authority. It is
-reconciled onto exact main [`a291556b2fa3c6fbaac7fa564ed35baadb5e9626`](https://github.com/hasanmanzak/meAndAI/commit/a291556b2fa3c6fbaac7fa564ed35baadb5e9626)
-but may activate only after that exact main is Ubuntu/Windows hosted green, a
-fresh changed-diff review closes without `Blocking`, and the maintainer issues
-an explicit implementation directive.
+This plan originally granted no implementation or expected-red authority.
+Later scoped authority activated only the Cohort-1 predecessor-compilable
+scaffold and its single immutable accepted canonical R under
+[FIND-0464](README.md#find-0464); it is never rerun. The no-child offline
+verifier passed, fresh final reviews closed without `Blocking`, and the
+marker-free transform is `ReviewedLocalGreen`.
 
 The design delivery is one consolidated checkpoint. The implementation uses
 one branch and one PR with three semantic cohorts; there is no PR or hosted run
@@ -30,7 +31,10 @@ For every cohort:
    once, using the exact FQN, one fresh results directory, one TRX, the default
    VSTest connection behavior, a `420`-second outer bound, no fallback/retry/
    reuse, and the locked-adapter allowance of zero or one nonempty marker-free
-   standard assertion `StackTrace`;
+   standard assertion `StackTrace`; the authoritative marker is the exact
+   `ErrorInfo/Message`, while at most one same-result `StdOut` transcript may
+   name the exact assembly/FQN, contain the marker once, and present that
+   standard stack with no `StdErr`, foreign result, or independent diagnostic;
 2. implement only its exact dependency-closed mutation and record allowlists;
 3. run the exact focused Fact, cumulative [TEST-0222](test-cases.md#test-0222)/
    [TEST-0209](test-cases.md#test-0209) route reached so far, full Conformance
@@ -96,9 +100,26 @@ Marker: TEST-0222-REPORT-SEALING-RED-0001
 
 The predecessor-compilable scaffold is direct and trait-free. It verifies the
 frozen public type/member surface is absent through exact reflection and then
-fails solely on the marker. The accepted red requires exactly one discovered,
+fails solely on the marker. Canonical acceptance requires exactly one discovered,
 executed and failed result with no unrelated diagnostic. The green transform
 uses direct public calls and preserves the red source/TRX separately.
+
+The immutable accepted canonical R is frozen at source `1,886` bytes / SHA-256
+`F7BC82040457A1CB585B152BBDAD8E69FBA88FC5A7210E6ED167FC079D47581E`
+and accepted TRX `5,108` bytes / SHA-256
+`4FFB591EAB6247DFC661D108501156BEEB33FBE746D191CE7E1B3B2F489D6C83`.
+The raw TRX marker count is exactly `2`: one authoritative Message and one
+locked same-result transcript occurrence. It has the exact Failed `1/1`
+16-counter inventory, no attachment, and one permitted marker-free same-FQN
+`[FAIL]` RunInfo. The original external runner remains separate diagnostic
+evidence at `17,741` bytes / SHA-256
+`61627FE78AF9E97BD5F5848F7BEBFF011D5E648DDFBDD710FEA74E723E92E89F`;
+its exit `1` occurred after the completed invocation because its validator
+overconstrained the permitted transcript to a byte-identical marker-only echo.
+The corrected no-child verifier, SHA-256
+`79AF177BDAFFA2A03BDAEBE18B84BCCEA059FC9639DA3FAD9040A1404C741F66`,
+exited `0` with `accepted=true`. R was not rerun; the marker-free transform is
+locally green and [FIND-0464](README.md#find-0464) custody remains immutable.
 
 Mutation allowlist:
 

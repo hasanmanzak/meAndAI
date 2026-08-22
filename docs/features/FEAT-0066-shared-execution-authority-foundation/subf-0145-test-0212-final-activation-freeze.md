@@ -210,7 +210,7 @@ formatting:
 The first [PR #189](https://github.com/hasanmanzak/meAndAI/pull/189) exact-head
 [run 32532961685](https://github.com/hasanmanzak/meAndAI/actions/runs/32532961685)
 exposed only the ordinary Windows finite bound after successful named Full
-child-suite evidence. [FIND-0464](README.md#find-0464) owns the correction.
+child-suite evidence. [FIND-0465](README.md#find-0465) owns the correction.
 The activation fourteen-path allowlist remains frozen; the dependency-closed
 correction may additionally change only:
 

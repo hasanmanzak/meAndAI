@@ -9,7 +9,7 @@ and [run 32521885155](https://github.com/hasanmanzak/meAndAI/actions/runs/325218
 The [TEST-0212](#test-0212) [final activation](subf-0145-test-0212-final-activation-freeze.md)
 is now locally active with semantic gates `Passing`. The first [PR #189](https://github.com/hasanmanzak/meAndAI/pull/189)
 exact-head run exposed only the finite Windows timeout owned by
-[FIND-0464](README.md#find-0464); corrected local structural evidence is green,
+[FIND-0465](README.md#find-0465); corrected local structural evidence is green,
 while replacement exact-head hosted validation remains pending.
 [SUBF-0146](README.md#subf-0146) remains inactive.
 
@@ -38,7 +38,7 @@ The neutral topology, executable owner, and both stable filters are active;
 exact-head hosted validation remains pending. A historical
 engine-state enum or workflow lease remains non-evidence.
 
-The bounded [FIND-0464](README.md#find-0464) correction changes only the
+The bounded [FIND-0465](README.md#find-0465) correction changes only the
 [TEST-0124](../FEAT-0027-v0104-runner-minute-efficiency/test-cases.md#test-0124)
 Windows finite bound from `55` to `65`; Linux remains `30`, post-publication
 remains `5`, and the activation topology, filters, owner, Scenario traits,
