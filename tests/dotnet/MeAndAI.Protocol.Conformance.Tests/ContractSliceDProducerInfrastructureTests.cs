@@ -8,8 +8,6 @@ namespace MeAndAI.Protocol.Conformance.Tests;
 
 public sealed class ContractSliceDProducerInfrastructureTests
 {
-    private const string Marker = "TEST-0210-D-BEHAVIOR-RED-0002";
-
     [Fact]
     [Trait("ContractSlice", "D")]
     [Trait("Scenario", "TEST-0210")]
@@ -18,22 +16,49 @@ public sealed class ContractSliceDProducerInfrastructureTests
         ContractSliceDProducerInfrastructureEvidence? evidence =
             ContractSliceDProducerInfrastructureFixture.Activate(
                 InitialRuleQualificationPolicy.Export);
-        if (evidence is null)
-        {
-            Assert.Fail(Marker);
-        }
+        Assert.NotNull(evidence);
 
         Assert.Equal((3, 2, 4, 1, 3, 5),
             (evidence.Codecs, evidence.Parsers, evidence.Indexes,
              evidence.Projectors, evidence.Selectors, evidence.Evaluators));
         Assert.True(evidence.CancellationClosed);
         Assert.True(evidence.ResourceMetersClosed);
+
+        Assert.Equal(
+            ["protocol.selector.decision-record",
+             "protocol.selector.feature-readme",
+             "protocol.selector.feature-test-cases"],
+            evidence.SelectorResults.Keys.OrderBy(
+                key => key, StringComparer.Ordinal));
+        var decision = evidence.SelectorResults["protocol.selector.decision-record"];
+        var readme = evidence.SelectorResults["protocol.selector.feature-readme"];
+        var testCases = evidence.SelectorResults["protocol.selector.feature-test-cases"];
+        Assert.Equal("DEC-0035", decision.ParentCanonicalValue);
+        Assert.Equal("docs/features/FEAT-0001", readme.ParentCanonicalValue);
+        Assert.Equal("docs/features/FEAT-0001", testCases.ParentCanonicalValue);
+        Assert.Same(decision.Parent, decision.Product.Parent);
+        Assert.Same(readme.Parent, readme.Product.Parent);
+        Assert.Same(testCases.Parent, testCases.Product.Parent);
+
+        Assert.Equal("DEC-0035", decision.Product.CanonicalValue);
+        Assert.Equal(
+            "docs/features/FEAT-0001/README.md",
+            readme.Product.CanonicalValue);
+        Assert.Equal(
+            "docs/features/FEAT-0001/test-cases.md",
+            testCases.Product.CanonicalValue);
     }
 }
 
 internal sealed record ContractSliceDProducerInfrastructureEvidence(
     int Codecs, int Parsers, int Indexes, int Projectors, int Selectors,
-    int Evaluators, bool CancellationClosed, bool ResourceMetersClosed);
+    int Evaluators, bool CancellationClosed, bool ResourceMetersClosed,
+    IReadOnlyDictionary<string, ContractSliceDSelectorEvidence> SelectorResults);
+
+internal sealed record ContractSliceDSelectorEvidence(
+    string ParentCanonicalValue,
+    QualifiedEvidenceHandle Parent,
+    SelectorProduct Product);
 
 internal static class ContractSliceDProducerInfrastructureFixture
 {
@@ -78,7 +103,8 @@ internal static class ContractSliceDProducerInfrastructureFixture
             export.SelectorRegistrations.Count,
             export.EvaluatorRegistrations.Count,
             probe.CancellationClosed,
-            probe.ResourceMetersClosed);
+            probe.ResourceMetersClosed,
+            probe.SelectorResults);
     }
 
     internal static EvidenceScope RepositoryScope()
@@ -140,8 +166,12 @@ internal static class ContractSliceDProducerInfrastructureFixture
     {
         private readonly List<ISealedModelHandle> _models = [];
         private readonly List<ICapabilityHandle> _capabilities = [];
+        private readonly Dictionary<string, ContractSliceDSelectorEvidence>
+            _selectorResults = new(StringComparer.Ordinal);
         internal bool CancellationClosed { get; private set; } = true;
         internal bool ResourceMetersClosed { get; private set; } = true;
+        internal IReadOnlyDictionary<string, ContractSliceDSelectorEvidence>
+            SelectorResults => _selectorResults;
 
         public bool Visit<TModel>(CodecRegistration<TModel> registration)
             where TModel : class, IProtocolSemanticModel
@@ -269,11 +299,23 @@ internal static class ContractSliceDProducerInfrastructureFixture
             var declaration = export.Catalog.Rules
                 .SelectMany(rule => rule.ExpectedSelectors)
                 .Single(item => ReferenceEquals(item.Resolver, registration.Component));
+            var parentCanonicalValue = declaration.SelectorKey switch
+            {
+                "protocol.selector.feature-readme" or
+                "protocol.selector.feature-test-cases" =>
+                    "docs/features/FEAT-0001",
+                "protocol.selector.decision-record" => "DEC-0035",
+                _ => throw new InvalidOperationException(
+                    $"Unexpected selector key: {declaration.SelectorKey}"),
+            };
             var parent = QualifiedEvidenceHandle.Create();
             var result = registration.Resolver.Resolve(ExpectedSelectorInput.Create(
-                declaration, parent, "docs/features/FEAT-0001/README.md"))
+                declaration, parent, parentCanonicalValue))
                 .Accept(SelectorObserver.Instance);
             Assert.Same(parent, result.Parent);
+            _selectorResults.Add(
+                declaration.SelectorKey,
+                new(parentCanonicalValue, parent, result));
             return true;
         }
 

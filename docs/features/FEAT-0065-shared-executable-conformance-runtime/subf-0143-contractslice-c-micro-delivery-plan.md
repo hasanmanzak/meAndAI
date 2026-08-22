@@ -3,14 +3,14 @@
 | Field | Value |
 | --- | --- |
 | Classification | Gate 2 micro-delivery plan and design freeze |
-| State | Original C complete: all four cohorts `ExactHeadHostedGreen`; C `11/11`, A+B+C/full Conformance `54/54`; R=0006/R=0008/R=0009/R=0010/R=0012/R=0013/R=0016 diagnostic/no-success and R=0007/R=0011/R=0014/R=0015/R=0017/R=0018 accepted/immutable; merged through [PR #178](https://github.com/hasanmanzak/meAndAI/pull/178) and exact-main hosted green. Parent scenario later became Passing/active; [FIND-0466](README.md#find-0466) is `AcceptedFrozenDesign`. |
+| State | Original C complete: all four cohorts `ExactHeadHostedGreen`; C `11/11`, A+B+C/full Conformance `54/54`; R=0006/R=0008/R=0009/R=0010/R=0012/R=0013/R=0016 diagnostic/no-success and R=0007/R=0011/R=0014/R=0015/R=0017/R=0018 accepted/immutable; merged through [PR #178](https://github.com/hasanmanzak/meAndAI/pull/178) and exact-main hosted green. Parent scenario later became Passing/active. The common correction design merged through [PR #191](https://github.com/hasanmanzak/meAndAI/pull/191); [FIND-0467](README.md#find-0467) D is `ReviewedLocalGreen`, while [FIND-0466](README.md#find-0466) C remains `AcceptedFrozenDesign` until D exact-main green. |
 | Parent | Owning feature and current subfeature |
 | Scenario | [TEST-0210](test-cases.md#test-0210), Passing/active on the immutable `65/65` predecessor; correction target remains inactive |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Ordered-C authority | [Maintainer continuation directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5264403013) |
 | Accepted predecessor | Merged [PR #177](https://github.com/hasanmanzak/meAndAI/pull/177), exact-main commit [`6ca42f56a48976093692dc4764c464ca185aa964`](https://github.com/hasanmanzak/meAndAI/commit/6ca42f56a48976093692dc4764c464ca185aa964), and [run 31579758253](https://github.com/hasanmanzak/meAndAI/actions/runs/31579758253): Ubuntu `6m22s`, Windows `11m11s`, publication verification skipped |
 | Normative owner | [Typed evaluation kernel design](subf-0143-typed-evaluation-kernel-design.md) |
-| Implementation language | C# only; correction R/source, feature completion, release, and publication remain held |
+| Implementation language | C# only; C correction R0019/source, feature completion, release, and publication remain held |
 
 ## Authority and non-goals
 
@@ -1026,13 +1026,27 @@ cancellation and resource checks, exact parents [`docs/features/FEAT-0001`](../F
 [`DEC-0035`](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) must yield [`docs/features/FEAT-0001/README.md`](../FEAT-0001-common-development-protocol/README.md),
 [`docs/features/FEAT-0001/test-cases.md`](../FEAT-0001-common-development-protocol/README.md), and [`DEC-0035`](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md). Only the exact legacy
 two-unchanged-feature-values/correct-decision tuple may emit the marker.
-The future pre-red transform must replace historical `...RED-0002` with a
-marker-free non-null assertion; thereafter source must contain exactly one
-`...RED-0010`. This design checkpoint has no D source/R mutation. Results are keyed by the exact three selector
+The accepted pre-red transform replaced historical `...RED-0002` with a
+marker-free non-null assertion and contained exactly one `...RED-0010`.
+Results were keyed by the exact three selector
 keys, not registration order; key set, parents and parent-handle identity are
 asserted before the marker tuple.
 Null input remains `ArgumentNullException`; cancellation is not applicable.
 Hard caps are production `120`, test `180`, combined `300`.
+
+R0020 is accepted and immutable without rerun. Runner, red source, report and
+sole TRX identities are respectively `43,086`/
+`90BDA5172C04D72DC5AB07DDABABB30398ED10757577B04C51E82D0BC6B19CD0`,
+`26,001`/`B44F6370E391340322F2C0610B877884CCA9B450DA967C9105A0E91385A0593E`,
+`12,933`/`CC452127DB21C7D51B62CD63EB6D8AC716CD279F52386A95D948C65F479E5394`,
+and `5,298`/`AD5F3BA680897B7DD8A9BEE0FE6BB3C5FD04703698138C867D35271B6E806E61`
+bytes/SHA-256. The marker-free implementation is `ReviewedLocalGreen` at
+focused `1/1`, D `11/11`, Scenario/A-D `65/65`, full Conformance `73/73`,
+Domain `98/98`, API/ownership `15/15`, Release `0/0`, format/locks/diff green,
+caps `16/120`, `60/180`, `76/300`, and fresh reviews `0/0/0`. Final record-
+synchronized graph `4/4` with exact `2/2` process-start and `4/4` blob-request
+counters, PS7/PS5.1 StructureOnly and publication evidence `7/7` are green.
+Commit/push/hosted/merge/exact-main gates remain pending.
 
 For the common design checkpoint, candidate filesystem/link/diff/capacity and
 fresh reviews precede the focused record commit; committed-HEAD graph,
