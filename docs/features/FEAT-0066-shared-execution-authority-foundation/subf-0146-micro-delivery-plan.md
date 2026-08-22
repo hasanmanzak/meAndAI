@@ -72,11 +72,12 @@ surfaces; they may not implement multiple packages concurrently.
 | `EA-RECOVERY-RETENTION-01` | exact newer-fenced recovery and separately authorized retention | `TEST-0213-RECOVERY-RED-0004` / `MeAndAI.Operations.Architecture.Tests.OperationRecoveryContractTests.TEST_0213_only_fresh_newer_fenced_recovery_or_retention_grant_mutates` | `HeldForPredecessor` |
 | `EA-RECOVERY-CONVERGE-01` | records/reviews/evidence reconciliation only | no red and no production/test change | `HeldForPackages` |
 
-Every future implementation Fact carries exactly
-`[Trait("Subfeature", "SUBF-0146")]`. It must not carry
-`Scenario=TEST-0213` until a later, separately frozen final-activation atom
+Every future implementation Fact carries exactly the trait
+[Subfeature=SUBF-0146](README.md#subf-0146). It must not carry
+[Scenario=TEST-0213](test-cases.md#test-0213) until a later, separately frozen final-activation atom
 adds the Scenario trait, owner mapping, stable workflow filter, and status in
-one change. Partial package evidence never makes TEST-0213 active.
+one change. Partial package evidence never makes
+[TEST-0213](test-cases.md#test-0213) active.
 
 Exact public-type ownership is frozen as follows. `EA-LEASE-FENCE-01` owns
 `DurableTransitionGrant`, `LeaseAction`, `LeaseGrant`, every `Lease*` type, and
@@ -96,7 +97,7 @@ without reopening Gate 2.
 
 All paths are repository-relative. A package may change only its exact list.
 The shared `ExecutionRecoveryPorts.cs` is successively owned by one active
-package, never concurrently. Existing SUBF-0145 source is read-only.
+package, never concurrently. Existing [SUBF-0145](README.md#subf-0145) source is read-only.
 
 ### EA-LEASE-FENCE-01
 
@@ -186,7 +187,7 @@ shared-writer operation after committed evidence exists.
 For each package, the accepted red is one compile-safe reflection Fact at the
 exact FQN/marker in the matrix. Before implementation it must:
 
-1. contain only `Subfeature=SUBF-0146`, fail only on the exact absent
+1. contain only [Subfeature=SUBF-0146](README.md#subf-0146), fail only on the exact absent
    type/member, and keep all other assertions green;
 2. run once through the original trusted project/filter route with no retry;
 3. record exact command, SDK/tool versions, exit code, TRX path, failing test,
@@ -233,7 +234,7 @@ is authorized by this plan.
 
 After all four packages are `ReviewedLocalGreen`, convergence reconciles only
 records and evidence, commits once, pushes one cohort, and requires exact-head
-Ubuntu/Windows green. TEST-0213 still remains `Planned` until its separate
+Ubuntu/Windows green. [TEST-0213](test-cases.md#test-0213) still remains `Planned` until its separate
 activation atom is frozen, authorized, reviewed, committed, pushed, and hosted
 green. Release, publication, adapters, consumer integration, authority transfer,
 remote branch cleanup, and worktree cleanup are independently authorized

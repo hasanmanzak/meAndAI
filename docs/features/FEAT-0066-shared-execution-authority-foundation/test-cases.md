@@ -54,7 +54,7 @@ filters, [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-014
 Its accepted natural-red and local-green evidence are retained in the
 [package ledger](subf-0145-package-evidence.md#test-0212-final-activation).
 
-For SUBF-0146, the [design](subf-0146-journal-recovery-design.md) freezes
+For [SUBF-0146](README.md#subf-0146), the [design](subf-0146-journal-recovery-design.md) freezes
 intent-before-effect, ambiguous-receipt, lease/fence, reconstruction, recovery,
 and independent retention semantics. The [public API](subf-0146-public-api-contract.md)
 and [value/error contract](subf-0146-value-error-contract.md) freeze the exact
@@ -62,4 +62,5 @@ surface, digests, rejections, precedence, and cancellation behavior. The
 [micro plan](subf-0146-micro-delivery-plan.md) freezes four future package
 markers/FQNs, one-time red custody, paths, caps, review gates, and the held
 Scenario-activation boundary. These records are test intent only: no
-`Subfeature=SUBF-0146` or `Scenario=TEST-0213` Fact currently exists.
+[Subfeature=SUBF-0146](README.md#subf-0146) or
+[Scenario=TEST-0213](#test-0213) Fact currently exists.

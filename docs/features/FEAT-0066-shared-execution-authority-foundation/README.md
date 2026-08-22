@@ -39,7 +39,7 @@ Its corrected exact-main commit
 passed [run 32542273165](https://github.com/hasanmanzak/meAndAI/actions/runs/32542273165)
 on Ubuntu and Windows. Release, publication, consumer mutation, credentials,
 authority transfer, and [SUBF-0146](#subf-0146) implementation remain
-separately held. The SUBF-0146
+separately held. The [SUBF-0146](#subf-0146)
 [design](subf-0146-journal-recovery-design.md),
 [public API](subf-0146-public-api-contract.md),
 [value/error contract](subf-0146-value-error-contract.md), and
@@ -124,7 +124,7 @@ reconstruction, and explicit recovery grants for every mutating application.
 | Test readiness | Gate 1 state | Evidence |
 | --- | --- | --- |
 | Scenarios | Defined | [Test scenarios](test-cases.md) |
-| Test code | SUBF-0145 four packages and TEST-0212 final activation exact-main hosted green; SUBF-0146 has no test code | The [activation design](subf-0145-test-0212-final-activation-freeze.md) owns exact Scenario `20/20`, neutral topology `1/1`, owner/workflow and [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) evidence; the SUBF-0146 [micro plan](subf-0146-micro-delivery-plan.md#package-matrix) freezes only future marker/FQN intent |
+| Test code | [SUBF-0145](#subf-0145) four packages and [TEST-0212](test-cases.md#test-0212) final activation exact-main hosted green; [SUBF-0146](#subf-0146) has no test code | The [activation design](subf-0145-test-0212-final-activation-freeze.md) owns exact Scenario `20/20`, neutral topology `1/1`, owner/workflow and [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) evidence; the [SUBF-0146](#subf-0146) [micro plan](subf-0146-micro-delivery-plan.md#package-matrix) freezes only future marker/FQN intent |
 | Baseline run | Four canonical reds immutable; four bounded greens complete | Exact R identities and local package evidence are retained in the [package ledger](subf-0145-package-evidence.md) |
 
 ## Decomposition and subfeature gates
@@ -184,6 +184,6 @@ passed [run 32521885155](https://github.com/hasanmanzak/meAndAI/actions/runs/325
 [run 32542273165](https://github.com/hasanmanzak/meAndAI/actions/runs/32542273165).
 [SUBF-0146](#subf-0146), adapters, feature DoD, release, publication,
 consumer mutation, and external authority effects remain held.
-The [SUBF-0146 design packet](subf-0146-journal-recovery-design.md) is only a
+The [SUBF-0146](#subf-0146) [design packet](subf-0146-journal-recovery-design.md) is only a
 records candidate and does not satisfy the remaining implementation or feature
 DoD.

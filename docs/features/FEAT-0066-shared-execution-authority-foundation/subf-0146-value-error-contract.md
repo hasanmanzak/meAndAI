@@ -16,11 +16,11 @@ normalizes, truncates, defaults, unions, or applies first/last-wins behavior.
 
 | Value | Exact rule |
 | --- | --- |
-| `OperationEffectId` | SUBF-0145 scalar token grammar; 1..128 bytes |
+| `OperationEffectId` | [SUBF-0145](README.md#subf-0145) scalar token grammar; 1..128 bytes |
 | `OperationJournalEntryDigest` | exactly 64 lowercase hexadecimal characters; `FromHashBytes` accepts exactly 32 bytes |
 | `JournalEntrySequence` | non-negative; genesis is `0`; every append is prior + 1 |
 | fencing token | positive signed 64-bit integer; first accepted token is at least `1`; every later acquisition is strictly greater than every token previously accepted for that operation |
-| all supplied `AuthorityDigest` values | exact SUBF-0145 SHA-256 shape |
+| all supplied `AuthorityDigest` values | exact [SUBF-0145](README.md#subf-0145) SHA-256 shape |
 | UTC timestamps | `Offset == TimeSpan.Zero`; no normalization from another offset |
 
 Closed wire values are exact:
@@ -136,7 +136,7 @@ selectable kind. Its mandatory floor is exactly `ProposalActor` plus
 `FinalPlanReviewer`, and the protected snapshot may add but not remove roles.
 Each required role has exactly one approval; extra, missing, duplicated,
 nonmember, or wrong-role evidence rejects as the subtype's closed
-`GrantRejected`/`GrantDrift` path. Existing SUBF-0145 policy kinds and source
+`GrantRejected`/`GrantDrift` path. Existing [SUBF-0145](README.md#subf-0145) policy kinds and source
 remain unchanged.
 
 `RecoveryGrant.Create` requires exactly one action/effect and a nonempty
@@ -170,7 +170,8 @@ only release time/state. Action or expiry mismatch is `GrantRejected`;
 generation mismatch is `GenerationMismatch`. No action reuses another lease
 grant ID or idempotency key.
 
-The bridge from numeric `LeaseFenceRecord.FencingToken` to SUBF-0145
+The bridge from numeric `LeaseFenceRecord.FencingToken` to
+[SUBF-0145](README.md#subf-0145)
 `LeaseFenceBinding.FencingToken` is its invariant ASCII decimal form with no
 sign and no leading zero. Numeric zero is permitted only in the exact genesis
 `unowned` sentinel and never in a protected lease record.
@@ -284,7 +285,7 @@ overflow returns `CasConflict` without mutation.
 ### Journal append
 
 1. protected authority and complete protected plan equality;
-2. for intent, ordinary SUBF-0145 grant and approved grant-store head; for
+2. for intent, ordinary [SUBF-0145](README.md#subf-0145) grant and approved grant-store head; for
    receipt, exact prior consumed grant ID/digest from the protected intent;
 3. approved journal store/head availability/integrity and current unexpired
    exact lease/fence;

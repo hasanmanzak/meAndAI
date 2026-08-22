@@ -9,16 +9,17 @@
 | Values/errors | [Exact value and error contract](subf-0146-value-error-contract.md) |
 | Delivery | [Micro-delivery plan](subf-0146-micro-delivery-plan.md) |
 
-This file is the sole normative public-signature authority for SUBF-0146.
+This file is the sole normative public-signature authority for
+[SUBF-0146](README.md#subf-0146).
 Domain types are in `MeAndAI.Operations.Domain.ExecutionAuthority`; services
 and ports are in `MeAndAI.Operations.Application.ExecutionAuthority`. The
-accepted SUBF-0145 public surface is unchanged. A signature change reopens the
+accepted [SUBF-0145](README.md#subf-0145) public surface is unchanged. A signature change reopens the
 complete design gate.
 
 No type has a public constructor or setter. Collections are defensively copied,
 ordinally sorted, duplicate-free `IReadOnlyList<T>`. Scalar classes implement
 the same exact `IEquatable<T>`, `IComparable<T>`, `Parse`, `TryParse`, and
-`ToString` pattern as SUBF-0145 scalar identities. Closed values expose only
+`ToString` pattern as [SUBF-0145](README.md#subf-0145) scalar identities. Closed values expose only
 the listed static values, `Value`, `Parse`, and `ToString`.
 
 ## Normative SliceInventory
