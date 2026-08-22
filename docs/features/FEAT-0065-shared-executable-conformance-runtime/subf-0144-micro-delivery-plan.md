@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Ordered implementation control plan |
-| Status | `AcceptedFrozenDesign`; all seven packets through `PROTECTED-POLICY-CONVERGE-01` are packet-local `ReviewedLocalGreen` at protected-policy/Scenario `7/7` and full Conformance `72/72`; canonical R0004/R0005/R0006 remain immutable without rerun; [TEST-0211](test-cases.md#test-0211) is locally Passing/active with owner/workflow activated. The [PR #186](https://github.com/hasanmanzak/meAndAI/pull/186) pre-correction candidate exposed [FIND-0462](README.md#find-0462), and committed-head graph reconstruction exposed [FIND-0463](../FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md#find-0463); both bounded infrastructure corrections are local `ReviewedLocalGreen`, while replacement exact-head hosted validation, merge, DoD, release, and publication are unclaimed. [SUBF-0154](README.md#subf-0154) remains held. |
+| Status | `AcceptedFrozenDesign`; all seven packets and bounded [FIND-0462](README.md#find-0462)/[FIND-0463](../FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md#find-0463) corrections are merged/exact-main hosted green through [PR #186](https://github.com/hasanmanzak/meAndAI/pull/186); canonical R0004/R0005/R0006 remain immutable without rerun and [TEST-0211](test-cases.md#test-0211) is Passing/active. [SUBF-0154](README.md#subf-0154) report sealing is merged/exact-main hosted green through [PR #190](https://github.com/hasanmanzak/meAndAI/pull/190); [TEST-0209](test-cases.md#test-0209) is held by [FIND-0466](README.md#find-0466)/[FIND-0467](README.md#find-0467). DoD, release and publication remain unclaimed. |
 | Parent design | [Protected policy and self-consumption design](subf-0144-extension-waiver-self-consumption-design.md) |
 | Scenario | [TEST-0211](test-cases.md#test-0211) |
 | Exact baseline | [`14ad828bcdde5f843cdbf12677b25f19736e5691`](https://github.com/hasanmanzak/meAndAI/commit/14ad828bcdde5f843cdbf12677b25f19736e5691) |
@@ -470,23 +470,24 @@ executable validation.
 The later hosted and committed-graph occurrences are separate bounded infrastructure corrections, not semantic packets. [FIND-0462](README.md#find-0462) expands frozen scope `22` to `24` through its exact nine paths and unchanged `80`/`84` record/total caps. Canonical [FIND-0463](../FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md#find-0463) has an exact twelve-path allowlist—three test executables and nine existing records—with executable/record/total normalized gross caps `48`/`96`/`144`, no added file, and six newly distinct paths, making final branch scope exactly `30`. It threads the loaded [DEC-0036](../../decisions/DEC-0036-prospective-instruction-graph-capacity.md) schema-2 blob/aggregate limits plus caller-local `240000` only into the two independent expected readers, retains generic transport default `120000`, and locks [TEST-0159](../FEAT-0039-v0130-test-runtime-efficiency/test-cases.md#test-0159), [TEST-0162](../FEAT-0040-v0131-batched-instruction-graph-acquisition/test-cases.md#test-0162), and committed-head [TEST-0153](../FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0153). Ubuntu `30`, Windows `55`, post-publication `5`, topology, routes, product invocations, filters, owner, C#, API, locks, packages, `337/2,000` semantic churn, and canonical R0004/R0005/R0006 remain unchanged.
 
 The original cohort reached `AcceptedFrozenDesign` and activated the ordered
-pipeline. Its three bounded corrections remain immutable exact-head hosted
+pipeline. Its three bounded corrections remain immutable exact-main hosted
 evidence without changing the seven-packet design or ownership boundary.
 Canonical R0004/R0005/R0006 remain immutable without rerun. The ten-path
 convergence transform closed focused `1/1`, protected-policy/Scenario `7/7`,
 full Conformance `72/72`, Domain `98/98`, warning/error-free Release validation,
-and the frozen main-validation route checks locally. All seven packets
-through `PROTECTED-POLICY-CONVERGE-01` are `ReviewedLocalGreen`, subject to
-final exact-tree graph, StructureOnly, publication-evidence, and review gates.
-[TEST-0211](test-cases.md#test-0211) is locally Passing/active with its Scenario owner/workflow activated.
+the frozen main-validation route checks, final graph/StructureOnly/publication
+evidence, and independent reviews before merge. All seven packets through
+`PROTECTED-POLICY-CONVERGE-01` are immutable merged predecessor evidence.
+[TEST-0211](test-cases.md#test-0211) is Passing/active with its Scenario owner/workflow activated.
 The pre-correction candidate was pushed through [PR #186](https://github.com/hasanmanzak/meAndAI/pull/186); its Ubuntu job reached the exact 25-minute ceiling.
 The same immutable old-head run's Windows job passed in about `50m06s`, with publication skipped; it supports retaining the 55-minute Windows bound but is not replacement-head evidence.
-The bounded correction is local; replacement exact-head hosted green, merge, completion/DoD, release, and publication are unclaimed.
+The bounded correction merged through [PR #186](https://github.com/hasanmanzak/meAndAI/pull/186) and is immutable predecessor evidence. Completion/DoD, release, and publication remain unclaimed.
 
 ## Held future work
 
-[SUBF-0154](README.md#subf-0154), [TEST-0222](test-cases.md#test-0222),
-[TEST-0209](test-cases.md#test-0209), [FEAT-0066](../FEAT-0066-shared-execution-authority-foundation/README.md)
+[SUBF-0154](README.md#subf-0154) report sealing and [TEST-0222](test-cases.md#test-0222)
+packet-local behavior are merged/exact-main hosted green through [PR #190](https://github.com/hasanmanzak/meAndAI/pull/190), while [TEST-0209](test-cases.md#test-0209)
+remains held until [FIND-0466](README.md#find-0466) graph/round custody and [FIND-0467](README.md#find-0467) Policy selector semantics are merged/exact-main green and the protected-policy/report consumers are reconciled. [FEAT-0066](../FEAT-0066-shared-execution-authority-foundation/README.md)
 durable stores/grants/CAS, [FEAT-0067](../FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md)
 adapters, consumer/Scenario-owner/workflow mutation, real publication,
 release, authority transfer, and PowerShell retirement remain held.

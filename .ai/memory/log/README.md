@@ -12,47 +12,34 @@ explicit SDLC/backlog scope, workflow/role/context architecture, planned tests,
 open Definition of Ready items, and the ContractSlice-C-first merge order. It
 does not change the active continuation or authorize implementation.
 
-Follow the current consolidated
-[report-sealing design handoff](2026-08-21-feat-0065-subf-0154-design-freeze.md).
-The predecessor
-[protected-policy design handoff](2026-08-14-feat-0065-subf-0144-design-freeze.md)
-remains the immutable source of its packet evidence.
-The immutable
-[ContractSlice D design freeze](2026-08-13-feat-0065-subf-0143-contractslice-d-design-freeze.md)
-and
-[final atomic activation freeze](2026-08-14-feat-0065-subf-0143-test-0210-final-activation-freeze.md)
+Follow the current
+[qualified-reference custody correction handoff](2026-08-22-feat-0065-subf-0143-qualified-reference-custody.md).
+The immutable [ContractSlice D design freeze](2026-08-13-feat-0065-subf-0143-contractslice-d-design-freeze.md)
+and [final atomic activation freeze](2026-08-14-feat-0065-subf-0143-test-0210-final-activation-freeze.md)
 retain exact predecessor custody.
 ContractSlice A-D and the final
 [TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
-atomic activation are immutable merged/exact-main-hosted-green predecessor
-evidence at full Conformance `65/65`, Domain `98/98`, API/ownership `15/15`,
-Scenario/ContractSlice `65/65`, and combined `163/163`. The current handoff owns
-the extension/waiver/debt/self-consumption `AcceptedFrozenDesign`. Seven
-ordered implementation packets—`POLICY-SURFACE-FRAMING-01`,
-`EXTENSION-AUTHORITY-01`, `EXTENSION-EVALUATION-01`, and
-`WAIVER-DISPOSITION-01`, `DEBT-ENFORCEMENT-01`, `SELF-CONSUMPTION-01`, and
-`PROTECTED-POLICY-CONVERGE-01`—are packet-local `ReviewedLocalGreen`, subject to
-final exact-tree gates, with protected-policy/Scenario `7/7`, full Conformance
-`72/72`, Domain `98/98`, and warning-free Release builds; canonical R0004/R0005/
-R0006 are preserved without rerun. The first input-
-custody correction and the superseding immutable issued-closure/API-oracle
-correction plus the canonical outcome-entry projection correction are immutable
-exact-head-hosted-green design evidence. [TEST-0211](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0211)
-is locally Passing/active with its owner/workflow activated. Its bounded
-[FIND-0462](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0462)
-and canonical [FIND-0463](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md#find-0463)
-corrections are contained in [PR #186](https://github.com/hasanmanzak/meAndAI/pull/186),
-merged at exact main [`a291556b2fa3c6fbaac7fa564ed35baadb5e9626`](https://github.com/hasanmanzak/meAndAI/commit/a291556b2fa3c6fbaac7fa564ed35baadb5e9626);
-exact-main hosted-green, completion/DoD, release, and publication remain
-unclaimed. The report-sealing successor retains its consolidated corrected
-`AcceptedFrozenDesign` checkpoint. `REPORT-SEALING-01` is
-`ReviewedLocalGreen`, its immutable sole R was not rerun, and
-[TEST-0222](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0222)
-remains Planned while its local `REPORT-SEALING-01` route is green. Push, hosted validation, subfeature completion, release,
-and publication remain unclaimed;
-[TEST-0209](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0209)
-remains Planned, `COMPOSED-QUALIFICATION-01` is inactive, and its P/R is
-`NotApplicable`.
+activation remain immutable merged/exact-main hosted-green predecessor evidence
+at `A32/B11/C11/D11` and `65/65`. The
+[protected-policy handoff](2026-08-14-feat-0065-subf-0144-design-freeze.md)
+retains canonical R0004/R0005/R0006 custody; its implementation merged through
+[PR #186](https://github.com/hasanmanzak/meAndAI/pull/186). The
+[report-sealing handoff](2026-08-21-feat-0065-subf-0154-design-freeze.md)
+retains the immutable Cohort-1 R; `REPORT-SEALING-01` merged through
+[PR #190](https://github.com/hasanmanzak/meAndAI/pull/190) at exact main
+[`997e2658b615212c5a34bc44ec1419282cf86446`](https://github.com/hasanmanzak/meAndAI/commit/997e2658b615212c5a34bc44ec1419282cf86446),
+and exact-main [run 32553183954](https://github.com/hasanmanzak/meAndAI/actions/runs/32553183954)
+passed both stable jobs. [TEST-0222](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0222)
+remains Planned.
+
+[FIND-0466](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0466)
+C session/graph correction and [FIND-0467](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0467)
+D selector correction are `AcceptedFrozenDesign`; the common
+[SUBF-0143](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)
+checkpoint is committed and its committed-HEAD graph, PS7/PS5.1 StructureOnly and publication-evidence gates are green; push, exact-head hosted validation, merge and exact-main green remain pending. No R0019/R0020 or C#/Policy mutation exists yet. [TEST-0209](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0209)
+remains Planned and `COMPOSED-QUALIFICATION-01` remains inactive until the
+corrections are implemented, merged, exact-main hosted green, and report sealing
+is reconciled. Feature DoD, release and publication remain unclaimed.
 
 In parallel, the optional repository-navigation direction is captured as a
 records-only
@@ -441,6 +428,7 @@ conversations while disallowing force pushes and deletion.
 
 ## History
 
+- [2026-08-22 - ContractSlice C qualified-reference custody correction redraw](2026-08-22-feat-0065-subf-0143-qualified-reference-custody.md)
 - [2026-08-12 - ContractSlice C design freeze](2026-08-12-feat-0065-subf-0143-contractslice-c-design-freeze.md)
 - [2026-08-12 - Agentic SDLC workflow architecture planning](2026-08-12-agentic-sdlc-workflow-architecture.md)
 - [2026-08-09 - ContractSlice B codec activation and wire packets](2026-08-09-feat-0065-subf-0143-contractslice-b-codec-activation-freeze.md)

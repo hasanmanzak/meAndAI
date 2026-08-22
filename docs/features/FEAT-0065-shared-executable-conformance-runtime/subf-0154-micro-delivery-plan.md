@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Ordered implementation control plan |
-| Status | `AcceptedFrozenDesign`; `REPORT-SEALING-01` is `ReviewedLocalGreen`; its local route is green while [TEST-0222](test-cases.md#test-0222) remains Planned; canonical R remains immutable; Cohort 2 and exact-head hosted validation remain pending |
+| Status | `AcceptedFrozenDesign`; `REPORT-SEALING-01` is merged/exact-main hosted green through [PR #190](https://github.com/hasanmanzak/meAndAI/pull/190); [TEST-0222](test-cases.md#test-0222) remains Planned and canonical R remains immutable; Cohort 2 is held by [FIND-0466](README.md#find-0466)/[FIND-0467](README.md#find-0467) and report reconciliation |
 | Parent design | [Canonical report sealing design](subf-0154-canonical-report-sealing-design.md) |
 | Exact design input | Reconciled exact main [`a291556b2fa3c6fbaac7fa564ed35baadb5e9626`](https://github.com/hasanmanzak/meAndAI/commit/a291556b2fa3c6fbaac7fa564ed35baadb5e9626) |
 | Scenarios | [TEST-0222](test-cases.md#test-0222) and [TEST-0209](test-cases.md#test-0209) |
@@ -15,7 +15,8 @@ Later scoped authority activated only the Cohort-1 predecessor-compilable
 scaffold and its single immutable accepted canonical R under
 [FIND-0464](README.md#find-0464); it is never rerun. The no-child offline
 verifier passed, fresh final reviews closed without `Blocking`, and the
-marker-free transform is `ReviewedLocalGreen`.
+marker-free transform is merged/exact-main hosted green at
+[`997e2658b615212c5a34bc44ec1419282cf86446`](https://github.com/hasanmanzak/meAndAI/commit/997e2658b615212c5a34bc44ec1419282cf86446).
 
 The design delivery is one consolidated checkpoint. The implementation uses
 one branch and one PR with three semantic cohorts; there is no PR or hosted run
@@ -170,6 +171,16 @@ ownership, exact resource equality/first-over, cancellation, and one-byte/root-
 field tampering.
 
 ## Cohort 2: `COMPOSED-QUALIFICATION-01`
+
+Activation hold: [FIND-0466](README.md#find-0466) owns the C graph/round
+predecessor and [FIND-0467](README.md#find-0467) owns real Policy selector
+semantics. Cohort 2 cannot begin until both corrections are merged and
+exact-main hosted green, this branch is reconciled onto them, and Cohort-1
+focused/cumulative/full report gates are green on the reconciled bytes. A synthetic protected input, test-authored protected
+evaluation, private writer invocation or adjacent-only location oracle cannot
+replace the real graph-owned public evaluation path. The hold changes neither
+the Cohort-2 P/R `NotApplicable` classification nor its normal one-test-file
+allowlist after the predecessor is complete.
 
 Outcome: prove the direct real-kernel composition across
 [SUBF-0152](README.md#subf-0152), [SUBF-0153](README.md#subf-0153),

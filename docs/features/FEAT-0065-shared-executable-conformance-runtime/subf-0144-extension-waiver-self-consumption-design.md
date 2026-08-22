@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / dependency-closed [FEAT-0065](README.md) design slice |
-| Status | `AcceptedFrozenDesign`; all seven packets through `PROTECTED-POLICY-CONVERGE-01` are packet-local `ReviewedLocalGreen`, subject to final exact-tree gates, at protected-policy/Scenario `7/7`, full Conformance `72/72`, and Domain `98/98`; canonical R0004/R0005/R0006 remain immutable without rerun; [TEST-0211](test-cases.md#test-0211) is locally Passing/active with owner/workflow activated; [SUBF-0144](README.md#subf-0144) is locally implementation-complete without push, hosted-green, merge, DoD, release, or publication claim; [SUBF-0154](README.md#subf-0154) remains held until exact-head hosted green |
+| Status | `AcceptedFrozenDesign`; all seven packets through `PROTECTED-POLICY-CONVERGE-01` are merged/exact-main hosted green through [PR #186](https://github.com/hasanmanzak/meAndAI/pull/186); canonical R0004/R0005/R0006 remain immutable without rerun; [TEST-0211](test-cases.md#test-0211) is Passing/active with owner/workflow activated; [SUBF-0154](README.md#subf-0154) report sealing is merged/exact-main hosted green through [PR #190](https://github.com/hasanmanzak/meAndAI/pull/190), while composed qualification is held by [FIND-0466](README.md#find-0466)/[FIND-0467](README.md#find-0467); feature DoD, release and publication remain unclaimed |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
@@ -2050,6 +2050,15 @@ accepted.
 
 ## Verification and acceptance
 
+The later [FIND-0466](README.md#find-0466) correction changes no protected-
+policy authority, waiver/debt rule, self-consumption logic, public API or
+canonical R custody. This slice consumes only qualified references minted by
+the corrected [SUBF-0143](README.md#subf-0143) sealed graph. After that
+correction merges and becomes exact-main hosted green, the protected-policy
+and report cohorts are revalidated as predecessor consumers before
+[TEST-0209](test-cases.md#test-0209); no synthetic or caller-authored reference
+may substitute for that graph.
+
 This security/authority design is bounded at `2,400` normalized lines and its
 micro plan at `500`; equality passes and first-one-over requires a reviewed
 appendix split or explicit redesign. These local readability brakes do not
@@ -2082,10 +2091,11 @@ reviews closed `0/0/0`; diff/format/link checks and StructureOnly were green;
 and its exact correction head became Ubuntu/Windows hosted green with
 publication skipped. Canonical R0005 remains immutable without rerun. Canonical
 R0006 was then consumed once and retained without rerun; its exact ten-path
-green transform makes all seven packets through `PROTECTED-POLICY-CONVERGE-01`
-packet-local `ReviewedLocalGreen`, subject to final exact-tree gates, at
-protected-policy/Scenario `7/7`, full Conformance `72/72`, Domain `98/98`, and
-warning/error-free Release validation. [TEST-0211](test-cases.md#test-0211)
-is locally Passing/active with owner/workflow activated. No push, hosted-green,
-merge, completion/DoD, release, or publication claim is made; [SUBF-0154](README.md#subf-0154) remains
-held until exact-head hosted green.
+green transform and all seven packets merged through [PR #186](https://github.com/hasanmanzak/meAndAI/pull/186)
+and are immutable exact-main hosted-green predecessor evidence at protected-
+policy/Scenario `7/7`, full Conformance `72/72`, Domain `98/98`, and warning/
+error-free Release validation. [TEST-0211](test-cases.md#test-0211) is Passing/
+active with owner/workflow activated. [SUBF-0154](README.md#subf-0154) report
+sealing is also merged/exact-main hosted green; completion/DoD, release and
+publication remain unclaimed, and [TEST-0209](test-cases.md#test-0209) is held
+by [FIND-0466](README.md#find-0466) and [FIND-0467](README.md#find-0467).

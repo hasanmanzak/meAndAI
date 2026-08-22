@@ -3,14 +3,14 @@
 | Field | Value |
 | --- | --- |
 | Classification | Gate 2 micro-delivery plan and design freeze |
-| State | Complete: all four cohorts `ExactHeadHostedGreen`; C `11/11`, A+B+C/full Conformance `54/54`; R=0006/R=0008/R=0009/R=0010/R=0012/R=0013/R=0016 diagnostic/no-success and R=0007/R=0011/R=0014/R=0015/R=0017/R=0018 accepted/immutable; merged through [PR #178](https://github.com/hasanmanzak/meAndAI/pull/178) and exact-main hosted green; parent scenario held |
+| State | Original C complete: all four cohorts `ExactHeadHostedGreen`; C `11/11`, A+B+C/full Conformance `54/54`; R=0006/R=0008/R=0009/R=0010/R=0012/R=0013/R=0016 diagnostic/no-success and R=0007/R=0011/R=0014/R=0015/R=0017/R=0018 accepted/immutable; merged through [PR #178](https://github.com/hasanmanzak/meAndAI/pull/178) and exact-main hosted green. Parent scenario later became Passing/active; [FIND-0466](README.md#find-0466) is `AcceptedFrozenDesign`. |
 | Parent | Owning feature and current subfeature |
-| Scenario | [TEST-0210](test-cases.md#test-0210), retained `Planned` |
+| Scenario | [TEST-0210](test-cases.md#test-0210), Passing/active on the immutable `65/65` predecessor; correction target remains inactive |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Ordered-C authority | [Maintainer continuation directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5264403013) |
 | Accepted predecessor | Merged [PR #177](https://github.com/hasanmanzak/meAndAI/pull/177), exact-main commit [`6ca42f56a48976093692dc4764c464ca185aa964`](https://github.com/hasanmanzak/meAndAI/commit/6ca42f56a48976093692dc4764c464ca185aa964), and [run 31579758253](https://github.com/hasanmanzak/meAndAI/actions/runs/31579758253): Ubuntu `6m22s`, Windows `11m11s`, publication verification skipped |
 | Normative owner | [Typed evaluation kernel design](subf-0143-typed-evaluation-kernel-design.md) |
-| Implementation language | C# only; D, Scenario/workflow activation, release, and publication remain held |
+| Implementation language | C# only; correction R/source, feature completion, release, and publication remain held |
 
 ## Authority and non-goals
 
@@ -56,6 +56,10 @@ that boundary is named `ReviewedLocalGreen`; intermediate package commits are
 not pushed and carry no hosted-green claim. A packet-specific freeze may refine
 fixtures and exact path allowlists but may not change this topology, Fact
 identity, ownership, or downstream holds without renewed design review.
+That historical rule continues to own the original C cohorts. The correction
+carve-out permits isolated C and D source/test preparation in parallel only;
+canonical R, shared-record synchronization, push and merge remain serialized
+by the correction order frozen below.
 
 ## Frozen delivery cohorts
 
@@ -886,6 +890,192 @@ sent in one push. C remains incomplete until that pushed exact head passes both
 stable hosted jobs with publication in its designed state. The parent scenario,
 final status/owner/workflow filters, runtime-efficiency activation, D, DoD,
 merge, release, and publication remain held.
+
+## `C-QUALIFIED-REFERENCE-CUSTODY-01` correction control
+
+[FIND-0466](README.md#find-0466) is `AcceptedFrozenDesign` and reopens the qualified-reference producer
+custody and multi-round evaluation boundary after the original A-D and
+[TEST-0210](test-cases.md#test-0210) activation remain immutable merged/
+exact-main evidence. It is an ordered predecessor of
+[TEST-0209](test-cases.md#test-0209), not a new scenario or report workaround.
+
+The correction is one local cohort of three dependency-closed packages.
+`C-SESSION-QUALIFICATION-CACHE-01` owns closed state, frames, plan/session/cache,
+B regressions and the ApplicabilityPlan oracle; hard caps are `1500/900/2400`.
+`C-SEALED-REFERENCE-GRAPH-01` owns graph/context/admission/resource and closure/
+activation oracles; caps are `1300/600/1900`. `C-MULTI-ROUND-PRODUCER-01` owns
+producer/plan/advance/intent/result/session transition, topology, the new Fact,
+R0019 and final green; caps are `1900/1000/2900`. Each package gets focused and
+cumulative gates, independent review and one local commit; no intermediate push
+or hosted claim exists. Aggregate caps remain `4700/2500/7200`, and each
+formatter-stable skeleton must remain at or below 90% before mutation/R.
+The exact Fact is `ContractSliceCQualifiedReferenceCustodyTests.Preserves_exact_root_derived_and_expected_selector_graph_through_public_evaluation`,
+with direct [`Scenario=TEST-0210`](test-cases.md#test-0210)/`ContractSlice=C`, marker
+[`TEST-0210-C-BEHAVIOR-RED-0010`](test-cases.md#test-0210), and sole R0019. After common setup, predecessor
+counts are `1/0 -> 1/1` with one-round closure; activated counts are
+`0/0 -> 1/0 -> 1/1` with graph2 two-round closure. Whole-state XOR and all
+setup/proof/model/root/round assertions are marker-free. Only the exact
+predecessor state plus its first repository-tree capability request throwing
+`InvalidOperationException` / `The requested capability is unavailable.` emits
+the marker. Green accepts only activated state. R is one FQN/TRX/child,
+`420000` ms, locked grammar, with no discovery/fallback/retry/rerun.
+
+All source paths below are under `src/MeAndAI.Protocol.*`; all tests are under
+`tests/dotnet/MeAndAI.Protocol.Conformance.Tests`. Exact package contracts are:
+
+| Package | Exact production/test membership | Exact expected-red and green boundary |
+| --- | --- | --- |
+| `C-SESSION-QUALIFICATION-CACHE-01` | Add `Conformance.Abstractions/Registration/CodecQualificationState.cs` and `Conformance/Evaluation/ProducerExecutionCore.cs`; modify `Conformance.Abstractions/Registration/ProducerHandleContracts.cs`, `Conformance/Planning/AcquisitionInstruction.cs`, `Conformance/Planning/ApplicabilityPlan.cs`, `Conformance/Planning/ApplicabilityPlanningCore.cs`; modify `ContractSliceBAdmissionProofTests.cs`, `ContractSliceBStructuralTests.cs`, `ContractSliceBDecodeModelCacheTests.cs`, `ContractSliceCApplicabilityPlanTests.cs`. | P=`Applicable`, R=`NotApplicable`, marker-free natural red at exact FQN `MeAndAI.Protocol.Conformance.Tests.ContractSliceCApplicabilityPlanTests.Plans_exact_static_applicability_instructions`: after all predecessor plan assertions, exact `Assert.Contains` over the empty declared `IPlanBoundEvidenceSession` method inventory fails with `XunitException` because `WriteCanonicalPayload`/`Qualify` are absent. One exact-FQN Release TRX invocation, no retry or marker oracle. Green retains and satisfies exact method-name/signature reflection assertions, then proves real writer/cache/state behavior plus focused and cumulative B/plan owners. |
+| `C-SEALED-REFERENCE-GRAPH-01` | Add `Conformance/Evidence/SealedReferenceGraph.cs`; modify `Conformance/Evidence/SealedEvaluationContext.cs`, `Conformance/Planning/ApplicabilityClosureCore.cs`; modify `ContractSliceCApplicabilityClosureTests.cs`, `ContractSliceCActivationTests.cs`. | P=`Applicable`, R=`NotApplicable`, marker-free natural red at exact FQN `MeAndAI.Protocol.Conformance.Tests.ContractSliceCApplicabilityClosureTests.Closes_applicability_with_exact_terminal_shapes`: after Package 1 green, exact `Assert.NotNull` reflection assertion fails with `XunitException` because the sealed context lacks the internal `ReferenceGraph` carrier. One exact-FQN Release TRX invocation, no retry or marker oracle. Green retains and strengthens the assertion to exact nonpublic `ReferenceGraph : SealedReferenceGraph`, then proves object-identical Root/closed-state graph custody plus focused and cumulative closure/activation owners. |
+| `C-MULTI-ROUND-PRODUCER-01` | Modify `Conformance/Evaluation/ProducerExecutionCore.cs`, `Conformance/Planning/EvaluationPlanningCore.cs`, `Conformance/Planning/EvaluationAdvanceCore.cs`, `Conformance/Evaluation/EvaluationIntentCore.cs`, `Conformance/Planning/EvaluationAdvanceResult.cs`, `Conformance/Planning/ApplicabilityPlanningCore.cs`; add `ContractSliceCQualifiedReferenceCustodyTests.cs`; modify `ContractSliceCProducerPipelineTests.cs`, `ContractSliceCEvaluationPlanTests.cs`, `ContractSliceCEvaluationAdvanceTests.cs`, `ContractSliceActivationTopologyTests.cs`. | P=`Applicable`, R=`Applicable`/`BehaviorRed`; sole R0019/FQN/marker and green boundary are frozen above. |
+
+`ProducerExecutionCore.cs` and `ApplicabilityPlanningCore.cs` are deliberate
+Package-1 then Package-3 sequential overlaps; their exact semantic hunks are
+reviewed/committed in that order and concurrent writers are forbidden. Every
+other path has one package owner. Aggregate membership is exactly three additions
+plus ten modifications in production and one addition plus ten modifications in
+tests. Reporting, Domain, all other Abstractions, Policy, Application, project,
+package, lock, workflow, owner, consumer and public API paths are excluded.
+
+Graph0 is admitted from the exact observed context and ordered models; round0
+acquires non-projected inputs and returns immutable graph1. Empty projected
+demand closes with graph1 owned by that closure; nonempty demand returns a
+graph1-bound round1 target plan that session custody must register. Round1
+creates graph2 and the final graph2-owned closure. Graph0 is never mutated,
+graph1 custody is asserted in the owning Fact, and no partial graph1/graph2
+survives error/cancellation. Under the session lock, the issued/advancing
+predecessor atomically becomes either a fresh same-session/applicability
+successor with count+1, target-only nonempty instructions, matching round
+ordinals and exact demand bijection, or a closure. Failure removes only the
+advancing mark and leaves the predecessor retryable.
+
+No ready rule returns the existing terminal closure. Ready rules with no
+missing non-projected input run the graph0 producer fixed point during planning:
+empty demand invokes the empty target index and closes graph1 at count0;
+nonempty demand returns a graph1-bound target-only count0 plan whose sole
+advance closes graph2 at count1. The R0019 nonempty-input route remains two
+advances and ends at count2.
+
+The historical B writer/qualification/cache suites were Tests-owned mirrors;
+this correction implements their already accepted production boundary.
+`IPlanBoundEvidenceSession` gains exact `WriteCanonicalPayload` and `Qualify`
+operations, and `KernelPlanningSession` delegates them through
+`ProducerExecutionCore` under the live instruction ticket and accepted cache.
+The writer runs once per accepted source and is never cached; codec qualification
+and the independent meter run once per exact cache miss, returning ordered
+closed states or canonical acquisition failures. Plans expose
+only their object-identical internal session. The graph has no canonical writer
+or borrowed report cap, and graph admission never re-executes codec or meter.
+The observed proof exposes ordered internal closed states containing the exact
+codec handle and manifest codec binding, independently measured local usage,
+admission-stable `Produced|Retained` disposition and a live-session-recognized
+opaque cache association; `Joined`, unknown, foreign association, claimed/
+measured mismatch or state/model/proof mismatch is `AdmissionProofInvalid`.
+After the exact Root is minted, graph admission builds
+the graph-owned root-relative ledger from that measured usage and mints the
+mapped Derived reference. Codec Derived kinds are
+exact `protocol.codec-output.governed-text`,
+`protocol.codec-output.repository-tree`, and
+`protocol.codec-output.repository-target-resolution` for their three `/1`
+schemas; identity is the exact output `<model-key>@<model-version>`. Unknown
+tuples are `RegistrationMismatch`. Governed text retains `200,000` schema
+bindings and `67,108,864` retained bytes; its completed codec call separately
+retains the `4,194,304`-byte wire/budget ceiling. Tree retains `16,777,216`
+bytes/`200,000` nodes. Target limits are `50,000` rows,
+`64` contents, `16,777,216` row-text bytes, `1,048,576` per content,
+`16,777,216` unique-content bytes and `33,554,432` wire bytes; the plan-global
+owner alone retains `64` unique keys, `16,777,216` unique-content bytes and
+`67,108,864` complete-payload bytes. Actual logical
+binding/model/derivation/capability/demand/selector rows observe cancellation
+first and at most every `1,024`; equality passes and first-one-over fails.
+
+Failure order is null arguments; kernel/session/plan/closure/phase/reuse;
+proof/model/binding/digest/order/target; reference/location/selector;
+source-owned resource; evaluator intent. Exact codes are `PlanStateInvalid`,
+`AdmissionProofInvalid`, `ReferenceInvalid`, `RegistrationMismatch`, and
+`IntentInvalid`. Codec rejection remains the proof-owned
+`AcquisitionFailure`, must match the exact schema `CodecFailureCodes`, and
+produces Failed acquisition/unresolved `NotEvaluated` without graph handles or
+`RuleEvaluationFailure`. Parser/index/projector failure codes belong to their
+exact producing declarations; every handle resolves in graph custody before
+projection. A valid such failure is structurally ordered and projected to
+every active dependent rule as `RuleEvaluationFailure`/`NotEvaluated` even
+when that rule has no evaluator-owned failure code. Foreign handles are
+`ReferenceInvalid`; undeclared/duplicate/invalid producer failure intent is
+`IntentInvalid`. Valid parser/index declared failure may retain only its exact
+same-session failure-cache entry; projector failure is plan-local/noncached,
+and codec rejection remains admission-owned. No failure creates a product
+handle/ledger or partial success graph. Failed attempts create/retain no
+ineligible entry and never evict/remove unrelated valid entries; undeclared,
+foreign, integrity, cancellation and host failures create no entry. No broad
+exception translation is allowed.
+
+C production hard-stops `4,700`, tests `2,500`, combined C# `7,200`; these are
+cohort ceilings only. The package table's own skeleton/cap gate precedes each
+mutation or R boundary; first over either package or aggregate cap forces redraw.
+The design/record cohort hard-stops at `1,200` normalized lines.
+
+## `D-SELECTOR-SEMANTICS-CORRECTION-01` correction control
+
+[FIND-0467](README.md#find-0467) separately corrects the three real Policy
+selector outputs. Only `PolicySelectorResolvers.cs` and
+`ContractSliceDProducerInfrastructureTests.cs` may change. The existing D Fact
+and topology stay unchanged; P/R are `Applicable`/`BehaviorRed`, marker
+[`TEST-0210-D-BEHAVIOR-RED-0010`](test-cases.md#test-0210), and sole R0020. After all existing producer,
+cancellation and resource checks, exact parents [`docs/features/FEAT-0001`](../FEAT-0001-common-development-protocol/README.md) and
+[`DEC-0035`](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) must yield [`docs/features/FEAT-0001/README.md`](../FEAT-0001-common-development-protocol/README.md),
+[`docs/features/FEAT-0001/test-cases.md`](../FEAT-0001-common-development-protocol/README.md), and [`DEC-0035`](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md). Only the exact legacy
+two-unchanged-feature-values/correct-decision tuple may emit the marker.
+The future pre-red transform must replace historical `...RED-0002` with a
+marker-free non-null assertion; thereafter source must contain exactly one
+`...RED-0010`. This design checkpoint has no D source/R mutation. Results are keyed by the exact three selector
+keys, not registration order; key set, parents and parent-handle identity are
+asserted before the marker tuple.
+Null input remains `ArgumentNullException`; cancellation is not applicable.
+Hard caps are production `120`, test `180`, combined `300`.
+
+For the common design checkpoint, candidate filesystem/link/diff/capacity and
+fresh reviews precede the focused record commit; committed-HEAD graph,
+StructureOnly and publication evidence run on that exact commit before push.
+No pre-commit graph tuple/digest is completion evidence. After design
+exact-main green, isolated C and D worktrees may prepare disjoint source/test
+changes, but only one shared-record/merge writer is active. D is the first
+final lane: R0020, green, record sync from the exact sixteen-path maximum,
+push, merge and exact-main hosted green. C may prepare static preflight in
+parallel but then reconciles onto that D exact main. Package 1 natural-red/green
+and Package 2 natural-red/green close in order; R0019 then consumes Package 1's
+production closed states and Package 2's graph0 against the still-one-round
+pre-Package-3 evaluator. Package 3 green removes only that predecessor branch
+and marker while activating two-round behavior. C reruns every
+local gate, performs the sole active record sync, and
+pushes its new exact head. Any pre-reconcile C hosted result is diagnostic, not
+merge evidence. C owns topology `66/66`. Each canonical R is invoked once.
+Each packet closes focused/cumulative/full Conformance and
+Domain, warning-free Release, format/diff, locks, API/owner, graph,
+StructureOnly, publication evidence and fresh reviews before one push and
+exact-head hosted green. Both must merge and pass exact-main hosted green;
+report sealing is then reconciled before any `COMPOSED-QUALIFICATION-01` work.
+
+The design-only record allowlist is exactly these sixteen paths:
+
+```text
+.ai/memory/README.md
+.ai/memory/log/README.md
+.ai/memory/project.md
+.ai/memory/log/2026-08-22-feat-0065-subf-0143-qualified-reference-custody.md
+docs/architecture/protocol-governance-and-execution/README.md
+docs/architecture/protocol-governance-and-execution/successor-delivery-plan.md
+docs/architecture/protocol-governance-and-execution/transition-register.md
+docs/features/README.md
+docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md
+docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md
+docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-typed-evaluation-kernel-design.md
+docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-contractslice-c-micro-delivery-plan.md
+docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0144-extension-waiver-self-consumption-design.md
+docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0144-micro-delivery-plan.md
+docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0154-canonical-report-sealing-design.md
+docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0154-micro-delivery-plan.md
+```
 
 ## ContractSlice D handoff
 
