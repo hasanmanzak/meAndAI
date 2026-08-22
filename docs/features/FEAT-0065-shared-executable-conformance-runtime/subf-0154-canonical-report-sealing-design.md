@@ -3,8 +3,8 @@
 | Field | Value |
 | --- | --- |
 | Classification | Gate 2 design freeze |
-| Status | `AcceptedFrozenDesign`; `REPORT-SEALING-01` is `ReviewedLocalGreen`; its local route is green while [TEST-0222](test-cases.md#test-0222) remains Planned; canonical R remains immutable; composed qualification and exact-head hosted validation remain pending |
-| Exact design input | Reconciled exact main [`a291556b2fa3c6fbaac7fa564ed35baadb5e9626`](https://github.com/hasanmanzak/meAndAI/commit/a291556b2fa3c6fbaac7fa564ed35baadb5e9626), which merges [PR #186](https://github.com/hasanmanzak/meAndAI/pull/186); exact-main hosted-green evidence remains unclaimed in this checkpoint |
+| Status | `AcceptedFrozenDesign`; `REPORT-SEALING-01` is merged/exact-main hosted green through [PR #190](https://github.com/hasanmanzak/meAndAI/pull/190); [TEST-0222](test-cases.md#test-0222) remains Planned and canonical R remains immutable; composed qualification is held by [FIND-0466](README.md#find-0466)/[FIND-0467](README.md#find-0467) predecessor corrections and subsequent report reconciliation |
+| Exact design input | Exact main [`997e2658b615212c5a34bc44ec1419282cf86446`](https://github.com/hasanmanzak/meAndAI/commit/997e2658b615212c5a34bc44ec1419282cf86446), which merges [PR #190](https://github.com/hasanmanzak/meAndAI/pull/190); exact-main [run 32553183954](https://github.com/hasanmanzak/meAndAI/actions/runs/32553183954) passed both stable jobs |
 | Parent feature | [FEAT-0065](README.md) |
 | Dependencies | [SUBF-0153](README.md#subf-0153), [SUBF-0143](README.md#subf-0143), and [SUBF-0144](README.md#subf-0144) |
 | Canonical scenarios | [TEST-0222](test-cases.md#test-0222) and [TEST-0209](test-cases.md#test-0209) |
@@ -17,14 +17,13 @@ contract, canonical byte grammar, digest boundary, security exclusions, errors,
 resource limits, scenario seams, and implementation cohorts. Later scoped
 authority activated the predecessor-compilable Cohort-1 scaffold, its single
 canonical expected red, and the later marker-free transform. That packet is
-now `ReviewedLocalGreen`; R remains immutable and was not rerun. This state
-does not authorize workflow/owner activation, push, pull-request, hosted,
-merge, subfeature completion, release, publication, or consumer mutation.
+now merged/exact-main hosted green; R remains immutable and was not rerun.
+This state does not activate the planned Scenario, subfeature completion,
+release, publication, or consumer mutation.
 
-[SUBF-0144](README.md#subf-0144) is the exact predecessor input and is merged at
-exact main [`a291556b2fa3c6fbaac7fa564ed35baadb5e9626`](https://github.com/hasanmanzak/meAndAI/commit/a291556b2fa3c6fbaac7fa564ed35baadb5e9626),
-but exact-main hosted-green evidence is not established by this checkpoint.
-The later activation authority is recorded separately. The no-child offline
+[SUBF-0144](README.md#subf-0144) is the exact predecessor input and is merged/
+exact-main hosted green. The later activation authority is recorded separately.
+The no-child offline
 verifier accepted the frozen source, runner, TRX, DLL, PDB, six locks and exact
 transcript grammar. Fresh final evidence/security and changed-diff reviews
 closed without `Blocking`; the scoped Cohort-1 authority was rechecked before
@@ -718,6 +717,17 @@ consume canonical R for this subfeature.
 
 ## Implementation boundary
 
+Direct [TEST-0209](test-cases.md#test-0209) composition remains inactive after
+report sealing because [FIND-0466](README.md#find-0466) proved that the current
+public predecessor kernel cannot carry graph-owned Root/Derived/
+ExpectedSelector authority into real evaluation, while [FIND-0467](README.md#find-0467)
+owns the real Policy selector outputs. Reporting may preserve a qualified
+reference but must never manufacture one. `COMPOSED-QUALIFICATION-01` therefore
+waits for both correction merges and exact-main hosted green, then reconciles
+and reruns Cohort-1 focused/cumulative/full gates against those predecessors
+before any Cohort-2 test mutation. This hold changes
+no report API, frame, digest, R custody, cap or error order.
+
 The exact source/test allowlist and line budgets are in the
 [micro-delivery plan](subf-0154-micro-delivery-plan.md). The implementation has
 three semantic cohorts: report sealing, composed qualification, and atomic
@@ -741,9 +751,10 @@ acyclic report byte/digest pair avoids publication cycles; the four dimensions
 remain independent; and WIP reuse is explicitly rejected. The correction
 author's static self-review candidate is superseded by current Cohort-1
 independent reviews at `0 Blocking / 0 Important / 0 Minor`; the synchronized-
-tree graph/capacity gate is green, while committed-HEAD graph and exact-head
-hosted validation remain pending, so this is not subfeature completion evidence.
+tree graph/capacity and committed-HEAD graph gates became green before
+[PR #190](https://github.com/hasanmanzak/meAndAI/pull/190) merged at exact main
+[`997e2658b615212c5a34bc44ec1419282cf86446`](https://github.com/hasanmanzak/meAndAI/commit/997e2658b615212c5a34bc44ec1419282cf86446).
 
-The marker-free transform is `ReviewedLocalGreen`. The immutable accepted
-canonical R is not hosted evidence, merge readiness, subfeature completion,
-release, or publication.
+The marker-free transform is exact-main hosted green. The immutable accepted
+canonical R remains BehaviorRed custody only; it was not rerun and is not
+subfeature completion, release, or publication evidence.

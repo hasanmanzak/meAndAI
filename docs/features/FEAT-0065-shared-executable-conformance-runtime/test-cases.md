@@ -23,22 +23,16 @@ merged, and bounded exact-main validated at
 [`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7).
 At that Gate 2 checkpoint, [TEST-0210](#test-0210) remained `Planned`.
 ContractSlice A-D and the final atomic activation later completed through their
-merged pull requests and exact-main hosted green. The current
-[SUBF-0144](README.md#subf-0144) implementation began only after its accepted
-design gate. All seven ordered packets through convergence are
-`ReviewedLocalGreen`, subject to final exact-tree gates, with protected-policy/
-Scenario `7/7`, full Conformance `72/72`, and Domain `98/98`; canonical R0004/
-R0005/R0006 are preserved without rerun. The first input-custody
-correction remains immutable intermediate evidence and the superseding
-immutable issued-closure carrier/API-oracle correction is exact-head hosted
-green. The canonical outcome-entry projection correction is also exact-head
-hosted green. [SUBF-0144](README.md#subf-0144) remains `AcceptedFrozenDesign`;
-[TEST-0211](#test-0211) is locally Passing/active with owner/workflow activated.
-[PR #186](https://github.com/hasanmanzak/meAndAI/pull/186) is merged at exact
-main [`a291556b2fa3c6fbaac7fa564ed35baadb5e9626`](https://github.com/hasanmanzak/meAndAI/commit/a291556b2fa3c6fbaac7fa564ed35baadb5e9626).
-Exact-main hosted green, feature completion/DoD, release and publication remain
-unclaimed. [SUBF-0154](README.md#subf-0154) report sealing is
-`ReviewedLocalGreen`; its composed successor remains inactive.
+merged pull requests and exact-main hosted green. [SUBF-0144](README.md#subf-0144)
+and [TEST-0211](#test-0211) merged through [PR #186](https://github.com/hasanmanzak/meAndAI/pull/186)
+at exact main [`a291556b2fa3c6fbaac7fa564ed35baadb5e9626`](https://github.com/hasanmanzak/meAndAI/commit/a291556b2fa3c6fbaac7fa564ed35baadb5e9626);
+canonical R0004/R0005/R0006 remain immutable without rerun. [SUBF-0154](README.md#subf-0154)
+report sealing merged through [PR #190](https://github.com/hasanmanzak/meAndAI/pull/190)
+at exact main [`997e2658b615212c5a34bc44ec1419282cf86446`](https://github.com/hasanmanzak/meAndAI/commit/997e2658b615212c5a34bc44ec1419282cf86446),
+while [TEST-0222](#test-0222) remains Planned and its R was never rerun.
+[FIND-0466](README.md#find-0466) now holds [TEST-0209](#test-0209) behind an
+`AcceptedFrozenDesign` predecessor correction. Feature completion/DoD, release
+and publication remain unclaimed.
 The append-only
 [BehaviorRed evidence clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139945054)
 changes only the TRX evidence wording. The earlier observation remains
@@ -91,9 +85,9 @@ echo, and one exact marker-free same-FQN `[FAIL]` RunInfo. The Failed summary's
 counter zero; no attachment or independent diagnostic exists. The parent
 `VSTEST_CONNECTION_TIMEOUT` was unset after the child completed. All three
 earlier observations remain diagnostic; the source and BehaviorRed oracle stay
-unchanged. The bounded implementation below now establishes packet-local
-`A-SCHEMA-SLOT-01` `ReviewedLocalGreen`; [TEST-0210](#test-0210) remains
-`Planned`.
+unchanged. The bounded implementation below established packet-local
+`A-SCHEMA-SLOT-01` `ReviewedLocalGreen`; at that historical packet checkpoint
+[TEST-0210](#test-0210) remained `Planned`.
 
 The subsequent scoped
 [activation directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5135051435)
@@ -106,12 +100,12 @@ passed both stable jobs.
 
 | ID | Related slice | Scenario | Expected result | Level | Intent review | Status | Automation |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| `TEST-0209` <a name="test-0209"></a> | [FEAT-0065](README.md) composed qualification across [SUBF-0152](README.md#subf-0152), [SUBF-0153](README.md#subf-0153), [SUBF-0143](README.md#subf-0143), [SUBF-0144](README.md#subf-0144), and [SUBF-0154](README.md#subf-0154) | Vary rule, evidence, typed location, profile axes, acquisition state, evaluation state, debt, waiver, enforcement, and report values, including missing, duplicate, stale, unknown, malformed, and redacted data. | Invalid combinations fail construction. Valid reports preserve predecessor-bound subject repository/snapshot identity and acquisition, per-rule evaluation, conformance verdict, and enforcement decision as four separate dimensions: incomplete/failed required acquisition creates `NotEvaluated` and aggregate `Indeterminate`, known violations remain visible, and enforcement follows the accepted phase/waiver/debt precedence. Canonical serialization, ordering, and digest are identical for identical typed input across supported runtimes and operating systems. | Component / contract / serialization | Nearest same-contract sibling: the [preserved WIP model scenario](https://github.com/hasanmanzak/meAndAI/blob/1873c98638ba4960734aadb188eb8c8d70b4bc52/docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0195); `Distinct` because it directly exercises the composed production model with typed multi-surface locations and separated result dimensions, rather than aggregating child-test results or reusing the bounded repository report. | Planned | Frozen FQN `MeAndAI.Protocol.Conformance.Tests.ComposedQualificationTests.Qualifies_exact_acquisition_evaluation_conformance_enforcement_and_report_dimensions`; P/R `NotApplicable`; direct test/evidence implementation not authorized |
-| `TEST-0210` <a name="test-0210"></a> | [SUBF-0143](README.md#subf-0143) | Execute the exact [typed-evaluation-kernel design](subf-0143-typed-evaluation-kernel-design.md) through ContractSlice A-D: A canonical manifest/digest/typed-projection and declaration/artifact/component preflight without executable export; first qualification/complete export activation in C; persistent writer/qualifier pairs, plan-bound Conformance qualification/cache, proof-candidate admission, provider-neutral capability/reference contracts; staged zero-to-N evaluation rounds with typed owner-sharded repository-target demand; retained acquisition outcomes; then kernel outputs, aggregation, and fresh RULE-0001..0005 repository/provider qualification. | The real five-rule Policy export is qualification-only and cannot mint a complete-baseline verdict; Application owns route/I/O but no protocol encoder; only exact instruction-bound proof candidates or kernel-synthesized absence enter the sealed context; repository/provider material shares compiled semantics while retaining distinct qualified locations; false applicability avoids evaluation-only evidence, unresolved remains NotEvaluated, acquisition Complete/Incomplete/Failed remains independent from rule status, empty repository-target demand performs no external I/O while the registered target index still produces the empty capability, external owners remain item custody rather than subject scope, independently metered four-counter producer/cache behavior is deterministic, integrity defects abort, and only the kernel mints referenced findings/evaluations. | Unit / component / qualification | Nearest same-contract siblings are [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004), [TEST-0005](../FEAT-0001-common-development-protocol/test-cases.md#test-0005), [TEST-0175](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175), [TEST-0176](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0176), [TEST-0177](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0177), and [TEST-0178](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178); all are `Distinct`, and [TEST-0210](#test-0210) executes fresh fixtures rather than consuming sibling results. | Passing | Merged/exact-main hosted green: Scenario and ContractSlice select the same `65/65` FQNs, topology `1/1`, combined `163/163`, full Conformance/Domain and API/ownership green. |
-| `TEST-0211` <a name="test-0211"></a> | [SUBF-0144](README.md#subf-0144) | Evaluate the exact [protected-policy design](subf-0144-extension-waiver-self-consumption-design.md): protected baseline plus valid/invalid active and proposed extensions, waivers, historical debt, activation proof, previous-trusted runtime, candidate runtime, differential results, and candidate self-certification attempts. | Extensions are additive and namespaced, active/proposed authority is separate, baseline enforcement cannot be lowered, waiver/debt effects follow the deterministic truth table without rewriting conformance, activation snapshot/payload/record/epoch/current-anchor mismatch fails closed, and candidate-only evidence cannot qualify or transfer authority. [SUBF-0144](README.md#subf-0144) makes no durable-store latest/freshness claim. | Component / security / differential | Nearest same-contract sibling: [TEST-0163](../FEAT-0041-v0132-exact-head-owner-attestation/test-cases.md#test-0163); `Distinct` protocol-runtime bootstrap and protected-policy contract. | Passing | `AcceptedFrozenDesign`; all seven Facts/packets `ReviewedLocalGreen` at `7/7`; canonical R0004/R0005/R0006 immutable; owner/workflow active; merged at exact main [`a291556b2fa3c6fbaac7fa564ed35baadb5e9626`](https://github.com/hasanmanzak/meAndAI/commit/a291556b2fa3c6fbaac7fa564ed35baadb5e9626); exact-main hosted-green/DoD/release/publication unclaimed |
+| `TEST-0209` <a name="test-0209"></a> | [FEAT-0065](README.md) composed qualification across [SUBF-0152](README.md#subf-0152), [SUBF-0153](README.md#subf-0153), [SUBF-0143](README.md#subf-0143), [SUBF-0144](README.md#subf-0144), and [SUBF-0154](README.md#subf-0154) | Vary rule, evidence, typed location, profile axes, acquisition state, evaluation state, debt, waiver, enforcement, and report values, including missing, duplicate, stale, unknown, malformed, and redacted data. | Invalid combinations fail construction. Valid reports preserve predecessor-bound subject repository/snapshot identity and acquisition, per-rule evaluation, conformance verdict, and enforcement decision as four separate dimensions: incomplete/failed required acquisition creates `NotEvaluated` and aggregate `Indeterminate`, known violations remain visible, and enforcement follows the accepted phase/waiver/debt precedence. Canonical serialization, ordering, and digest are identical for identical typed input across supported runtimes and operating systems. | Component / contract / serialization | Nearest same-contract sibling: the [preserved WIP model scenario](https://github.com/hasanmanzak/meAndAI/blob/1873c98638ba4960734aadb188eb8c8d70b4bc52/docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0195); `Distinct` because it directly exercises the composed production model with typed multi-surface locations and separated result dimensions, rather than aggregating child-test results or reusing the bounded repository report. | Planned | Frozen FQN `MeAndAI.Protocol.Conformance.Tests.ComposedQualificationTests.Qualifies_exact_acquisition_evaluation_conformance_enforcement_and_report_dimensions`; P/R `NotApplicable`; held until [FIND-0466](README.md#find-0466) C graph/round custody and [FIND-0467](README.md#find-0467) real Policy selector semantics are merged/exact-main hosted green and report sealing is reconciled against both predecessors |
+| `TEST-0210` <a name="test-0210"></a> | [SUBF-0143](README.md#subf-0143) | Execute the exact [typed-evaluation-kernel design](subf-0143-typed-evaluation-kernel-design.md) through ContractSlice A-D: A canonical manifest/digest/typed-projection and declaration/artifact/component preflight without executable export; first qualification/complete export activation in C; persistent writer/qualifier pairs, plan-bound Conformance qualification/cache, proof-candidate admission, provider-neutral capability/reference contracts; staged zero-to-N evaluation rounds with typed owner-sharded repository-target demand; retained acquisition outcomes; then kernel outputs, aggregation, and fresh RULE-0001..0005 repository/provider qualification. | The real five-rule Policy export is qualification-only and cannot mint a complete-baseline verdict; Application owns route/I/O but no protocol encoder; only exact instruction-bound proof candidates or kernel-synthesized absence enter the sealed context; repository/provider material shares compiled semantics while retaining distinct qualified locations; false applicability avoids evaluation-only evidence, unresolved remains NotEvaluated, acquisition Complete/Incomplete/Failed remains independent from rule status, empty repository-target demand performs no external I/O while the registered target index still produces the empty capability, external owners remain item custody rather than subject scope, independently metered four-counter producer/cache behavior is deterministic, integrity defects abort, and only the kernel mints referenced findings/evaluations. | Unit / component / qualification | Nearest same-contract siblings are [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004), [TEST-0005](../FEAT-0001-common-development-protocol/test-cases.md#test-0005), [TEST-0175](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175), [TEST-0176](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0176), [TEST-0177](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0177), and [TEST-0178](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178); all are `Distinct`, and [TEST-0210](#test-0210) executes fresh fixtures rather than consuming sibling results. | Passing | Original merged/exact-main hosted-green inventory remains immutable at `65/65`; [FIND-0466](README.md#find-0466) renewed candidate would add one behavior-owned C Fact and targets `A32/B11/C12/D11`, Scenario/ContractSlice `66/66`, without owner/workflow mutation. |
+| `TEST-0211` <a name="test-0211"></a> | [SUBF-0144](README.md#subf-0144) | Evaluate the exact [protected-policy design](subf-0144-extension-waiver-self-consumption-design.md): protected baseline plus valid/invalid active and proposed extensions, waivers, historical debt, activation proof, previous-trusted runtime, candidate runtime, differential results, and candidate self-certification attempts. | Extensions are additive and namespaced, active/proposed authority is separate, baseline enforcement cannot be lowered, waiver/debt effects follow the deterministic truth table without rewriting conformance, activation snapshot/payload/record/epoch/current-anchor mismatch fails closed, and candidate-only evidence cannot qualify or transfer authority. [SUBF-0144](README.md#subf-0144) makes no durable-store latest/freshness claim. | Component / security / differential | Nearest same-contract sibling: [TEST-0163](../FEAT-0041-v0132-exact-head-owner-attestation/test-cases.md#test-0163); `Distinct` protocol-runtime bootstrap and protected-policy contract. | Passing | All seven Facts are active at `7/7`; canonical R0004/R0005/R0006 remain immutable; owner/workflow active; [PR #186](https://github.com/hasanmanzak/meAndAI/pull/186) merged at exact main [`a291556b2fa3c6fbaac7fa564ed35baadb5e9626`](https://github.com/hasanmanzak/meAndAI/commit/a291556b2fa3c6fbaac7fa564ed35baadb5e9626) with exact-main hosted green; feature DoD, release and publication unclaimed |
 | `TEST-0220` <a name="test-0220"></a> | [SUBF-0152](README.md#subf-0152) | Vary exact rule identity/revision and SHA-256 values, every closed profile/outcome token, SurfaceSet order/duplicates/mutability, ExecutionProfile axes, and the new project graph. | Invalid lexical, range, null, duplicate, and cross-dimension values fail closed; valid values are immutable and ordinal-exact; SurfaceSet and profile equality are input-order independent; the Domain assembly is BCL-only and no outcome dimension implies another. | Unit / architecture / contract | Nearest siblings: [TEST-0191](../FEAT-0059-csharp-operational-foundation/test-cases.md#test-0191), [TEST-0192](../FEAT-0059-csharp-operational-foundation/test-cases.md#test-0192), and preserved [TEST-0195](../FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0195); `Distinct` scalar invalid-state and independent-axis contract in the new protocol Domain assembly. | Passing | `tests/dotnet/MeAndAI.Protocol.Domain.Tests/MeAndAI.Protocol.Domain.Tests.csproj`; completed slice evidence is recorded below |
 | `TEST-0221` <a name="test-0221"></a> | [SUBF-0153](README.md#subf-0153) | Vary the exact inventory-derived [evidence-acquisition design](subf-0153-evidence-contract-design.md): requirement schemas, request target, observed boundary/scope, asserted-canonical payload, typed locations, bindings/root references, requirement acquisition, pagination, context, and observed/absent/failed result variants. | Schema-identified content is immutable and content-addressed but remains an untrusted assertion until exact [FEAT-0067](../FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md) qualification; source/snapshot scope is structural; absent is `Incomplete`; failed has no valid context and remains `Failed`; requirement/context status is derived; invalid API, pagination, reference, schema, redaction, failure, collision, and union combinations fail construction. | Unit / architecture / contract | Same-contract classifications are fixed in the [design inventory](subf-0153-evidence-contract-design.md#distinct-test-intent-and-sibling-inventory). `Distinct` acquisition/evidence substrate rather than [SUBF-0143](README.md#subf-0143) codec/typed-model/derived-reference/finding/evaluation behavior, composed reports, or repository-only WIP. | Passing | `tests/dotnet/MeAndAI.Protocol.Domain.Tests/MeAndAI.Protocol.Domain.Tests.csproj`; completed through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173), exact main [`ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd`](https://github.com/hasanmanzak/meAndAI/commit/ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd), and [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) |
-| `TEST-0222` <a name="test-0222"></a> | [SUBF-0154](README.md#subf-0154) | Seal the complete typed report after catalog evaluation and debt/waiver disposition; vary predecessor-bound subject/snapshot identity including zero outcomes, input order, culture, operating system, framed LF/CRLF strings, redaction, missing dimensions, and digest tampering. | The report is complete or fails closed; the reviewed literal bytes/digest and nested tag order are exact; identical typed input is OS-invariant while framed LF versus CRLF changes the digest; raw content and credentials are absent. | Component / serialization / cross-runtime | `Distinct` from [TEST-0209](#test-0209) by canonical-byte/digest nondeterminism risk and report-sealing boundary rather than composed semantic evaluation. | Planned | Frozen FQN `MeAndAI.Protocol.Conformance.Tests.CanonicalReportSealingTests.Seals_exact_typed_report_bytes_digest_redaction_and_dimensions` and marker `TEST-0222-REPORT-SEALING-RED-0001`; immutable accepted BehaviorRed custody remains recorded below and in [FIND-0464](README.md#find-0464), R was never rerun, and the local `REPORT-SEALING-01` route is green without Scenario owner/workflow activation |
+| `TEST-0222` <a name="test-0222"></a> | [SUBF-0154](README.md#subf-0154) | Seal the complete typed report after catalog evaluation and debt/waiver disposition; vary predecessor-bound subject/snapshot identity including zero outcomes, input order, culture, operating system, framed LF/CRLF strings, redaction, missing dimensions, and digest tampering. | The report is complete or fails closed; the reviewed literal bytes/digest and nested tag order are exact; identical typed input is OS-invariant while framed LF versus CRLF changes the digest; raw content and credentials are absent. | Component / serialization / cross-runtime | `Distinct` from [TEST-0209](#test-0209) by canonical-byte/digest nondeterminism risk and report-sealing boundary rather than composed semantic evaluation. | Planned | Frozen FQN `MeAndAI.Protocol.Conformance.Tests.CanonicalReportSealingTests.Seals_exact_typed_report_bytes_digest_redaction_and_dimensions` and marker `TEST-0222-REPORT-SEALING-RED-0001`; immutable BehaviorRed custody remains in [FIND-0464](README.md#find-0464), R was never rerun, and marker-free behavior merged/exact-main hosted green through [PR #190](https://github.com/hasanmanzak/meAndAI/pull/190) without Scenario owner/workflow activation |
 
 [TEST-0222](#test-0222) immutable accepted canonical R has one Failed result whose exact
 `Message` child under `ErrorInfo` is authoritative. The locked xUnit/VSTest adapter's one
@@ -133,7 +127,85 @@ diagnostic evidence under [FIND-0464](README.md#find-0464), not an invalid R.
 The corrected no-child verifier SHA-256
 `79AF177BDAFFA2A03BDAEBE18B84BCCEA059FC9639DA3FAD9040A1404C741F66`
 exited `0` with `accepted=true`; the later marker-free transform is locally
-green while exact-head hosted evidence remains pending.
+green and merged/exact-main hosted through [PR #190](https://github.com/hasanmanzak/meAndAI/pull/190)
+at [`997e2658b615212c5a34bc44ec1419282cf86446`](https://github.com/hasanmanzak/meAndAI/commit/997e2658b615212c5a34bc44ec1419282cf86446).
+
+## [TEST-0210](#test-0210) qualified-reference custody correction
+
+[FIND-0466](README.md#find-0466) records a predecessor-kernel defect exposed by
+the direct [TEST-0209](#test-0209) composition review: the current public
+applicability/evaluation chain retains a ContextProof but discards admitted
+roots, ordered qualified models, capabilities, demand bindings, derived
+references and selector authority before projector/index/evaluator execution.
+Report/debt layers may preserve references but cannot manufacture that missing
+producer authority, and a test-authored protected evaluation is not accepted
+product evidence.
+
+The C correction's sole new Fact is
+`MeAndAI.Protocol.Conformance.Tests.ContractSliceCQualifiedReferenceCustodyTests.Preserves_exact_root_derived_and_expected_selector_graph_through_public_evaluation`.
+It carries direct [`Scenario=TEST-0210`](#test-0210) and `ContractSlice=C` traits. P/R are
+`Applicable`/`BehaviorRed`; marker [`TEST-0210-C-BEHAVIOR-RED-0010`](#test-0210), R0019. Its
+red source recognizes the exact current one-round closure and the activated
+two-round successor-plan/graph2 closure as mutually exclusive whole states.
+Predecessor projector/index counts are `1/0` after planning and `1/1` after its
+sole advance; activated counts are `0/0` after planning, `1/0` after round0 and
+`1/1` after round1. Every partial/mixed round state is marker-free. Only the exact predecessor
+whole state plus exact `InvalidOperationException` /
+`The requested capability is unavailable.` at the first evaluator
+repository-tree capability request may emit its marker. Green removes that
+predecessor branch and uses only the public two-round planning/evaluation path
+without `WithProtectedInput`; it proves one admitted ContextProof plus exact
+Root/Derived/ExpectedSelector identity, same-or-narrower typed locations,
+reference-equality custody and graph-owned protected access, and rejects
+missing/foreign/duplicate/stale or widened authority before evaluator intent.
+Its ProducerPipeline/Plan/Advance matrix also freezes the exact three codec
+Derived kinds `protocol.codec-output.governed-text`,
+`protocol.codec-output.repository-tree`, and
+`protocol.codec-output.repository-target-resolution`, their exact model-key/version
+identities, graph0/graph1/graph2 custody, atomic successor/retry transitions,
+no-ready-rule terminal closure, and ready-rule zero-missing-input empty/nonempty
+demand routes. The real plan-bound evidence session owns exact
+`WriteCanonicalPayload` and `Qualify` operations, instruction/ticket custody,
+one writer per accepted source and one qualifier/independent meter per exact
+qualification-cache miss, plus same-session cache reuse; the
+historical B mirrors remain regression evidence rather than production proof.
+Ordered closed codec states preserve object-identical handles, manifest codec
+binding, independently measured local usage and admission-stable
+Produced/Retained live-session cache association; Joined, foreign-association
+or mismatched state is rejected before graph admission.
+The root-relative graph ledger is built only after Root custody without codec
+or meter re-execution; codec rejection remains a schema-declared
+`AcquisitionFailure` with Failed acquisition/unresolved `NotEvaluated` and no
+invented handle. Parser/index/projector producing-declaration failures resolve
+every graph handle, retain structural order, and project to each active
+dependent rule as `RuleEvaluationFailure`/`NotEvaluated`;
+valid parser/index failure may retain only its exact same-session failure-cache
+entry, while projector failure is plan-local/noncached. Undeclared/foreign/
+integrity/cancellation/host states retain no cache and no failure creates a
+partial success graph, product handle or product ledger.
+The design-only correction is `AcceptedFrozenDesign`; no R or C# change is
+authorized until its focused design checkpoint merges and exact-main hosted
+validation is green.
+
+[FIND-0467](README.md#find-0467) separately freezes the real Policy selector
+correction in the existing D producer-infrastructure Fact. P/R are
+`Applicable`/`BehaviorRed`; marker [`TEST-0210-D-BEHAVIOR-RED-0010`](#test-0210), R0020.
+Exact Derived parents [`docs/features/FEAT-0001`](../FEAT-0001-common-development-protocol/README.md) and [`DEC-0035`](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) must resolve to
+[`docs/features/FEAT-0001/README.md`](../FEAT-0001-common-development-protocol/README.md),
+[`docs/features/FEAT-0001/test-cases.md`](../FEAT-0001-common-development-protocol/README.md), and unchanged [`DEC-0035`](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md). The original
+`65/65` remains immutable predecessor evidence; only the C correction adds a
+Fact, so the green combined topology becomes C `12/12` and
+Scenario/ContractSlice `66/66`. Both corrections and report reconciliation are
+required before [TEST-0209](#test-0209).
+R0020's pre-red source first replaces the historical `...RED-0002`
+null-evidence branch with a marker-free assertion, then contains exactly one
+`...RED-0010` marker. The three results are keyed by exact selector key; key
+set, parent values and parent-handle identities precede its sole tuple seam.
+
+R0019 and R0020 use the same locked one-FQN/one-TRX/one-child/`420000` ms
+BehaviorRed grammar and no-retry boundary as the retained ContractSlice route.
+Only their exact seams above may emit their markers; neither result may be
+substituted by discovery, console inference, a sibling Fact, or the other R.
 
 ## [TEST-0210](#test-0210) final atomic activation freeze
 

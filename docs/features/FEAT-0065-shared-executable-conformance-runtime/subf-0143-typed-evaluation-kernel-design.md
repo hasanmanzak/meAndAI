@@ -3,14 +3,14 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted; ContractSlice A-D are merged and exact-main green at `A32/B11/C11/D11`, cumulative/full Conformance `65/65`. [TEST-0210](test-cases.md#test-0210) is `Passing` locally: its atomic activation is `ReviewedLocalGreen`, Scenario and ContractSlice pass the same `65/65` FQNs, and the combined route is `163/163`; exact-head hosted implementation gate pending, no feature DoD. |
+| Status | Original Gate 2 accepted; ContractSlice A-D and [TEST-0210](test-cases.md#test-0210) are immutable merged/exact-main hosted-green predecessor evidence at `A32/B11/C11/D11` and `65/65`. [FIND-0466](README.md#find-0466) `C-QUALIFIED-REFERENCE-CUSTODY-01` and [FIND-0467](README.md#find-0467) `D-SELECTOR-SEMANTICS-CORRECTION-01` are `AcceptedFrozenDesign`; the common checkpoint awaits delivery gates. R0019/R0020 and implementation remain held before the design checkpoint merges and passes exact-main hosted green. Feature DoD, release and publication remain held. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Test | [TEST-0210](test-cases.md#test-0210) |
-| Gate 3 micro-delivery routing | Historical A-D delivery remains owned by its micro plans and merged PR evidence. The final atomic-activation design checkpoint became exact-head hosted green and was accepted; the exact candidate below is now `ReviewedLocalGreen` and awaits its own hosted gate. |
+| Gate 3 micro-delivery routing | Historical A-D delivery and final activation remain immutable. The new correction is owned only by the [C plan](subf-0143-contractslice-c-micro-delivery-plan.md#c-qualified-reference-custody-01-correction-control); no source/test/R mutation starts before its focused design commit merges and passes exact-main hosted green. |
 | Exact-main design baseline | Accepted A merge commit [`51623f4d404a95e0f706d72805cf7ddbbbd293b8`](https://github.com/hasanmanzak/meAndAI/commit/51623f4d404a95e0f706d72805cf7ddbbbd293b8), validated by exact-main [run 31304787603](https://github.com/hasanmanzak/meAndAI/actions/runs/31304787603) |
-| Design and Gate 3 authority | Historical A-D directives, accepted reds, diagnostics, cohort evidence, and exact-main closure remain immutable. Authority is limited to the accepted final atomic-activation allowlist; local implementation gates are green, while exact-head hosted proof, feature DoD, merge, release, publication, and later subfeatures remain held. |
+| Design and Gate 3 authority | Historical A-D directives, accepted reds, diagnostics, cohort evidence, and exact-main closure remain immutable. [FIND-0466](README.md#find-0466) and [FIND-0467](README.md#find-0467) retain `AcceptedFrozenDesign` authority, but neither implementation starts before the common checkpoint is committed, merged and exact-main hosted green. Feature DoD, release, publication and [TEST-0209](test-cases.md#test-0209) remain held. |
 | Completed predecessor | [SUBF-0153](README.md#subf-0153) / [TEST-0221](test-cases.md#test-0221), merged through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173) and exact-main validated by [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) |
 
 ## Directive and hard boundary
@@ -11490,6 +11490,388 @@ IDs; the four independently reviewable internal slices remain ordered:
 Each slice receives expected red, review, bounded implementation, focused
 green, and fresh-diff review before the next begins. [TEST-0210](test-cases.md#test-0210) remains the one
 composed canonical scenario.
+
+### Accepted `C-QUALIFIED-REFERENCE-CUSTODY-01` correction design <a name="c-qualified-reference-custody-01"></a>
+
+The merged ContractSlice C implementation proves context-proof admission and
+producer ordering, but the later direct-composition review exposed
+[FIND-0466](README.md#find-0466): the public applicability/evaluation path does
+not retain admitted roots, qualified models, capabilities, demand authority,
+derived references, or selector authority as one session-owned graph.
+`ApplicabilityClosureCore` and `EvaluationAdvanceCore` mint only a
+`ContextProof` projection with null `Root`/`Location`, while the projector and
+index invocations receive empty reference/model/capability inputs. Report and
+debt code can preserve a supplied reference but cannot mint this missing
+predecessor authority. A synthetic protected input or test-authored evaluation
+is therefore not valid [TEST-0209](test-cases.md#test-0209) product evidence.
+
+The real Policy graph also makes target demand a later producer round. The
+initial evaluation plan must acquire the non-projected governed-text and
+repository-tree inputs before a governed-reference capability exists. Only
+after that round may the real projector derive repository-target demand; a
+nonempty demand then produces one successor evaluation plan and a second
+advance. `KernelPlanningSession` must register that successor plan as issued.
+An empty projected demand may build the empty target index and close in the
+first advance. Projecting against six empty collections before this graph
+exists, or closing unconditionally after the first advance, is forbidden.
+
+The correction adds no public type or member. One internal immutable,
+session-bound `SealedReferenceGraph` is owned by `SealedEvaluationContext`. It
+retains reference-equality handle-to-`QualifiedEvidenceReference` identity,
+slot-to-ContextProof identity, the exact ordered admitted qualified-model state,
+sealed capabilities, demand-authority bindings, and catalog-bound derivation
+and selector resolution. Admission validates the exact observed
+`EvidenceContext` and ordered `IObservedQualificationProofState.QualifiedModels`
+before graph construction. The existing ContextProof remains null for
+root/location/selector and empty for derivations; one Root is minted for each
+exact admitted `EvidenceContext.References` row.
+
+Codec, parser, and index Derived rows may be minted only from graph-owned
+parents and exact manifest component/artifact/output contracts. Every derived
+location is structurally same-or-narrower under the already-frozen relation.
+ExpectedSelector is lazy, uses only the exact rule declaration and registered
+resolver, and for the current Policy catalog accepts only a Derived parent from
+the same slot/rule/session. Its canonical input is the final derivation's exact
+`TypedNodeIdentity`; ContextProof and Root have no selector-canonical-value
+authority. Selector-on-selector nesting and invented target Root/Location are
+forbidden. Projector execution receives the graph's actual
+governed-reference capability plus exact source and authority handles; target
+parser/index execution receives exact demand bindings. Rule and extension
+input access uses the same graph. When the graph owns the repository-tree
+capability, the normal public closure derives its protected input from that
+graph. The legacy test attachment seam remains isolated and is not product
+evidence for this packet.
+
+The accepted plan-bound writer/qualification boundary is now implementation-
+owned by this correction rather than treated as already delivered by the
+historical B mirrors. `IPlanBoundEvidenceSession` exposes the already accepted
+exact `WriteCanonicalPayload(instruction, source, token)` and
+`Qualify(instruction, observedResult, token)` methods. `KernelPlanningSession`
+implements both under the live plan/instruction ticket through
+`ProducerExecutionCore`: the writer executes once per accepted source and is
+never cached; the codec and independent local meter execute once per exact
+qualification-cache miss. Successful qualification returns an
+`ObservedEvidenceQualificationIntent` containing ordered closed qualification
+states, and rejection returns only canonical acquisition failures. The cache
+key, collision comparison, single-flight, Produced/Joined/Retained semantics,
+retention and operational-failure exclusion remain the accepted B contract.
+`AcquisitionInstruction` retains defensive internal copies of its already-
+canonical instruction and demand frames beside their digests; ticket/cache
+validation consumes those exact bytes and never invokes a second frame writer.
+`ApplicabilityPlan` and every successor plan expose the same internal session
+only to the exact Tests friend now and the separately authorized Application
+friend after that project exists. The C applicability-plan regression directly
+proves instruction ownership, one-time use, cross-plan rejection and same-
+session cache reuse; the producer-pipeline fixture supplies a real successful
+writer/qualifier instead of the current rejection-only stub.
+
+The immutable successor lifecycle is exact. New internal
+`Conformance.Abstractions/Registration/CodecQualificationState.cs` owns the
+closed `DecodeModelCacheDisposition` (`Produced=0`, `Retained=1`, `Joined=2`),
+session identity, cache association, `IQualifiedCodecModelState` surface and
+closed `ObservedEvidenceQualificationIntent` Qualified/Rejected union.
+The association retains the reference-identical session, exact cache-key
+digest, non-negative canonical-byte cost and disposition; the state retains
+the exact codec model, manifest codec binding, independently measured local
+usage and association. Only the live plan-bound session creates a state. The
+Tests friend, and the separately authorized Application friend after that
+project exists, may carry the exact returned state into a proof candidate.
+Tests may construct foreign/malformed fixture states only for negative proof;
+ordinary/public callers cannot mint product authority, and live session/
+instruction custody decides admission. `ObservedEvidenceQualificationIntent.Qualified`
+and the internal
+`IObservedQualificationProofState.QualifiedModels` collection changes from raw
+`ICodecModelHandle` values to a defensive ordered snapshot of those states.
+`Produced|Retained` are admission-stable; `Joined` and unknown values are
+`AdmissionProofInvalid`. A concurrent joiner receives the owner attempt's
+object-identical `Produced` state; a later lookup receives `Retained`.
+`Joined` remains cache telemetry and a negative admission value, never a
+successful proof state. The exact Application/Tests proof
+owner only carries the state; a public candidate cannot forge it.
+`ApplicabilityClosureCore` validates observed `EvidenceContext`, state/model/
+proof bijection, instruction/demand/binding/schema/component identity and
+claimed-equals-measured usage without calling `Qualify` or `MeasureLocal`, then
+creates graph0. Because a resource ledger is graph-root-relative, graph0 mints
+the exact Root first and only then constructs its graph-owned
+`SemanticResourceLedger` from the already measured usage and exact codec source
+contribution; no ledger is synthesized before Root custody.
+`SealedEvaluationContext` owns graph0. `EvaluationPlanningCore` issues round0
+for missing non-projected inputs. `EvaluationAdvanceCore` consumes graph0 and
+round0 proofs, adopts and validates the closed codec states without invoking
+the codec or meter again, mints their mapped codec Derived references and
+root-relative graph ledgers, executes only the parser/index stages through
+`ProducerExecutionCore`, and returns a new immutable graph1. An empty target
+projection closes with graph1 owned by the returned `EvaluationClosure`; a
+nonempty projection returns an internally graph1-bound round1
+`EvaluationPlan`. The allowed `ApplicabilityPlanningCore` change registers
+that exact graph1-bound successor plan. Round1 consumes only exact demand-
+backed target proofs, creates graph2, invokes the target index, and returns the
+final graph2-owned closure. Graph0 is never mutated; graph1/graph2 are retained
+only by their exact result owner, and no partial successor graph survives
+integrity failure or cancellation.
+
+The same session-lock transition requires the predecessor plan to be issued
+and advancing; a successor is a fresh reference bound to the same session and
+applicability, has `CompletedRoundCount = predecessor + 1`, contains only
+nonempty target instructions whose `RoundOrdinal` equals that successor count,
+and forms an exact demand bijection. The transition atomically removes and
+advances the predecessor and issues the successor; the closure branch is
+equally atomic. Failure or cancellation removes only the advancing mark,
+leaves the predecessor retryable, and retains no successor or partial graph.
+
+Zero-input producer reachability is closed without inventing a zero-instruction
+plan. If there are no ready rules, planning returns the existing terminal
+closure. If ready rules exist but no non-projected input is missing,
+`EvaluationPlanningCore` executes the graph0 producer fixed point atomically.
+Empty projected demand invokes the mandatory target index on an empty input,
+adds its empty capability to graph1, and returns a graph1-owned count-0 closure;
+nonempty demand returns a graph1-bound target-only count-0 plan whose sole
+advance returns a graph2-owned count-1 closure. The nonempty-input R0019 route
+remains graph0 -> round0/graph1 plan -> round1/graph2 closure.
+
+Codec base Derived identity is also frozen: the parent is the unique exact Root
+whose binding owns the model; component/artifact/output identities come from
+the activated manifest; location is the exact binding location; typed-node
+identity is `<model-key>@<model-version>`. The schema-owned typed-node-kind map
+is closed and ordinal-exact:
+
+| Schema/version | Codec Derived typed-node kind | Typed-node identity |
+| --- | --- | --- |
+| `protocol.governed-text/1` | `protocol.codec-output.governed-text` | `protocol.model.source-text@1` |
+| `protocol.repository-tree/1` | `protocol.codec-output.repository-tree` | `protocol.model.repository-tree@1` |
+| `protocol.repository-target-resolution/1` | `protocol.codec-output.repository-target-resolution` | `protocol.model.repository-target-resolution@1` |
+
+Unknown or duplicate schema/model/component tuples fail
+`RegistrationMismatch` before execution. Parser and index derivations use their registered
+component/artifact/output plus producer-returned exact typed kind, identity and
+same-or-narrower location. Unknown or ambiguous parents fail before execution.
+
+Validation order is exact: null public arguments; activated-kernel/session/
+plan/closure/phase/reuse custody; observed proof, ordered model, binding,
+digest, instruction and target identity; root/derived/location/selector and
+unknown-handle authority; source-owned resource enforcement; then evaluator
+intent. Custody failures map to `PlanStateInvalid`; proof/model/binding/digest/
+order/target failures to `AdmissionProofInvalid`; reference/location/selector
+failures to `ReferenceInvalid`; registration/component/generic mismatches to
+`RegistrationMismatch`; evaluator-intent defects to `IntentInvalid`.
+Cancellation and unexpected host/arithmetic defects are preserved.
+
+Graph admission never re-executes a completed codec or meter; this packet first
+implements the plan-bound qualification that invokes them once per cache miss.
+A retained codec rejection remains
+the admission-owned `AcquisitionFailure`: its code must be declared by the
+exact payload schema's `CodecFailureCodes`, it produces Failed acquisition and
+unresolved `NotEvaluated`, and it has no invented graph handle or
+`RuleEvaluationFailure`. Parser/index/projector failures instead belong to the
+exact producing component declaration, not to
+`RuleDeclaration.EvaluationFailureCodes`. Their primary/related handles must
+resolve through the sealed graph before intent projection; a foreign handle is
+`ReferenceInvalid`. A valid parser/index/projector failure is projected in
+distinct structural order to every exact active dependent rule as
+`RuleEvaluationFailure` plus `NotEvaluated`, even when that rule declares no
+evaluator-owned failure code. Undeclared codes, duplicate/invalid structural
+rows or invalid producer intent are `IntentInvalid`. A valid declared parser/
+index failure may retain only its canonical failure-cache entry under the
+existing exact-key/same-session contract; projector failure is plan-local and
+never cached. Codec rejection remains wholly in admission and may retain only
+its existing eligible admission-cache entry. No failed producer creates a
+product handle, product ledger or partial success graph. A failed attempt
+creates or retains no ineligible entry and never evicts or removes unrelated
+valid entries. An eligible declared semantic failure may retain only its own
+exact same-session entry; undeclared, foreign, integrity, cancellation and host
+failures create no entry. Unexpected host/arithmetic defects remain unchanged.
+
+There is no new graph canonical writer and no borrowed report-wide byte cap.
+Admission retains each payload schema's existing per-instruction binding and
+retained-byte limits. Producer calls retain their exact declaration
+`SemanticResourceBudget`, `SemanticResourceAllowance`, measured local usage and
+`SemanticResourceLedger`: the governed-text schema retains `200,000` bindings
+and `67,108,864` retained bytes, while its already-completed codec call retains
+the separate `4,194,304`-byte wire/budget ceiling; repository tree retains
+`16,777,216` bytes and `200,000` nodes.
+The target owner separately enforces `50,000` rows, `64` contents,
+`16,777,216` row-text bytes, `1,048,576` bytes per content,
+`16,777,216` aggregate unique-content bytes and `33,554,432` wire-payload
+bytes. Only the existing plan-global target owner enforces `64` unique-content
+keys, `16,777,216` unique-content bytes and `67,108,864` complete-payload
+bytes. Every schema and producer retains its declaration-owned four-counter
+budget, allowance, measured local usage and ledger; limits are never pooled.
+Graph cardinality is the checked sum of admitted bindings/models plus produced
+derivations/capabilities/demand bindings/selectors. Limit failure during
+admission, including an invalid retained closed codec state or measured usage,
+is `AdmissionProofInvalid`. Root-relative graph-ledger construction and
+validation occur only after the exact Root is minted; their failure is also
+`AdmissionProofInvalid`. Registration/type-meter mismatch is
+`RegistrationMismatch`; graph-authority failure is `ReferenceInvalid`; valid
+declared parser/index/projector exhaustion follows the producing-declaration
+failure route above. No broad exception translation is allowed.
+The logical cancellation counter ticks on every admitted binding, model,
+derived reference, capability, demand binding and selector lookup during actual
+enumeration/sort/execution, at the first row and at most every `1,024` rows.
+Equality passes and first-one-over fails in the owning source-specific oracle.
+
+The exact retained behavior Fact is
+`MeAndAI.Protocol.Conformance.Tests.ContractSliceCQualifiedReferenceCustodyTests.Preserves_exact_root_derived_and_expected_selector_graph_through_public_evaluation`.
+It carries the already-active direct traits [`Scenario=TEST-0210`](test-cases.md#test-0210) and
+`ContractSlice=C`; P/R are `Applicable`/`BehaviorRed`, the sole marker is
+[`TEST-0210-C-BEHAVIOR-RED-0010`](test-cases.md#test-0210), and the one-shot execution ordinal is R0019.
+The fresh project-neutral fixture uses public PlanApplicability ->
+CloseApplicability -> PlanEvaluation and never `WithProtectedInput`. Its red
+source recognizes exactly two complete, mutually exclusive advance shapes.
+The predecessor shape has projector/index counts `1/0` immediately after
+`PlanEvaluation`, consumes the current combined proof set, and returns a
+one-round `EvaluationClosure` with counts `1/1` and no successor plan. The
+activated shape has counts `0/0` after `PlanEvaluation`, consumes only round0
+non-projected proofs, returns a session-owned target-only successor
+`EvaluationPlan` with counts `1/0`, consumes exact demand-backed target proofs
+in round1, and returns graph2 closure with counts `1/1`. The Fact asserts
+reference-equality graph1 custody on the successor plan and graph2 custody on
+the final closure. A partial or mixed shape fails marker-free. Missing/foreign/duplicate models or
+roots, widened locations, unknown parents, selector nesting, stale sessions,
+and first-over resource cases are also marker-free. Green removes the
+predecessor branch and proves only the activated two-round path, exact
+ContextProof/Root/Derived/ExpectedSelector identity, reference-equality
+custody, graph-derived protected access, and the public finding/evaluation
+path.
+
+R0019 has one natural seam. After all setup and proof/model/root assertions,
+the red source first proves `(predecessorOneRoundExact XOR activatedTwoRoundExact)`
+outside the catch. Only the exact predecessor branch continues to the current
+closure's evaluator, whose first operation is
+`input.GetCapability<IRepositoryTree>("protocol.slot.repository-tree")`.
+Only `predecessorOneRoundExact` plus the exact `InvalidOperationException`
+whose message is `The requested capability is unavailable.` may emit
+[`Assert.Fail("TEST-0210-C-BEHAVIOR-RED-0010")`](test-cases.md#test-0210). Any other exception, message,
+selector failure, assertion, cancellation, setup or host failure is marker-free.
+The marker-free green transform removes the predecessor branch and marker,
+requires only `activatedTwoRoundExact`, then invokes the exact feature selector
+and asserts the returned handle and reference; the selector result is not part
+of the red seam.
+
+The exact C production allowlist is three additions and ten modifications:
+
+```text
+add src/MeAndAI.Protocol.Conformance.Abstractions/Registration/CodecQualificationState.cs
+add src/MeAndAI.Protocol.Conformance/Evidence/SealedReferenceGraph.cs
+add src/MeAndAI.Protocol.Conformance/Evaluation/ProducerExecutionCore.cs
+modify src/MeAndAI.Protocol.Conformance.Abstractions/Registration/ProducerHandleContracts.cs
+modify src/MeAndAI.Protocol.Conformance/Planning/AcquisitionInstruction.cs
+modify src/MeAndAI.Protocol.Conformance/Planning/ApplicabilityPlan.cs
+modify src/MeAndAI.Protocol.Conformance/Evidence/SealedEvaluationContext.cs
+modify src/MeAndAI.Protocol.Conformance/Planning/ApplicabilityClosureCore.cs
+modify src/MeAndAI.Protocol.Conformance/Planning/EvaluationPlanningCore.cs
+modify src/MeAndAI.Protocol.Conformance/Planning/EvaluationAdvanceCore.cs
+modify src/MeAndAI.Protocol.Conformance/Evaluation/EvaluationIntentCore.cs
+modify src/MeAndAI.Protocol.Conformance/Planning/EvaluationAdvanceResult.cs
+modify src/MeAndAI.Protocol.Conformance/Planning/ApplicabilityPlanningCore.cs
+```
+
+The exact C test allowlist adds
+`ContractSliceCQualifiedReferenceCustodyTests.cs` and modifies only
+`ContractSliceCApplicabilityClosureTests.cs`,
+`ContractSliceCActivationTests.cs`, `ContractSliceCProducerPipelineTests.cs`,
+`ContractSliceCApplicabilityPlanTests.cs`,
+`ContractSliceCEvaluationPlanTests.cs`, `ContractSliceCEvaluationAdvanceTests.cs`,
+`ContractSliceActivationTopologyTests.cs`, and the existing B owners
+`ContractSliceBAdmissionProofTests.cs`, `ContractSliceBStructuralTests.cs` and
+`ContractSliceBDecodeModelCacheTests.cs`.
+The B admission regression directly exercises exact closed-state construction,
+Produced/Retained acceptance, Joined/mismatch/foreign-association rejection,
+defensive ordered state custody and no codec/meter rerun; the structural owner
+locks the real internal type/interface shape. The decode-cache owner adapts its
+existing FQN to the production cache and proves collision, single-flight,
+Produced/joiner normalization/Retained, eviction and eligible failure retention
+without adding a Fact. `SealedAcquisitionOutcome.cs`,
+`ApplicabilityClosure.cs`, `CatalogSliceProducerGraph.cs`, every Reporting
+file, every other Abstractions path, Domain,
+Policy, Application, projects, packages, locks, workflow and owner files are
+immutable. Final ContractSlice C is `12/12`; total Scenario/ContractSlice is
+`66/66` with `A32/B11/C12/D11`.
+
+The C delivery is one local cohort of three dependency-closed packages. Package
+1 owns session/write/qualification/cache state, retained frames and the B plus
+ApplicabilityPlan oracles; its hard caps are production `1,500`, tests `900`,
+combined `2,400`. Package 2 owns sealed graph/context/admission/reference/
+resource and closure/activation oracles; its caps are `1,300`/`600`/`1,900`.
+Package 3 owns producer execution, multi-round plan/advance/intent/result/session
+transition, topology, the new Fact, R0019 and final green; its caps are
+`1,900`/`1,000`/`2,900`. Each package receives focused+cumulative gates,
+independent review and a local commit; no intermediate push or hosted claim is
+made. The formatter-stable skeleton must stay at or below 90% of each package
+cap before its mutation/R boundary. The [C plan's exact package table](subf-0143-contractslice-c-micro-delivery-plan.md#c-qualified-reference-custody-01-correction-control)
+freezes path membership, focused FQN, natural-red/BehaviorRed identity, sequential
+shared-file ownership and green boundary for every package. Aggregate
+`4,700` production / `2,500` test / `7,200` combined values are cohort ceilings
+only; each package's formatter-stable skeleton must remain within its own 90%
+gate. The first line over either a package or aggregate cap, or any required
+extra path, forces redraw before the owning mutation/R. Design/record change
+hard-stops at `1,200`.
+
+This renewed Gate-2 design is `AcceptedFrozenDesign`. Implementation remains
+inactive while the accepted tree receives one focused commit that
+passes committed-HEAD schema-2 graph, StructureOnly and publication-evidence
+gates before one push and exact-head Ubuntu/Windows hosted validation. That
+exact-head gate makes the design PR merge-ready; the design PR must merge and
+its exact-main head pass Ubuntu/Windows before either implementation lane.
+That design gate authorizes only the D-first R0020 sequence below. After D
+merges/exact-main green, C reconciles; Package 1 and Package 2 close their
+natural-red/green gates in order. R0019 then consumes Package 1's production
+closed states and Package 2's graph0 against the exact still-one-round pre-
+Package-3 evaluator, retaining one immutable red. Package 3 green removes only
+that predecessor branch and marker and activates two-round behavior. R0019 uses the locked xUnit/VSTest message, optional marker-free
+stack/echo/RunInfo grammar, a `420000` ms outer bound, one child and no
+discovery/fallback/retry. The accepted tree claims no committed graph identity.
+[TEST-0209](test-cases.md#test-0209)
+and `COMPOSED-QUALIFICATION-01` remain inactive until both this correction and
+the Policy selector correction below are merged/exact-main hosted green, and
+report sealing is reconciled and revalidated against those predecessors.
+
+### `D-SELECTOR-SEMANTICS-CORRECTION-01` correction freeze <a name="d-selector-semantics-correction-01"></a>
+
+[FIND-0467](README.md#find-0467) owns a separate real-Policy defect. The three
+registered selector resolvers currently copy the parent canonical value.
+`protocol.selector.relative-child.v1` instead requires the feature-directory
+Derived canonical path plus exactly one `/README.md` or `/test-cases.md` child;
+`protocol.selector.decision-record-by-id.v1` copies the exact `DEC-NNNN`
+Derived identity. No filesystem lookup, path normalization beyond the frozen
+single slash, URI decoding, case folding, `.`/`..`, or invented location is
+allowed.
+
+This packet modifies only
+`src/MeAndAI.Protocol.Policy/Selectors/PolicySelectorResolvers.cs` and
+`tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ContractSliceDProducerInfrastructureTests.cs`.
+It changes no declaration, public API, catalog topology, workflow, owner,
+project, package, lock, C source or report source. The existing Fact/FQN remains
+`MeAndAI.Protocol.Conformance.Tests.ContractSliceDProducerInfrastructureTests.Activates_exact_real_codec_parser_index_projector_selector_evaluator_graph`;
+no Fact or topology count is added. P/R are `Applicable`/`BehaviorRed`, marker
+[`TEST-0210-D-BEHAVIOR-RED-0010`](test-cases.md#test-0210), and one-shot execution ordinal R0020.
+
+All existing real producer graph, cancellation and resource assertions precede
+the red seam. The fixture resolves three exact Derived parents:
+[`docs/features/FEAT-0001`](../FEAT-0001-common-development-protocol/README.md) must yield
+[`docs/features/FEAT-0001/README.md`](../FEAT-0001-common-development-protocol/README.md) and
+[`docs/features/FEAT-0001/test-cases.md`](../FEAT-0001-common-development-protocol/README.md); [`DEC-0035`](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) must remain [`DEC-0035`](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md).
+Only the exact predecessor tuple where both feature values equal the unchanged
+directory parent while the decision value is correct may emit the marker.
+Other values, exceptions, setup failures and host failures are marker-free.
+The future pre-red transform must replace the historical `...RED-0002` null-
+evidence branch with a marker-free non-null assertion; thereafter the source
+must contain exactly one marker literal, `...RED-0010`. The current design
+checkpoint has no D source or R mutation. Results are collected by the exact selector
+key rather than registration order; the exact three-key set, parent values and
+parent-handle identity are asserted before the marker tuple. Green removes only
+the `...RED-0010` marker branch and asserts all three exact values.
+Resolver cancellation is not applicable because the interface has no token;
+null input remains the existing `ArgumentNullException` contract.
+
+The D packet hard-stops at production `120`, test `180`, and combined `300`
+normalized changed lines. After this common design checkpoint is exact-main
+green, D is the first final implementation lane: it consumes R0020, closes its
+green/record/hosted/merge gates and passes exact-main before C consumes R0019.
+C scaffold and static preflight may proceed in an isolated worktree during D,
+but C must reconcile onto D exact main before R0019. The exact sixteen design
+records are the maximum shared record-sync allowlist; only one record/merge
+writer is active. R0020 is independent of R0019; neither may be rerun.
 
 ## External follow-ups that do not weaken this design
 

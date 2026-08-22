@@ -1,6 +1,6 @@
 # Project Snapshot
 
-Last verified: **2026-08-21**
+Last verified: **2026-08-22**
 
 ## Verified facts
 
@@ -155,20 +155,21 @@ Last verified: **2026-08-21**
   Ubuntu in `20m44s` and Windows in `46m51s`; publication verification was
   correctly skipped. The exact lifecycle implementation identity recorded in
   the canonical handoff passed Ubuntu in `19m36s` and Windows in `36m02s`; publication verification was
-  correctly skipped. ContractSlice A-D and the final [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) atomic activation are merged and exact-main hosted green at `A32/B11/C11/D11`, cumulative/full Conformance `65/65`, Domain `98/98`, API/ownership `15/15`, Scenario/ContractSlice `65/65`, and combined `163/163`. [SUBF-0144](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0144) remains `AcceptedFrozenDesign`: all seven packets through convergence are packet-local `ReviewedLocalGreen`, with protected-policy/Scenario `7/7`, full Conformance `72/72`, Domain `98/98`, warning-free Release builds, and canonical R0004/R0005/R0006 immutable without rerun. [TEST-0211](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0211) is locally Passing/active with its owner/workflow activated. The bounded [FIND-0462](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0462) and canonical [FIND-0463](../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md#find-0463) corrections are contained in [PR #186](https://github.com/hasanmanzak/meAndAI/pull/186), merged at exact main [`a291556b2fa3c6fbaac7fa564ed35baadb5e9626`](https://github.com/hasanmanzak/meAndAI/commit/a291556b2fa3c6fbaac7fa564ed35baadb5e9626); exact-main hosted-green, feature DoD, release, and publication remain unclaimed. Follow the current [canonical log index](log/README.md). The
+  correctly skipped. ContractSlice A-D and the final [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) activation are immutable merged/exact-main hosted-green predecessor evidence. [SUBF-0144](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0144) and [TEST-0211](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0211) merged through [PR #186](https://github.com/hasanmanzak/meAndAI/pull/186) at exact main [`a291556b2fa3c6fbaac7fa564ed35baadb5e9626`](https://github.com/hasanmanzak/meAndAI/commit/a291556b2fa3c6fbaac7fa564ed35baadb5e9626); exact-main hosted green is established, while feature DoD, release and publication remain unclaimed. Follow the current [canonical log index](log/README.md). The
   [SUBF-0154](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0154)
-  retains one consolidated corrected `AcceptedFrozenDesign`
-  [report-sealing contract](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0154-canonical-report-sealing-design.md)
-  and [micro-delivery plan](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0154-micro-delivery-plan.md).
-  The design was reconciled onto exact-main input
-  [`a291556b2fa3c6fbaac7fa564ed35baadb5e9626`](https://github.com/hasanmanzak/meAndAI/commit/a291556b2fa3c6fbaac7fa564ed35baadb5e9626);
-  predecessor-bound subject/snapshot custody, exhaustive frame/golden and
-  Cohort-1-only R remain frozen. `REPORT-SEALING-01` is
-  `ReviewedLocalGreen`, [TEST-0222](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0222)
-  remains Planned while its local route is green, and R was not rerun. [TEST-0209](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0209)
-  remains Planned; `COMPOSED-QUALIFICATION-01` is inactive and its P/R is
-  `NotApplicable` until report sealing is exact-head hosted green. Push,
-  hosted validation, subfeature completion, release, and publication remain
+  report sealing merged through [PR #190](https://github.com/hasanmanzak/meAndAI/pull/190)
+  at exact main [`997e2658b615212c5a34bc44ec1419282cf86446`](https://github.com/hasanmanzak/meAndAI/commit/997e2658b615212c5a34bc44ec1419282cf86446);
+  exact-main [run 32553183954](https://github.com/hasanmanzak/meAndAI/actions/runs/32553183954)
+  passed both stable jobs and publication verification was correctly skipped.
+  [TEST-0222](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0222)
+  remains Planned, and its Cohort-1 R is immutable without rerun. Direct
+  [TEST-0209](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0209)
+  composition review exposed [FIND-0466](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0466)
+  and [FIND-0467](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0467):
+  C session/graph correction and the D selector packet are
+  `AcceptedFrozenDesign`; the common checkpoint awaits its delivery gates,
+  while R0019/R0020, implementation delivery push/hosted/merge and composed
+  qualification remain inactive. Feature DoD, release and publication remain
   unclaimed. Applicable Active recurrences are
   canonical cross-record links, planned Scenario deferral, locked xUnit
   StackTrace, VSTest zero-discovery abort, multi-cohort ledger advancement,
@@ -1646,7 +1647,9 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   `1,048,576`/`8,388,608` limits plus reader-owned `240000`; PS7/PS5.1 return
   `386/4554/341/5135238` and digest
   `8b992f95273aa597e12aa8d3ede053dee378ed89f1416575183b5a11de6c42ce`;
-  exact-head hosted evidence remains pending.
+  the correction merged through [PR #188](https://github.com/hasanmanzak/meAndAI/pull/188)
+  and exact-main [run 32527420672](https://github.com/hasanmanzak/meAndAI/actions/runs/32527420672)
+  passed both stable jobs.
 - Required safe response: invoke the exact loaded policy getter once, pass both
   selected size limits and the reader-owned deadline, retain generic defaults,
   and update the exact [TEST-0159](../../docs/features/FEAT-0039-v0130-test-runtime-efficiency/test-cases.md#test-0159)
@@ -1665,10 +1668,72 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 - Affected contract and cause: serial-suite growth exceeded the reviewed Windows job headroom while the workflow retained an older finite bound. Job identity, route, command, scenario ownership, and product semantics are not the owning layer.
 - Canonical owner and evidence: [FIND-0465](../../docs/features/FEAT-0066-shared-execution-authority-foundation/README.md#find-0465)
   / [TEST-0124](../../docs/features/FEAT-0027-v0104-runner-minute-efficiency/test-cases.md#test-0124) / [PR #189](https://github.com/hasanmanzak/meAndAI/pull/189) / [issue #166](https://github.com/hasanmanzak/meAndAI/issues/166).
-- Fixed release or evidence: no release. Exact head [`4679d15`](https://github.com/hasanmanzak/meAndAI/commit/4679d15ce597ae74c945259aa2da38551d263b87) passed Ubuntu in `20m37s`; Windows [run 32532961685](https://github.com/hasanmanzak/meAndAI/actions/runs/32532961685) reached exact `55m0s` after four named Full child groups passed, with nine suites and package steps remaining. The test-first owner then failed only the `55 -> 65` bound in `456.5s`; corrected local evidence is green and exact-head hosted evidence remains pending.
+- Fixed release or evidence: no release. Exact head [`4679d15`](https://github.com/hasanmanzak/meAndAI/commit/4679d15ce597ae74c945259aa2da38551d263b87) passed Ubuntu in `20m37s`; Windows [run 32532961685](https://github.com/hasanmanzak/meAndAI/actions/runs/32532961685) reached exact `55m0s` after four named Full child groups passed, with nine suites and package steps remaining. The test-first owner then failed only the `55 -> 65` bound in `456.5s`; the correction merged through [PR #189](https://github.com/hasanmanzak/meAndAI/pull/189), and exact-main [run 32542273165](https://github.com/hasanmanzak/meAndAI/actions/runs/32542273165) passed both stable jobs.
 - Required safe response: classify emitted suite evidence before changing any test or semantic surface, select the smallest finite step that contains the known remainder plus headroom, update the existing exact owner, and require fresh exact-head hosted proof. For this occurrence, `60` cannot contain the more-than-five-minute remainder and headroom; the reviewed bound is `65`.
 - Unsafe retry boundary: do not rerun the unchanged timed-out head, disable the finite timeout, auto-raise again, widen WindowsNative, remove suites, split canonical ownership, or claim success from child-suite output alone.
 - Freshness and review condition: last confirmed 2026-08-22; review whenever the Full suite inventory, serial ordering, package steps, or Windows runtime distribution changes, or any exact finite ceiling is reached again.
+- Superseded by: `None`
+
+### Sealed producer execution drops qualified-reference graph and round custody
+
+- Status: `Active`
+- Observable signature: direct public planning/evaluation produces only a
+  ContextProof with null Root/Location, or projector/index/evaluator inputs use
+  empty model, capability, reference, demand or selector authority despite an
+  admitted observed context containing those values, or the first advance
+  closes instead of issuing the required graph-owned successor plan.
+- Applicability: [SUBF-0143](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)
+  applicability/evaluation composition and any later consumer, protected-policy
+  or report fixture that requires typed multi-surface qualified references.
+- Affected contract and cause: closure/advance reconstructed projection-only
+  handles and discarded observed roots plus ordered qualified-model state;
+  producer calls then substituted empty collections instead of one immutable
+  session-bound graph. A report layer can preserve but cannot mint that missing
+  authority.
+- Canonical owner and evidence: [FIND-0466](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0466),
+  the [typed correction design](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-typed-evaluation-kernel-design.md#c-qualified-reference-custody-01),
+  [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210),
+  and [issue #165](https://github.com/hasanmanzak/meAndAI/issues/165).
+- Fixed release or evidence: no fixed release or implementation evidence yet;
+  the accepted design adds the missing production plan-bound qualification
+  session and admission-stable closed codec state to the sealed graph/two-round
+  lifecycle; design delivery, R0019 and implementation remain pending.
+- Required safe response: correct the producer/reference owner first, preserve
+  exact proof/model/reference/location/selector authority through the public
+  evaluation route, prove it with a fresh project-neutral fixture, merge and
+  obtain exact-main hosted green, then reconcile downstream report composition.
+- Unsafe retry boundary: do not inject a synthetic protected evaluation,
+  call `WithProtectedInput` as product proof, manufacture references in report
+  code, patch only Root/Location, copy a second graph/writer, or start
+  [TEST-0209](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0209)
+  before the owning predecessor is exact-main green.
+- Freshness and review condition: confirmed 2026-08-22; review whenever sealed
+  context admission, qualified-model state, projector/index/evaluator input,
+  derivation/selector minting, protected-input derivation or report composition
+  changes.
+- Superseded by: `None`
+
+### Real Policy selector copies the parent instead of its exact target
+
+- Status: `Active`
+- Observable signature: feature README/test-case selectors return the feature
+  directory parent unchanged, or a decision selector changes its `DEC-NNNN` parent.
+- Applicability: real [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
+  Policy selectors and any composed finding that requests an expected target.
+- Affected contract and cause: the shared resolver copied every parent value;
+  relative-child and decision-by-id schemas require different exact transforms.
+- Canonical owner and evidence: [FIND-0467](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0467),
+  the [D selector freeze](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-typed-evaluation-kernel-design.md#d-selector-semantics-correction-01),
+  [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210), and [issue #165](https://github.com/hasanmanzak/meAndAI/issues/165).
+- Fixed release or evidence: no implementation evidence yet; exact parents and
+  three outputs, two-path allowlist, marker `TEST-0210-D-BEHAVIOR-RED-0010`,
+  and R0020 are frozen design-only.
+- Required safe response: correct the real Policy resolver owner and prove all
+  three values in the existing D infrastructure Fact before composed use.
+- Unsafe retry boundary: do not patch a test-owned mirror, normalize paths
+  implicitly, broaden the declaration, invent a location, or rerun R0020.
+- Freshness and review condition: confirmed 2026-08-22; review when selector
+  schemas, resolvers, parent canonical values or real Policy composition change.
 - Superseded by: `None`
 
 ## Open context
@@ -1789,9 +1854,9 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   claimed clean. Canonical-string coverage `Important` is closed at the
   historical `13/13` checkpoint; current grammar/number/graph/rule routing is
   the [FIND-0441](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0441)
-  recovery described below, and
-  [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
-  remains `Planned`.
+  recovery described below. [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
+  is now Passing/active on immutable `65/65`; only the [FIND-0466](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0466)
+  correction target remains inactive.
   It separates qualification slices from complete catalogs, uses an acyclic
   artifact/manifest/release graph, and fixes the cumulative public inventories
   at `48/72/95/96`, ending with `72` Abstractions, `23` Conformance, and one
@@ -1800,14 +1865,13 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   component union.
 
   [FEAT-0067](../../docs/features/FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md)
-  owns routing/I/O and constructs an instruction-bound structural
-  observed result, but it does not invoke a Policy codec or own a semantic
-  cache. The exact plan-bound Conformance qualification session resolves the
-  manifest codec, invokes it once per binding/cache miss, verifies exact
-  byte/depth/node/complexity usage, and returns qualified model handles or a
-  declared rejection. Application copies those handles into its proof
-  candidate; the Conformance admission coordinator validates them without a
-  codec rerun.
+  owns routing/I/O and constructs an instruction-bound structural observed
+  result, but it does not invoke a Policy codec or own a semantic cache. The
+  accepted architecture requires a plan-bound Conformance qualification
+  session to resolve the manifest codec once per binding/cache miss, verify
+  exact usage, and return a closed state or declared rejection. Historical B
+  mirrors did not deliver that production session; [FIND-0466](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0466)
+  is `AcceptedFrozenDesign`; implementation still waits design exact-main green.
 
   The mandatory state sequence is `PlanApplicability -> CloseApplicability ->
   PlanEvaluation -> zero-to-N AdvanceEvaluation -> EvaluationClosure ->
