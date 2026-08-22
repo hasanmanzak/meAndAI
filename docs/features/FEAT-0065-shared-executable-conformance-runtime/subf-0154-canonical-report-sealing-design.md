@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Gate 2 design freeze |
-| Status | `AcceptedFrozenDesign`; implementation remains held |
+| Status | `AcceptedFrozenDesign`; `REPORT-SEALING-01` is `ReviewedLocalGreen`; its local route is green while [TEST-0222](test-cases.md#test-0222) remains Planned; canonical R remains immutable; composed qualification and exact-head hosted validation remain pending |
 | Exact design input | Reconciled exact main [`a291556b2fa3c6fbaac7fa564ed35baadb5e9626`](https://github.com/hasanmanzak/meAndAI/commit/a291556b2fa3c6fbaac7fa564ed35baadb5e9626), which merges [PR #186](https://github.com/hasanmanzak/meAndAI/pull/186); exact-main hosted-green evidence remains unclaimed in this checkpoint |
 | Parent feature | [FEAT-0065](README.md) |
 | Dependencies | [SUBF-0153](README.md#subf-0153), [SUBF-0143](README.md#subf-0143), and [SUBF-0144](README.md#subf-0144) |
@@ -12,22 +12,23 @@
 
 ## Authority and activation boundary
 
-This checkpoint consumes design-only authority. It freezes the report contract,
-canonical byte grammar, digest boundary, security exclusions, errors, resource
-limits, scenario seams, and implementation cohorts. It does not authorize an
-expected-red invocation or a production, test, workflow, owner, status, push,
-pull-request, hosted, merge, release, publication, or consumer mutation.
+This checkpoint originally consumed design-only authority and froze the report
+contract, canonical byte grammar, digest boundary, security exclusions, errors,
+resource limits, scenario seams, and implementation cohorts. Later scoped
+authority activated the predecessor-compilable Cohort-1 scaffold, its single
+canonical expected red, and the later marker-free transform. That packet is
+now `ReviewedLocalGreen`; R remains immutable and was not rerun. This state
+does not authorize workflow/owner activation, push, pull-request, hosted,
+merge, subfeature completion, release, publication, or consumer mutation.
 
 [SUBF-0144](README.md#subf-0144) is the exact predecessor input and is merged at
 exact main [`a291556b2fa3c6fbaac7fa564ed35baadb5e9626`](https://github.com/hasanmanzak/meAndAI/commit/a291556b2fa3c6fbaac7fa564ed35baadb5e9626),
 but exact-main hosted-green evidence is not established by this checkpoint.
-Therefore [SUBF-0154](README.md#subf-0154) implementation cannot activate from
-this design checkpoint. Activation requires all of the following, in order:
-
-1. exact-main [`a291556b2fa3c6fbaac7fa564ed35baadb5e9626`](https://github.com/hasanmanzak/meAndAI/commit/a291556b2fa3c6fbaac7fa564ed35baadb5e9626)
-   Ubuntu/Windows hosted green;
-2. one fresh changed-diff design/security/evidence review with no `Blocking`;
-3. an explicit implementation directive for the frozen cohorts.
+The later activation authority is recorded separately. The no-child offline
+verifier accepted the frozen source, runner, TRX, DLL, PDB, six locks and exact
+transcript grammar. Fresh final evidence/security and changed-diff reviews
+closed without `Blocking`; the scoped Cohort-1 authority was rechecked before
+the marker-free transform.
 
 The design cohort is deliberately consolidated. No appendix, secondary report
 schema, derivative validator, or design-only per-boundary PR/hosted checkpoint
@@ -660,9 +661,36 @@ TEST-0222-REPORT-SEALING-RED-0001
 Its predecessor-compilable scaffold uses exact reflection only to establish
 that the frozen public report surface is absent, then reaches the sole marker.
 Missing discovery, build/restore failure, a different exception, an assertion
-before the marker, broad execution or alternate FQN is invalid red. After the
-single accepted red, the retained green test calls the public API directly;
-the red source/TRX identity is immutable and never rerun.
+before the marker, broad execution or alternate FQN is invalid red. The
+immutable accepted canonical R passed offline verification; the retained green
+test calls the public API directly while red source/TRX custody remains immutable and never rerun.
+
+[FIND-0464](README.md#find-0464) records the immutable accepted canonical R at
+source `1,886` bytes / SHA-256
+`F7BC82040457A1CB585B152BBDAD8E69FBA88FC5A7210E6ED167FC079D47581E`
+and accepted TRX `5,108` bytes / SHA-256
+`4FFB591EAB6247DFC661D108501156BEEB33FBE746D191CE7E1B3B2F489D6C83`.
+The authoritative marker is the exact sole-result `ErrorInfo/Message`. The
+locked xUnit/VSTest adapter may also emit one same-result `StdOut` transcript;
+when present it must name the exact test assembly and FQN, contain the marker
+exactly once, present only the standard assertion stack, and contain no
+`StdErr`, foreign result, or independent diagnostic. The raw accepted TRX then
+contains the marker exactly twice. Its Failed summary has the exact 16 counters,
+including `total=1`, `executed=1`, `failed=1`, and every other outcome counter
+zero; it permits at most one marker-free same-FQN `[FAIL]` RunInfo and no
+attachment or collector evidence.
+
+The original external runner is retained separately at `17,741` bytes /
+SHA-256
+`61627FE78AF9E97BD5F5848F7BEBFF011D5E648DDFBDD710FEA74E723E92E89F`.
+It exited `1` only after the child invocation and accepted TRX were complete,
+because its post-invocation validator incorrectly required the optional
+transcript to be byte-identical to the marker-only Message. That exit is
+diagnostic evidence of an external oracle defect, not a second R or an invalid
+BehaviorRed. The corrected no-child verifier, SHA-256
+`79AF177BDAFFA2A03BDAEBE18B84BCCEA059FC9639DA3FAD9040A1404C741F66`,
+exited `0` with `accepted=true` and the exact frozen cardinalities. R is never
+rerun; the marker-free Cohort-1 transform is now locally green.
 
 The exact [TEST-0209](test-cases.md#test-0209) direct composed-test identity is:
 
@@ -711,12 +739,11 @@ The accepted predecessor types plus the narrow planning-carrier carve-out can
 supply every frozen field without crossing an I/O or trust boundary; the
 acyclic report byte/digest pair avoids publication cycles; the four dimensions
 remain independent; and WIP reuse is explicitly rejected. The correction
-author's static self-review candidate is
-`0 Blocking / 0 Important / 0 Minor`; final independent changed-diff review and
-the committed-HEAD graph/capacity gate remain pending, so this is not yet a
-final review closure.
+author's static self-review candidate is superseded by current Cohort-1
+independent reviews at `0 Blocking / 0 Important / 0 Minor`; the synchronized-
+tree graph/capacity gate is green, while committed-HEAD graph and exact-head
+hosted validation remain pending, so this is not subfeature completion evidence.
 
-Implementation remains held by the predecessor and explicit-authority gates at
-the start of this document. This acceptance is design readiness, not product
-completion, passing scenario evidence, hosted evidence, merge readiness,
-release or publication.
+The marker-free transform is `ReviewedLocalGreen`. The immutable accepted
+canonical R is not hosted evidence, merge readiness, subfeature completion,
+release, or publication.

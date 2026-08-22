@@ -44,13 +44,15 @@ and canonical [FIND-0463](../../../docs/features/FEAT-0040-v0131-batched-instruc
 corrections are contained in [PR #186](https://github.com/hasanmanzak/meAndAI/pull/186),
 merged at exact main [`a291556b2fa3c6fbaac7fa564ed35baadb5e9626`](https://github.com/hasanmanzak/meAndAI/commit/a291556b2fa3c6fbaac7fa564ed35baadb5e9626);
 exact-main hosted-green, completion/DoD, release, and publication remain
-unclaimed. The report-sealing successor now has one consolidated
-corrected `AcceptedFrozenDesign` checkpoint: predecessor-bound subject/snapshot
-custody, exhaustive frame/golden, and Cohort-1-only R are frozen. Its
-implementation and sole R remain held pending exact-main hosted-green evidence,
-fresh review, and explicit implementation authority;
+unclaimed. The report-sealing successor retains its consolidated corrected
+`AcceptedFrozenDesign` checkpoint. `REPORT-SEALING-01` is
+`ReviewedLocalGreen`, its immutable sole R was not rerun, and
+[TEST-0222](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0222)
+remains Planned while its local `REPORT-SEALING-01` route is green. Push, hosted validation, subfeature completion, release,
+and publication remain unclaimed;
 [TEST-0209](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0209)
-and convergence P/R are `NotApplicable`.
+remains Planned, `COMPOSED-QUALIFICATION-01` is inactive, and its P/R is
+`NotApplicable`.
 
 In parallel, the optional repository-navigation direction is captured as a
 records-only

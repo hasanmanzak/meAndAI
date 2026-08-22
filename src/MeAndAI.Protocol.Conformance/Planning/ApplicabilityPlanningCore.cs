@@ -293,13 +293,51 @@ internal static class ApplicabilityPlanningCore
         NamedExecutionProfile profile,
         IEnumerable<AcquisitionTarget> targets)
     {
+        ValidateCompleteProfile(session, profile);
+        var plan = Create(
+            session,
+            profile.Axes,
+            CompleteRules(session, profile),
+            targets,
+            subjectRepository: null);
+        session.RegisterNamedProfile(plan, profile);
+        return plan;
+    }
+
+    internal static ApplicabilityPlan PlanComplete(
+        KernelPlanningSession session,
+        NamedExecutionProfile profile,
+        AcquisitionTarget subjectRepository,
+        IEnumerable<AcquisitionTarget> targets)
+    {
+        ValidateCompleteProfile(session, profile);
+        ArgumentNullException.ThrowIfNull(subjectRepository);
+        var plan = Create(
+            session,
+            profile.Axes,
+            CompleteRules(session, profile),
+            targets,
+            subjectRepository);
+        session.RegisterNamedProfile(plan, profile);
+        return plan;
+    }
+
+    private static void ValidateCompleteProfile(
+        KernelPlanningSession session,
+        NamedExecutionProfile profile)
+    {
         ArgumentNullException.ThrowIfNull(session);
         ArgumentNullException.ThrowIfNull(profile);
         if (!ReferenceEquals(session, profile.PlanningSession))
         {
             Invalid();
         }
+    }
 
+    private static RuleDeclaration[] CompleteRules(
+        KernelPlanningSession session,
+        NamedExecutionProfile profile)
+    {
         var rules = profile.RuleIds.Select(ruleId =>
         {
             var matches = session.Rules
@@ -313,16 +351,15 @@ internal static class ApplicabilityPlanningCore
             Invalid();
         }
 
-        var plan = Create(session, profile.Axes, rules, targets);
-        session.RegisterNamedProfile(plan, profile);
-        return plan;
+        return rules;
     }
 
     private static ApplicabilityPlan Create(
         KernelPlanningSession session,
         ExecutionProfile profile,
         IReadOnlyList<RuleDeclaration> rules,
-        IEnumerable<AcquisitionTarget> targets)
+        IEnumerable<AcquisitionTarget> targets,
+        AcquisitionTarget? subjectRepository = null)
     {
         ArgumentNullException.ThrowIfNull(targets);
         if (rules.Count == 0)
@@ -333,6 +370,35 @@ internal static class ApplicabilityPlanningCore
         var materializedTargets = targets.ToArray();
         if (materializedTargets.Any(target => target is null) ||
             materializedTargets.Distinct().Count() != materializedTargets.Length)
+        {
+            Invalid();
+        }
+
+        var repositoryTargets = materializedTargets.Where(static target =>
+            target.Surface.Equals(SurfaceKind.Repository)).ToArray();
+        if (repositoryTargets.Length > 1)
+        {
+            Invalid();
+        }
+
+        var retainedSubjectRepository = subjectRepository ??
+            repositoryTargets.FirstOrDefault();
+        if (retainedSubjectRepository is not null &&
+            (!retainedSubjectRepository.Surface.Equals(SurfaceKind.Repository) ||
+             !retainedSubjectRepository.SnapshotKind.Equals(profile.SnapshotKind) ||
+             materializedTargets.Any(target =>
+                 !string.Equals(
+                     target.SubjectIdentity,
+                     retainedSubjectRepository.SubjectIdentity,
+                     StringComparison.Ordinal) ||
+                 !target.SnapshotKind.Equals(retainedSubjectRepository.SnapshotKind) ||
+                 !string.Equals(
+                     target.TargetIdentity,
+                     retainedSubjectRepository.TargetIdentity,
+                     StringComparison.Ordinal)) ||
+             materializedTargets.Any(target =>
+                 target.Surface.Equals(SurfaceKind.Repository) &&
+                 !target.Equals(retainedSubjectRepository))))
         {
             Invalid();
         }
@@ -393,7 +459,8 @@ internal static class ApplicabilityPlanningCore
             rules.Select(rule => rule.RuleId),
             applicabilitySlots,
             instructions,
-            session);
+            session,
+            retainedSubjectRepository);
     }
 
     private static IReadOnlyList<EvidenceSlotDeclaration>

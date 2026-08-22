@@ -67,6 +67,12 @@ public sealed class ProtectedPolicySurfaceTests
         "ActivatedExtensionPolicy",
         "CandidateIndependentQualification",
         "CandidateIndependentQualificationInput",
+        "CanonicalAcquisitionResult",
+        "CanonicalConformanceReport",
+        "CanonicalFindingDisposition",
+        "CanonicalReportIntegrityCode",
+        "CanonicalReportIntegrityException",
+        "CanonicalRuleResult",
         "ExtensionEvaluation",
         "ExtensionEvaluationFailure",
         "ExtensionFinding",
@@ -246,10 +252,10 @@ public sealed class ProtectedPolicySurfaceTests
                 "MeAndAI.Protocol.Conformance", ConformanceTypes));
         Assert.Equal(40, typeof(RuleId).Assembly.GetExportedTypes().Length);
         Assert.Equal(112, typeof(ExtensionRuleDeclaration).Assembly.GetExportedTypes().Length);
-        Assert.Equal(35, typeof(ProtectedPolicyEvaluation).Assembly.GetExportedTypes().Length);
+        Assert.Equal(41, typeof(ProtectedPolicyEvaluation).Assembly.GetExportedTypes().Length);
         Assert.Equal(2, typeof(InitialRuleQualificationPolicy).Assembly.GetExportedTypes().Length);
         Assert.Equal(
-            149,
+            155,
             typeof(ExtensionRuleDeclaration).Assembly.GetExportedTypes().Length +
             typeof(ProtectedPolicyEvaluation).Assembly.GetExportedTypes().Length +
             typeof(InitialRuleQualificationPolicy).Assembly.GetExportedTypes().Length);
@@ -265,7 +271,7 @@ public sealed class ProtectedPolicySurfaceTests
         AssertCanonicalArtifactInputOrderRejection();
         AssertNoUnexpectedPublicConstruction();
         Assert.Equal(
-            "2be3248728e679ff9567eb52faba505dc0f23654e26d0b9d961431616ef6184f",
+            "ec8f1c0cf1384a2aa25922503f8d5c4f549be63de15e6da5be74c698eea8b101",
             PublicSignatureDigest());
     }
 
