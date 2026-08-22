@@ -437,6 +437,33 @@ try {
         $protocolEvidenceScenarioId = 'TEST-' + '0221'
         $protocolKernelScenarioId = 'TEST-' + '0210'
         $protocolProtectedPolicyScenarioId = 'TEST-' + '0211'
+        $operationsFoundationScenarioId = 'TEST-' + '0191'
+        $operationsBoundaryScenarioId = 'TEST-' + '0192'
+        $operationsPackagingScenarioId = 'TEST-' + '0193'
+        $operationsAuthorityScenarioId = 'TEST-' + '0212'
+        $operationsTopologyFqn =
+            'MeAndAI.Operations.Architecture.Tests.ExecutionAuthorityActivationTopologyTests.Matches_exact_execution_authority_scenario_inventory'
+        $operationsScenarioFilter =
+            'Scenario={0}|Scenario={1}|Scenario={2}|Scenario={3}|FullyQualifiedName={4}' -f
+                $operationsFoundationScenarioId,
+                $operationsBoundaryScenarioId,
+                $operationsPackagingScenarioId,
+                $operationsAuthorityScenarioId,
+                $operationsTopologyFqn
+        $operationsTestCommand =
+            'dotnet test MeAndAI.Operations.slnx --configuration Release --no-restore --nologo --verbosity minimal --filter "{0}"' -f $operationsScenarioFilter
+        $expectedOperationsSteps = @(
+            [pscustomobject]@{
+                Role = 'operations'
+                Command = 'dotnet restore MeAndAI.Operations.slnx --configfile NuGet.Config --locked-mode'
+                RunForm = '>-'
+            },
+            [pscustomobject]@{
+                Role = 'operations'
+                Command = $operationsTestCommand
+                RunForm = '>-'
+            }
+        )
         $protocolScenarioFilter =
             'Scenario={0}|Scenario={1}|Scenario={2}|Scenario={3}|ContractSlice=A|ContractSlice=B|ContractSlice=C|ContractSlice=D|FullyQualifiedName=MeAndAI.Protocol.Conformance.Tests.ContractSliceActivationTopologyTests.Matches_exact_contract_slice_scenario_inventory' -f
                 $protocolVocabularyScenarioId,
@@ -447,10 +474,12 @@ try {
             'dotnet test MeAndAI.Protocol.slnx --configuration Release --no-restore --nologo --verbosity minimal --filter "{0}"' -f $protocolScenarioFilter
         $expectedProtocolSteps = @(
             [pscustomobject]@{
+                Role = 'protocol'
                 Command = 'dotnet restore MeAndAI.Protocol.slnx --configfile NuGet.Config --locked-mode'
                 RunForm = '>-'
             },
             [pscustomobject]@{
+                Role = 'protocol'
                 Command = $protocolTestCommand
                 RunForm = '|'
             }
@@ -571,6 +600,13 @@ try {
                 Add-Failure "TEST-0146 stable job '$stableJobId' must reference MeAndAI.Protocol.slnx exactly twice."
             }
 
+            $operationsTargetReferences = [regex]::Matches(
+                $jobSource,
+                '(?i)\bMeAndAI\.Operations\.slnx\b')
+            if ($operationsTargetReferences.Count -ne 2) {
+                Add-Failure "TEST-0146 stable job '$stableJobId' must reference MeAndAI.Operations.slnx exactly twice."
+            }
+
             $allDotNetRestoreInvocations = @(
                 $steps | ForEach-Object {
                     [regex]::Matches(
@@ -594,6 +630,20 @@ try {
             )
             if ($protocolRestoreInvocations.Count -ne 1) {
                 Add-Failure "TEST-0146 stable job '$stableJobId' must contain exactly one MeAndAI.Protocol.slnx restore invocation."
+            }
+
+            $operationsRestoreInvocations = @(
+                $steps | Where-Object {
+                    $_.Command -match
+                        '(?i)\bMeAndAI\.Operations\.slnx\b'
+                } | ForEach-Object {
+                    [regex]::Matches(
+                        $_.Command,
+                        '(?i)(?<![a-z0-9_.-])["'']?dotnet(?:\.exe)?["'']?\s+restore\b')
+                }
+            )
+            if ($operationsRestoreInvocations.Count -ne 1) {
+                Add-Failure "TEST-0146 stable job '$stableJobId' must contain exactly one Operations solution restore invocation."
             }
 
             $protocolTestTargetReferences = [regex]::Matches(
@@ -628,19 +678,33 @@ try {
                 Add-Failure "TEST-0146 stable job '$stableJobId' must contain exactly one Protocol solution test invocation."
             }
 
-            foreach ($expectedStep in $expectedProtocolSteps) {
+            $operationsTestInvocations = @(
+                $steps | Where-Object {
+                    $_.Command -match
+                        '(?i)\bMeAndAI\.Operations\.slnx\b'
+                } | ForEach-Object {
+                    [regex]::Matches(
+                        $_.Command,
+                        '(?i)(?<![a-z0-9_.-])["'']?dotnet(?:\.exe)?["'']?\s+test\b')
+                }
+            )
+            if ($operationsTestInvocations.Count -ne 1) {
+                Add-Failure "TEST-0146 stable job '$stableJobId' must contain exactly one Operations solution test invocation."
+            }
+
+            foreach ($expectedStep in @($expectedOperationsSteps + $expectedProtocolSteps)) {
                 $expectedCommand = $expectedStep.Command
                 $matchingSteps = @($steps | Where-Object {
                     $_.Command -ceq $expectedCommand
                 })
                 if ($matchingSteps.Count -ne 1) {
-                    Add-Failure "TEST-0146 stable job '$stableJobId' must contain exactly one protocol step '$expectedCommand'."
+                    Add-Failure "TEST-0146 stable job '$stableJobId' must contain exactly one $($expectedStep.Role) step '$expectedCommand'."
                     continue
                 }
 
                 $candidateSource = $matchingSteps[0].Source
                 if ($matchingSteps[0].RunForm -cne $expectedStep.RunForm) {
-                    Add-Failure "TEST-0146 protocol step in '$stableJobId' uses an alternate run form: '$expectedCommand'."
+                    Add-Failure "TEST-0146 $($expectedStep.Role) step in '$stableJobId' uses an alternate run form: '$expectedCommand'."
                 }
                 $ifLines = [regex]::Matches(
                     $candidateSource,
@@ -651,12 +715,12 @@ try {
                     "(?m)^        if: steps\.main-route\.outputs\.route == 'Full'\r?$"
                 )
                 if ($ifLines.Count -ne 1 -or $fullRouteLines.Count -ne 1) {
-                    Add-Failure "TEST-0146 protocol step in '$stableJobId' is not bound exactly to the Full route: '$expectedCommand'."
+                    Add-Failure "TEST-0146 $($expectedStep.Role) step in '$stableJobId' is not bound exactly to the Full route: '$expectedCommand'."
                 }
                 if ($candidateSource.IndexOf(
                     'continue-on-error',
                     [StringComparison]::OrdinalIgnoreCase) -ge 0) {
-                    Add-Failure "TEST-0146 protocol step in '$stableJobId' is allowed to fail: '$expectedCommand'."
+                    Add-Failure "TEST-0146 $($expectedStep.Role) step in '$stableJobId' is allowed to fail: '$expectedCommand'."
                 }
             }
         }

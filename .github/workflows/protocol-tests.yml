@@ -116,7 +116,7 @@ jobs:
           --no-restore
           --nologo
           --verbosity minimal
-          --filter "Scenario=TEST-0191|Scenario=TEST-0192|Scenario=TEST-0193"
+          --filter "Scenario=TEST-0191|Scenario=TEST-0192|Scenario=TEST-0193|Scenario=TEST-0212|FullyQualifiedName=MeAndAI.Operations.Architecture.Tests.ExecutionAuthorityActivationTopologyTests.Matches_exact_execution_authority_scenario_inventory"
       - name: Run protocol-domain vocabulary tests
         if: steps.main-route.outputs.route == 'Full'
         shell: bash
@@ -206,7 +206,7 @@ jobs:
     name: Validate on windows-latest
     if: ${{ !(github.event_name == 'workflow_dispatch' && inputs.verify_post_publication) }}
     runs-on: windows-latest
-    timeout-minutes: 55
+    timeout-minutes: 65
     steps:
       - name: Check out repository and comparison commits
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
@@ -292,7 +292,7 @@ jobs:
           --no-restore
           --nologo
           --verbosity minimal
-          --filter "Scenario=TEST-0191|Scenario=TEST-0192|Scenario=TEST-0193"
+          --filter "Scenario=TEST-0191|Scenario=TEST-0192|Scenario=TEST-0193|Scenario=TEST-0212|FullyQualifiedName=MeAndAI.Operations.Architecture.Tests.ExecutionAuthorityActivationTopologyTests.Matches_exact_execution_authority_scenario_inventory"
       - name: Run protocol-domain vocabulary tests
         if: steps.main-route.outputs.route == 'Full'
         shell: pwsh

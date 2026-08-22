@@ -9,6 +9,7 @@ public sealed class ExecutionGrantContractTests
 {
     [Fact]
     [Trait("Subfeature", "SUBF-0145")]
+    [Trait("Scenario", "TEST-0212")]
     public async Task TEST_0212_grant_is_fresh_exact_non_transitive_and_single_use()
     {
         Fixture fixture = new();
@@ -35,6 +36,7 @@ public sealed class ExecutionGrantContractTests
 
     [Fact]
     [Trait("Subfeature", "SUBF-0145")]
+    [Trait("Scenario", "TEST-0212")]
     public async Task TEST_0212_first_failure_order_and_pre_mutation_store_checks_are_exact()
     {
         Fixture missing = new() { ReturnSnapshot = false };
@@ -109,6 +111,7 @@ public sealed class ExecutionGrantContractTests
 
     [Fact]
     [Trait("Subfeature", "SUBF-0145")]
+    [Trait("Scenario", "TEST-0212")]
     public async Task TEST_0212_approval_separation_drift_and_validity_edges_fail_closed()
     {
         Fixture empty = new();
@@ -169,6 +172,7 @@ public sealed class ExecutionGrantContractTests
 
     [Fact]
     [Trait("Subfeature", "SUBF-0145")]
+    [Trait("Scenario", "TEST-0212")]
     public async Task TEST_0212_all_capability_binding_pairs_are_non_transitive()
     {
         ExecutionCapability[] capabilities = [ExecutionCapability.RepositoryRead, ExecutionCapability.ProviderRead,
@@ -192,6 +196,7 @@ public sealed class ExecutionGrantContractTests
 
     [Fact]
     [Trait("Subfeature", "SUBF-0145")]
+    [Trait("Scenario", "TEST-0212")]
     public async Task TEST_0212_atomic_mutation_rechecks_replay_authority_and_store_head()
     {
         Fixture idempotency = new();
@@ -213,6 +218,7 @@ public sealed class ExecutionGrantContractTests
 
     [Fact]
     [Trait("Subfeature", "SUBF-0145")]
+    [Trait("Scenario", "TEST-0212")]
     public void TEST_0212_grant_values_are_canonical_defensive_and_closed()
     {
         Assert.Equal("repository.read", ExecutionCapability.RepositoryRead.Value);
@@ -271,6 +277,7 @@ public sealed class ExecutionGrantContractTests
 
     [Fact]
     [Trait("Subfeature", "SUBF-0145")]
+    [Trait("Scenario", "TEST-0212")]
     public async Task TEST_0212_pre_cancellation_performs_no_port_call()
     {
         Fixture fixture = new();
