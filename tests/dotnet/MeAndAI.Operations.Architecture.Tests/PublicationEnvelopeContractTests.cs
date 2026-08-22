@@ -6,6 +6,7 @@ public sealed class PublicationEnvelopeContractTests
 {
     [Fact]
     [Trait("Subfeature", "SUBF-0145")]
+    [Trait("Scenario", "TEST-0212")]
     public void TEST_0212_envelope_binds_sealed_report_and_publication_grant()
     {
         Fixture fixture = new();
@@ -33,6 +34,7 @@ public sealed class PublicationEnvelopeContractTests
 
     [Fact]
     [Trait("Subfeature", "SUBF-0145")]
+    [Trait("Scenario", "TEST-0212")]
     public void TEST_0212_envelope_rejects_nonpublication_or_disagreeing_grants()
     {
         Fixture fixture = new();
@@ -57,6 +59,7 @@ public sealed class PublicationEnvelopeContractTests
 
     [Fact]
     [Trait("Subfeature", "SUBF-0145")]
+    [Trait("Scenario", "TEST-0212")]
     public void TEST_0212_envelope_has_exact_value_equality()
     {
         Fixture fixture = new();

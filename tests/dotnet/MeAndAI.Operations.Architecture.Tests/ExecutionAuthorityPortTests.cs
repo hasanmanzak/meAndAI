@@ -9,6 +9,7 @@ public sealed class ExecutionAuthorityPortTests
 {
     [Fact]
     [Trait("Subfeature", "SUBF-0145")]
+    [Trait("Scenario", "TEST-0212")]
     public void TEST_0212_execution_authority_ports_are_least_authority()
     {
         Assert.Equal(
@@ -43,6 +44,7 @@ public sealed class ExecutionAuthorityPortTests
 
     [Fact]
     [Trait("Subfeature", "SUBF-0145")]
+    [Trait("Scenario", "TEST-0212")]
     public void TEST_0212_authorizer_factory_rejects_null_ports_by_name()
     {
         StubPort port = new();

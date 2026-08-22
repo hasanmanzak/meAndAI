@@ -57,6 +57,7 @@ public sealed class ExecutionAuthorityPublicApiTests
     };
     [Fact]
     [Trait("Subfeature", "SUBF-0145")]
+    [Trait("Scenario", "TEST-0212")]
     public void TEST_0212_snapshot_public_api_matches_the_frozen_contract()
     {
         Assert.All(SnapshotTypes, AssertExactTypeSurface);
@@ -83,6 +84,7 @@ public sealed class ExecutionAuthorityPublicApiTests
     }
     [Fact]
     [Trait("Subfeature", "SUBF-0145")]
+    [Trait("Scenario", "TEST-0212")]
     public void TEST_0212_grant_public_api_matches_the_frozen_contract()
     {
         AssertProperties<AuthorityGrantId>(new PropertySpec("Value", typeof(string)));
