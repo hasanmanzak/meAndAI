@@ -162,7 +162,7 @@ and test step in each stable job. It preserves the existing exact job and
 protocol-step oracles and rejects missing, duplicate, alternate-run-form,
 non-Full-route, or `continue-on-error` variants.
 
-## Exact fourteen-path implementation allowlist
+## Exact fourteen-path activation allowlist
 
 Only these paths may differ from the accepted design checkpoint in the final
 activation atom:
@@ -203,7 +203,33 @@ formatting:
 - the four record paths change at most `160` gross lines after the bounded canonical-link correction;
   and
 - executable/test gross change is at most `356`, record gross change at most
-  `160`, total gross change at most `516`, and no fifteenth path is permitted.
+  `160`, total gross change at most `516`, and no fifteenth activation path is permitted.
+
+## Bounded [PR #189](https://github.com/hasanmanzak/meAndAI/pull/189) finite-timeout correction
+
+The first [PR #189](https://github.com/hasanmanzak/meAndAI/pull/189) exact-head
+[run 32532961685](https://github.com/hasanmanzak/meAndAI/actions/runs/32532961685)
+exposed only the ordinary Windows finite bound after successful named Full
+child-suite evidence. [FIND-0464](README.md#find-0464) owns the correction.
+The activation fourteen-path allowlist remains frozen; the dependency-closed
+correction may additionally change only:
+
+15. `tests/capabilities/protocol-governance/protocol-governance.tests.ps1`
+16. `docs/features/FEAT-0027-v0104-runner-minute-efficiency/test-cases.md`
+17. `.ai/memory/project.md`
+
+The workflow and four [FEAT-0066](README.md) records are already activation paths. The
+correction therefore has exactly eight changed paths: executable/workflow
+gross at most `4`, records gross at most `96`, and total gross at most `100`;
+the combined activation-plus-correction scope is at most `17` paths and `616`
+gross lines. It changes Windows only from `55` to `65`, retains Linux `30` and
+post-publication `5`, and cannot alter product/test semantics, traits, filters,
+owners, workflow commands, R custody, [TEST-0213](test-cases.md#test-0213), or
+[SUBF-0146](README.md#subf-0146). The corrected exact bytes require local
+[TEST-0124](../FEAT-0027-v0104-runner-minute-efficiency/test-cases.md#test-0124),
+[TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
+actionlint, diff/cap/link review, and replacement exact-head Ubuntu/Windows
+hosted green. No unchanged hosted retry or automatic further raise is allowed.
 
 This design cohort itself is exactly the new freeze plus `README.md` and
 `test-cases.md`: at most `320` additions, `340` gross changed lines, and no

@@ -1601,6 +1601,20 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   graph reader, selected profile, batch-helper call, or reader deadline changes.
 - Superseded by: `None`
 
+### Stable Windows full validation reaches its exact finite job ceiling
+
+- Status: `Active`
+- Observable signature: the stable Windows job is cancelled at its exact finite timeout after named PowerShell 5.1 Full child suites pass, while discovered suites or later package steps remain and no semantic failure is emitted.
+- Applicability: ordinary, manual, main, and merge-queue Full validation on the single stable Windows job; compatibility-only WindowsNative routing remains separate.
+- Affected contract and cause: serial-suite growth exceeded the reviewed Windows job headroom while the workflow retained an older finite bound. Job identity, route, command, scenario ownership, and product semantics are not the owning layer.
+- Canonical owner and evidence: [FIND-0464](../../docs/features/FEAT-0066-shared-execution-authority-foundation/README.md#find-0464)
+  / [TEST-0124](../../docs/features/FEAT-0027-v0104-runner-minute-efficiency/test-cases.md#test-0124) / [PR #189](https://github.com/hasanmanzak/meAndAI/pull/189) / [issue #166](https://github.com/hasanmanzak/meAndAI/issues/166).
+- Fixed release or evidence: no release. Exact head [`4679d15`](https://github.com/hasanmanzak/meAndAI/commit/4679d15ce597ae74c945259aa2da38551d263b87) passed Ubuntu in `20m37s`; Windows [run 32532961685](https://github.com/hasanmanzak/meAndAI/actions/runs/32532961685) reached exact `55m0s` after four named Full child groups passed, with nine suites and package steps remaining. The test-first owner then failed only the `55 -> 65` bound in `456.5s`; corrected local evidence is green and exact-head hosted evidence remains pending.
+- Required safe response: classify emitted suite evidence before changing any test or semantic surface, select the smallest finite step that contains the known remainder plus headroom, update the existing exact owner, and require fresh exact-head hosted proof. For this occurrence, `60` cannot contain the more-than-five-minute remainder and headroom; the reviewed bound is `65`.
+- Unsafe retry boundary: do not rerun the unchanged timed-out head, disable the finite timeout, auto-raise again, widen WindowsNative, remove suites, split canonical ownership, or claim success from child-suite output alone.
+- Freshness and review condition: last confirmed 2026-08-22; review whenever the Full suite inventory, serial ordering, package steps, or Windows runtime distribution changes, or any exact finite ceiling is reached again.
+- Superseded by: `None`
+
 ## Open context
 
 - The maintainer accepted

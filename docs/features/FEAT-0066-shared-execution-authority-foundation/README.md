@@ -3,10 +3,10 @@
 | Field | Value |
 | --- | --- |
 | Classification | Feature |
-| Status | [SUBF-0145](#subf-0145) is merged and exact-main hosted green through [PR #187](https://github.com/hasanmanzak/meAndAI/pull/187) and [run 32521885155](https://github.com/hasanmanzak/meAndAI/actions/runs/32521885155); [TEST-0212](test-cases.md#test-0212) [final activation](subf-0145-test-0212-final-activation-freeze.md) semantic gates are locally `Passing`, while final exact-tree structural/review gates, commit/push, exact-head hosted validation, feature DoD, release, and publication remain pending or held |
+| Status | [SUBF-0145](#subf-0145) is merged and exact-main hosted green through [PR #187](https://github.com/hasanmanzak/meAndAI/pull/187) and [run 32521885155](https://github.com/hasanmanzak/meAndAI/actions/runs/32521885155); [TEST-0212](test-cases.md#test-0212) [final activation](subf-0145-test-0212-final-activation-freeze.md) semantic gates are locally `Passing`, while [FIND-0464](#find-0464) corrects only the finite Windows bound after the first [PR #189](https://github.com/hasanmanzak/meAndAI/pull/189) exact-head run; replacement exact-head hosted validation, feature DoD, release, and publication remain pending or held |
 | Target version | 0.17.0 |
 | Issue | [#166](https://github.com/hasanmanzak/meAndAI/issues/166) |
-| Pull request | Merged [PR #187](https://github.com/hasanmanzak/meAndAI/pull/187) |
+| Pull request | Merged [PR #187](https://github.com/hasanmanzak/meAndAI/pull/187); activation [PR #189](https://github.com/hasanmanzak/meAndAI/pull/189) |
 | Decisions | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md), [DEC-0011](../../decisions/DEC-0011-qualified-evidence-and-closure.md), [DEC-0013](../../decisions/DEC-0013-trusted-adoption-and-recoverable-evidence.md), and [DEC-0017](../../decisions/DEC-0017-idempotent-consumer-lifecycle.md) |
 | Tests | [TEST-0212](test-cases.md#test-0212) and [TEST-0213](test-cases.md#test-0213) |
 
@@ -33,7 +33,9 @@ Every implementation Fact remains subfeature-scoped with exact
 [Subfeature=SUBF-0145](#subf-0145), and the atomic final-activation candidate
 adds [Scenario=TEST-0212](test-cases.md#test-0212) to the same exact `20` Facts.
 The neutral topology, executable owner, both stable filters, [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) oracle,
-and `Passing` status are locally green; exact-head hosted validation is pending.
+and `Passing` status are locally green. The first [PR #189](https://github.com/hasanmanzak/meAndAI/pull/189)
+head exposed only the finite Windows bound recorded by [FIND-0464](#find-0464);
+replacement exact-head hosted validation is pending.
 Merge, release, publication, consumer mutation, credentials, authority
 transfer, and [SUBF-0146](#subf-0146) implementation remain separately held.
 The preserved [draft PR #160](https://github.com/hasanmanzak/meAndAI/pull/160)
@@ -100,6 +102,12 @@ reconstruction, and explicit recovery grants for every mutating application.
 | --- | --- | --- |
 | `RISK-0302` <a name="risk-0302"></a> | A stale, replayed, over-broad, or role-conflicting grant authorizes mutation or authority transfer. | Authority owner / exact subject-target-operation-generation binding, expiry/freshness, non-transitivity, separation rules, and atomic consumption evidence. |
 | `RISK-0303` <a name="risk-0303"></a> | Journal loss, lease expiry, retention, corruption, or duplicated receipts reconstructs an ambiguous operation as complete. | Recovery owner / fencing, append-only integrity, explicit terminal receipts, fail-closed reconstruction, and separately authorized recovery. |
+
+## Findings
+
+| ID | Observation | Disposition |
+| --- | --- | --- |
+| `FIND-0464` <a name="find-0464"></a> | Exact activation head [`4679d15`](https://github.com/hasanmanzak/meAndAI/commit/4679d15ce597ae74c945259aa2da38551d263b87) passed Ubuntu in `20m37s`, while [Windows job 96928488451](https://github.com/hasanmanzak/meAndAI/actions/runs/32532961685/job/96928488451) in [run 32532961685](https://github.com/hasanmanzak/meAndAI/actions/runs/32532961685) was cancelled at the exact `55m0s` ceiling. Its PowerShell 5.1 Full route emitted successful quick-adoption (`773683ms`), instruction-graph (`373843ms`), protocol-governance (`836293ms`), and recurrence (`739ms`) evidence before nine discovered suites and all later package steps remained; no semantic failure was emitted. | Classification `VerifiedDefect`; disposition `CorrectedLocal`; severity `low`; confidence `high`; priority `p0`; owning layer `workflow finite bound` / [TEST-0124](../FEAT-0027-v0104-runner-minute-efficiency/test-cases.md#test-0124). Sixty minutes cannot contain the known remaining work plus headroom, so the smallest dependency-closed step is Windows `55 -> 65`, with Linux `30` and post-publication `5` unchanged. The single test-first owner run failed only the frozen Windows-bound oracle in `456.5s`; activation semantics, Scenario traits, owners, routes, C#/API, canonical reds, and [TEST-0213](test-cases.md#test-0213)/[SUBF-0146](#subf-0146) holds are unchanged. Local corrected-owner and replacement exact-head hosted evidence are required before closure. |
 
 | Test readiness | Gate 1 state | Evidence |
 | --- | --- | --- |

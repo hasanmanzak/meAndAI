@@ -7,8 +7,10 @@ is exact-head hosted green. The final review-link cohort is merged and
 exact-main hosted green through [PR #187](https://github.com/hasanmanzak/meAndAI/pull/187)
 and [run 32521885155](https://github.com/hasanmanzak/meAndAI/actions/runs/32521885155).
 The [TEST-0212](#test-0212) [final activation](subf-0145-test-0212-final-activation-freeze.md)
-is now locally active with semantic gates `Passing`; final exact-tree
-structural/review gates, commit/push, and hosted validation remain pending.
+is now locally active with semantic gates `Passing`. The first [PR #189](https://github.com/hasanmanzak/meAndAI/pull/189)
+exact-head run exposed only the finite Windows timeout owned by
+[FIND-0464](README.md#find-0464); corrected local structural evidence is green,
+while replacement exact-head hosted validation remains pending.
 [SUBF-0146](README.md#subf-0146) remains inactive.
 
 | ID | Related slice | Scenario | Expected result | Level | Intent review | Status | Automation |
@@ -36,9 +38,15 @@ The neutral topology, executable owner, and both stable filters are active;
 exact-head hosted validation remains pending. A historical
 engine-state enum or workflow lease remains non-evidence.
 
+The bounded [FIND-0464](README.md#find-0464) correction changes only the
+[TEST-0124](../FEAT-0027-v0104-runner-minute-efficiency/test-cases.md#test-0124)
+Windows finite bound from `55` to `65`; Linux remains `30`, post-publication
+remains `5`, and the activation topology, filters, owner, Scenario traits,
+canonical red custody, and held successor scope are unchanged.
+
 The [final activation freeze](subf-0145-test-0212-final-activation-freeze.md)
 binds the exact `20` FQNs, six source paths, neutral topology-test FQN, one
 natural-red marker/invocation identity, owner move, two stable workflow
-filters, [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) oracle, fourteen-path allowlist, caps, and closure gates.
+filters, [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) oracle, fourteen-path activation allowlist, bounded finite-timeout correction allowlist, caps, and closure gates.
 Its accepted natural-red and local-green evidence are retained in the
 [package ledger](subf-0145-package-evidence.md#test-0212-final-activation).
